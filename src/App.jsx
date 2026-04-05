@@ -20,7 +20,11 @@ import {
   ScanLine,
   Globe,
   Wifi,
-  User
+  User,
+  Menu,
+  X,
+  Monitor,
+  ChevronRight
 } from 'lucide-react';
 import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
@@ -69,6 +73,23 @@ export default function App() {
   // State: Tab & Theme
   const [activeTab, setActiveTab] = useState('generator');
   const [theme, setTheme] = useState('dark');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
 
   // State: QR Content
   const [qrType, setQrType] = useState(QR_TYPES.URL);
@@ -476,21 +497,71 @@ export default function App() {
         </div>
         
         <div className="header-actions">
-          {/* Fix 17: Tooltip wrapper */}
-          <div
-            className="theme-toggle-wrapper"
-            data-tooltip={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
+          {/* Hamburger menu */}
+          <div className="app-menu-wrapper" ref={menuRef}>
             <button
-              className="btn btn-ghost btn-icon"
-              onClick={() => {
-                const newTheme = theme === 'dark' ? 'light' : 'dark';
-                setTheme(newTheme);
-                savePreferences({ ...getPreferences(), theme: newTheme });
-              }}
+              className={`btn btn-ghost btn-icon app-menu-trigger${menuOpen ? ' active' : ''}`}
+              onClick={() => setMenuOpen(v => !v)}
+              aria-label="Open menu"
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
+
+            {menuOpen && (
+              <div className="app-menu-dropdown">
+                <div className="app-menu-header">
+                  <span className="app-menu-title">Menu</span>
+                </div>
+
+                {/* Theme section */}
+                <div className="app-menu-section-label">Appearance</div>
+                <button
+                  className={`app-menu-item${theme === 'light' ? ' menu-item-active' : ''}`}
+                  onClick={() => {
+                    const newTheme = 'light';
+                    setTheme(newTheme);
+                    savePreferences({ ...getPreferences(), theme: newTheme });
+                  }}
+                >
+                  <Sun size={16} />
+                  <span>Light Mode</span>
+                  {theme === 'light' && <span className="app-menu-check">✓</span>}
+                </button>
+                <button
+                  className={`app-menu-item${theme === 'dark' ? ' menu-item-active' : ''}`}
+                  onClick={() => {
+                    const newTheme = 'dark';
+                    setTheme(newTheme);
+                    savePreferences({ ...getPreferences(), theme: newTheme });
+                  }}
+                >
+                  <Moon size={16} />
+                  <span>Dark Mode</span>
+                  {theme === 'dark' && <span className="app-menu-check">✓</span>}
+                </button>
+
+                <div className="app-menu-divider" />
+
+                {/* Navigation section */}
+                <div className="app-menu-section-label">Navigate</div>
+                <button
+                  className={`app-menu-item${activeTab === 'generator' ? ' menu-item-active' : ''}`}
+                  onClick={() => { setActiveTab('generator'); setMenuOpen(false); }}
+                >
+                  <QrCode size={16} />
+                  <span>QR Generator</span>
+                  {activeTab === 'generator' && <span className="app-menu-check">✓</span>}
+                </button>
+                <button
+                  className={`app-menu-item${activeTab === 'history' ? ' menu-item-active' : ''}`}
+                  onClick={() => { setActiveTab('history'); setMenuOpen(false); }}
+                >
+                  <HistoryIcon size={16} />
+                  <span>History</span>
+                  {activeTab === 'history' && <span className="app-menu-check">✓</span>}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
