@@ -374,12 +374,6 @@ export default function App() {
                   )}
                 </div>
                 
-                <div style={{ width: '100%', display: 'flex', gap: '8px' }}>
-                  <button className="btn btn-primary" style={{ flex: 1, padding: '14px' }} onClick={handleSave}>
-                    <Save size={18} /> Save to History
-                  </button>
-                </div>
-                
                 <div className="download-grid" style={{ width: '100%' }}>
                   <button className="download-btn" onClick={() => canvasRef.current && downloadPNG(canvasRef.current)}>
                     <Download size={20} className="download-btn-icon" /> PNG
