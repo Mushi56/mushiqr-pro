@@ -751,7 +751,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: var(--transition-fast);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
   font-family: var(--font-sans);
@@ -818,9 +818,60 @@ input[type="range"]::-moz-range-thumb {
   transform: translateY(0);
 }
 
-.download-btn-icon {
+.download-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-muted) !important;
+  background: var(--bg-tertiary) !important;
+}
+
+/* Spinning loader animation — Fix 5 */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinning {
+  animation: spin 0.75s linear infinite;
+}
+
+/* Copy Image Button — Fix 6 */
+.btn-copy {
+  width: 100%;
   display: flex;
-  opacity: 0.7;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.btn-copy:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-copy:active {
+  transform: translateY(0);
+}
+
+.btn-copy:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* ========================================
@@ -1097,6 +1148,17 @@ input[type="range"]::-moz-range-thumb {
 /* ========================================
    RESPONSIVE
    ======================================== */
+
+@media (max-width: 768px) {
+  .preview-panel {
+    order: -1;
+    min-height: 380px;
+  }
+
+  .sidebar {
+    order: 1;
+  }
+}
 
 @media (max-width: 1024px) {
   body {

@@ -12,7 +12,9 @@ import {
   Image as ImageIcon,
   ShieldCheck,
   Save,
-  Download
+  Download,
+  Copy,
+  Loader2
 } from 'lucide-react';
 import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
@@ -77,6 +79,7 @@ export default function App() {
   const renderTimeoutRef = useRef(null);
   const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
   const [toast, setToast] = useState(null);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
 
   // Load preferences
   useEffect(() => {
@@ -93,6 +96,32 @@ export default function App() {
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
+  };
+
+  // Copy QR to clipboard
+  const handleCopyToClipboard = () => {
+    if (!canvasRef.current) return;
+    canvasRef.current.toBlob(async (blob) => {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        showToast('Copied to clipboard!');
+      } catch (err) {
+        showToast('Copy not supported in this browser', 'error');
+      }
+    });
+  };
+
+  // Download with loading state
+  const handleDownload = async (format, downloadFn) => {
+    if (!canvasRef.current) return;
+    setDownloadingFormat(format);
+    try {
+      await downloadFn(canvasRef.current);
+    } finally {
+      setTimeout(() => setDownloadingFormat(null), 800);
+    }
   };
 
   // 1. Generate QR Data Matrix (when content changes)
@@ -260,7 +289,7 @@ export default function App() {
           <ColorPicker label="Corner Frame Color" value={eyeOuterColor} onChange={setEyeOuterColor} />
           <div style={{ margin: '8px 0' }} />
           <ColorPicker label="Corner Dot Color" value={eyeColor} onChange={setEyeColor} />
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8 }}>
             Leave blank to use main QR color
           </div>
         </div>
@@ -317,7 +346,7 @@ export default function App() {
             <option value="Q">Q (25%) - Good for small logos</option>
             <option value="H">H (30%) - Best for large logos</option>
           </select>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             Higher levels allow larger logos but make the QR dots denser.
           </div>
         </div>
@@ -374,19 +403,37 @@ export default function App() {
                   )}
                 </div>
                 
+                {/* Copy to Clipboard — Fix 6 */}
+                <button
+                  className="btn-copy"
+                  onClick={handleCopyToClipboard}
+                  disabled={!qrMatrixInfo}
+                  title="Copy image to clipboard"
+                >
+                  <Copy size={16} /> Copy Image
+                </button>
+
+                {/* Download Buttons — Fix 5: disabled + loading states */}
                 <div className="download-grid" style={{ width: '100%' }}>
-                  <button className="download-btn" onClick={() => canvasRef.current && downloadPNG(canvasRef.current)}>
-                    <Download size={20} className="download-btn-icon" /> PNG
-                  </button>
-                  <button className="download-btn" onClick={() => canvasRef.current && downloadSVG(canvasRef.current)}>
-                    <Download size={20} className="download-btn-icon" /> SVG
-                  </button>
-                  <button className="download-btn" onClick={() => canvasRef.current && downloadPDF(canvasRef.current)}>
-                    <Download size={20} className="download-btn-icon" /> PDF
-                  </button>
-                  <button className="download-btn" onClick={() => canvasRef.current && downloadJPG(canvasRef.current)}>
-                    <Download size={20} className="download-btn-icon" /> JPG
-                  </button>
+                  {[
+                    { label: 'PNG', fn: downloadPNG },
+                    { label: 'SVG', fn: downloadSVG },
+                    { label: 'PDF', fn: downloadPDF },
+                    { label: 'JPG', fn: downloadJPG },
+                  ].map(({ label, fn }) => (
+                    <button
+                      key={label}
+                      className="download-btn"
+                      disabled={!qrMatrixInfo}
+                      onClick={() => handleDownload(label, fn)}
+                    >
+                      {downloadingFormat === label
+                        ? <Loader2 size={20} className="download-btn-icon spinning" />
+                        : <Download size={20} className="download-btn-icon" />
+                      }
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </section>
