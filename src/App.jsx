@@ -518,26 +518,24 @@ export default function App() {
                 <button
                   className={`app-menu-item${theme === 'light' ? ' menu-item-active' : ''}`}
                   onClick={() => {
-                    const newTheme = 'light';
-                    setTheme(newTheme);
-                    savePreferences({ ...getPreferences(), theme: newTheme });
+                    setTheme('light');
+                    savePreferences({ ...getPreferences(), theme: 'light' });
                   }}
                 >
                   <Sun size={16} />
-                  <span>Light Mode</span>
-                  {theme === 'light' && <span className="app-menu-check">✓</span>}
+                  <span className="menu-label">Light Mode</span>
+                  {theme === 'light' && <span className="menu-dot" />}
                 </button>
                 <button
                   className={`app-menu-item${theme === 'dark' ? ' menu-item-active' : ''}`}
                   onClick={() => {
-                    const newTheme = 'dark';
-                    setTheme(newTheme);
-                    savePreferences({ ...getPreferences(), theme: newTheme });
+                    setTheme('dark');
+                    savePreferences({ ...getPreferences(), theme: 'dark' });
                   }}
                 >
                   <Moon size={16} />
-                  <span>Dark Mode</span>
-                  {theme === 'dark' && <span className="app-menu-check">✓</span>}
+                  <span className="menu-label">Dark Mode</span>
+                  {theme === 'dark' && <span className="menu-dot" />}
                 </button>
 
                 <div className="app-menu-divider" />
@@ -549,17 +547,19 @@ export default function App() {
                   onClick={() => { setActiveTab('generator'); setMenuOpen(false); }}
                 >
                   <QrCode size={16} />
-                  <span>QR Generator</span>
-                  {activeTab === 'generator' && <span className="app-menu-check">✓</span>}
+                  <span className="menu-label">QR Generator</span>
+                  {activeTab === 'generator' && <span className="menu-dot" />}
                 </button>
                 <button
                   className={`app-menu-item${activeTab === 'history' ? ' menu-item-active' : ''}`}
                   onClick={() => { setActiveTab('history'); setMenuOpen(false); }}
                 >
                   <HistoryIcon size={16} />
-                  <span>History</span>
-                  {activeTab === 'history' && <span className="app-menu-check">✓</span>}
+                  <span className="menu-label">History</span>
+                  {activeTab === 'history' && <span className="menu-dot" />}
                 </button>
+
+                <div style={{ height: 8 }} />
               </div>
             )}
           </div>
