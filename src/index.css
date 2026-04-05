@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
 
 /* ========================================
    DESIGN SYSTEM — QR Code Generator Pro
@@ -6,12 +7,12 @@
 
 :root {
   /* Colors — Dark Theme (Default) */
-  --bg-primary: #050508;
-  --bg-secondary: #0d0d14;
-  --bg-tertiary: #14141e;
-  --bg-card: #101018;
-  --bg-elevated: #1a1a26;
-  --bg-input: #08080c;
+  --bg-primary: #080810;
+  --bg-secondary: #0f0f1a;
+  --bg-tertiary: #161625;
+  --bg-card: #111120;
+  --bg-elevated: #1c1c30;
+  --bg-input: #0a0a14;
   --bg-hover: #1f1f2e;
   --bg-glass: rgba(13, 13, 20, 0.7);
 
@@ -20,11 +21,11 @@
   --text-tertiary: #71717a;
   --text-muted: #52525b;
 
-  --accent-primary: #8b5cf6;
-  --accent-secondary: #c4b5fd;
-  --accent-gradient: linear-gradient(135deg, #8b5cf6, #3b82f6);
-  --accent-glow: rgba(139, 92, 246, 0.4);
-  --accent-soft: rgba(139, 92, 246, 0.15);
+  --accent-primary: #00c896;
+  --accent-secondary: #67e8d4;
+  --accent-gradient: linear-gradient(135deg, #00c896, #0ea5e9);
+  --accent-glow: rgba(0, 200, 150, 0.35);
+  --accent-soft: rgba(0, 200, 150, 0.12);
 
   --success: #10b981;
   --warning: #f59e0b;
@@ -33,12 +34,12 @@
 
   --border-color: rgba(255, 255, 255, 0.08);
   --border-light: rgba(255, 255, 255, 0.12);
-  --border-accent: rgba(139, 92, 246, 0.3);
+  --border-accent: rgba(0, 200, 150, 0.25);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
+  --shadow-glow: 0 0 40px rgba(0, 200, 150, 0.15);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -52,19 +53,19 @@
 
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  --sidebar-width: 460px;
+  --sidebar-width: 340px;
   --header-height: 70px;
 }
 
 /* Light Theme */
 [data-theme="light"] {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f1f5f9;
+  --bg-primary: #f0f2f8;
+  --bg-secondary: #f7f8fc;
+  --bg-tertiary: #eef0f6;
   --bg-card: #ffffff;
   --bg-elevated: #ffffff;
-  --bg-input: #f8fafc;
-  --bg-hover: #e2e8f0;
+  --bg-input: #eef0f6;
+  --bg-hover: #e4e7f0;
   --bg-glass: rgba(255, 255, 255, 0.8);
 
   --text-primary: #0f172a;
@@ -72,8 +73,8 @@
   --text-tertiary: #64748b;
   --text-muted: #94a3b8;
 
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-light: rgba(0, 0, 0, 0.15);
+  --border-color: rgba(0, 0, 0, 0.09);
+  --border-light: rgba(0, 0, 0, 0.14);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -109,8 +110,7 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
-  overflow: hidden;
-  height: 100vh;
+  height: 100dvh;
   margin: 0;
 }
 
@@ -146,7 +146,7 @@ body {
    ======================================== */
 
 .app {
-  height: 100%;
+  height: 100dvh;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -186,7 +186,8 @@ body {
 }
 
 .app-logo-text {
-  font-size: 18px;
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
 }
@@ -277,7 +278,7 @@ body {
 }
 
 .preview-qr-wrapper:hover {
-  box-shadow: var(--shadow-lg), 0 0 60px rgba(139, 92, 246, 0.25);
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(0, 200, 150, 0.25);
   transform: translateY(-4px);
 }
 
@@ -285,19 +286,53 @@ body {
   max-width: 100%;
   max-height: 100%;
   border-radius: var(--radius-md);
+  animation: qrAppear 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes qrAppear {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .preview-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   color: var(--text-muted);
+  text-align: center;
+  padding: 16px;
+}
+
+.preview-placeholder-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  background: var(--bg-elevated);
+  box-shadow: 0 0 40px rgba(0, 200, 150, 0.18), 0 0 0 1px rgba(0, 200, 150, 0.1);
+  animation: placeholderPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes placeholderPulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(0, 200, 150, 0.18), 0 0 0 1px rgba(0, 200, 150, 0.1); }
+  50% { box-shadow: 0 0 60px rgba(0, 200, 150, 0.32), 0 0 0 1px rgba(0, 200, 150, 0.22); }
 }
 
 .preview-placeholder-text {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.preview-placeholder-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: -8px;
 }
 
 /* ========================================
@@ -338,7 +373,7 @@ body {
   gap: 10px;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: -0.3px;
   color: var(--text-primary);
 }
 
@@ -384,6 +419,7 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .form-input,
@@ -529,7 +565,7 @@ input[type="range"]::-webkit-slider-thumb {
   background: var(--accent-primary);
   border-radius: 50%;
   border: 3px solid var(--bg-secondary);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 200, 150, 0.5);
   cursor: pointer;
   transition: transform var(--transition-fast);
 }
@@ -544,7 +580,7 @@ input[type="range"]::-moz-range-thumb {
   background: var(--accent-primary);
   border-radius: 50%;
   border: 3px solid var(--bg-secondary);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 200, 150, 0.5);
   cursor: pointer;
 }
 
@@ -633,12 +669,19 @@ input[type="range"]::-moz-range-thumb {
 .btn-primary {
   background: var(--accent-gradient);
   color: white;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 200, 150, 0.3);
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.4);
+  background: linear-gradient(135deg, #00e0a8, #38bdf8);
+  box-shadow: 0 6px 20px rgba(0, 200, 150, 0.4);
   transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .btn-secondary {
@@ -723,7 +766,7 @@ input[type="range"]::-moz-range-thumb {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
   color: var(--accent-primary);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 200, 150, 0.1);
 }
 
 .type-tab-icon {
@@ -811,7 +854,7 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 200, 150, 0.2);
 }
 
 .download-btn:active {
@@ -1011,7 +1054,7 @@ input[type="range"]::-moz-range-thumb {
 .history-title {
   font-size: 28px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 .history-grid {
@@ -1142,7 +1185,7 @@ input[type="range"]::-moz-range-thumb {
 .nav-tab.active {
   background: var(--accent-primary);
   color: white;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 200, 150, 0.4);
 }
 
 /* ========================================
@@ -1157,6 +1200,7 @@ input[type="range"]::-moz-range-thumb {
 
   .sidebar {
     order: 1;
+    overflow-y: auto;
   }
 }
 
@@ -1276,4 +1320,347 @@ input[type="range"]::-moz-range-thumb {
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(30px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ========================================
+   FIX 17 — Theme Toggle Tooltip
+   ======================================== */
+
+.theme-toggle-wrapper {
+  position: relative;
+}
+
+.theme-toggle-wrapper::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: white;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 200;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.theme-toggle-wrapper:hover::after {
+  opacity: 1;
+}
+
+/* ========================================
+   FIX 18 — Color Palette Presets
+   ======================================== */
+
+.color-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.color-preset-swatch {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: var(--transition-fast);
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+
+.color-preset-swatch:hover {
+  transform: scale(1.18);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.color-preset-swatch::after {
+  content: attr(data-name);
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: white;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 50;
+}
+
+.color-preset-swatch:hover::after {
+  opacity: 1;
+}
+
+/* ========================================
+   FIX 19 — QR Type Quick Templates
+   ======================================== */
+
+.quick-templates {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.quick-template-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.quick-template-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.quick-template-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+/* ========================================
+   FIX 20 — Scan Me Frame
+   ======================================== */
+
+.scan-frame-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.scan-frame-toggle:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.scan-frame-toggle.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.scan-frame-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border: 3px solid transparent;
+  border-radius: 16px;
+  background-clip: padding-box;
+  padding: 8px 8px 4px;
+  width: 100%;
+}
+
+.scan-frame-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  background: var(--accent-gradient);
+  z-index: -1;
+}
+
+.scan-frame-label {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--accent-primary);
+  padding: 6px 0 2px;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   FIX 26 — Phone Mockup Frame
+   ======================================== */
+
+.phone-preview-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.phone-preview-toggle:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.phone-preview-toggle.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.phone-mockup {
+  position: relative;
+  background: #0a0a14;
+  border: 3px solid rgba(255,255,255,0.15);
+  border-radius: 40px;
+  padding: 48px 16px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.phone-mockup-notch {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72px;
+  height: 10px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 6px;
+}
+
+.phone-mockup-home {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 5px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
+}
+
+.phone-mockup-screen {
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-panel-toggles {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+/* ========================================
+   FIX 15 — Loading state for download buttons (already has spin)
+   ======================================== */
+
+.download-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   FIX 10 — Logo fallback
+   ======================================== */
+
+.app-logo-fallback {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   FIX 7 — Share button
+   ======================================== */
+
+.btn-share {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.btn-share:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-share:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.preview-action-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.preview-action-row .btn-copy {
+  flex: 1;
+  width: auto;
 }

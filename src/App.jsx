@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { 
   QrCode, 
   History as HistoryIcon, 
@@ -14,7 +14,13 @@ import {
   Save,
   Download,
   Copy,
-  Loader2
+  Loader2,
+  Share2,
+  Smartphone,
+  ScanLine,
+  Globe,
+  Wifi,
+  User
 } from 'lucide-react';
 import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
@@ -28,6 +34,36 @@ import HistoryPage from './components/HistoryPage';
 import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, formatQRData } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
 import { saveToHistory, getPreferences, savePreferences } from './utils/storage';
+
+/* ── Fix 22: Error Boundary ────────────────────────────── */
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(err) { console.error('QR Engine error:', err); }
+  render() {
+    if (this.state.hasError) return (
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', gap:16, color:'var(--text-secondary)', padding:40 }}>
+        <QrCode size={48} strokeWidth={1} color="var(--text-muted)" />
+        <p style={{ fontSize:15, fontWeight:600, color:'var(--text-primary)' }}>Something went wrong generating your QR.</p>
+        <p style={{ fontSize:13 }}>Please check your input and try again.</p>
+        <button className="btn btn-primary btn-sm" onClick={() => this.setState({ hasError: false })}>Try Again</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
+/* ── Fix 18: Color palette presets ─────────────────────── */
+const COLOR_PRESETS = [
+  { name: 'Classic',  qr: '#000000', bg: '#ffffff' },
+  { name: 'Midnight', qr: '#ffffff', bg: '#0a0a1a' },
+  { name: 'Ocean',    qr: '#0369a1', bg: '#e0f2fe' },
+  { name: 'Forest',   qr: '#166534', bg: '#dcfce7' },
+  { name: 'Sunset',   qr: '#9a3412', bg: '#fff7ed' },
+  { name: 'Royal',    qr: '#4f46e5', bg: '#eef2ff' },
+  { name: 'Rose',     qr: '#9f1239', bg: '#fff1f2' },
+  { name: 'Slate',    qr: '#334155', bg: '#f8fafc' },
+];
 
 export default function App() {
   // State: Tab & Theme
@@ -81,6 +117,18 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
 
+  // Fix 25: QR animation key
+  const [qrAnimKey, setQrAnimKey] = useState(0);
+
+  // Fix 26: Phone preview toggle
+  const [phonePreview, setPhonePreview] = useState(false);
+
+  // Fix 20: Scan frame toggle
+  const [scanFrame, setScanFrame] = useState(false);
+
+  // Fix 10: Logo image error state
+  const [logoImgError, setLogoImgError] = useState(false);
+
   // Load preferences
   useEffect(() => {
     const prefs = getPreferences();
@@ -113,6 +161,20 @@ export default function App() {
     });
   };
 
+  // Fix 7: Web Share API
+  const handleShare = () => {
+    if (!canvasRef.current) return;
+    canvasRef.current.toBlob(async (blob) => {
+      try {
+        const file = new File([blob], 'qrcode.png', { type: 'image/png' });
+        await navigator.share({ files: [file], title: 'My QR Code' });
+        showToast('Shared successfully!');
+      } catch (err) {
+        if (err.name !== 'AbortError') showToast('Share failed', 'error');
+      }
+    });
+  };
+
   // Download with loading state
   const handleDownload = async (format, downloadFn) => {
     if (!canvasRef.current) return;
@@ -140,6 +202,11 @@ export default function App() {
     regenerateMatrix();
   }, [regenerateMatrix]);
 
+  // Fix 25: increment animation key whenever matrix updates
+  useEffect(() => {
+    if (qrMatrixInfo) setQrAnimKey(k => k + 1);
+  }, [qrMatrixInfo]);
+
   // 2. Render Canvas (when visual settings change)
   const renderCanvas = useCallback(() => {
     if (!qrMatrixInfo || !canvasRef.current) return;
@@ -152,7 +219,7 @@ export default function App() {
       if (!canvasRef.current) return;
       renderQR(canvasRef.current, {
         ...qrMatrixInfo,
-        size: 1024,
+        size: 512,
         qrColor,
         bgColor,
         bgTransparent,
@@ -227,16 +294,47 @@ export default function App() {
   // Render Left Panel Content
   const renderControls = () => (
     <div className="sidebar-scroll fade-in">
-      {/* 1. CONTENT */}
-      <Section title="1. QR Content" icon={Wand2} defaultOpen={true}>
+      {/* CONTENT */}
+      <Section title="QR Content" icon={Wand2} defaultOpen={true}>
+        {/* Fix 19: Quick Templates */}
+        <div className="quick-templates">
+          <button
+            className={`quick-template-btn${qrType === QR_TYPES.URL ? ' active' : ''}`}
+            onClick={() => { setQrType(QR_TYPES.URL); setQrData({ url: 'https://' }); }}
+          >🌐 Website</button>
+          <button
+            className={`quick-template-btn${qrType === QR_TYPES.WIFI ? ' active' : ''}`}
+            onClick={() => { setQrType(QR_TYPES.WIFI); }}
+          >📶 WiFi</button>
+          <button
+            className={`quick-template-btn${qrType === QR_TYPES.VCARD ? ' active' : ''}`}
+            onClick={() => { setQrType(QR_TYPES.VCARD); }}
+          >👤 Contact</button>
+        </div>
         <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
         <div style={{ marginTop: 12 }}>
           <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
         </div>
       </Section>
 
-      {/* 2. COLORS */}
-      <Section title="2. Colors" icon={Palette} defaultOpen={true}>
+      {/* COLORS */}
+      <Section title="Colors" icon={Palette} defaultOpen={true}>
+        {/* Fix 18: Color Palette Presets */}
+        <div>
+          <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Quick Presets</label>
+          <div className="color-presets">
+            {COLOR_PRESETS.map(preset => (
+              <button
+                key={preset.name}
+                className="color-preset-swatch"
+                data-name={preset.name}
+                title={preset.name}
+                style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                onClick={() => { setQrColor(preset.qr); setBgColor(preset.bg); setBgTransparent(false); }}
+              />
+            ))}
+          </div>
+        </div>
         <ColorPicker label="QR Code Color" value={qrColor} onChange={setQrColor} />
         <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
         {!bgTransparent && (
@@ -265,8 +363,8 @@ export default function App() {
         </div>
       </Section>
 
-      {/* 3. SHAPES */}
-      <Section title="3. Design & Shapes" icon={Shapes} defaultOpen={false}>
+      {/* SHAPES */}
+      <Section title="Design & Shapes" icon={Shapes} defaultOpen={false}>
         <div className="form-group">
           <label className="form-label">Pattern Style</label>
           <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
@@ -295,8 +393,8 @@ export default function App() {
         </div>
       </Section>
 
-      {/* 4. LOGO */}
-      <Section title="4. Logo & Image" icon={ImageIcon} defaultOpen={false}>
+      {/* LOGO */}
+      <Section title="Logo & Image" icon={ImageIcon} defaultOpen={false}>
         <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
         
         {logo && (
@@ -336,18 +434,18 @@ export default function App() {
         )}
       </Section>
       
-      {/* 5. QUALITY */}
-      <Section title="5. Error Correction" icon={ShieldCheck} defaultOpen={false}>
+      {/* SCAN RELIABILITY */}
+      <Section title="Scan Reliability" icon={ShieldCheck} defaultOpen={false}>
         <div className="form-group">
-          <label className="form-label">Level</label>
+          <label className="form-label">Reliability Level</label>
           <select className="form-select" value={errorLevel} onChange={(e) => setErrorLevel(e.target.value)}>
-            <option value="L">L (7%) - Best for clean QR</option>
-            <option value="M">M (15%) - Standard</option>
-            <option value="Q">Q (25%) - Good for small logos</option>
-            <option value="H">H (30%) - Best for large logos</option>
+            <option value="L">Fast Scan — Best for simple QR codes</option>
+            <option value="M">Standard — Good for most uses</option>
+            <option value="Q">High — Recommended with logos</option>
+            <option value="H">Maximum — Best for complex logos</option>
           </select>
-          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
-            Higher levels allow larger logos but make the QR dots denser.
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.5 }}>
+            Higher reliability lets you add larger logos but increases QR complexity.
           </div>
         </div>
       </Section>
@@ -359,24 +457,41 @@ export default function App() {
       {/* Header */}
       <header className="app-header">
         <div className="app-logo">
+          {/* Fix 10: Logo with fallback */}
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
-            <img src="/logo.png" alt="Mushi QR Pro" style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', display: 'block' }} />
+            {logoImgError ? (
+              <div className="app-logo-fallback">
+                <QrCode size={24} color="white" />
+              </div>
+            ) : (
+              <img
+                src="/logo.png"
+                alt="Mushi QR Pro"
+                style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', display: 'block' }}
+                onError={() => setLogoImgError(true)}
+              />
+            )}
           </div>
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
         
         <div className="header-actions">
-          <button 
-            className="btn btn-ghost btn-icon"
-            onClick={() => {
-              const newTheme = theme === 'dark' ? 'light' : 'dark';
-              setTheme(newTheme);
-              savePreferences({ ...getPreferences(), theme: newTheme });
-            }}
-            title="Toggle theme"
+          {/* Fix 17: Tooltip wrapper */}
+          <div
+            className="theme-toggle-wrapper"
+            data-tooltip={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
+            <button
+              className="btn btn-ghost btn-icon"
+              onClick={() => {
+                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+                savePreferences({ ...getPreferences(), theme: newTheme });
+              }}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -387,56 +502,128 @@ export default function App() {
             <aside className="sidebar">
               {renderControls()}
             </aside>
-            
-            <section className="preview-panel pt-4 pb-4">
-              <div className="preview-container scale-in">
-                <div className="preview-qr-wrapper">
-                  {!qrMatrixInfo ? (
-                    <div className="preview-placeholder">
-                      <span className="preview-placeholder-icon">
-                        <QrCode size={64} color="var(--text-tertiary)" strokeWidth={1} />
-                      </span>
-                      <span className="preview-placeholder-text">Enter data to generate QR</span>
+
+            {/* Fix 22: ErrorBoundary wrap */}
+            <ErrorBoundary>
+              <section className="preview-panel pt-4 pb-4">
+                <div className="preview-container scale-in">
+
+                  {/* Fix 26+20: Toggle buttons */}
+                  <div className="preview-panel-toggles">
+                    <button
+                      className={`phone-preview-toggle${phonePreview ? ' active' : ''}`}
+                      onClick={() => setPhonePreview(v => !v)}
+                    >
+                      <Smartphone size={14} /> Phone Preview
+                    </button>
+                    <button
+                      className={`scan-frame-toggle${scanFrame ? ' active' : ''}`}
+                      onClick={() => setScanFrame(v => !v)}
+                    >
+                      <ScanLine size={14} /> Add Frame
+                    </button>
+                  </div>
+
+                  {/* Fix 26: Phone mockup wrapper (conditional) */}
+                  {phonePreview ? (
+                    <div className="phone-mockup">
+                      <div className="phone-mockup-notch" />
+                      <div className="phone-mockup-screen">
+                        {/* Fix 20: Scan frame inside phone */}
+                        {scanFrame && qrMatrixInfo ? (
+                          <div className="scan-frame-wrapper">
+                            <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                            <div className="scan-frame-label">SCAN ME</div>
+                          </div>
+                        ) : (
+                          !qrMatrixInfo ? (
+                            <div className="preview-placeholder" style={{ padding: 24 }}>
+                              <span className="preview-placeholder-icon">
+                                <QrCode size={48} color="var(--text-tertiary)" strokeWidth={1} />
+                              </span>
+                              <span className="preview-placeholder-text">Your QR code will appear here</span>
+                            </div>
+                          ) : (
+                            <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                          )
+                        )}
+                      </div>
+                      <div className="phone-mockup-home" />
                     </div>
                   ) : (
-                    <canvas ref={canvasRef} className="preview-canvas" />
+                    /* Normal QR wrapper */
+                    <div className="preview-qr-wrapper">
+                      {!qrMatrixInfo ? (
+                        /* Fix 4: Improved placeholder */
+                        <div className="preview-placeholder">
+                          <span className="preview-placeholder-icon">
+                            <QrCode size={96} color="var(--accent-primary)" strokeWidth={1} />
+                          </span>
+                          <span className="preview-placeholder-text">Your QR code will appear here</span>
+                          <span className="preview-placeholder-sub">Start by entering a URL or text above</span>
+                        </div>
+                      ) : scanFrame ? (
+                        /* Fix 20: Scan Me frame */
+                        <div className="scan-frame-wrapper">
+                          <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                          <div className="scan-frame-label">SCAN ME</div>
+                        </div>
+                      ) : (
+                        /* Fix 25: animated canvas with key */
+                        <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                      )}
+                    </div>
                   )}
-                </div>
-                
-                {/* Copy to Clipboard — Fix 6 */}
-                <button
-                  className="btn-copy"
-                  onClick={handleCopyToClipboard}
-                  disabled={!qrMatrixInfo}
-                  title="Copy image to clipboard"
-                >
-                  <Copy size={16} /> Copy Image
-                </button>
 
-                {/* Download Buttons — Fix 5: disabled + loading states */}
-                <div className="download-grid" style={{ width: '100%' }}>
-                  {[
-                    { label: 'PNG', fn: downloadPNG },
-                    { label: 'SVG', fn: downloadSVG },
-                    { label: 'PDF', fn: downloadPDF },
-                    { label: 'JPG', fn: downloadJPG },
-                  ].map(({ label, fn }) => (
+                  {/* Fix 7: Copy + Share action row */}
+                  <div className="preview-action-row">
                     <button
-                      key={label}
-                      className="download-btn"
+                      className="btn-copy"
+                      onClick={handleCopyToClipboard}
                       disabled={!qrMatrixInfo}
-                      onClick={() => handleDownload(label, fn)}
+                      title="Copy image to clipboard"
                     >
-                      {downloadingFormat === label
-                        ? <Loader2 size={20} className="download-btn-icon spinning" />
-                        : <Download size={20} className="download-btn-icon" />
-                      }
-                      {label}
+                      <Copy size={16} /> Copy Image
                     </button>
-                  ))}
+                    {/* Fix 7: only show Share if supported */}
+                    {typeof navigator !== 'undefined' && navigator.canShare && (
+                      <button
+                        className="btn-share"
+                        onClick={handleShare}
+                        disabled={!qrMatrixInfo}
+                        title="Share QR code"
+                      >
+                        <Share2 size={16} /> Share
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Fix 15: Download buttons with loading state */}
+                  <div className="download-grid" style={{ width: '100%' }}>
+                    {[
+                      { label: 'PNG', fn: downloadPNG },
+                      { label: 'SVG', fn: downloadSVG },
+                      { label: 'PDF', fn: downloadPDF },
+                      { label: 'JPG', fn: downloadJPG },
+                    ].map(({ label, fn }) => (
+                      <button
+                        key={label}
+                        className="download-btn"
+                        disabled={!qrMatrixInfo}
+                        onClick={() => handleDownload(label, fn)}
+                      >
+                        {downloadingFormat === label
+                          ? <Loader2 size={20} className="download-btn-icon spinning" />
+                          : <Download size={20} className="download-btn-icon" />
+                        }
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
                 </div>
-              </div>
-            </section>
+              </section>
+            </ErrorBoundary>
           </>
         ) : (
           <HistoryPage onLoadQR={handleLoadQR} />
