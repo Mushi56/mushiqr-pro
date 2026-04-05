@@ -330,28 +330,13 @@ export default function App() {
       {/* Header */}
       <header className="app-header">
         <div className="app-logo">
-          <div className="app-logo-image" style={{ width: 32, height: 32, marginRight: 10 }}>
-            <img src="/logo.png" alt="MushiQR Pro" style={{ width: '100%', height: '100%', borderRadius: 8, objectFit: 'cover' }} />
+          <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
+            <img src="/logo.png" alt="Mushi QR Pro" style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', display: 'block' }} />
           </div>
-          <div className="app-logo-text">MushiQR <span>Pro</span></div>
+          <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
         
         <div className="header-actions">
-          <div className="nav-tabs">
-            <button 
-              className={`nav-tab ${activeTab === 'generator' ? 'active' : ''}`}
-              onClick={() => setActiveTab('generator')}
-            >
-              <Wand2 size={16} /> Generator
-            </button>
-            <button 
-              className={`nav-tab ${activeTab === 'history' ? 'active' : ''}`}
-              onClick={() => setActiveTab('history')}
-            >
-              <HistoryIcon size={16} /> History
-            </button>
-          </div>
-          
           <button 
             className="btn btn-ghost btn-icon"
             onClick={() => {
@@ -397,16 +382,16 @@ export default function App() {
                 
                 <div className="download-grid" style={{ width: '100%' }}>
                   <button className="download-btn" onClick={() => canvasRef.current && downloadPNG(canvasRef.current)}>
-                    <Download size={16} className="download-btn-icon" /> PNG
+                    <Download size={20} className="download-btn-icon" /> PNG
                   </button>
                   <button className="download-btn" onClick={() => canvasRef.current && downloadSVG(canvasRef.current)}>
-                    <Download size={16} className="download-btn-icon" /> SVG
+                    <Download size={20} className="download-btn-icon" /> SVG
                   </button>
                   <button className="download-btn" onClick={() => canvasRef.current && downloadPDF(canvasRef.current)}>
-                    <Download size={16} className="download-btn-icon" /> PDF
+                    <Download size={20} className="download-btn-icon" /> PDF
                   </button>
                   <button className="download-btn" onClick={() => canvasRef.current && downloadJPG(canvasRef.current)}>
-                    <Download size={16} className="download-btn-icon" /> JPG
+                    <Download size={20} className="download-btn-icon" /> JPG
                   </button>
                 </div>
               </div>
