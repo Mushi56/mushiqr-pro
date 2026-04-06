@@ -830,53 +830,205 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
 }
 
-/* Primary download action — PNG gets full-width hero treatment */
-.btn-download-primary {
+/* ========================================
+   DOWNLOAD SPLIT BUTTON
+   A single button that triggers download in the selected format,
+   with a chevron that opens a format-picker dropdown.
+   ======================================== */
+
+.download-split-wrapper {
+  position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 24px;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-  border-radius: var(--radius-md);
-  border: none;
-  cursor: pointer;
-  background: var(--accent-gradient);
-  color: white;
-  box-shadow: 0 4px 16px rgba(0, 200, 150, 0.35);
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-download-primary:hover {
-  background: linear-gradient(135deg, #00e0a8, #38bdf8);
+.download-split-btn {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--accent-gradient);
+  box-shadow: 0 4px 16px rgba(0, 200, 150, 0.3);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.download-split-btn:not(.disabled):hover {
   box-shadow: 0 6px 22px rgba(0, 200, 150, 0.45);
   transform: translateY(-2px);
 }
 
-.btn-download-primary:active {
-  transform: translateY(0);
-  box-shadow: none;
+.download-split-btn.disabled {
+  opacity: 0.38;
+  pointer-events: none;
 }
 
-.btn-download-primary:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  transform: none !important;
-  box-shadow: none !important;
+/* Left side — triggers the actual download */
+.download-split-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
 }
 
-/* Secondary formats — SVG / PDF / JPG as smaller equal-weight options */
-.download-formats-secondary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+.download-split-main:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.download-split-main:active {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Thin vertical divider between the two halves */
+.download-split-divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+  margin: 8px 0;
+}
+
+/* Right side — opens the format picker */
+.download-split-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.download-split-chevron:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.download-split-chevron:active {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.download-split-chevron > svg {
+  transition: transform var(--transition-base);
+}
+
+.download-split-chevron.open > svg {
+  transform: rotate(180deg);
+}
+
+/* Format picker dropdown */
+.download-format-dropdown {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 200;
+  animation: dropdownAppear 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom center;
+}
+
+@keyframes dropdownAppear {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.download-format-dropdown-label {
+  padding: 10px 14px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.download-format-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   width: 100%;
+  padding: 11px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  text-align: left;
 }
 
-/* Reuse .download-btn styles — no change needed */
+.download-format-option:hover {
+  background: var(--bg-hover);
+}
+
+.download-format-option.active {
+  background: var(--accent-soft);
+}
+
+/* File extension badge — e.g. ".png" */
+.download-format-ext {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-primary);
+  background: var(--accent-soft);
+  border: 1px solid var(--border-accent);
+  border-radius: 5px;
+  padding: 3px 7px;
+  flex-shrink: 0;
+  min-width: 38px;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.download-format-option.active .download-format-ext {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+.download-format-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+.download-format-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.download-format-tip {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* Active row checkmark */
+.download-format-check {
+  font-size: 13px;
+  color: var(--accent-primary);
+  font-weight: 700;
+  flex-shrink: 0;
+}
 
 
   display: grid;
@@ -1464,15 +1616,20 @@ input[type="range"]::-moz-range-thumb {
     padding: 10px 12px;
   }
 
-  .download-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
+  /* Split download button — full width already, just tighten padding on small screens */
+  .download-split-main {
+    padding: 12px 16px;
+    font-size: 13px;
   }
 
-  .download-btn {
-    padding: 10px 4px;
-    font-size: 11px;
-    gap: 4px;
+  .download-split-chevron {
+    padding: 0 12px;
+  }
+
+  /* Format dropdown opens upward, ensure it fits viewport */
+  .download-format-dropdown {
+    left: 0;
+    right: 0;
   }
 
   .type-tabs {

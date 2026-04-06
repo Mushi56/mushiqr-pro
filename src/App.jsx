@@ -22,7 +22,8 @@ import {
   Wifi,
   User,
   Menu,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
@@ -69,6 +70,9 @@ export default function App() {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
+      }
+      if (downloadBtnRef.current && !downloadBtnRef.current.contains(e.target)) {
+        setFormatDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -129,6 +133,10 @@ export default function App() {
   const [downloadingFormat, setDownloadingFormat] = useState(null);
   // Tracks which colour preset is currently active for the active-ring indicator
   const [activePreset, setActivePreset] = useState(null);
+  // Download format selector
+  const [selectedFormat, setSelectedFormat] = useState('PNG');
+  const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
+  const downloadBtnRef = useRef(null);
 
   // Canvas animation key — bumped on every matrix update to replay the CSS appear animation
   const [qrAnimKey, setQrAnimKey] = useState(0);
@@ -199,6 +207,15 @@ export default function App() {
         if (err.name !== 'AbortError') showToast('Share failed', 'error');
       }
     });
+  };
+
+
+  // Format lookup — maps the selectedFormat label to its export function
+  const FORMAT_MAP = {
+    PNG: downloadPNG,
+    SVG: downloadSVG,
+    PDF: downloadPDF,
+    JPG: downloadJPG,
   };
 
   // Download with loading state
@@ -581,43 +598,67 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Download section: PNG as the clear primary CTA; other formats secondary */}
-                  <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {/* Primary: PNG — the format 90% of users want */}
-                    <button
-                      className="btn-download-primary"
-                      disabled={!qrMatrixInfo}
-                      onClick={() => handleDownload('PNG', downloadPNG)}
-                    >
-                      {downloadingFormat === 'PNG'
-                        ? <Loader2 size={18} className="spinning" />
-                        : <Download size={18} />
-                      }
-                      Download PNG
-                    </button>
+                  {/* Single split-button: left side triggers download, right side opens format picker */}
+                  <div className="download-split-wrapper" ref={downloadBtnRef}>
+                    <div className={`download-split-btn${!qrMatrixInfo ? ' disabled' : ''}`}>
 
-                    {/* Secondary: SVG / PDF / JPG — less common, grouped as a compact row */}
-                    <div className="download-formats-secondary">
-                      {[
-                        { label: 'SVG', fn: downloadSVG, tip: 'Vector — best for print' },
-                        { label: 'PDF', fn: downloadPDF, tip: 'Document format' },
-                        { label: 'JPG', fn: downloadJPG, tip: 'Compressed image' },
-                      ].map(({ label, fn, tip }) => (
-                        <button
-                          key={label}
-                          className="download-btn"
-                          disabled={!qrMatrixInfo}
-                          onClick={() => handleDownload(label, fn)}
-                          title={tip}
-                        >
-                          {downloadingFormat === label
-                            ? <Loader2 size={16} className="download-btn-icon spinning" />
-                            : <Download size={16} className="download-btn-icon" />
-                          }
-                          {label}
-                        </button>
-                      ))}
+                      {/* Left: trigger download in currently selected format */}
+                      <button
+                        className="download-split-main"
+                        disabled={!qrMatrixInfo}
+                        onClick={() => handleDownload(selectedFormat, FORMAT_MAP[selectedFormat])}
+                      >
+                        {downloadingFormat === selectedFormat
+                          ? <Loader2 size={17} className="spinning" />
+                          : <Download size={17} />
+                        }
+                        Download {selectedFormat}
+                      </button>
+
+                      {/* Divider */}
+                      <span className="download-split-divider" />
+
+                      {/* Right: open format picker dropdown */}
+                      <button
+                        className={`download-split-chevron${formatDropdownOpen ? ' open' : ''}`}
+                        disabled={!qrMatrixInfo}
+                        onClick={() => setFormatDropdownOpen(v => !v)}
+                        aria-label="Choose download format"
+                      >
+                        <ChevronDown size={15} />
+                      </button>
                     </div>
+
+                    {/* Format picker dropdown */}
+                    {formatDropdownOpen && (
+                      <div className="download-format-dropdown">
+                        <div className="download-format-dropdown-label">Choose format</div>
+                        {[
+                          { label: 'PNG',  tip: 'Best for web & sharing',    ext: '.png' },
+                          { label: 'SVG',  tip: 'Vector — scales to any size', ext: '.svg' },
+                          { label: 'PDF',  tip: 'Best for documents & print', ext: '.pdf' },
+                          { label: 'JPG',  tip: 'Compressed — smaller file',  ext: '.jpg' },
+                        ].map(({ label, tip, ext }) => (
+                          <button
+                            key={label}
+                            className={`download-format-option${selectedFormat === label ? ' active' : ''}`}
+                            onClick={() => {
+                              setSelectedFormat(label);
+                              setFormatDropdownOpen(false);
+                            }}
+                          >
+                            <span className="download-format-ext">{ext}</span>
+                            <span className="download-format-info">
+                              <span className="download-format-name">{label}</span>
+                              <span className="download-format-tip">{tip}</span>
+                            </span>
+                            {selectedFormat === label && (
+                              <span className="download-format-check">✓</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                 </div>
