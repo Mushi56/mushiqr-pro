@@ -2171,3 +2171,29 @@ input[type="range"]::-moz-range-thumb {
   background: var(--border-color);
   margin: 4px 12px;
 }
+
+/* ========================================
+   THEME TOGGLE BUTTON (header)
+   ======================================== */
+
+.btn-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-base);
+  flex-shrink: 0;
+}
+
+.btn-theme-toggle:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: rotate(20deg) scale(1.1);
+}
