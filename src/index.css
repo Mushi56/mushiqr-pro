@@ -1714,7 +1714,7 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 1024px) {
   /* Stack vertically on tablet/mobile */
   .app-main {
-    flex-direction: column;
+    flex-direction: column-reverse;
     height: auto;
     overflow-y: auto;   /* scroll container is app-main itself */
     overflow-x: hidden;
