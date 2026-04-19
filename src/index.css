@@ -1650,16 +1650,24 @@ input[type="range"]::-moz-range-thumb {
     height: auto;
   }
 
-  /* Preview sticks to top of the scroll container while sidebar scrolls below */
+  /* Preview sticks smoothly below the header */
   .preview-panel {
     position: sticky;
-    top: 0;
-    z-index: 10;
+    top: var(--header-height);
+    z-index: 50;
     height: auto;
-    min-height: 400px;
-    padding: 28px 24px 20px;
+    min-height: auto;
+    padding: 24px;
     flex-shrink: 0;
-    overflow: visible;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .preview-panel::before {
+    width: 500px;
+    height: 500px;
+    filter: blur(50px);
   }
 
   .preview-container {
@@ -1667,7 +1675,8 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .preview-qr-wrapper {
-    max-width: 320px;
+    max-width: 280px;
+    margin: 0 auto;
   }
 
   /* Sidebar is normal flow — scrolls inside app-main */
@@ -1675,15 +1684,15 @@ input[type="range"]::-moz-range-thumb {
     width: 100%;
     height: auto;
     border-right: none;
-    border-top: 1px solid var(--border-color);
     overflow: visible;
     flex-shrink: 0;
+    background: transparent;
+    box-shadow: none;
   }
 }
 
 @media (max-width: 768px) {
   .preview-panel {
-    min-height: 360px;
     padding: 20px 16px 16px;
   }
 
@@ -1694,8 +1703,16 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @media (max-width: 640px) {
+  :root {
+    --header-height: 64px;
+  }
+
   .app-header {
-    padding: 0 20px;
+    padding: 0 16px;
+  }
+
+  .app-logo-text {
+    font-size: 18px;
   }
 
   /* Hide nav tabs on mobile — hamburger menu handles navigation */
@@ -1708,27 +1725,29 @@ input[type="range"]::-moz-range-thumb {
     display: flex;
   }
 
-  .nav-tab {
-    padding: 8px 14px;
-    font-size: 13px;
-  }
-
   .sidebar-scroll {
-    padding: 16px;
+    padding: 20px 16px;
+    gap: 16px;
   }
 
   .preview-panel {
-    padding: 14px 12px 12px;
-    min-height: 300px;
+    padding: 16px;
+  }
+
+  .preview-panel::before {
+    width: 300px;
+    height: 300px;
+    filter: blur(40px);
   }
 
   .preview-container {
-    gap: 10px;
+    gap: 12px;
   }
 
   .preview-qr-wrapper {
-    padding: 14px;
+    padding: 16px;
     max-width: 220px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   }
 
   .preview-panel-toggles {
@@ -1736,36 +1755,62 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .preview-action-row {
-    gap: 8px;
+    gap: 10px;
+    justify-content: center;
   }
 
   .btn-copy, .btn-share {
     font-size: 13px;
-    padding: 10px 12px;
+    padding: 10px 16px;
   }
 
-  /* Split download button — full width already, just tighten padding on small screens */
   .download-split-main {
-    padding: 12px 16px;
-    font-size: 13px;
+    padding: 12px 20px;
+    font-size: 14px;
   }
 
   .download-split-chevron {
-    padding: 0 12px;
+    padding: 0 16px;
   }
 
-  /* Format dropdown opens upward, ensure it fits viewport */
-  .download-format-dropdown {
-    left: 0;
-    right: 0;
+  /* Horizontal scrolling for quick templates / type tabs */
+  .quick-templates {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px; /* space for scrollbar */
+    margin-bottom: -8px; /* offset padding */
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .quick-templates::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
   }
 
-  .type-tabs {
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  .quick-template-btn {
+    flex: 0 0 auto;
+  }
+
+  .color-presets {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: -8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .color-presets::-webkit-scrollbar {
+    display: none;
+  }
+
+  .color-preset-swatch {
+    flex: 0 0 auto;
   }
 
   .history-page {
-    padding: 24px;
+    padding: 16px;
   }
 }
 
