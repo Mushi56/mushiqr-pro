@@ -1127,16 +1127,34 @@ input[type="range"]::-moz-range-thumb {
   background: var(--bg-dropdown);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-light);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--accent-primary);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4), 0 0 15px var(--accent-glow);
   border-radius: var(--radius-md);
   padding: 12px;
   z-index: 200;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 8px;
   animation: dropdownAppear 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-origin: bottom center;
+}
+
+@media (max-width: 480px) {
+  .download-format-dropdown {
+    padding: 8px;
+    gap: 4px;
+  }
+  .download-format-option {
+    padding: 8px 2px;
+    gap: 4px;
+  }
+  .download-format-name {
+    font-size: 11px;
+  }
+  .download-format-icon-wrapper {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @keyframes dropdownAppear {
