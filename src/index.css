@@ -1141,19 +1141,28 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 480px) {
   .download-format-dropdown {
-    padding: 8px;
+    padding: 6px;
     gap: 4px;
+  }
+  .download-format-dropdown-label {
+    padding: 2px 4px 6px;
+    font-size: 10px;
   }
   .download-format-option {
-    padding: 8px 2px;
-    gap: 4px;
+    padding: 6px 2px;
+    gap: 2px;
   }
   .download-format-name {
-    font-size: 11px;
+    font-size: 10px;
   }
   .download-format-icon-wrapper {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+  .download-format-icon-wrapper > svg {
+    width: 18px !important;
+    height: 18px !important;
   }
 }
 
