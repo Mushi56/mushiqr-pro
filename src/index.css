@@ -1114,7 +1114,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Format picker */
-.download-wrapper {
+.download-split-wrapper {
   position: relative;
   width: 100%;
 }
@@ -1151,6 +1151,7 @@ input[type="range"]::-moz-range-thumb {
   .download-format-option {
     padding: 6px 2px;
     gap: 2px;
+    min-width: 0;
   }
   .download-format-name {
     font-size: 10px;
