@@ -1716,8 +1716,7 @@ input[type="range"]::-moz-range-thumb {
   .app-main {
     flex-direction: column-reverse;
     height: auto;
-    overflow-y: auto;   /* scroll container is app-main itself */
-    overflow-x: hidden;
+    overflow: visible;
   }
 
   .app, #root {
@@ -1734,14 +1733,15 @@ input[type="range"]::-moz-range-thumb {
   .preview-panel {
     position: sticky;
     top: var(--header-height);
-    z-index: 50;
+    z-index: 100;
     height: auto;
     min-height: auto;
-    padding: 24px;
+    padding: 20px;
     flex-shrink: 0;
-    overflow: hidden;
+    overflow: visible;
     border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    background: var(--bg-primary);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
 
   .preview-panel::before {
