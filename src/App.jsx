@@ -679,7 +679,7 @@ export default function App() {
                                 <span className="download-format-name">{label}</span>
                                 <span className="download-format-tip">{tip}</span>
                               </span>
-                              <span className="download-format-ext">{ext}</span>
+
                               {selectedFormat === label && (
                                 <span className="download-format-check">
                                   <CheckCircle2 size={16} />
