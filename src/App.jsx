@@ -673,16 +673,12 @@ export default function App() {
                             }}
                           >
                               <div className="download-format-icon-wrapper" style={{ '--icon-color': color }}>
-                                <Icon size={20} strokeWidth={1.5} />
+                                <Icon size={24} strokeWidth={1.5} />
                               </div>
-                              <span className="download-format-info">
-                                <span className="download-format-name">{label}</span>
-                                <span className="download-format-tip">{tip}</span>
-                              </span>
-
+                              <span className="download-format-name">{label}</span>
                               {selectedFormat === label && (
                                 <span className="download-format-check">
-                                  <CheckCircle2 size={16} />
+                                  <CheckCircle2 size={14} />
                                 </span>
                               )}
                           </button>
