@@ -88,7 +88,7 @@ export default function App() {
 
   // State: QR Content
   const [qrType, setQrType] = useState(QR_TYPES.URL);
-  const [qrData, setQrData] = useState({ url: 'https://mushiqr.pro' });
+  const [qrData, setQrData] = useState({ url: 'https://example.com' });
   // M is the right default — dense enough for reliability, scannable at small sizes.
   // Auto-upgrades to H when a logo is added (see logo useEffect below).
   const [errorLevel, setErrorLevel] = useState('M');

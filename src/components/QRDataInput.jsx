@@ -16,6 +16,11 @@ export default function QRDataInput({ type, data, onChange }) {
             placeholder="https://example.com"
             value={data.url || ''}
             onChange={(e) => updateField('url', e.target.value)}
+            onFocus={(e) => {
+              if (data.url === 'https://example.com') {
+                updateField('url', '');
+              }
+            }}
           />
         </div>
       );
