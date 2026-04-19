@@ -61,6 +61,8 @@
   /* Widened from 340px — gives controls room to breathe */
   --sidebar-width: 400px;
   --header-height: 80px;
+
+  --bg-dropdown: rgba(10, 10, 15, 0.85);
 }
 
 /* Light Theme — High-end clean aesthetic */
@@ -85,6 +87,8 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.08);
+
+  --bg-dropdown: rgba(255, 255, 255, 0.9);
 }
 
 /* ========================================
@@ -1075,7 +1079,7 @@ input[type="range"]::-moz-range-thumb {
   bottom: calc(100% + 10px);
   left: 0;
   right: 0;
-  background: rgba(10, 10, 15, 0.85);
+  background: var(--bg-dropdown);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-light);
@@ -2240,7 +2244,7 @@ input[type="range"]::-moz-range-thumb {
   top: calc(100% + 12px);
   right: 0;
   width: 240px;
-  background: rgba(10, 10, 15, 0.85);
+  background: var(--bg-dropdown);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-light);
