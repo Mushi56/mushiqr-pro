@@ -1114,24 +1114,29 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Format picker */
+.download-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .download-format-dropdown {
   position: absolute;
   bottom: calc(100% + 12px);
-  right: 0;
-  width: 320px;
+  left: 0;
+  width: 100%;
   background: var(--bg-dropdown);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-light);
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   padding: 12px;
   z-index: 200;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 6px;
   animation: dropdownAppear 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-origin: bottom right;
+  transform-origin: bottom center;
 }
 
 @keyframes dropdownAppear {
@@ -1177,9 +1182,9 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .download-format-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background: var(--bg-input);
   color: var(--icon-color);
   display: flex;
@@ -1215,10 +1220,11 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .download-format-check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
   color: var(--accent-primary);
-  display: flex;
-  align-items: center;
-  margin-left: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
 
@@ -2450,46 +2456,7 @@ input[type="range"]::-moz-range-thumb {
   background: var(--accent-soft);
 }
 
-.download-format-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  background: var(--bg-body);
-  cursor: pointer;
-  transition: var(--transition-base);
-}
 
-.download-format-option:hover {
-  border-color: var(--accent-primary);
-  background: var(--accent-soft);
-}
-
-.download-format-option.active {
-  border-color: var(--accent-primary);
-  background: var(--accent-primary-alpha);
-}
-
-.download-format-icon-wrapper {
-  color: var(--icon-color);
-}
-
-.download-format-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.download-format-check {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  color: var(--accent-primary);
-}
 
 .app-menu-divider {
   height: 1px;
