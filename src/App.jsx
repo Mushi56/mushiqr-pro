@@ -311,6 +311,34 @@ export default function App() {
     setQrType(item.qrType);
     setQrData(item.qrData);
     setErrorLevel(item.errorLevel || 'H');
+    
+    // Restore styling
+    if (item.qrColor !== undefined) setQrColor(item.qrColor);
+    if (item.bgColor !== undefined) setBgColor(item.bgColor);
+    if (item.bgTransparent !== undefined) setBgTransparent(item.bgTransparent);
+    if (item.gradientEnabled !== undefined) setGradientEnabled(item.gradientEnabled);
+    if (item.gradientColor1 !== undefined) setGradientColor1(item.gradientColor1);
+    if (item.gradientColor2 !== undefined) setGradientColor2(item.gradientColor2);
+    if (item.gradientType !== undefined) setGradientType(item.gradientType);
+    if (item.dotStyle !== undefined) setDotStyle(item.dotStyle);
+    if (item.eyeStyle !== undefined) setEyeStyle(item.eyeStyle);
+    if (item.eyeColor !== undefined) setEyeColor(item.eyeColor);
+    if (item.eyeOuterColor !== undefined) setEyeOuterColor(item.eyeOuterColor);
+    if (item.dotPadding !== undefined) setDotPadding(item.dotPadding);
+    if (item.eyePadding !== undefined) setEyePadding(item.eyePadding);
+    if (item.logoSize !== undefined) setLogoSize(item.logoSize);
+    if (item.logoPadding !== undefined) setLogoPadding(item.logoPadding);
+    if (item.logoBackground !== undefined) setLogoBackground(item.logoBackground);
+    if (item.logoBgColor !== undefined) setLogoBgColor(item.logoBgColor);
+    if (item.logoBgShape !== undefined) setLogoBgShape(item.logoBgShape);
+    if (item.logoOutline !== undefined) setLogoOutline(item.logoOutline);
+    if (item.logoOutlineColor !== undefined) setLogoOutlineColor(item.logoOutlineColor);
+    if (item.logoOutlineWidth !== undefined) setLogoOutlineWidth(item.logoOutlineWidth);
+    if (item.logoOutlineOpacity !== undefined) setLogoOutlineOpacity(item.logoOutlineOpacity);
+    
+    // Clear logo since we can't easily save the uploaded file
+    setLogo(null);
+    
     setActiveTab('generator');
     showToast('Loaded from history');
   };
@@ -330,6 +358,28 @@ export default function App() {
       qrData,
       displayText: dataString.substring(0, 50),
       errorLevel,
+      qrColor,
+      bgColor,
+      bgTransparent,
+      gradientEnabled,
+      gradientColor1,
+      gradientColor2,
+      gradientType,
+      dotStyle,
+      eyeStyle,
+      eyeColor,
+      eyeOuterColor,
+      dotPadding,
+      eyePadding,
+      logoSize,
+      logoPadding,
+      logoBackground,
+      logoBgColor,
+      logoBgShape,
+      logoOutline,
+      logoOutlineColor,
+      logoOutlineWidth,
+      logoOutlineOpacity,
       thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
     });
     showToast('Saved to history');

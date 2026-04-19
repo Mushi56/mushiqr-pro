@@ -78,23 +78,8 @@ export default function ControlsPanel({
 
       {/* ── QR Content ─────────────────────────────────────── */}
       <Section title="QR Content" icon={Wand2} defaultOpen={true}>
-        {/* Quick-pick templates for the three most common QR types */}
-        <div className="quick-templates">
-          <button
-            className={`quick-template-btn${qrType === QR_TYPES.URL ? ' active' : ''}`}
-            onClick={() => { setQrType(QR_TYPES.URL); setQrData({ url: 'https://' }); }}
-          ><Globe size={13} /> Website</button>
-          <button
-            className={`quick-template-btn${qrType === QR_TYPES.WIFI ? ' active' : ''}`}
-            onClick={() => { setQrType(QR_TYPES.WIFI); }}
-          ><Wifi size={13} /> WiFi</button>
-          <button
-            className={`quick-template-btn${qrType === QR_TYPES.VCARD ? ' active' : ''}`}
-            onClick={() => { setQrType(QR_TYPES.VCARD); }}
-          ><User size={13} /> Contact</button>
-        </div>
         <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 16 }}>
           <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
         </div>
       </Section>
@@ -106,7 +91,7 @@ export default function ControlsPanel({
           <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Quick Presets</label>
           <div className="color-presets">
             {COLOR_PRESETS.map(preset => (
-              <button
+              <div
                 key={preset.name}
                 className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
                 data-name={preset.name}

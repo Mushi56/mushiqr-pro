@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.jsx';
 import About from './About.jsx';
 import PrivacyPolicy from './PrivacyPolicy.jsx';
+import Terms from './Terms.jsx';
 import Footer from './Footer.jsx';
 import './index.css';
 
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/" element={<><App /><Footer /></>} />
         <Route path="/about" element={<><About /><Footer /></>} />
         <Route path="/privacy-policy" element={<><PrivacyPolicy /><Footer /></>} />
+        <Route path="/terms" element={<><Terms /><Footer /></>} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,

@@ -5,9 +5,13 @@ export default function Footer() {
     <footer style={styles.footer}>
       <p style={styles.text}>© 2026 MushiQR Pro · All rights reserved</p>
       <div style={styles.links}>
+        <Link to="/" style={styles.link}>Generator</Link>
+        <span style={styles.dot}>·</span>
         <Link to="/about" style={styles.link}>About</Link>
         <span style={styles.dot}>·</span>
         <Link to="/privacy-policy" style={styles.link}>Privacy Policy</Link>
+        <span style={styles.dot}>·</span>
+        <Link to="/terms" style={styles.link}>Terms of Service</Link>
       </div>
     </footer>
   );

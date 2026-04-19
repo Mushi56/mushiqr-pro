@@ -1,5 +1,6 @@
 // PrivacyPolicy.jsx
 // Add this file to your src/ folder in your project
+import { Link } from 'react-router-dom';
 
 export default function PrivacyPolicy() {
   return (
@@ -66,6 +67,10 @@ export default function PrivacyPolicy() {
             contact@mushiqr-pro.com
           </a>
         </Section>
+        
+        <div style={{ marginTop: '40px', textAlign: 'center' }}>
+          <Link to="/" style={styles.backLink}>← Back to Generator</Link>
+        </div>
       </div>
     </div>
   );
@@ -148,4 +153,15 @@ const styles = {
     color: "#818cf8",
     textDecoration: "none",
   },
+  backLink: {
+    color: "#a5b4fc",
+    textDecoration: "none",
+    fontSize: "14px",
+    fontWeight: "600",
+    padding: "10px 20px",
+    background: "rgba(99, 102, 241, 0.15)",
+    borderRadius: "8px",
+    display: "inline-block",
+    transition: "background 0.2s",
+  }
 };

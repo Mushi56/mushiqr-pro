@@ -1,5 +1,6 @@
 // About.jsx
 // Add this file to your src/ folder in your project
+import { Link } from 'react-router-dom';
 
 export default function About() {
   return (
@@ -42,7 +43,10 @@ export default function About() {
         <p style={styles.footerText}>
           Built with ❤️ by <strong>Mushi</strong> · Deployed on Vercel
         </p>
-        <a href="/privacy-policy" style={styles.link}>Privacy Policy</a>
+        <Link to="/privacy-policy" style={styles.link}>Privacy Policy</Link>
+        <div style={{ marginTop: '20px' }}>
+          <Link to="/" style={styles.backLink}>← Back to Generator</Link>
+        </div>
       </div>
     </div>
   );
@@ -145,4 +149,15 @@ const styles = {
   footer: { textAlign: "center", marginTop: "60px" },
   footerText: { color: "#666", fontSize: "14px", marginBottom: "12px" },
   link: { color: "#818cf8", textDecoration: "none", fontSize: "14px" },
+  backLink: {
+    color: "#a5b4fc",
+    textDecoration: "none",
+    fontSize: "14px",
+    fontWeight: "600",
+    padding: "10px 20px",
+    background: "rgba(99, 102, 241, 0.15)",
+    borderRadius: "8px",
+    display: "inline-block",
+    transition: "background 0.2s",
+  }
 };
