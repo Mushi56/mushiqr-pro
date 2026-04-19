@@ -1109,9 +1109,9 @@ input[type="range"]::-moz-range-thumb {
 .download-format-option {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  padding: 11px 14px;
+  padding: 12px 14px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -1125,6 +1125,51 @@ input[type="range"]::-moz-range-thumb {
 
 .download-format-option.active {
   background: var(--accent-soft);
+}
+
+.download-format-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--bg-input);
+  color: var(--icon-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  border: 1px solid var(--border-color);
+}
+
+.download-format-option:hover .download-format-icon-wrapper {
+  background: var(--bg-secondary);
+  border-color: var(--icon-color);
+  box-shadow: 0 0 10px rgba(var(--icon-color), 0.2);
+}
+
+.download-format-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.download-format-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.download-format-tip {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.download-format-check {
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
 }
 
 /* File extension badge — e.g. ".png" */

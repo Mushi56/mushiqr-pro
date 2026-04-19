@@ -23,7 +23,10 @@ import {
   User,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  FileImage,
+  FileCode,
+  FileText
 } from 'lucide-react';
 import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
@@ -674,11 +677,11 @@ export default function App() {
                       <div className="download-format-dropdown">
                         <div className="download-format-dropdown-label">Choose format</div>
                         {[
-                          { label: 'PNG',  tip: 'Best for web & sharing',    ext: '.png' },
-                          { label: 'SVG',  tip: 'Vector — scales to any size', ext: '.svg' },
-                          { label: 'PDF',  tip: 'Best for documents & print', ext: '.pdf' },
-                          { label: 'JPG',  tip: 'Compressed — smaller file',  ext: '.jpg' },
-                        ].map(({ label, tip, ext }) => (
+                          { label: 'PNG',  tip: 'Best for web & sharing',    ext: '.png', Icon: FileImage, color: '#00F0FF' },
+                          { label: 'SVG',  tip: 'Vector — scales to any size', ext: '.svg', Icon: FileCode, color: '#7000FF' },
+                          { label: 'PDF',  tip: 'Best for documents & print', ext: '.pdf', Icon: FileText, color: '#FF007F' },
+                          { label: 'JPG',  tip: 'Compressed — smaller file',  ext: '.jpg', Icon: FileImage, color: '#FFD54F' },
+                        ].map(({ label, tip, ext, Icon, color }) => (
                           <button
                             key={label}
                             className={`download-format-option${selectedFormat === label ? ' active' : ''}`}
@@ -687,14 +690,19 @@ export default function App() {
                               setFormatDropdownOpen(false);
                             }}
                           >
-                            <span className="download-format-ext">{ext}</span>
-                            <span className="download-format-info">
-                              <span className="download-format-name">{label}</span>
-                              <span className="download-format-tip">{tip}</span>
-                            </span>
-                            {selectedFormat === label && (
-                              <span className="download-format-check">✓</span>
-                            )}
+                              <div className="download-format-icon-wrapper" style={{ '--icon-color': color }}>
+                                <Icon size={20} strokeWidth={1.5} />
+                              </div>
+                              <span className="download-format-info">
+                                <span className="download-format-name">{label}</span>
+                                <span className="download-format-tip">{tip}</span>
+                              </span>
+                              <span className="download-format-ext">{ext}</span>
+                              {selectedFormat === label && (
+                                <span className="download-format-check">
+                                  <CheckCircle2 size={16} />
+                                </span>
+                              )}
                           </button>
                         ))}
                       </div>
