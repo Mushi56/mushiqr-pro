@@ -458,24 +458,6 @@ export default function App() {
                   <span className="app-menu-title">Menu</span>
                 </div>
 
-                <div className="app-menu-section-label">Appearance</div>
-                <button
-                  className="app-menu-item"
-                  onClick={() => {
-                    const next = theme === 'dark' ? 'light' : 'dark';
-                    setTheme(next);
-                    savePreferences({ ...getPreferences(), theme: next });
-                    setMenuOpen(false);
-                  }}
-                >
-                  {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-                  <span className="menu-label">
-                    {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
-                  </span>
-                </button>
-
-                <div className="app-menu-divider" />
-
                 <div className="app-menu-section-label">Navigate</div>
                 <button
                   className={`app-menu-item${activeTab === 'generator' ? ' menu-item-active' : ''}`}
