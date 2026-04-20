@@ -16,7 +16,7 @@ const LOGO_PRESETS = [
   { slug: 'google-maps', name: 'Maps', color: '#34A853', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ed/4d/b0/ed4db0a7-9f7d-ced1-8b97-08155865629b/maps_2025-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-0-85-220-0.png/512x512bb.jpg' },
   { slug: 'google-calendar', name: 'Calendar', color: '#4285F4', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/24/c5/c3/24c5c3b9-3f5f-095e-19f5-4f5760eadd0b/calendar_2020q4-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-0-85-220.png/512x512bb.jpg' },
   { slug: 'crypto', name: 'Crypto', color: '#0B1E43', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/be/93/03/be9303c9-6846-7349-1b65-9d4fcec61f6c/AppIcon-0-0-1x_U007emarketing-0-6-0-sRGB-85-220.png/512x512bb.jpg' },
-  { slug: 'google-messages', name: 'Messages', color: '#4285F4', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Messages_%28Google%29_icon.svg/512px-Messages_%28Google%29_icon.svg.png' },
+  { slug: 'messenger', name: 'Messenger', color: '#A033FF', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/00/b5/f0/00b5f0a9-3d19-b938-5b09-d44b710f524b/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/512x512bb.jpg' },
   { slug: 'spotify', name: 'Spotify', color: '#1DB954', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/22/32/d22232a2-e63b-1f9c-cf70-3029be26b00c/AppIcon-0-0-1x_U007epad-0-1-0-0-sRGB-85-220.png/512x512bb.jpg' },
 ];
 
