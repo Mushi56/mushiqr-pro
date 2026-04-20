@@ -14,7 +14,7 @@
  *   presets  — activePreset, setActivePreset (drives the active-ring on swatches)
  */
 
-import { Globe, Wifi, User, Palette, Wand2, Shapes, ShieldCheck, Image as ImageIcon } from 'lucide-react';
+import { Globe, Wifi, User, Palette, Wand2, Shapes, ShieldCheck, Image as ImageIcon, Frame } from 'lucide-react';
 import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -23,7 +23,7 @@ import LogoUpload from './components/LogoUpload';
 import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
-import { QR_TYPES } from './utils/qrEngine';
+import { QR_TYPES, FRAME_STYLES } from './utils/qrEngine';
 
 // Color palette presets — defined here so they live alongside the UI that renders them.
 // Previously in App.jsx they were a module-level constant mixed in with app state.
@@ -72,6 +72,10 @@ export default function ControlsPanel({
   logoOutlineOpacity, setLogoOutlineOpacity,
   // Reliability
   errorLevel, setErrorLevel,
+  // Frames
+  frameStyle, setFrameStyle,
+  frameText, setFrameText,
+  frameColor, setFrameColor,
 }) {
   return (
     <div className="sidebar-scroll fade-in">
@@ -202,6 +206,54 @@ export default function ControlsPanel({
                   <Slider label="Box Padding" value={logoPadding} min={0} max={30} step={1} onChange={setLogoPadding} />
                 </div>
               )}
+            </div>
+          </div>
+        )}
+      </Section>
+
+      {/* ── Frames ───────────────────────────────────────── */}
+      <Section title="Frames" icon={Frame} defaultOpen={false}>
+        <div className="form-group">
+          <label className="form-label">Frame Style</label>
+          <select 
+            className="form-select" 
+            value={frameStyle} 
+            onChange={(e) => setFrameStyle(e.target.value)}
+          >
+            <option value={FRAME_STYLES.NONE}>None</option>
+            <option value={FRAME_STYLES.SCAN_ME}>Scan Me (Classic)</option>
+            <option value={FRAME_STYLES.TEXT_BOTTOM}>Text Bottom</option>
+            <option value={FRAME_STYLES.BOX}>Square Box</option>
+            <option value={FRAME_STYLES.ROUNDED}>Rounded Box</option>
+            <option value={FRAME_STYLES.MODERN}>Modern Corners</option>
+          </select>
+        </div>
+
+        {frameStyle !== FRAME_STYLES.NONE && (
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Only show text input for styles that use text */}
+            {[FRAME_STYLES.SCAN_ME, FRAME_STYLES.TEXT_BOTTOM].includes(frameStyle) && (
+              <div className="form-group">
+                <label className="form-label">Frame Text</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={frameText} 
+                  onChange={(e) => setFrameText(e.target.value)}
+                  placeholder="e.g. SCAN ME"
+                />
+              </div>
+            )}
+            
+            <ColorPicker 
+              label="Frame Color" 
+              value={frameColor || qrColor} 
+              onChange={setFrameColor} 
+              showClear={true}
+              onClear={() => setFrameColor('')}
+            />
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: -8 }}>
+              Leave empty to match QR color.
             </div>
           </div>
         )}

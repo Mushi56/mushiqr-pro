@@ -118,6 +118,17 @@ export const EYE_STYLES = {
   DENSO: 'denso',
 };
 
+// Frame styles
+export const FRAME_STYLES = {
+  NONE: 'none',
+  SCAN_ME: 'scan-me',
+  TEXT_BOTTOM: 'text-bottom',
+  TEXT_TOP: 'text-top',
+  BOX: 'box',
+  ROUNDED: 'rounded',
+  MODERN: 'modern',
+};
+
 /**
  * Generate QR matrix from data
  */
@@ -192,6 +203,9 @@ export function renderQR(canvas, options) {
     logoOutlineWidth = 3,
     logoOutlineOpacity = 1,
     quietZone = 2,
+    frameStyle = FRAME_STYLES.NONE,
+    frameText = 'SCAN ME',
+    frameColor = '',
   } = options;
 
   if (!matrix || !canvas) return;
@@ -210,6 +224,17 @@ export function renderQR(canvas, options) {
   if (!bgTransparent) {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, size, size);
+  }
+
+  // Draw frame if enabled (before QR so QR is on top)
+  if (frameStyle !== FRAME_STYLES.NONE) {
+    drawFrame(ctx, size, {
+      frameStyle,
+      frameText,
+      frameColor: frameColor || (gradientEnabled ? gradientColor1 : qrColor),
+      bgColor,
+      bgTransparent
+    });
   }
 
   // Create gradient if enabled
@@ -627,3 +652,108 @@ function drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, 
     ctx.drawImage(silhouetteCanvas, logoX + dx, logoY + dy, logoW, logoH);
   }
 }
+
+/**
+ * Draw decorative frame around the QR code
+ */
+function drawFrame(ctx, size, options) {
+  const { frameStyle, frameText, frameColor, bgColor, bgTransparent } = options;
+  const padding = size * 0.05; // 5% padding
+  const innerSize = size - padding * 2;
+  
+  ctx.save();
+  ctx.fillStyle = frameColor;
+  ctx.strokeStyle = frameColor;
+  ctx.lineWidth = size * 0.02; // 2% line width
+  
+  switch (frameStyle) {
+    case FRAME_STYLES.SCAN_ME: {
+      // Draw a box with a label area at bottom
+      const labelHeight = size * 0.15;
+      const cornerRadius = size * 0.05;
+      
+      // Main box outline
+      ctx.beginPath();
+      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, cornerRadius);
+      ctx.stroke();
+      
+      // Label box at bottom
+      ctx.beginPath();
+      drawRoundedRectPath(ctx, padding, size - padding - labelHeight, innerSize, labelHeight, cornerRadius);
+      ctx.fill();
+      
+      // Text
+      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
+      ctx.font = `bold ${labelHeight * 0.5}px Outfit, Segoe UI, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2);
+      break;
+    }
+    case FRAME_STYLES.TEXT_BOTTOM: {
+      const labelHeight = size * 0.1;
+      ctx.font = `bold ${labelHeight * 0.7}px Outfit, Segoe UI, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(frameText, size / 2, size - padding / 2);
+      break;
+    }
+    case FRAME_STYLES.BOX: {
+      ctx.strokeRect(padding, padding, innerSize, innerSize);
+      break;
+    }
+    case FRAME_STYLES.ROUNDED: {
+      ctx.beginPath();
+      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, size * 0.08);
+      ctx.stroke();
+      break;
+    }
+    case FRAME_STYLES.MODERN: {
+      const cornerSize = size * 0.15;
+      const t = ctx.lineWidth;
+      // TL
+      ctx.beginPath();
+      ctx.moveTo(padding, padding + cornerSize);
+      ctx.lineTo(padding, padding);
+      ctx.lineTo(padding + cornerSize, padding);
+      ctx.stroke();
+      // TR
+      ctx.beginPath();
+      ctx.moveTo(size - padding - cornerSize, padding);
+      ctx.lineTo(size - padding, padding);
+      ctx.lineTo(size - padding, padding + cornerSize);
+      ctx.stroke();
+      // BR
+      ctx.beginPath();
+      ctx.moveTo(size - padding, size - padding - cornerSize);
+      ctx.lineTo(size - padding, size - padding);
+      ctx.lineTo(size - padding - cornerSize, size - padding);
+      ctx.stroke();
+      // BL
+      ctx.beginPath();
+      ctx.moveTo(padding + cornerSize, size - padding);
+      ctx.lineTo(padding, size - padding);
+      ctx.lineTo(padding, size - padding - cornerSize);
+      ctx.stroke();
+      break;
+    }
+  }
+  
+  ctx.restore();
+}
+
+/**
+ * Path helper for rounded rect (doesn't call fill/stroke)
+ */
+function drawRoundedRectPath(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+}
+

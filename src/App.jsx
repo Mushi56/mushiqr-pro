@@ -144,9 +144,10 @@ export default function App() {
   // Canvas animation key — bumped on every matrix update to replay the CSS appear animation
   const [qrAnimKey, setQrAnimKey] = useState(0);
 
-  // Phone mockup and scan frame preview toggles
-  const [phonePreview, setPhonePreview] = useState(false);
-  const [scanFrame, setScanFrame] = useState(false);
+  // Frame state
+  const [frameStyle, setFrameStyle] = useState('none');
+  const [frameText, setFrameText] = useState('SCAN ME');
+  const [frameColor, setFrameColor] = useState('');
 
   // Logo image fallback state (shows gradient icon if /logo.png fails to load)
   const [logoImgError, setLogoImgError] = useState(false);
@@ -290,6 +291,9 @@ export default function App() {
         logoOutlineWidth,
         logoOutlineOpacity,
         quietZone: 2,
+        frameStyle,
+        frameText,
+        frameColor,
       });
     }, 40); // 40ms debounce to allow 60fps UI threads during slider changes
   }, [
@@ -297,7 +301,8 @@ export default function App() {
     eyeOuterColor, gradientEnabled, gradientColor1, gradientColor2, gradientType,
     logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-    dotPadding, eyePadding
+    dotPadding, eyePadding,
+    frameStyle, frameText, frameColor
   ]);
 
   useEffect(() => {
@@ -516,6 +521,9 @@ export default function App() {
                 logoOutlineWidth={logoOutlineWidth} setLogoOutlineWidth={setLogoOutlineWidth}
                 logoOutlineOpacity={logoOutlineOpacity} setLogoOutlineOpacity={setLogoOutlineOpacity}
                 errorLevel={errorLevel} setErrorLevel={setErrorLevel}
+                frameStyle={frameStyle} setFrameStyle={setFrameStyle}
+                frameText={frameText} setFrameText={setFrameText}
+                frameColor={frameColor} setFrameColor={setFrameColor}
               />
             </aside>
 
@@ -524,72 +532,20 @@ export default function App() {
               <section className="preview-panel pt-4 pb-4">
                 <div className="preview-container scale-in">
 
-                  {/* Preview toggles: phone mockup and scan-me frame */}
-                  <div className="preview-panel-toggles">
-                    <button
-                      className={`phone-preview-toggle${phonePreview ? ' active' : ''}`}
-                      onClick={() => setPhonePreview(v => !v)}
-                    >
-                      <Smartphone size={14} /> Phone Preview
-                    </button>
-                    <button
-                      className={`scan-frame-toggle${scanFrame ? ' active' : ''}`}
-                      onClick={() => setScanFrame(v => !v)}
-                    >
-                      <ScanLine size={14} /> Add Frame
-                    </button>
-                  </div>
-
-                  {/* Render either phone mockup wrapper or plain QR card */}
-                  {phonePreview ? (
-                    <div className="phone-mockup">
-                      <div className="phone-mockup-notch" />
-                      <div className="phone-mockup-screen">
-                        {/* Scan-me frame shown inside the phone mockup */}
-                        {scanFrame && qrMatrixInfo ? (
-                          <div className="scan-frame-wrapper">
-                            <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
-                            <div className="scan-frame-label">SCAN ME</div>
-                          </div>
-                        ) : (
-                          !qrMatrixInfo ? (
-                            <div className="preview-placeholder" style={{ padding: 24 }}>
-                              <span className="preview-placeholder-icon">
-                                <QrCode size={48} color="var(--text-tertiary)" strokeWidth={1} />
-                              </span>
-                              <span className="preview-placeholder-text">Your QR code will appear here</span>
-                            </div>
-                          ) : (
-                            <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
-                          )
-                        )}
+                  {/* Enhanced QR Card with integrated frames */}
+                  <div className="preview-qr-wrapper">
+                    {!qrMatrixInfo ? (
+                      <div className="preview-placeholder">
+                        <span className="preview-placeholder-icon">
+                          <QrCode size={120} color="var(--accent-primary)" strokeWidth={1} />
+                        </span>
+                        <span className="preview-placeholder-text">Your QR code will appear here</span>
+                        <span className="preview-placeholder-sub">Start by entering a URL or text above</span>
                       </div>
-                      <div className="phone-mockup-home" />
-                    </div>
-                  ) : (
-                    /* Normal QR wrapper */
-                    <div className="preview-qr-wrapper">
-                      {!qrMatrixInfo ? (
-                        /* Empty state — shown before the user enters any QR content */
-                        <div className="preview-placeholder">
-                          <span className="preview-placeholder-icon">
-                            <QrCode size={96} color="var(--accent-primary)" strokeWidth={1} />
-                          </span>
-                          <span className="preview-placeholder-text">Your QR code will appear here</span>
-                          <span className="preview-placeholder-sub">Start by entering a URL or text above</span>
-                        </div>
-                      ) : scanFrame ? (
-                        /* Scan-me decorative frame around the QR canvas */
-                        <div className="scan-frame-wrapper">
-                          <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
-                          <div className="scan-frame-label">SCAN ME</div>
-                        </div>
-                      ) : (
-                        /* Keyed canvas — key increment replays the CSS appear animation */
-                        <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
-                      )}
-                    </div>
-                  )}
+                    ) : (
+                      <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                    )}
+                  </div>
 
                   {/* Primary actions: copy, save to history, and native share */}
                   <div className="preview-action-row">
