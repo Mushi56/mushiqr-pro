@@ -51,9 +51,10 @@ export default function LogoPresets({ onLogoChange }) {
             style={{ '--brand-color': logo.color }}
           >
             <img 
-              src={`https://cdn.simpleicons.org/${logo.slug}`} 
+              src={`https://cdn.simpleicons.org/${logo.slug}/${logo.color.replace('#', '')}`} 
               alt={logo.name} 
               loading="lazy"
+              crossOrigin="anonymous"
             />
           </button>
         ))}

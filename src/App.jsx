@@ -116,7 +116,7 @@ export default function App() {
   
   // State: Logo
   const [logo, setLogo] = useState(null);
-  const [logoSize, setLogoSize] = useState(0.25);
+  const [logoSize, setLogoSize] = useState(0.18);
   const [logoPadding, setLogoPadding] = useState(10);
   const [logoBackground, setLogoBackground] = useState(false);
   const [logoBgColor, setLogoBgColor] = useState('#ffffff');
