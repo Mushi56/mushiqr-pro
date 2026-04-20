@@ -2514,6 +2514,50 @@ input[type="range"]::-moz-range-thumb {
 .btn-theme-toggle:hover {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
-  color: var(--accent-primary);
   transform: rotate(20deg) scale(1.1);
 }
+
+/* ========================================
+   FOOTER
+   ======================================== */
+
+.app-footer {
+  padding: 40px 20px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  margin-top: auto;
+}
+
+.app-footer-text {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.app-footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-footer-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition-fast);
+}
+
+.app-footer-link:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.app-footer-dot {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
