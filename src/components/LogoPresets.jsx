@@ -1,20 +1,20 @@
 import { useState } from 'react';
 
 const LOGO_PRESETS = [
-  { slug: 'whatsapp', name: 'WhatsApp', color: '#25D366', url: 'https://img.icons8.com/fluency/144/whatsapp.png' },
-  { slug: 'instagram', name: 'Instagram', color: '#E4405F', url: 'https://img.icons8.com/fluency/144/instagram-new.png' },
-  { slug: 'facebook', name: 'Facebook', color: '#1877F2', url: 'https://img.icons8.com/fluency/144/facebook-new.png' },
-  { slug: 'x', name: 'X', color: '#000000', url: 'https://img.icons8.com/fluency/144/twitterx.png' },
-  { slug: 'youtube', name: 'YouTube', color: '#FF0000', url: 'https://img.icons8.com/fluency/144/youtube-play.png' },
-  { slug: 'linkedin', name: 'LinkedIn', color: '#0A66C2', url: 'https://img.icons8.com/fluency/144/linkedin.png' },
-  { slug: 'tiktok', name: 'TikTok', color: '#000000', url: 'https://img.icons8.com/fluency/144/tiktok.png' },
-  { slug: 'telegram', name: 'Telegram', color: '#26A5E4', url: 'https://img.icons8.com/fluency/144/telegram-app.png' },
-  { slug: 'snapchat', name: 'Snapchat', color: '#FFFC00', url: 'https://img.icons8.com/fluency/144/snapchat.png' },
-  { slug: 'discord', name: 'Discord', color: '#5865F2', url: 'https://img.icons8.com/fluency/144/discord-new.png' },
-  { slug: 'pinterest', name: 'Pinterest', color: '#BD081C', url: 'https://img.icons8.com/fluency/144/pinterest.png' },
-  { slug: 'reddit', name: 'Reddit', color: '#FF4500', url: 'https://img.icons8.com/fluency/144/reddit.png' },
-  { slug: 'slack', name: 'Slack', color: '#4A154B', url: 'https://img.icons8.com/fluency/144/slack-new.png' },
-  { slug: 'spotify', name: 'Spotify', color: '#1DB954', url: 'https://img.icons8.com/fluency/144/spotify.png' },
+  { slug: 'whatsapp', name: 'WhatsApp', color: '#25D366', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/70/af/4a/70af4af2-a08e-a810-b6d5-42027416f9f1/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-85-220.png/512x512bb.jpg' },
+  { slug: 'instagram', name: 'Instagram', color: '#E4405F', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/18/73/96/187396d0-9ea0-cd65-83f6-42550506b3f3/Prod-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/512x512bb.jpg' },
+  { slug: 'facebook', name: 'Facebook', color: '#1877F2', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5a/27/ac/5a27acbb-4b2a-8c6f-40e6-c9b5a1aed6b6/Icon-Production-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
+  { slug: 'x', name: 'X', color: '#000000', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/fe/b1/9a/feb19ad2-ed11-4322-3e9e-4b869126f7e8/ProductionAppIcon-0-0-1x_U007emarketing-0-8-0-0-0-85-220.png/512x512bb.jpg' },
+  { slug: 'youtube', name: 'YouTube', color: '#FF0000', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/75/aa/76/75aa76e8-aebd-475f-6a09-346b103e19a3/logo_youtube_2024_q4_color-0-0-1x_U007emarketing-0-0-0-7-0-0-0-85-220.png/512x512bb.jpg' },
+  { slug: 'linkedin', name: 'LinkedIn', color: '#0A66C2', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/38/bd/9a/38bd9af1-77ba-9f20-9159-c41d0b7589ad/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/512x512bb.jpg' },
+  { slug: 'tiktok', name: 'TikTok', color: '#000000', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/be/78/6e/be786e47-e6ca-510d-0214-5439aac28f37/TikTok_AppIcon26-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
+  { slug: 'telegram', name: 'Telegram', color: '#26A5E4', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/da/4c/f6/da4cf68b-3261-b5f2-1b2d-cf8bbce4b6d1/Telegram-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/512x512bb.jpg' },
+  { slug: 'snapchat', name: 'Snapchat', color: '#FFFC00', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/71/9c/83/719c8366-b2c9-f087-91b7-e1a6606b223d/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
+  { slug: 'discord', name: 'Discord', color: '#5865F2', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/25/85/00/25850032-a067-3439-8ec4-5417ef606dea/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
+  { slug: 'pinterest', name: 'Pinterest', color: '#BD081C', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/49/ab/ea/49abea30-3e81-b6fa-5eda-b4ec87e0c3e4/AppIcon-0-0-1x_U007epad-0-1-0-0-0-85-220.png/512x512bb.jpg' },
+  { slug: 'reddit', name: 'Reddit', color: '#FF4500', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/c1/20/7a/c1207a64-299e-844c-c9db-8dfeea65c06d/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
+  { slug: 'slack', name: 'Slack', color: '#4A154B', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/52/44/3f/52443fd9-20ba-59af-66a9-fbb9edf4903d/slack_icon_prod-0-0-1x_U007epad-0-1-sRGB-85-220.png/512x512bb.jpg' },
+  { slug: 'spotify', name: 'Spotify', color: '#1DB954', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/22/32/d22232a2-e63b-1f9c-cf70-3029be26b00c/AppIcon-0-0-1x_U007epad-0-1-0-0-sRGB-85-220.png/512x512bb.jpg' },
 ];
 
 export default function LogoPresets({ onLogoChange }) {
