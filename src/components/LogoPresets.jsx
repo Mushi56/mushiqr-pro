@@ -11,9 +11,12 @@ const LOGO_PRESETS = [
   { slug: 'telegram', name: 'Telegram', color: '#26A5E4', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/da/4c/f6/da4cf68b-3261-b5f2-1b2d-cf8bbce4b6d1/Telegram-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/512x512bb.jpg' },
   { slug: 'snapchat', name: 'Snapchat', color: '#FFFC00', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/71/9c/83/719c8366-b2c9-f087-91b7-e1a6606b223d/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
   { slug: 'discord', name: 'Discord', color: '#5865F2', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/25/85/00/25850032-a067-3439-8ec4-5417ef606dea/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
-  { slug: 'pinterest', name: 'Pinterest', color: '#BD081C', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/49/ab/ea/49abea30-3e81-b6fa-5eda-b4ec87e0c3e4/AppIcon-0-0-1x_U007epad-0-1-0-0-0-85-220.png/512x512bb.jpg' },
-  { slug: 'reddit', name: 'Reddit', color: '#FF4500', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/c1/20/7a/c1207a64-299e-844c-c9db-8dfeea65c06d/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg' },
-  { slug: 'slack', name: 'Slack', color: '#4A154B', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/52/44/3f/52443fd9-20ba-59af-66a9-fbb9edf4903d/slack_icon_prod-0-0-1x_U007epad-0-1-sRGB-85-220.png/512x512bb.jpg' },
+  { slug: 'threads', name: 'Threads', color: '#000000', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/f8/b9/3a/f8b93a6c-cfe4-17bf-d260-8a9f15739c52/Prod-0-0-1x_U007ephone-0-0-0-1-0-0-P3-85-220.png/512x512bb.jpg' },
+  { slug: 'gmail', name: 'Gmail', color: '#EA4335', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/38/3b/c1/383bc1a3-ba7f-33a8-bf14-d9e697a63f7b/logo_gmail_2020q4_color-0-0-1x_U007emarketing-0-0-0-7-0-0-0-0-85-220.png/512x512bb.jpg' },
+  { slug: 'google-maps', name: 'Maps', color: '#34A853', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ed/4d/b0/ed4db0a7-9f7d-ced1-8b97-08155865629b/maps_2025-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-0-85-220-0.png/512x512bb.jpg' },
+  { slug: 'google-calendar', name: 'Calendar', color: '#4285F4', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/24/c5/c3/24c5c3b9-3f5f-095e-19f5-4f5760eadd0b/calendar_2020q4-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-0-85-220.png/512x512bb.jpg' },
+  { slug: 'crypto', name: 'Crypto', color: '#0B1E43', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/be/93/03/be9303c9-6846-7349-1b65-9d4fcec61f6c/AppIcon-0-0-1x_U007emarketing-0-6-0-sRGB-85-220.png/512x512bb.jpg' },
+  { slug: 'google-messages', name: 'Messages', color: '#4285F4', url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Messages_%28Google%29_icon.svg/512px-Messages_%28Google%29_icon.svg.png' },
   { slug: 'spotify', name: 'Spotify', color: '#1DB954', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/22/32/d22232a2-e63b-1f9c-cf70-3029be26b00c/AppIcon-0-0-1x_U007epad-0-1-0-0-sRGB-85-220.png/512x512bb.jpg' },
 ];
 

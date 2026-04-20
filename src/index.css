@@ -1425,7 +1425,7 @@ input[type="range"]::-moz-range-thumb {
 .logo-preset-btn {
   aspect-ratio: 1;
   padding: 0;
-  background: transparent;
+  background: #ffffff;
   border: none;
   border-radius: 22%;
   cursor: pointer;
