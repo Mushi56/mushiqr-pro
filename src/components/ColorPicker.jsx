@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 
-export default function ColorPicker({ label, value, onChange }) {
+export default function ColorPicker({ label, value, onChange, showClear = false, onClear }) {
   const [localValue, setLocalValue] = useState(value);
 
   // Sync with external value changes
@@ -50,6 +51,16 @@ export default function ColorPicker({ label, value, onChange }) {
           spellCheck={false}
           maxLength={7}
         />
+        {showClear && onClear && (
+          <button
+            className="color-clear-btn"
+            onClick={onClear}
+            title="Reset to default"
+            type="button"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
     </div>
   );

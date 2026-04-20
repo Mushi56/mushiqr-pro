@@ -437,7 +437,6 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  overflow: hidden;
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
 }
@@ -589,42 +588,9 @@ body {
 
 /* ========================================
    COLOR PICKER & PRESETS
+   (Main .color-presets rules are in FIX 18 section below)
    ======================================== */
 
-.color-presets {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.color-preset-swatch {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border-light);
-  cursor: pointer;
-  padding: 0;
-  appearance: none;
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
-  overflow: hidden;
-  isolation: isolate;
-  /* Force clipping in Webkit browsers */
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
-}
-
-.color-preset-swatch:hover {
-  transform: scale(1.1);
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.color-preset-swatch.active {
-  border-color: var(--accent-primary);
-  transform: scale(1.15);
-  box-shadow: 0 0 0 2px var(--accent-soft);
-}
 
 .color-picker-group {
   display: flex;
@@ -1143,6 +1109,9 @@ input[type="range"]::-moz-range-thumb {
   .download-format-dropdown {
     padding: 6px;
     gap: 4px;
+    width: 260px;
+    left: 50%;
+    transform: translateX(-50%);
   }
   .download-format-dropdown-label {
     padding: 2px 4px 6px;
@@ -1228,33 +1197,6 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--icon-color);
   box-shadow: 0 0 10px rgba(var(--icon-color), 0.2);
 }
-
-.download-format-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-}
-
-.download-format-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.download-format-tip {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.download-format-check {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  color: var(--accent-primary);
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
-
 
 
 .download-format-info {
@@ -1691,26 +1633,7 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 200, 150, 0.1);
 }
 
-/* Theme toggle button in header */
-.btn-theme-toggle {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--transition-fast);
-}
-
-.btn-theme-toggle:hover {
-  background: var(--bg-hover);
-  color: var(--accent-primary);
-  border-color: var(--accent-primary);
-}
+/* Theme toggle — canonical styles in THEME TOGGLE BUTTON section below */
 
 
 .nav-tab {
@@ -1752,24 +1675,19 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @media (max-width: 1024px) {
-  /* Stack vertically on tablet/mobile */
   .app-main {
     flex-direction: column-reverse;
     height: auto;
     overflow: visible;
   }
-
   .app, #root {
     height: auto;
     min-height: 100dvh;
   }
-
   body {
     overflow: auto;
     height: auto;
   }
-
-  /* Preview sticks smoothly below the header */
   .preview-panel {
     position: sticky;
     top: var(--header-height);
@@ -1780,26 +1698,21 @@ input[type="range"]::-moz-range-thumb {
     flex-shrink: 0;
     overflow: visible;
     border-bottom: 1px solid var(--border-color);
-    background: var(--bg-primary);
+    background: radial-gradient(ellipse at 50% 50%, var(--bg-secondary) 0%, var(--bg-primary) 100%);
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
-
   .preview-panel::before {
     width: 500px;
     height: 500px;
     filter: blur(50px);
   }
-
   .preview-container {
-    gap: 16px;
+    gap: 14px;
   }
-
   .preview-qr-wrapper {
-    max-width: 280px;
+    max-width: 240px;
     margin: 0 auto;
   }
-
-  /* Sidebar is normal flow — scrolls inside app-main */
   .sidebar {
     width: 100%;
     height: auto;
@@ -1812,127 +1725,73 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @media (max-width: 768px) {
-  .preview-panel {
-    padding: 20px 16px 16px;
-  }
-
-  .preview-qr-wrapper {
-    max-width: 260px;
-    padding: 20px;
-  }
+  .preview-panel { padding: 16px 16px 14px; }
+  .preview-qr-wrapper { max-width: 220px; padding: 16px; }
+  .style-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 640px) {
-  :root {
-    --header-height: 64px;
-  }
-
-  .app-header {
-    padding: 0 16px;
-  }
-
-  .app-logo-text {
-    font-size: 18px;
-  }
-
-  /* Hide nav tabs on mobile — hamburger menu handles navigation */
-  .header-nav {
-    display: none;
-  }
-
-  /* Show hamburger on mobile */
-  .app-menu-wrapper {
-    display: flex;
-  }
-
-  .sidebar-scroll {
-    padding: 20px 16px;
-    gap: 16px;
-  }
-
-  .preview-panel {
-    padding: 16px;
-  }
-
-  .preview-panel::before {
-    width: 300px;
-    height: 300px;
-    filter: blur(40px);
-  }
-
-  .preview-container {
-    gap: 12px;
-  }
-
+  :root { --header-height: 56px; }
+  .app-header { padding: 0 12px; }
+  .app-logo-image { width: 32px !important; height: 32px !important; margin-right: 8px !important; }
+  .app-logo-text { font-size: 16px; }
+  .header-nav { display: none; }
+  .app-menu-wrapper { display: flex; }
+  .sidebar-scroll { padding: 16px 12px; gap: 12px; }
+  .preview-panel { padding: 12px 12px 10px; }
+  .preview-panel::before { width: 250px; height: 250px; filter: blur(40px); }
+  .preview-container { gap: 10px; }
   .preview-qr-wrapper {
-    padding: 16px;
-    max-width: 220px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    padding: 12px;
+    max-width: 180px;
+    box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+    border-radius: var(--radius-lg);
   }
-
-  .preview-panel-toggles {
-    display: none;
+  .preview-qr-wrapper:hover { transform: none; box-shadow: 0 16px 32px rgba(0,0,0,0.4); }
+  .preview-panel-toggles { display: none; }
+  .preview-action-row { gap: 8px; justify-content: center; }
+  .btn-copy, .btn-save, .btn-share {
+    font-size: 0;
+    padding: 10px 14px;
+    border-radius: var(--radius-full);
+    min-width: 42px;
+    min-height: 42px;
   }
+  .download-split-main { padding: 10px 16px; font-size: 13px; }
+  .download-split-chevron { padding: 0 12px; }
 
-  .preview-action-row {
-    gap: 10px;
-    justify-content: center;
-  }
-
-  .btn-copy, .btn-share {
-    font-size: 13px;
-    padding: 10px 16px;
-  }
-
-  .download-split-main {
-    padding: 12px 20px;
-    font-size: 14px;
-  }
-
-  .download-split-chevron {
-    padding: 0 16px;
-  }
-
-  /* Horizontal scrolling for quick templates / type tabs */
+  .style-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .style-option { padding: 10px 4px; font-size: 11px; }
+  .section-header { padding: 12px 14px; }
+  .section-content { padding: 0 14px 14px; gap: 12px; }
+  .section-title { font-size: 13px; }
   .quick-templates {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 8px; /* space for scrollbar */
-    margin-bottom: -8px; /* offset padding */
-    gap: 8px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
+    flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px;
+    margin-bottom: -6px; gap: 6px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
-  
-  .quick-templates::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
-  }
-
-  .quick-template-btn {
-    flex: 0 0 auto;
-  }
-
+  .quick-templates::-webkit-scrollbar { display: none; }
+  .quick-template-btn { flex: 0 0 auto; }
   .color-presets {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    margin-bottom: -8px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    display: flex; flex-wrap: nowrap; overflow-x: auto;
+    padding: 6px 14px 10px 14px; margin: -6px -14px -10px -14px; gap: 12px;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
   }
-  
-  .color-presets::-webkit-scrollbar {
-    display: none;
+  .color-presets::-webkit-scrollbar { display: none; }
+  .color-preset-swatch { flex: 0 0 auto; }
+  .history-page { padding: 16px; }
+  .history-grid { grid-template-columns: 1fr; gap: 12px; }
+  .app-footer { padding: 24px 16px; }
+  .app-footer-links { flex-direction: column; gap: 8px; }
+  .app-footer-dot { display: none; }
+  .toast {
+    bottom: auto;
+    top: calc(var(--header-height) + 12px);
+    left: 16px; right: 16px; width: auto;
   }
-
-  .color-preset-swatch {
-    flex: 0 0 auto;
-  }
-
-  .history-page {
-    padding: 16px;
-  }
+  .form-input, .form-select, .form-textarea { padding: 10px 12px; font-size: 13px; }
 }
+
 
 /* ========================================
    ANIMATIONS
@@ -2022,56 +1881,36 @@ input[type="range"]::-moz-range-thumb {
 .color-presets {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 14px;
+  padding: 6px;
+  margin: -6px -6px 8px -6px;
 }
 
 .color-preset-swatch {
   position: relative;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   outline: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.1);
   flex-shrink: 0;
 }
 
 .color-preset-swatch:hover {
-  transform: scale(1.18);
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary), 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10;
 }
 
-.color-preset-swatch::after {
-  content: attr(data-name);
-  position: absolute;
-  bottom: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1a1a2e;
-  color: white;
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 5px;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  z-index: 50;
-}
 
-.color-preset-swatch:hover::after {
-  opacity: 1;
-}
 
 /* Active state — shows which preset is currently applied */
 .color-preset-swatch.active {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-soft), 0 2px 8px rgba(0,0,0,0.4);
-  transform: scale(1.15);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary), 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+  z-index: 10;
 }
 
 /* ========================================
@@ -2561,3 +2400,93 @@ input[type="range"]::-moz-range-thumb {
   font-size: 14px;
 }
 
+
+/* ========================================
+   LIGHT MODE POLISH (D1, D2, D3)
+   ======================================== */
+
+/* D1: Ambient gradient in light mode preview */
+[data-theme="light"] .preview-panel {
+  background: radial-gradient(ellipse at 50% 50%, #eef6ff 0%, var(--bg-primary) 100%);
+}
+
+/* D2: Stronger shadows for light mode cards */
+[data-theme="light"] .section {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .section:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 200, 200, 0.15);
+}
+
+/* D2: Better preview wrapper in light mode */
+[data-theme="light"] .preview-qr-wrapper {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .preview-qr-wrapper:hover {
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), 0 0 40px rgba(0, 200, 200, 0.08);
+}
+
+/* D3: Light mode active nav tab — use soft tinted bg instead of plain white */
+[data-theme="light"] .header-nav {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Light mode toast */
+[data-theme="light"] .toast {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Light mode download dropdown */
+[data-theme="light"] .download-format-dropdown {
+  border-color: rgba(0, 200, 200, 0.3);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.06);
+}
+
+/* Light mode action buttons */
+[data-theme="light"] .btn-copy,
+[data-theme="light"] .btn-save,
+[data-theme="light"] .btn-share {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .btn-copy:hover,
+[data-theme="light"] .btn-save:hover,
+[data-theme="light"] .btn-share:hover {
+  background: #f0fdfa;
+  border-color: var(--accent-primary);
+  box-shadow: 0 4px 12px rgba(0, 200, 200, 0.1);
+}
+
+/* ========================================
+   COLOR PICKER CLEAR BUTTON (B4)
+   ======================================== */
+
+.color-clear-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.color-clear-btn:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}

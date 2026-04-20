@@ -35,10 +35,16 @@ export const COLOR_PRESETS = [
   { name: 'Sunset',   qr: '#9a3412', bg: '#fff7ed' },
   { name: 'Royal',    qr: '#4f46e5', bg: '#eef2ff' },
   { name: 'Rose',     qr: '#9f1239', bg: '#fff1f2' },
-  { name: 'Slate',    qr: '#334155', bg: '#f8fafc' },
+  { name: 'Gold',     qr: '#854d0e', bg: '#fefce8' },
+  { name: 'Lavender', qr: '#6b21a8', bg: '#faf5ff' },
+  { name: 'Teal',     qr: '#0f766e', bg: '#f0fdfa' },
+  { name: 'Coffee',   qr: '#3f2c23', bg: '#f5f0ec' },
+  { name: 'Cyber',    qr: '#00ffcc', bg: '#111111' },
 ];
 
 export default function ControlsPanel({
+  // Responsive
+  isMobile = false,
   // Content
   qrType, setQrType,
   qrData, setQrData,
@@ -82,14 +88,14 @@ export default function ControlsPanel({
 
       {/* ── QR Content ─────────────────────────────────────── */}
       <Section title="QR Content" icon={Wand2} defaultOpen={true}>
-        <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
-        <div style={{ marginTop: 16 }}>
+        <div style={{ marginBottom: 16 }}>
           <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
         </div>
+        <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
       </Section>
 
       {/* ── Colors ─────────────────────────────────────────── */}
-      <Section title="Colors" icon={Palette} defaultOpen={true}>
+      <Section title="Colors" icon={Palette} defaultOpen={!isMobile}>
         {/* Colour presets — one-click combos for QR + background color */}
         <div>
           <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Quick Presets</label>
@@ -100,7 +106,7 @@ export default function ControlsPanel({
                 className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
                 data-name={preset.name}
                 title={preset.name}
-                style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                style={{ background: `linear-gradient(180deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
                 onClick={() => {
                   setQrColor(preset.qr);
                   setBgColor(preset.bg);
@@ -140,7 +146,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Design & Shapes ────────────────────────────────── */}
-      <Section title="Design & Shapes" icon={Shapes} defaultOpen={false}>
+      <Section title="Design & Shapes" icon={Shapes} defaultOpen={false} isMobile={isMobile}>
         <div className="form-group">
           <label className="form-label">Pattern Style</label>
           <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
@@ -172,7 +178,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Logo & Image ───────────────────────────────────── */}
-      <Section title="Logo & Image" icon={ImageIcon} defaultOpen={false}>
+      <Section title="Logo & Image" icon={ImageIcon} defaultOpen={false} isMobile={isMobile}>
         <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
 
         {logo && (
@@ -212,7 +218,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Frames ───────────────────────────────────────── */}
-      <Section title="Frames" icon={Frame} defaultOpen={false}>
+      <Section title="Frames" icon={Frame} defaultOpen={false} isMobile={isMobile}>
         <div className="form-group">
           <label className="form-label">Frame Style</label>
           <select 
@@ -260,7 +266,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Scan Reliability ───────────────────────────────── */}
-      <Section title="Scan Reliability" icon={ShieldCheck} defaultOpen={false}>
+      <Section title="Scan Reliability" icon={ShieldCheck} defaultOpen={false} isMobile={isMobile}>
         <div className="form-group">
           <label className="form-label">Reliability Level</label>
           <select className="form-select" value={errorLevel} onChange={(e) => setErrorLevel(e.target.value)}>
