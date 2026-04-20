@@ -632,11 +632,7 @@ export default function App() {
                                 <Icon size={24} strokeWidth={1.5} />
                               </div>
                               <span className="download-format-name">{label}</span>
-                              {selectedFormat === label && (
-                                <span className="download-format-check">
-                                  <CheckCircle2 size={14} />
-                                </span>
-                              )}
+
                           </button>
                         ))}
                       </div>

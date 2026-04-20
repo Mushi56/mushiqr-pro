@@ -1109,9 +1109,6 @@ input[type="range"]::-moz-range-thumb {
   .download-format-dropdown {
     padding: 6px;
     gap: 4px;
-    width: 260px;
-    left: 50%;
-    transform: translateX(-50%);
   }
   .download-format-dropdown-label {
     padding: 2px 4px 6px;
