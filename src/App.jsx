@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo, Component } from 'react';
+import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { 
   QrCode, 
   History as HistoryIcon, 
@@ -67,15 +67,6 @@ export default function App() {
   const [theme, setTheme] = useState('dark');
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
-
-  // Mobile detection for responsive behavior (collapse sections, compact buttons, etc.)
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
-  useEffect(() => {
-    const mql = window.matchMedia('(max-width: 640px)');
-    const handler = (e) => setIsMobile(e.matches);
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
-  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -167,6 +158,10 @@ export default function App() {
     if (prefs.theme) setTheme(prefs.theme);
   }, []);
 
+  // Bump canvas animation key on every matrix update
+  useEffect(() => {
+    if (qrMatrixInfo) setQrAnimKey(k => k + 1);
+  }, [qrMatrixInfo]);
 
   // Auto-upgrade error correction to H when a logo is present (logo occludes QR modules,
   // higher redundancy is needed). Downgrade back to M when logo is removed.
@@ -499,7 +494,6 @@ export default function App() {
           <>
             <aside className="sidebar">
               <ControlsPanel
-                isMobile={isMobile}
                 qrType={qrType} setQrType={setQrType}
                 qrData={qrData} setQrData={setQrData}
                 qrColor={qrColor} setQrColor={setQrColor}
@@ -561,16 +555,18 @@ export default function App() {
                       disabled={!qrMatrixInfo}
                       title="Copy image to clipboard"
                     >
-                      <Copy size={16} />{!isMobile && ' Copy'}
+                      <Copy size={16} /> Copy
                     </button>
+                    {/* Save to history — was previously defined but never wired to a button */}
                     <button
                       className="btn-save"
                       onClick={handleSave}
                       disabled={!qrMatrixInfo}
                       title="Save to history"
                     >
-                      <Save size={16} />{!isMobile && ' Save'}
+                      <Save size={16} /> Save
                     </button>
+                    {/* Share button — only shown when Web Share API is available */}
                     {typeof navigator !== 'undefined' && navigator.canShare && (
                       <button
                         className="btn-share"
@@ -578,7 +574,7 @@ export default function App() {
                         disabled={!qrMatrixInfo}
                         title="Share QR code"
                       >
-                        <Share2 size={16} />{!isMobile && ' Share'}
+                        <Share2 size={16} /> Share
                       </button>
                     )}
                   </div>

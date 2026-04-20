@@ -43,8 +43,6 @@ export const COLOR_PRESETS = [
 ];
 
 export default function ControlsPanel({
-  // Responsive
-  isMobile = false,
   // Content
   qrType, setQrType,
   qrData, setQrData,
@@ -95,7 +93,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Colors ─────────────────────────────────────────── */}
-      <Section title="Colors" icon={Palette} defaultOpen={!isMobile}>
+      <Section title="Colors" icon={Palette} defaultOpen={true}>
         {/* Colour presets — one-click combos for QR + background color */}
         <div>
           <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Quick Presets</label>
@@ -146,7 +144,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Design & Shapes ────────────────────────────────── */}
-      <Section title="Design & Shapes" icon={Shapes} defaultOpen={false} isMobile={isMobile}>
+      <Section title="Design & Shapes" icon={Shapes} defaultOpen={false}>
         <div className="form-group">
           <label className="form-label">Pattern Style</label>
           <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
@@ -178,7 +176,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Logo & Image ───────────────────────────────────── */}
-      <Section title="Logo & Image" icon={ImageIcon} defaultOpen={false} isMobile={isMobile}>
+      <Section title="Logo & Image" icon={ImageIcon} defaultOpen={false}>
         <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
 
         {logo && (
@@ -218,7 +216,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Frames ───────────────────────────────────────── */}
-      <Section title="Frames" icon={Frame} defaultOpen={false} isMobile={isMobile}>
+      <Section title="Frames" icon={Frame} defaultOpen={false}>
         <div className="form-group">
           <label className="form-label">Frame Style</label>
           <select 
@@ -266,7 +264,7 @@ export default function ControlsPanel({
       </Section>
 
       {/* ── Scan Reliability ───────────────────────────────── */}
-      <Section title="Scan Reliability" icon={ShieldCheck} defaultOpen={false} isMobile={isMobile}>
+      <Section title="Scan Reliability" icon={ShieldCheck} defaultOpen={false}>
         <div className="form-group">
           <label className="form-label">Reliability Level</label>
           <select className="form-select" value={errorLevel} onChange={(e) => setErrorLevel(e.target.value)}>
