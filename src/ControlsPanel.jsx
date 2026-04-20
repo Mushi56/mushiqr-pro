@@ -20,6 +20,7 @@ import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
 import Toggle from './components/Toggle';
 import LogoUpload from './components/LogoUpload';
+import LogoPresets from './components/LogoPresets';
 import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
@@ -178,6 +179,7 @@ export default function ControlsPanel({
       {/* ── Logo & Image ───────────────────────────────────── */}
       <Section title="Logo & Image" icon={ImageIcon} defaultOpen={false}>
         <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
+        <LogoPresets onLogoChange={setLogo} />
 
         {logo && (
           <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: '16px' }}>

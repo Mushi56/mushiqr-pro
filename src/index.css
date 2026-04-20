@@ -1407,6 +1407,61 @@ input[type="range"]::-moz-range-thumb {
   color: var(--accent-secondary);
 }
 
+.logo-presets-container {
+  margin-top: 16px;
+}
+
+.logo-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+
+.logo-preset-btn {
+  aspect-ratio: 1;
+  padding: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-preset-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--brand-color, var(--accent-primary));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.logo-preset-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform var(--transition-fast);
+}
+
+.logo-preset-btn:hover img {
+  transform: scale(1.1);
+}
+
+.logo-preset-btn.loading {
+  opacity: 0.5;
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+}
+
+@media (max-width: 480px) {
+  .logo-presets-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+}
+
+
 .logo-upload-area.has-logo {
   border-style: solid;
   padding: 16px;
