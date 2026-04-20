@@ -37,6 +37,7 @@ import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
 import HistoryPage from './components/HistoryPage';
+import QRScanner from './components/QRScanner';
 import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, formatQRData } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
 import { saveToHistory, getPreferences, savePreferences } from './utils/storage';
@@ -426,6 +427,12 @@ export default function App() {
               <QrCode size={15} /> Generator
             </button>
             <button
+              className={`header-nav-tab${activeTab === 'scanner' ? ' active' : ''}`}
+              onClick={() => setActiveTab('scanner')}
+            >
+              <ScanLine size={15} /> Scanner
+            </button>
+            <button
               className={`header-nav-tab${activeTab === 'history' ? ' active' : ''}`}
               onClick={() => setActiveTab('history')}
             >
@@ -471,6 +478,14 @@ export default function App() {
                   <QrCode size={16} />
                   <span className="menu-label">QR Generator</span>
                   {activeTab === 'generator' && <span className="menu-dot" />}
+                </button>
+                <button
+                  className={`app-menu-item${activeTab === 'scanner' ? ' menu-item-active' : ''}`}
+                  onClick={() => { setActiveTab('scanner'); setMenuOpen(false); }}
+                >
+                  <ScanLine size={16} />
+                  <span className="menu-label">Scanner</span>
+                  {activeTab === 'scanner' && <span className="menu-dot" />}
                 </button>
                 <button
                   className={`app-menu-item${activeTab === 'history' ? ' menu-item-active' : ''}`}
@@ -643,6 +658,8 @@ export default function App() {
               </section>
             </ErrorBoundary>
           </>
+        ) : activeTab === 'scanner' ? (
+          <QRScanner />
         ) : (
           <HistoryPage onLoadQR={handleLoadQR} />
         )}
