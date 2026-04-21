@@ -3704,18 +3704,24 @@ input[type="range"]::-moz-range-thumb {
 
 .advanced-picker-overlay .advanced-picker-container {
   width: 100% !important;
-  max-height: 55vh !important;
+  max-height: 60vh !important;
   height: auto !important;
-  max-width: 360px !important;
-  background: #0A0A0F !important;
+  max-width: 400px !important;
+  background: var(--bg-card) !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 12px 12px 20px !important;
+  padding: 16px 12px 80px !important; /* Added 80px bottom padding to clear navbar */
   position: relative !important;
   border-radius: 24px 24px 0 0 !important;
   border-top: 1px solid var(--border-light) !important;
-  box-shadow: none !important;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.3) !important;
   overflow: hidden !important;
+}
+
+/* Ensure light mode works correctly */
+[data-theme="light"] .advanced-picker-overlay .advanced-picker-container {
+  background: #ffffff !important;
+  border-top: 1px solid rgba(0,0,0,0.05) !important;
 }
 
 .picker-header {
@@ -3781,8 +3787,12 @@ input[type="range"]::-moz-range-thumb {
   content: '';
   position: absolute;
   inset: 20px;
-  background: #0A0A0F;
+  background: var(--bg-card);
   border-radius: 50%;
+}
+
+[data-theme="light"] .hue-wheel::after {
+  background: #ffffff;
 }
 
 .hue-handle {
