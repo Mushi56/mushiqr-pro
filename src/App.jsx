@@ -41,6 +41,7 @@ import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/expo
 import { saveToHistory, getPreferences, savePreferences } from './utils/storage';
 import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
+import AdvancedColorPicker from './components/AdvancedColorPicker';
 import { ScanLine, History } from 'lucide-react';
 
 /* ── Color Presets ── */
@@ -147,6 +148,10 @@ export default function App() {
   const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
   const [toast, setToast] = useState(null);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
+
+  // ── Advanced Picker State ──
+  const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
+  const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
   const [selectedFormat, setSelectedFormat] = useState('PNG');
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
@@ -419,6 +424,15 @@ export default function App() {
             )}
           </div>
         </div>
+        <AdvancedColorPicker 
+          isOpen={advPicker.open}
+          initialColor={advPicker.color}
+          onConfirm={(newColor) => {
+            if (advPicker.setter) advPicker.setter(newColor);
+            setAdvPicker({ ...advPicker, open: false });
+          }}
+          onCancel={() => setAdvPicker({ ...advPicker, open: false })}
+        />
       </header>
 
       {/* ── Main Content Area ── */}
@@ -546,21 +560,21 @@ export default function App() {
                   </div>
 
                   <div className="panel-section">
-                    <ColorPicker label="Background Color" value={bgColor} onChange={setBgColor} />
+                    <ColorPicker label="Background Color" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
                   </div>
 
                   <div className="panel-section">
-                    <ColorPicker label="Dots Color" value={qrColor} onChange={setQrColor} />
+                    <ColorPicker label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
                   </div>
 
                   <div className="panel-section">
                     {!syncEyes ? (
                       <div className="eye-colors-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                        <ColorPicker label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} />
-                        <ColorPicker label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} />
+                        <ColorPicker label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
+                        <ColorPicker label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
                       </div>
                     ) : (
-                      <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} />
+                      <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
                     )}
                     <div className="toggle-row">
                       <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
@@ -621,7 +635,7 @@ export default function App() {
                         </div>
                         {logoOutline && (
                           <div className="nested-panel-section fade-in" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ColorPicker label="Stroke Color" value={logoOutlineColor} onChange={setLogoOutlineColor} />
+                            <ColorPicker label="Stroke Color" value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
                             <Slider
                               label="Stroke Width"
                               value={logoOutlineWidth}
@@ -642,7 +656,7 @@ export default function App() {
                         </div>
                         {logoBackground && (
                           <div className="nested-panel-section fade-in" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} />
+                            <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
                             <div className="selector-group">
                               <label className="panel-label-sub">Shape</label>
                               <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>

@@ -3689,3 +3689,231 @@ input[type="range"]::-moz-range-thumb {
   background: #f9fafb;
 }
 
+/* ── Advanced Color Picker ── */
+.advanced-picker-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  backdrop-filter: blur(8px);
+}
+
+.advanced-picker-container {
+  width: 100%;
+  height: 100%;
+  max-width: 450px;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  position: relative;
+  overflow-y: auto;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 24px;
+}
+
+.picker-close, .picker-confirm {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.picker-close:hover, .picker-confirm:hover {
+  opacity: 0.7;
+}
+
+.picker-preview-dual {
+  display: flex;
+  width: 160px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.picker-preview-old, .picker-preview-new {
+  flex: 1;
+}
+
+.picker-wheel-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.picker-wheel-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+}
+
+.hue-wheel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  cursor: crosshair;
+}
+
+.hue-wheel::after {
+  content: '';
+  position: absolute;
+  inset: 30px;
+  background: #000;
+  border-radius: 50%;
+}
+
+.hue-handle {
+  position: absolute;
+  top: calc(50% - 15px);
+  left: calc(50% - 15px);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px rgba(0,0,0,0.8);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.sv-diamond {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 5;
+  cursor: crosshair;
+}
+
+.sv-gradient-white {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #fff, transparent);
+}
+
+.sv-gradient-black {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, #000);
+}
+
+.sv-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  pointer-events: none;
+}
+
+.picker-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 16px 0;
+}
+
+.picker-tab-btn {
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.picker-tab-btn.active {
+  color: #fff;
+}
+
+.picker-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 16px 32px;
+}
+
+.rgb-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #fff;
+}
+
+.rgb-label {
+  width: 20px;
+  font-weight: 700;
+  font-size: 16px;
+  color: #888;
+}
+
+.rgb-step {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.rgb-value {
+  width: 40px;
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+}
+
+.rgb-track-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.rgb-range-input {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  outline: none;
+}
+
+.rgb-range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+
