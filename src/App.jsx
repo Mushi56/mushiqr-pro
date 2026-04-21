@@ -378,7 +378,7 @@ export default function App() {
     { id: 'shapes',  label: 'Shapes',  icon: Hexagon },
     { id: 'logo',    label: 'Logo',    icon: ImageIcon },
     { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
-    { id: 'scan',    label: 'Scan',    icon: ShieldCheck },
+    { id: 'scan',    label: 'Reliability', icon: ShieldCheck },
   ];
 
   // ── Get the frame CSS class for the preview wrapper ──
@@ -819,25 +819,24 @@ export default function App() {
         )}
       </main>
 
-      {/* ── Bottom Navigation Bar ── */}
-      <nav className="bottom-nav">
-        {TABS.map(tab => (
-          <button
-            key={tab.id}
-            className={`bottom-nav-tab${activeTab === tab.id && activePage === 'generator' ? ' active' : ''}`}
-            onClick={() => {
-              setActivePage('generator');
-              setActiveTab(tab.id);
-            }}
-          >
-            <div className="bottom-nav-highlight" />
-            <span className="bottom-nav-icon">
-              <tab.icon size={20} strokeWidth={2} />
-            </span>
-            <span className="bottom-nav-label">{tab.label}</span>
-          </button>
-        ))}
-      </nav>
+      {/* ── Bottom Navigation Bar (Only for Generator) ── */}
+      {activePage === 'generator' && (
+        <nav className="bottom-nav">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`bottom-nav-tab${activeTab === tab.id ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <div className="bottom-nav-highlight" />
+              <span className="bottom-nav-icon">
+                <tab.icon size={20} strokeWidth={2} />
+              </span>
+              <span className="bottom-nav-label">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
 
       {/* Toast */}
       {toast && (

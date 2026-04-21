@@ -245,7 +245,7 @@ body {
 .app-main {
   flex: 1;
   display: flex;
-  height: calc(100dvh - var(--header-height));
+  min-height: 0;
   overflow: hidden;
   position: relative;
 }
