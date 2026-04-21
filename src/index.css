@@ -3260,6 +3260,10 @@ input[type="range"]::-moz-range-thumb {
   color: var(--accent-primary);
 }
 
+.bottom-nav-tab.active .bottom-nav-icon {
+  transform: scale(1.18);
+}
+
 .bottom-nav-tab.active {
   color: var(--accent-primary);
 }
@@ -3270,6 +3274,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   height: 24px;
   line-height: 1;
+  transition: transform var(--transition-base);
 }
 
 .bottom-nav-label {
