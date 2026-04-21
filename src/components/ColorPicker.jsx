@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) {
+export default function ColorPicker({ label, value, onChange, onOpenAdvanced, className = '' }) {
   const [localValue, setLocalValue] = useState(value);
   const nativeInputRef = useRef(null);
 
@@ -35,7 +35,7 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) 
   const safeColor = /^#[A-Fa-f0-9]{6}$/.test(localValue) ? localValue : '#000000';
 
   return (
-    <div className="form-group">
+    <div className={`form-group ${className}`}>
       {label && <label className="form-label">{label}</label>}
       <div className="color-picker-group">
         <div 
