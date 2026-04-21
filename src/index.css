@@ -667,24 +667,31 @@ body {
 
 /* Compact version for side-by-side pickers */
 .compact-picker .color-hex {
-  padding: 10px 10px;
+  padding: 0 10px;
   font-size: 13px;
+  height: 38px;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
 }
 
 .compact-picker .color-preview {
   width: 38px;
   height: 38px;
+  flex-shrink: 0;
 }
 
 .compact-picker .color-picker-group {
   gap: 8px;
+  width: 100%;
+  display: flex;
 }
 
 .eye-colors-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 4px;
   width: 100%;
 }
 
