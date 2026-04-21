@@ -667,9 +667,8 @@ body {
 
 /* Compact version for side-by-side pickers */
 .compact-picker .color-hex {
-  padding: 10px 8px;
+  padding: 10px 10px;
   font-size: 13px;
-  text-align: center;
 }
 
 .compact-picker .color-preview {
@@ -684,25 +683,28 @@ body {
 .eye-colors-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 16px;
-  background: var(--bg-elevated);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-light);
-  animation: fadeIn 0.3s ease-out;
+  gap: 16px;
+  margin-top: 8px;
+  width: 100%;
 }
 
 .eye-colors-grid .form-group {
   margin-bottom: 0;
+  width: 100%;
+  gap: 0;
 }
 
 .eye-colors-grid .form-label {
   font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-tertiary);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.eye-colors-grid .color-picker-group {
+  width: 100%;
 }
 
 .color-hex:focus {

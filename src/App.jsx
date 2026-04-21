@@ -640,13 +640,14 @@ export default function App() {
 
                   <div className="panel-section">
                     {!syncEyes ? (
-                      <div className="eye-colors-grid fade-in">
+                      <div className="eye-colors-grid">
                         <ColorPicker className="compact-picker" label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
                         <ColorPicker className="compact-picker" label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
                       </div>
                     ) : (
                       <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
                     )}
+                    <div className="panel-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
                     <div className="toggle-row">
                       <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
                       <span className="toggle-hint">When ON, eyes match dots color</span>
