@@ -3704,18 +3704,19 @@ input[type="range"]::-moz-range-thumb {
 
 .advanced-picker-overlay .advanced-picker-container {
   width: 100% !important;
-  max-height: 60vh !important;
+  max-height: 80vh !important;
   height: auto !important;
   max-width: 400px !important;
   background: var(--bg-card) !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 16px 12px 80px !important; /* Added 80px bottom padding to clear navbar */
+  padding: 16px 12px 110px !important; /* Significantly increased padding to 110px */
   position: relative !important;
   border-radius: 24px 24px 0 0 !important;
   border-top: 1px solid var(--border-light) !important;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.3) !important;
-  overflow: hidden !important;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.5) !important;
+  overflow-y: auto !important; /* Enable scrolling if content overflows */
+  overscroll-behavior: contain;
 }
 
 /* Ensure light mode works correctly */
