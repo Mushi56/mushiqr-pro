@@ -1399,28 +1399,144 @@ input[type="range"]::-moz-range-thumb {
    LOGO UPLOAD
    ======================================== */
 
-.logo-upload-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 32px 20px;
-  border: 2px dashed var(--border-light);
+.logo-upload-card {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: var(--transition-base);
-  color: var(--text-muted);
-  text-align: center;
-  position: relative;
+  transition: all 0.2s ease;
   overflow: hidden;
-  background: var(--bg-input);
 }
 
-.logo-upload-area:hover {
+.logo-upload-card:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.logo-upload-card.drag-over {
   border-color: var(--accent-primary);
   background: var(--accent-soft);
-  color: var(--accent-secondary);
+  transform: scale(1.02);
+}
+
+.logo-upload-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.upload-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.upload-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.upload-text-group .main-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.upload-text-group .sub-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Logo Preview state */
+.logo-upload-card.active {
+  cursor: default;
+  padding: 12px 16px;
+  border-color: var(--success);
+}
+
+.logo-upload-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.logo-img-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: white;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.logo-img-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.logo-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.logo-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logo-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--success);
+}
+
+.logo-remove-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logo-remove-btn:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
 }
 
 .logo-presets-container {
@@ -1431,92 +1547,6 @@ input[type="range"]::-moz-range-thumb {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
   gap: 8px;
-}
-
-.logo-preset-btn {
-  aspect-ratio: 1;
-  padding: 0;
-  background: #ffffff;
-  border: none;
-  border-radius: 22%;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.logo-preset-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-}
-
-.logo-preset-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 22%;
-  transition: transform var(--transition-fast);
-}
-
-.logo-preset-btn:hover img {
-  transform: scale(1.1);
-}
-
-.logo-preset-btn.loading {
-  opacity: 0.5;
-  pointer-events: none;
-  animation: pulse 1.5s infinite;
-}
-
-@media (max-width: 480px) {
-  .logo-presets-grid {
-    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
-    gap: 6px;
-  }
-  .logo-preset-btn {
-    padding: 6px;
-  }
-}
-
-
-.logo-upload-area.has-logo {
-  border-style: solid;
-  padding: 16px;
-  border-color: var(--border-color);
-}
-
-.logo-upload-area input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.logo-upload-icon {
-  display: flex;
-}
-
-.logo-upload-text {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.logo-upload-hint {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.logo-preview-container {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  overflow: hidden;
-  max-width: 100%;
 }
 
 .logo-preview-img {
