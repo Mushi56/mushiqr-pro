@@ -3606,16 +3606,18 @@ input[type="range"]::-moz-range-thumb {
 
 .app-dropdown-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 12px);
   right: 0;
-  width: 240px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  width: 260px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
   z-index: 3000;
   overflow: hidden;
-  animation: dropdownSlideIn 200ms ease;
+  animation: dropdownSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes dropdownSlideIn {
@@ -3633,17 +3635,18 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: transparent;
   border: none;
   border-radius: var(--radius-md);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   text-align: left;
   cursor: pointer;
   transition: var(--transition-fast);
+  text-decoration: none; /* For Link components */
 }
 
 .menu-link-btn:hover {
@@ -3657,7 +3660,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .menu-link-btn svg {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   transition: color var(--transition-fast);
 }
 
