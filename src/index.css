@@ -3240,8 +3240,8 @@ input[type="range"]::-moz-range-thumb {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) scale(0.8);
-  width: 64px;
-  height: 36px;
+  width: 54px;
+  height: 54px;
   background: var(--accent-soft);
   border: 1.5px solid var(--accent-primary);
   border-radius: var(--radius-md);
