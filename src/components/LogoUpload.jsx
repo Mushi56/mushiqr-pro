@@ -75,7 +75,7 @@ export default function LogoUpload({ logo, onLogoChange, onLogoRemove }) {
       />
       <div className="logo-compact-btn-content">
         <div className="btn-icon">
-          <UploadCloud size={18} />
+          <UploadCloud size={22} />
         </div>
         <div className="btn-text">
           <span className="top">Upload Custom Logo</span>
