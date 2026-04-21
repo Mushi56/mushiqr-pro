@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { UploadCloud, X, CheckCircle2 } from 'lucide-react';
+import { UploadCloud, X } from 'lucide-react';
 
 export default function LogoUpload({ logo, onLogoChange, onLogoRemove }) {
   const [dragActive, setDragActive] = useState(false);
@@ -39,18 +39,20 @@ export default function LogoUpload({ logo, onLogoChange, onLogoRemove }) {
     }
   };
 
+  const formatSize = (bytes) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  };
+
   if (logo) {
     return (
-      <div className="logo-upload-card active">
-        <div className="logo-upload-preview">
-          <div className="logo-img-wrapper">
-            <img src={logo.src} alt="Logo" />
-          </div>
-          <div className="logo-info">
-            <span className="logo-name">{logo.name}</span>
-            <span className="logo-status">
-              <CheckCircle2 size={12} color="var(--success)" /> Ready to use
-            </span>
+      <div className="logo-upload-area has-logo">
+        <div className="logo-preview-container">
+          <img src={logo.src} alt="Logo" className="logo-preview-img" />
+          <div className="logo-preview-info">
+            <div className="logo-preview-name">{logo.name}</div>
+            <div className="logo-preview-size">{formatSize(logo.size)}</div>
           </div>
           <button
             className="logo-remove-btn"
@@ -60,7 +62,7 @@ export default function LogoUpload({ logo, onLogoChange, onLogoRemove }) {
             }}
             title="Remove logo"
           >
-            <X size={16} />
+            <X size={16} strokeWidth={2.5} />
           </button>
         </div>
       </div>
@@ -69,28 +71,22 @@ export default function LogoUpload({ logo, onLogoChange, onLogoRemove }) {
 
   return (
     <div
-      className={`logo-upload-card ${dragActive ? 'drag-over' : ''}`}
+      className={`logo-upload-area ${dragActive ? 'drag-active' : ''}`}
       onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
       onDragLeave={() => setDragActive(false)}
       onDrop={handleDrop}
-      onClick={() => inputRef.current?.click()}
     >
       <input
         ref={inputRef}
         type="file"
         accept="image/png,image/jpeg,image/svg+xml,image/webp"
         onChange={handleChange}
-        hidden
       />
-      <div className="logo-upload-content">
-        <div className="upload-icon-circle">
-          <UploadCloud size={20} />
-        </div>
-        <div className="upload-text-group">
-          <span className="main-text">Upload Custom Logo</span>
-          <span className="sub-text">PNG, SVG or WEBP (Max 2MB)</span>
-        </div>
-      </div>
+      <span className="logo-upload-icon">
+        <UploadCloud size={32} strokeWidth={1.5} color="var(--accent-primary)" />
+      </span>
+      <span className="logo-upload-text">Drop logo here or click to upload</span>
+      <span className="logo-upload-hint">PNG recommended for perfect transparency</span>
     </div>
   );
 }
