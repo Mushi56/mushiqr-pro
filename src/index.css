@@ -747,7 +747,9 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 4px 0;
+  width: 100%;
 }
 
 .toggle-switch {
@@ -3446,6 +3448,25 @@ input[type="range"]::-moz-range-thumb {
 .ec-btn:hover {
   border-color: var(--border-light);
   background: var(--bg-hover);
+}
+
+.toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toggle-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.nested-panel-section {
+  padding: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
 }
 
 .ec-btn.active {
