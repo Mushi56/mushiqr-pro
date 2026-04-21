@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 export default function Terms() {
   return (
@@ -36,7 +37,9 @@ export default function Terms() {
         </Section>
         
         <div style={{ marginTop: '40px', textAlign: 'center' }}>
-          <Link to="/" style={styles.backLink}>← Back to Generator</Link>
+          <Link to="/" style={styles.backLink}>
+            <ArrowLeft size={16} /> Back to Generator
+          </Link>
         </div>
       </div>
     </div>
@@ -55,28 +58,29 @@ function Section({ title, children }) {
 const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
+    background: "var(--bg-primary)",
     padding: "60px 20px",
-    fontFamily: "'Segoe UI', sans-serif",
+    fontFamily: "var(--font-sans)",
   },
   card: {
-    maxWidth: "750px",
+    maxWidth: "800px",
     margin: "0 auto",
-    background: "rgba(255,255,255,0.05)",
+    background: "var(--bg-card)",
     backdropFilter: "blur(12px)",
-    borderRadius: "20px",
+    borderRadius: "24px",
     padding: "50px",
-    border: "1px solid rgba(255,255,255,0.1)",
-    color: "#e0e0e0",
+    border: "1px solid var(--border-color)",
+    color: "var(--text-primary)",
+    boxShadow: "var(--shadow-md)",
   },
   badge: {
     display: "inline-block",
-    background: "rgba(99, 102, 241, 0.3)",
-    color: "#a5b4fc",
-    padding: "4px 14px",
+    background: "var(--accent-soft)",
+    color: "var(--accent-primary)",
+    padding: "6px 16px",
     borderRadius: "20px",
     fontSize: "12px",
-    fontWeight: "600",
+    fontWeight: "700",
     letterSpacing: "1px",
     textTransform: "uppercase",
     marginBottom: "16px",
@@ -84,46 +88,49 @@ const styles = {
   title: {
     fontSize: "36px",
     fontWeight: "800",
-    color: "#ffffff",
+    color: "var(--text-primary)",
     margin: "0 0 8px 0",
   },
   updated: {
     fontSize: "13px",
-    color: "#888",
+    color: "var(--text-tertiary)",
     marginBottom: "40px",
   },
   section: {
     marginBottom: "32px",
     paddingBottom: "32px",
-    borderBottom: "1px solid rgba(255,255,255,0.07)",
+    borderBottom: "1px solid var(--border-light)",
   },
   sectionTitle: {
-    fontSize: "16px",
+    fontSize: "18px",
     fontWeight: "700",
-    color: "#a5b4fc",
-    marginBottom: "10px",
-    textTransform: "uppercase",
+    color: "var(--accent-primary)",
+    marginBottom: "12px",
     letterSpacing: "0.5px",
   },
   sectionText: {
     fontSize: "15px",
     lineHeight: "1.8",
-    color: "#ccc",
+    color: "var(--text-secondary)",
     margin: 0,
   },
   link: {
-    color: "#818cf8",
+    color: "var(--accent-primary)",
     textDecoration: "none",
+    fontWeight: "600",
   },
   backLink: {
-    color: "#a5b4fc",
+    color: "var(--text-primary)",
     textDecoration: "none",
     fontSize: "14px",
     fontWeight: "600",
-    padding: "10px 20px",
-    background: "rgba(99, 102, 241, 0.15)",
-    borderRadius: "8px",
-    display: "inline-block",
+    padding: "12px 24px",
+    background: "var(--bg-elevated)",
+    borderRadius: "12px",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
     transition: "background 0.2s",
+    border: "1px solid var(--border-color)",
   }
 };

@@ -1,6 +1,7 @@
 // About.jsx
 // Add this file to your src/ folder in your project
 import { Link } from 'react-router-dom';
+import { Zap, Sliders, ShieldCheck, Smartphone, ArrowLeft } from 'lucide-react';
 
 export default function About() {
   return (
@@ -14,10 +15,10 @@ export default function About() {
       </div>
 
       <div style={styles.grid}>
-        <FeatureCard icon="⚡" title="Instant Generation" desc="Generate QR codes in real-time as you type. No waiting, no delays." />
-        <FeatureCard icon="🎨" title="Fully Customizable" desc="Change colors, styles, and formats to match your brand." />
-        <FeatureCard icon="🔒" title="100% Private" desc="Your data never leaves your browser. Nothing is stored on our servers." />
-        <FeatureCard icon="📱" title="Works Everywhere" desc="Optimized for mobile and desktop. Works on any device, any browser." />
+        <FeatureCard icon={<Zap size={32} color="var(--accent-primary)" />} title="Instant Generation" desc="Generate QR codes in real-time as you type. No waiting, no delays." />
+        <FeatureCard icon={<Sliders size={32} color="var(--accent-primary)" />} title="Fully Customizable" desc="Change colors, styles, and formats to match your brand." />
+        <FeatureCard icon={<ShieldCheck size={32} color="var(--accent-primary)" />} title="100% Private" desc="Your data never leaves your browser. Nothing is stored on our servers." />
+        <FeatureCard icon={<Smartphone size={32} color="var(--accent-primary)" />} title="Works Everywhere" desc="Optimized for mobile and desktop. Works on any device, any browser." />
       </div>
 
       <div style={styles.card}>
@@ -45,7 +46,9 @@ export default function About() {
         </p>
         <Link to="/privacy-policy" style={styles.link}>Privacy Policy</Link>
         <div style={{ marginTop: '20px' }}>
-          <Link to="/" style={styles.backLink}>← Back to Generator</Link>
+          <Link to="/" style={styles.backLink}>
+            <ArrowLeft size={16} /> Back to Generator
+          </Link>
         </div>
       </div>
     </div>
@@ -74,10 +77,10 @@ function Step({ num, text }) {
 const styles = {
   container: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)",
+    background: "var(--bg-primary)",
     padding: "60px 20px",
-    fontFamily: "'Segoe UI', sans-serif",
-    color: "#e0e0e0",
+    fontFamily: "var(--font-sans)",
+    color: "var(--text-primary)",
   },
   hero: {
     textAlign: "center",
@@ -86,78 +89,84 @@ const styles = {
   },
   badge: {
     display: "inline-block",
-    background: "rgba(99, 102, 241, 0.3)",
-    color: "#a5b4fc",
-    padding: "4px 14px",
+    background: "var(--accent-soft)",
+    color: "var(--accent-primary)",
+    padding: "6px 16px",
     borderRadius: "20px",
     fontSize: "12px",
-    fontWeight: "600",
+    fontWeight: "700",
     letterSpacing: "1px",
     textTransform: "uppercase",
     marginBottom: "16px",
   },
   title: {
-    fontSize: "52px",
+    fontSize: "clamp(40px, 8vw, 56px)",
     fontWeight: "900",
-    color: "#ffffff",
+    color: "var(--text-primary)",
     margin: "0 0 16px",
-    background: "linear-gradient(90deg, #a5b4fc, #818cf8)",
+    background: "var(--accent-gradient)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
   },
   subtitle: {
     fontSize: "18px",
-    color: "#aaa",
+    color: "var(--text-secondary)",
     lineHeight: "1.7",
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "20px",
-    maxWidth: "900px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: "24px",
+    maxWidth: "1000px",
     margin: "0 auto 40px",
   },
   featureCard: {
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "16px",
-    padding: "28px",
+    background: "var(--bg-card)",
+    border: "1px solid var(--border-color)",
+    borderRadius: "20px",
+    padding: "32px 24px",
     textAlign: "center",
+    boxShadow: "var(--shadow-sm)",
   },
-  icon: { fontSize: "32px", marginBottom: "12px" },
-  featureTitle: { fontSize: "16px", fontWeight: "700", color: "#fff", marginBottom: "8px" },
-  featureDesc: { fontSize: "14px", color: "#999", lineHeight: "1.6", margin: 0 },
+  icon: { marginBottom: "16px", display: "flex", justifyContent: "center" },
+  featureTitle: { fontSize: "18px", fontWeight: "700", color: "var(--text-primary)", marginBottom: "8px" },
+  featureDesc: { fontSize: "14px", color: "var(--text-secondary)", lineHeight: "1.6", margin: 0 },
   card: {
-    maxWidth: "750px",
+    maxWidth: "800px",
     margin: "0 auto 30px",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "16px",
-    padding: "36px",
+    background: "var(--bg-card)",
+    border: "1px solid var(--border-color)",
+    borderRadius: "24px",
+    padding: "40px",
+    boxShadow: "var(--shadow-md)",
   },
-  cardTitle: { fontSize: "20px", fontWeight: "700", color: "#a5b4fc", marginBottom: "16px" },
-  cardText: { fontSize: "15px", lineHeight: "1.8", color: "#ccc", margin: 0 },
-  steps: { display: "flex", flexDirection: "column", gap: "16px" },
-  step: { display: "flex", alignItems: "center", gap: "16px" },
+  cardTitle: { fontSize: "24px", fontWeight: "800", color: "var(--text-primary)", marginBottom: "20px" },
+  cardText: { fontSize: "16px", lineHeight: "1.8", color: "var(--text-secondary)", margin: 0 },
+  steps: { display: "flex", flexDirection: "column", gap: "20px" },
+  step: { display: "flex", alignItems: "center", gap: "20px" },
   stepNum: {
-    width: "36px", height: "36px", borderRadius: "50%",
-    background: "linear-gradient(135deg, #6366f1, #818cf8)",
+    width: "40px", height: "40px", borderRadius: "50%",
+    background: "var(--accent-gradient)",
     display: "flex", alignItems: "center", justifyContent: "center",
-    fontWeight: "800", fontSize: "14px", color: "#fff", flexShrink: 0,
+    fontWeight: "800", fontSize: "16px", color: "#fff", flexShrink: 0,
+    boxShadow: "var(--shadow-glow)",
   },
-  stepText: { fontSize: "15px", color: "#ccc", margin: 0 },
-  footer: { textAlign: "center", marginTop: "60px" },
-  footerText: { color: "#666", fontSize: "14px", marginBottom: "12px" },
-  link: { color: "#818cf8", textDecoration: "none", fontSize: "14px" },
+  stepText: { fontSize: "16px", color: "var(--text-secondary)", margin: 0, fontWeight: "500" },
+  footer: { textAlign: "center", marginTop: "80px" },
+  footerText: { color: "var(--text-tertiary)", fontSize: "14px", marginBottom: "16px" },
+  link: { color: "var(--accent-primary)", textDecoration: "none", fontSize: "14px", fontWeight: "600" },
   backLink: {
-    color: "#a5b4fc",
+    color: "var(--text-primary)",
     textDecoration: "none",
     fontSize: "14px",
     fontWeight: "600",
-    padding: "10px 20px",
-    background: "rgba(99, 102, 241, 0.15)",
-    borderRadius: "8px",
-    display: "inline-block",
+    padding: "12px 24px",
+    background: "var(--bg-elevated)",
+    borderRadius: "12px",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
     transition: "background 0.2s",
+    border: "1px solid var(--border-color)",
   }
 };
