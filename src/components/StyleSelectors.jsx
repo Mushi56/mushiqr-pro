@@ -54,8 +54,8 @@ const DOT_PREVIEWS = {
   ),
   [DOT_STYLES.CROSS]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <rect x="11" y="2" width="6" height="24" fill="currentColor" transform="rotate(45 14 14)" transform-origin="center" />
-      <rect x="2" y="11" width="24" height="6" fill="currentColor" transform="rotate(45 14 14)" transform-origin="center" />
+      <rect x="11" y="2" width="6" height="24" fill="currentColor" transform="rotate(45 14 14)" />
+      <rect x="2" y="11" width="24" height="6" fill="currentColor" transform="rotate(45 14 14)" />
     </svg>
   ),
   [DOT_STYLES.DENSO]: (
