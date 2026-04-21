@@ -10,8 +10,9 @@ import {
   CheckCircle2,
   RefreshCw,
   ImagePlus,
-  Smartphone,
-  Zap
+  RefreshCcw,
+  Zap,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function QRScanner() {
@@ -248,7 +249,7 @@ export default function QRScanner() {
                 }}
                 title="Switch Camera"
               >
-                <Smartphone size={18} />
+                <RefreshCcw size={18} />
               </button>
             </div>
 
@@ -288,7 +289,7 @@ export default function QRScanner() {
 
         {/* Info */}
         <div className="scanner-info">
-          <Zap size={14} />
+          <ShieldCheck size={14} />
           <span>Scans are processed locally — your data never leaves your device.</span>
         </div>
       </div>

@@ -1,49 +1,79 @@
 import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { 
   QrCode, 
-  History as HistoryIcon, 
   Sun, 
   Moon, 
   CheckCircle2, 
   XCircle,
-  Wand2,
-  Palette,
-  Shapes,
-  Image as ImageIcon,
-  ShieldCheck,
   Save,
   Download,
   Copy,
   Loader2,
   Share2,
-  Smartphone,
-  ScanLine,
-  Globe,
-  Wifi,
-  User,
-  Menu,
-  X,
   ChevronDown,
   FileImage,
   FileCode,
-  FileText
+  FileText,
+  Pencil,
+  Palette,
+  Hexagon,
+  Image as ImageIcon,
+  LayoutGrid,
+  ShieldCheck,
+  UploadCloud,
+  X,
+  Menu,
+  Info,
+  Shield,
+  FileText as FileIcon,
+  ExternalLink
 } from 'lucide-react';
-import Section from './components/Section';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
 import Toggle from './components/Toggle';
 import LogoUpload from './components/LogoUpload';
+import LogoPresets from './components/LogoPresets';
 import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
-import HistoryPage from './components/HistoryPage';
-import QRScanner from './components/QRScanner';
-import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, formatQRData } from './utils/qrEngine';
+import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
 import { saveToHistory, getPreferences, savePreferences } from './utils/storage';
-import ControlsPanel, { COLOR_PRESETS } from './ControlsPanel';
+import QRScanner from './components/QRScanner';
+import HistoryPage from './components/HistoryPage';
+import { ScanLine, History } from 'lucide-react';
 
-/* ── Error Boundary: isolates QR engine failures from the rest of the UI ── */
+/* ── Color Presets ── */
+const COLOR_PRESETS = [
+  { name: 'Classic',  qr: '#000000', bg: '#ffffff' },
+  { name: 'Midnight', qr: '#ffffff', bg: '#0a0a1a' },
+  { name: 'Ocean',    qr: '#0369a1', bg: '#e0f2fe' },
+  { name: 'Forest',   qr: '#166534', bg: '#dcfce7' },
+  { name: 'Sunset',   qr: '#9a3412', bg: '#fff7ed' },
+  { name: 'Royal',    qr: '#4f46e5', bg: '#eef2ff' },
+  { name: 'Rose',     qr: '#9f1239', bg: '#fff1f2' },
+  { name: 'Gold',     qr: '#854d0e', bg: '#fefce8' },
+];
+
+/* ── Frame options for Frame Tab ── */
+const FRAME_OPTIONS = [
+  { id: FRAME_STYLES.NONE,    label: 'No Frame',       icon: '⊘' },
+  { id: FRAME_STYLES.BOX,     label: 'Simple Border',  icon: '▢' },
+  { id: FRAME_STYLES.ROUNDED, label: 'Rounded Border', icon: '▣' },
+  { id: FRAME_STYLES.MODERN,  label: 'Shadow Box',     icon: '◈' },
+  { id: FRAME_STYLES.SCAN_ME, label: 'Neon Glow',      icon: '◇' },
+  { id: FRAME_STYLES.TEXT_BOTTOM, label: 'Vintage Stamp', icon: '◆' },
+];
+
+/* ── Error Correction Levels ── */
+const EC_LEVELS = [
+  { key: 'L', label: 'L', pct: '7%',  width: 25,  desc: 'Low error correction. Best for simple QR codes with clean printing and close-range scanning.' },
+  { key: 'M', label: 'M', pct: '15%', width: 50,  desc: 'Medium error correction. Good balance for most use cases — recommended as default.' },
+  { key: 'Q', label: 'Q', pct: '25%', width: 75,  desc: 'Quartile error correction. Recommended when adding a logo or for medium-range scanning.' },
+  { key: 'H', label: 'H', pct: '30%', width: 100, desc: 'High error correction. Best for complex logos, small print sizes, or harsh environments.' },
+];
+
+/* ── Error Boundary ── */
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
   static getDerivedStateFromError() { return { hasError: true }; }
@@ -63,20 +93,111 @@ class ErrorBoundary extends Component {
 
 
 export default function App() {
-  // State: Tab & Theme
-  const [activeTab, setActiveTab] = useState('generator');
+  // ── Tab & Theme ──
+  const [activeTab, setActiveTab] = useState('content');
+  const [activePage, setActivePage] = useState('generator'); // 'generator', 'scanner', 'history'
   const [theme, setTheme] = useState('dark');
-  const [menuOpen, setMenuOpen] = useState(false);
+
+  // ── QR Content ──
+  const [qrType, setQrType] = useState(QR_TYPES.URL);
+  const [qrData, setQrData] = useState({ url: 'https://example.com' });
+  const [errorLevel, setErrorLevel] = useState('M');
+
+  // ── Colors ──
+  const [qrColor, setQrColor] = useState('#000000');
+  const [bgColor, setBgColor] = useState('#ffffff');
+  const [bgTransparent, setBgTransparent] = useState(false);
+  const [eyeColor, setEyeColor] = useState('');
+  const [eyeOuterColor, setEyeOuterColor] = useState('');
+  const [syncEyes, setSyncEyes] = useState(true);
+  const [activePreset, setActivePreset] = useState(null);
+  
+  // ── Gradient ──
+  const [gradientEnabled, setGradientEnabled] = useState(false);
+  const [gradientColor1, setGradientColor1] = useState('#6c5ce7');
+  const [gradientColor2, setGradientColor2] = useState('#a78bfa');
+  const [gradientType, setGradientType] = useState('linear');
+
+  // ── Shapes ──
+  const [dotStyle, setDotStyle] = useState(DOT_STYLES.SQUARE);
+  const [eyeStyle, setEyeStyle] = useState(EYE_STYLES.SQUARE);
+  const [dotPadding, setDotPadding] = useState(0);
+  const [eyePadding, setEyePadding] = useState(0);
+
+  // ── Logo ──
+  const [logo, setLogo] = useState(null);
+  const [logoSize, setLogoSize] = useState(0.18);
+  const [logoPadding, setLogoPadding] = useState(10);
+  const [logoBackground, setLogoBackground] = useState(false);
+  const [logoBgColor, setLogoBgColor] = useState('#ffffff');
+  const [logoBgShape, setLogoBgShape] = useState('circle');
+  const [logoOutline, setLogoOutline] = useState(false);
+  const [logoOutlineColor, setLogoOutlineColor] = useState('#ffffff');
+  const [logoOutlineWidth, setLogoOutlineWidth] = useState(3);
+  const [logoOutlineOpacity, setLogoOutlineOpacity] = useState(1);
+
+  // ── Frame ──
+  const [frameStyle, setFrameStyle] = useState('none');
+  const [frameText, setFrameText] = useState('SCAN ME');
+  const [frameColor, setFrameColor] = useState('');
+
+  // ── References ──
+  const canvasRef = useRef(null);
+  const renderTimeoutRef = useRef(null);
+  const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [selectedFormat, setSelectedFormat] = useState('PNG');
+  const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
+  const downloadBtnRef = useRef(null);
+  const [qrAnimKey, setQrAnimKey] = useState(0);
+  const [logoImgError, setLogoImgError] = useState(false);
+
+  // ── Menu ──
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Close menu when clicking outside
+  // ── Sync Eyes color with dots color when syncEyes is ON ──
+  useEffect(() => {
+    if (syncEyes) {
+      setEyeColor(qrColor);
+      setEyeOuterColor(qrColor);
+    }
+  }, [syncEyes, qrColor]);
+
+  // ── Load preferences ──
+  useEffect(() => {
+    const prefs = getPreferences();
+    if (prefs.theme) setTheme(prefs.theme);
+  }, []);
+
+  // ── Bump canvas animation key ──
+  useEffect(() => {
+    if (qrMatrixInfo) setQrAnimKey(k => k + 1);
+  }, [qrMatrixInfo]);
+
+  // ── Auto-upgrade error correction when logo is present ──
+  useEffect(() => {
+    if (logo) {
+      setErrorLevel(prev => (prev === 'L' || prev === 'M') ? 'H' : prev);
+    } else {
+      setErrorLevel(prev => prev === 'H' ? 'M' : prev);
+    }
+  }, [logo]);
+
+  // ── Update body theme ──
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  // ── Close dropdown/menu on outside click ──
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false);
-      }
       if (downloadBtnRef.current && !downloadBtnRef.current.contains(e.target)) {
         setFormatDropdownOpen(false);
+      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -87,105 +208,13 @@ export default function App() {
     };
   }, []);
 
-  // State: QR Content
-  const [qrType, setQrType] = useState(QR_TYPES.URL);
-  const [qrData, setQrData] = useState({ url: 'https://example.com' });
-  // M is the right default — dense enough for reliability, scannable at small sizes.
-  // Auto-upgrades to H when a logo is added (see logo useEffect below).
-  const [errorLevel, setErrorLevel] = useState('M');
-
-  // State: Colors
-  const [qrColor, setQrColor] = useState('#000000');
-  const [bgColor, setBgColor] = useState('#ffffff');
-  const [bgTransparent, setBgTransparent] = useState(false);
-  
-  // State: Gradient
-  const [gradientEnabled, setGradientEnabled] = useState(false);
-  const [gradientColor1, setGradientColor1] = useState('#6c5ce7');
-  const [gradientColor2, setGradientColor2] = useState('#a78bfa');
-  const [gradientType, setGradientType] = useState('linear');
-  
-  // State: Shapes
-  const [dotStyle, setDotStyle] = useState(DOT_STYLES.SQUARE);
-  const [eyeStyle, setEyeStyle] = useState(EYE_STYLES.SQUARE);
-  const [eyeColor, setEyeColor] = useState('');
-  const [eyeOuterColor, setEyeOuterColor] = useState('');
-  
-  // State: Shapes padding
-  const [dotPadding, setDotPadding] = useState(0);
-  const [eyePadding, setEyePadding] = useState(0);
-  
-  // State: Logo
-  const [logo, setLogo] = useState(null);
-  const [logoSize, setLogoSize] = useState(0.18);
-  const [logoPadding, setLogoPadding] = useState(10);
-  const [logoBackground, setLogoBackground] = useState(false);
-  const [logoBgColor, setLogoBgColor] = useState('#ffffff');
-  const [logoBgShape, setLogoBgShape] = useState('circle');
-  
-  // State: Logo Smart Outline
-  const [logoOutline, setLogoOutline] = useState(false);
-  const [logoOutlineColor, setLogoOutlineColor] = useState('#ffffff');
-  const [logoOutlineWidth, setLogoOutlineWidth] = useState(3);
-  const [logoOutlineOpacity, setLogoOutlineOpacity] = useState(1);
-
-  // References
-  const canvasRef = useRef(null);
-  const renderTimeoutRef = useRef(null);
-  const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
-  const [toast, setToast] = useState(null);
-  const [downloadingFormat, setDownloadingFormat] = useState(null);
-  // Tracks which colour preset is currently active for the active-ring indicator
-  const [activePreset, setActivePreset] = useState(null);
-  // Download format selector
-  const [selectedFormat, setSelectedFormat] = useState('PNG');
-  const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
-  const downloadBtnRef = useRef(null);
-
-  // Canvas animation key — bumped on every matrix update to replay the CSS appear animation
-  const [qrAnimKey, setQrAnimKey] = useState(0);
-
-  // Frame state
-  const [frameStyle, setFrameStyle] = useState('none');
-  const [frameText, setFrameText] = useState('SCAN ME');
-  const [frameColor, setFrameColor] = useState('');
-
-  // Logo image fallback state (shows gradient icon if /logo.png fails to load)
-  const [logoImgError, setLogoImgError] = useState(false);
-
-  // Load preferences
-  useEffect(() => {
-    const prefs = getPreferences();
-    if (prefs.theme) setTheme(prefs.theme);
-  }, []);
-
-  // Bump canvas animation key on every matrix update
-  useEffect(() => {
-    if (qrMatrixInfo) setQrAnimKey(k => k + 1);
-  }, [qrMatrixInfo]);
-
-  // Auto-upgrade error correction to H when a logo is present (logo occludes QR modules,
-  // higher redundancy is needed). Downgrade back to M when logo is removed.
-  useEffect(() => {
-    if (logo) {
-      setErrorLevel(prev => (prev === 'L' || prev === 'M') ? 'H' : prev);
-    } else {
-      setErrorLevel(prev => prev === 'H' ? 'M' : prev);
-    }
-  }, [logo]);
-
-  // Update body theme
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  // Show toast notification
+  // ── Toast ──
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Copy QR to clipboard
+  // ── Copy to Clipboard ──
   const handleCopyToClipboard = () => {
     if (!canvasRef.current) return;
     canvasRef.current.toBlob(async (blob) => {
@@ -200,7 +229,7 @@ export default function App() {
     });
   };
 
-  // Web Share API — only shown when browser supports navigator.share
+  // ── Share ──
   const handleShare = () => {
     if (!canvasRef.current) return;
     canvasRef.current.toBlob(async (blob) => {
@@ -214,16 +243,9 @@ export default function App() {
     });
   };
 
+  // ── Download ──
+  const FORMAT_MAP = { PNG: downloadPNG, SVG: downloadSVG, PDF: downloadPDF, JPG: downloadJPG };
 
-  // Format lookup — maps the selectedFormat label to its export function
-  const FORMAT_MAP = {
-    PNG: downloadPNG,
-    SVG: downloadSVG,
-    PDF: downloadPDF,
-    JPG: downloadJPG,
-  };
-
-  // Download with loading state
   const handleDownload = async (format, downloadFn) => {
     if (!canvasRef.current) return;
     setDownloadingFormat(format);
@@ -234,7 +256,23 @@ export default function App() {
     }
   };
 
-  // 1. Generate QR Data Matrix (when content changes)
+  // ── Save ──
+  const handleSave = () => {
+    if (!canvasRef.current) return;
+    const dataString = formatQRData(qrType, qrData);
+    if (!dataString) { showToast('Please enter QR data first', 'error'); return; }
+    saveToHistory({
+      qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
+      qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
+      dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
+      logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+      logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+      thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
+    });
+    showToast('Saved to history');
+  };
+
+  // ── Generate QR Matrix ──
   const regenerateMatrix = useCallback(() => {
     const dataString = formatQRData(qrType, qrData);
     if (!dataString) return;
@@ -246,160 +284,70 @@ export default function App() {
     }
   }, [qrType, qrData, errorLevel]);
 
-  useEffect(() => {
-    regenerateMatrix();
-  }, [regenerateMatrix]);
+  useEffect(() => { regenerateMatrix(); }, [regenerateMatrix]);
 
-  // Bump canvas key to replay appear animation on each new QR
-  useEffect(() => {
-    if (qrMatrixInfo) setQrAnimKey(k => k + 1);
-  }, [qrMatrixInfo]);
-
-  // 2. Render Canvas (when visual settings change)
+  // ── Render Canvas ──
   const renderCanvas = useCallback(() => {
     if (!qrMatrixInfo || !canvasRef.current) return;
-    
-    if (renderTimeoutRef.current) {
-      clearTimeout(renderTimeoutRef.current);
-    }
-
+    if (renderTimeoutRef.current) clearTimeout(renderTimeoutRef.current);
     renderTimeoutRef.current = setTimeout(() => {
       if (!canvasRef.current) return;
       renderQR(canvasRef.current, {
-        ...qrMatrixInfo,
-        size: 512,
-        qrColor,
-        bgColor,
-        bgTransparent,
-        dotStyle,
-        eyeStyle,
-        eyeColor,
-        eyeOuterColor,
-        dotPadding,
-        eyePadding,
-        gradientEnabled,
-        gradientColor1,
-        gradientColor2,
-        gradientType,
-        logo: logo?.image,
-        logoSize,
-        logoPadding,
-        logoBackground,
-        logoBgColor,
-        logoBgShape,
-        logoOutline,
-        logoOutlineColor,
-        logoOutlineWidth,
-        logoOutlineOpacity,
-        quietZone: 2,
-        frameStyle,
-        frameText,
-        frameColor,
+        ...qrMatrixInfo, size: 512,
+        qrColor, bgColor, bgTransparent, dotStyle, eyeStyle,
+        eyeColor: syncEyes ? qrColor : eyeColor,
+        eyeOuterColor: syncEyes ? qrColor : eyeOuterColor,
+        dotPadding, eyePadding,
+        gradientEnabled, gradientColor1, gradientColor2, gradientType,
+        logo: logo?.image, logoSize, logoPadding,
+        logoBackground, logoBgColor, logoBgShape,
+        logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+        quietZone: 2, frameStyle, frameText, frameColor,
       });
-    }, 40); // 40ms debounce to allow 60fps UI threads during slider changes
+    }, 40);
   }, [
-    qrMatrixInfo, qrColor, bgColor, bgTransparent, dotStyle, eyeStyle, eyeColor, 
-    eyeOuterColor, gradientEnabled, gradientColor1, gradientColor2, gradientType,
+    qrMatrixInfo, qrColor, bgColor, bgTransparent, dotStyle, eyeStyle, eyeColor,
+    eyeOuterColor, syncEyes, gradientEnabled, gradientColor1, gradientColor2, gradientType,
     logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-    dotPadding, eyePadding,
-    frameStyle, frameText, frameColor
+    dotPadding, eyePadding, frameStyle, frameText, frameColor
   ]);
 
   useEffect(() => {
     renderCanvas();
-    // Re-render when logo image loads or fails to load
     if (logo?.image && !logo.image.complete) {
       logo.image.onload = renderCanvas;
       logo.image.onerror = () => showToast('Logo failed to load', 'error');
     }
   }, [renderCanvas, logo]);
 
-  // Handle Loading from History
-  const handleLoadQR = (item) => {
-    setQrType(item.qrType);
-    setQrData(item.qrData);
-    setErrorLevel(item.errorLevel || 'H');
-    
-    // Restore styling
-    if (item.qrColor !== undefined) setQrColor(item.qrColor);
-    if (item.bgColor !== undefined) setBgColor(item.bgColor);
-    if (item.bgTransparent !== undefined) setBgTransparent(item.bgTransparent);
-    if (item.gradientEnabled !== undefined) setGradientEnabled(item.gradientEnabled);
-    if (item.gradientColor1 !== undefined) setGradientColor1(item.gradientColor1);
-    if (item.gradientColor2 !== undefined) setGradientColor2(item.gradientColor2);
-    if (item.gradientType !== undefined) setGradientType(item.gradientType);
-    if (item.dotStyle !== undefined) setDotStyle(item.dotStyle);
-    if (item.eyeStyle !== undefined) setEyeStyle(item.eyeStyle);
-    if (item.eyeColor !== undefined) setEyeColor(item.eyeColor);
-    if (item.eyeOuterColor !== undefined) setEyeOuterColor(item.eyeOuterColor);
-    if (item.dotPadding !== undefined) setDotPadding(item.dotPadding);
-    if (item.eyePadding !== undefined) setEyePadding(item.eyePadding);
-    if (item.logoSize !== undefined) setLogoSize(item.logoSize);
-    if (item.logoPadding !== undefined) setLogoPadding(item.logoPadding);
-    if (item.logoBackground !== undefined) setLogoBackground(item.logoBackground);
-    if (item.logoBgColor !== undefined) setLogoBgColor(item.logoBgColor);
-    if (item.logoBgShape !== undefined) setLogoBgShape(item.logoBgShape);
-    if (item.logoOutline !== undefined) setLogoOutline(item.logoOutline);
-    if (item.logoOutlineColor !== undefined) setLogoOutlineColor(item.logoOutlineColor);
-    if (item.logoOutlineWidth !== undefined) setLogoOutlineWidth(item.logoOutlineWidth);
-    if (item.logoOutlineOpacity !== undefined) setLogoOutlineOpacity(item.logoOutlineOpacity);
-    
-    // Clear logo since we can't easily save the uploaded file
-    setLogo(null);
-    
-    setActiveTab('generator');
-    showToast('Loaded from history');
-  };
+  // ── Tab definitions ──
+  const TABS = [
+    { id: 'content', label: 'Content', icon: Pencil },
+    { id: 'color',   label: 'Color',   icon: Palette },
+    { id: 'shapes',  label: 'Shapes',  icon: Hexagon },
+    { id: 'logo',    label: 'Logo',    icon: ImageIcon },
+    { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
+    { id: 'scan',    label: 'Scan',    icon: ShieldCheck },
+  ];
 
-  // Handle Save
-  const handleSave = () => {
-    if (!canvasRef.current) return;
-    
-    const dataString = formatQRData(qrType, qrData);
-    if (!dataString) {
-      showToast('Please enter QR data first', 'error');
-      return;
+  // ── Get the frame CSS class for the preview wrapper ──
+  const getFrameClass = () => {
+    switch (frameStyle) {
+      case FRAME_STYLES.BOX: return 'frame-simple-border';
+      case FRAME_STYLES.ROUNDED: return 'frame-rounded-border';
+      case FRAME_STYLES.MODERN: return 'frame-shadow-box';
+      case FRAME_STYLES.SCAN_ME: return 'frame-neon-glow';
+      case FRAME_STYLES.TEXT_BOTTOM: return 'frame-vintage-stamp';
+      default: return '';
     }
-    
-    saveToHistory({
-      qrType,
-      qrData,
-      displayText: dataString.substring(0, 50),
-      errorLevel,
-      qrColor,
-      bgColor,
-      bgTransparent,
-      gradientEnabled,
-      gradientColor1,
-      gradientColor2,
-      gradientType,
-      dotStyle,
-      eyeStyle,
-      eyeColor,
-      eyeOuterColor,
-      dotPadding,
-      eyePadding,
-      logoSize,
-      logoPadding,
-      logoBackground,
-      logoBgColor,
-      logoBgShape,
-      logoOutline,
-      logoOutlineColor,
-      logoOutlineWidth,
-      logoOutlineOpacity,
-      thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
-    });
-    showToast('Saved to history');
   };
 
   return (
-    <div className="app">
-      {/* Header */}
+    <div className="app redesigned">
+      {/* ── Header ── */}
       <header className="app-header">
         <div className="app-logo">
-          {/* App logo — gradient icon fallback if logo.png is missing */}
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
             {logoImgError ? (
               <div className="app-logo-fallback">
@@ -416,31 +364,8 @@ export default function App() {
           </div>
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
-        
-        <div className="header-actions">
-          {/* Visible nav tabs on desktop — Generator and History always accessible */}
-          <nav className="header-nav">
-            <button
-              className={`header-nav-tab${activeTab === 'generator' ? ' active' : ''}`}
-              onClick={() => setActiveTab('generator')}
-            >
-              <QrCode size={15} /> Generator
-            </button>
-            <button
-              className={`header-nav-tab${activeTab === 'scanner' ? ' active' : ''}`}
-              onClick={() => setActiveTab('scanner')}
-            >
-              <ScanLine size={15} /> Scanner
-            </button>
-            <button
-              className={`header-nav-tab${activeTab === 'history' ? ' active' : ''}`}
-              onClick={() => setActiveTab('history')}
-            >
-              <HistoryIcon size={15} /> History
-            </button>
-          </nav>
 
-          {/* Theme toggle — always visible, one-click switch */}
+        <div className="app-header-actions" style={{ display: 'flex', gap: '8px' }}>
           <button
             className="btn-theme-toggle"
             onClick={() => {
@@ -454,218 +379,327 @@ export default function App() {
             {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
           </button>
 
-          {/* Hamburger — mobile only (hidden on desktop via CSS) */}
-          <div className="app-menu-wrapper" ref={menuRef}>
+          <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
             <button
-              className={`btn btn-ghost btn-icon app-menu-trigger${menuOpen ? ' active' : ''}`}
-              onClick={() => setMenuOpen(v => !v)}
-              aria-label="Open menu"
+              className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle menu"
             >
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+              <Menu size={20} />
             </button>
 
-            {menuOpen && (
-              <div className="app-menu-dropdown">
-                <div className="app-menu-header">
-                  <span className="app-menu-title">Menu</span>
+            {isMenuOpen && (
+              <div className="app-dropdown-menu fade-in">
+                <div className="menu-links">
+                  <button className={`menu-link-btn ${activePage === 'generator' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('generator'); }}>
+                    <QrCode size={16} /> QR Generator
+                  </button>
+                  <button className={`menu-link-btn ${activePage === 'scanner' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('scanner'); }}>
+                    <ScanLine size={16} /> QR Scanner
+                  </button>
+                  <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('history'); }}>
+                    <History size={16} /> History
+                  </button>
+                  <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
+                  <button className="menu-link-btn" onClick={() => window.location.href = '/about'}>
+                    <Info size={16} /> About
+                  </button>
+                  <button className="menu-link-btn" onClick={() => window.location.href = '/privacy-policy'}>
+                    <Shield size={16} /> Privacy Policy
+                  </button>
+                  <button className="menu-link-btn" onClick={() => window.location.href = '/terms'}>
+                    <FileIcon size={16} /> Terms of Service
+                  </button>
                 </div>
-
-                <div className="app-menu-section-label">Navigate</div>
-                <button
-                  className={`app-menu-item${activeTab === 'generator' ? ' menu-item-active' : ''}`}
-                  onClick={() => { setActiveTab('generator'); setMenuOpen(false); }}
-                >
-                  <QrCode size={16} />
-                  <span className="menu-label">QR Generator</span>
-                  {activeTab === 'generator' && <span className="menu-dot" />}
-                </button>
-                <button
-                  className={`app-menu-item${activeTab === 'scanner' ? ' menu-item-active' : ''}`}
-                  onClick={() => { setActiveTab('scanner'); setMenuOpen(false); }}
-                >
-                  <ScanLine size={16} />
-                  <span className="menu-label">Scanner</span>
-                  {activeTab === 'scanner' && <span className="menu-dot" />}
-                </button>
-                <button
-                  className={`app-menu-item${activeTab === 'history' ? ' menu-item-active' : ''}`}
-                  onClick={() => { setActiveTab('history'); setMenuOpen(false); }}
-                >
-                  <HistoryIcon size={16} />
-                  <span className="menu-label">History</span>
-                  {activeTab === 'history' && <span className="menu-dot" />}
-                </button>
-
-                <div style={{ height: 8 }} />
+                <div className="menu-footer">
+                  <p>© 2026 MushiQR Pro</p>
+                  <p>All rights reserved</p>
+                </div>
               </div>
             )}
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="app-main">
-        {activeTab === 'generator' ? (
+      {/* ── Main Content Area ── */}
+      <main className="app-main-redesigned">
+        {activePage === 'generator' ? (
           <>
-            <aside className="sidebar">
-              <ControlsPanel
-                qrType={qrType} setQrType={setQrType}
-                qrData={qrData} setQrData={setQrData}
-                qrColor={qrColor} setQrColor={setQrColor}
-                bgColor={bgColor} setBgColor={setBgColor}
-                bgTransparent={bgTransparent} setBgTransparent={setBgTransparent}
-                gradientEnabled={gradientEnabled} setGradientEnabled={setGradientEnabled}
-                gradientColor1={gradientColor1} setGradientColor1={setGradientColor1}
-                gradientColor2={gradientColor2} setGradientColor2={setGradientColor2}
-                gradientType={gradientType} setGradientType={setGradientType}
-                activePreset={activePreset} setActivePreset={setActivePreset}
-                dotStyle={dotStyle} setDotStyle={setDotStyle}
-                eyeStyle={eyeStyle} setEyeStyle={setEyeStyle}
-                eyeColor={eyeColor} setEyeColor={setEyeColor}
-                eyeOuterColor={eyeOuterColor} setEyeOuterColor={setEyeOuterColor}
-                dotPadding={dotPadding} setDotPadding={setDotPadding}
-                eyePadding={eyePadding} setEyePadding={setEyePadding}
-                logo={logo} setLogo={setLogo}
-                logoSize={logoSize} setLogoSize={setLogoSize}
-                logoPadding={logoPadding} setLogoPadding={setLogoPadding}
-                logoBackground={logoBackground} setLogoBackground={setLogoBackground}
-                logoBgColor={logoBgColor} setLogoBgColor={setLogoBgColor}
-                logoBgShape={logoBgShape} setLogoBgShape={setLogoBgShape}
-                logoOutline={logoOutline} setLogoOutline={setLogoOutline}
-                logoOutlineColor={logoOutlineColor} setLogoOutlineColor={setLogoOutlineColor}
-                logoOutlineWidth={logoOutlineWidth} setLogoOutlineWidth={setLogoOutlineWidth}
-                logoOutlineOpacity={logoOutlineOpacity} setLogoOutlineOpacity={setLogoOutlineOpacity}
-                errorLevel={errorLevel} setErrorLevel={setErrorLevel}
-                frameStyle={frameStyle} setFrameStyle={setFrameStyle}
-                frameText={frameText} setFrameText={setFrameText}
-                frameColor={frameColor} setFrameColor={setFrameColor}
-              />
-            </aside>
-
-            {/* Error boundary: isolates QR engine crashes from the page shell */}
+            {/* ── QR Preview Card (always visible) ── */}
             <ErrorBoundary>
-              <section className="preview-panel pt-4 pb-4">
-                <div className="preview-container scale-in">
-
-                  {/* Enhanced QR Card with integrated frames */}
-                  <div className="preview-qr-wrapper">
-                    {!qrMatrixInfo ? (
-                      <div className="preview-placeholder">
-                        <span className="preview-placeholder-icon">
-                          <QrCode size={120} color="var(--accent-primary)" strokeWidth={1} />
-                        </span>
-                        <span className="preview-placeholder-text">Your QR code will appear here</span>
-                        <span className="preview-placeholder-sub">Start by entering a URL or text above</span>
-                      </div>
-                    ) : (
-                      <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
-                    )}
-                  </div>
-
-                  {/* Primary actions: copy, save to history, and native share */}
-                  <div className="preview-action-row">
-                    <button
-                      className="btn-copy"
-                      onClick={handleCopyToClipboard}
-                      disabled={!qrMatrixInfo}
-                      title="Copy image to clipboard"
-                    >
-                      <Copy size={16} /> Copy
-                    </button>
-                    {/* Save to history — was previously defined but never wired to a button */}
-                    <button
-                      className="btn-save"
-                      onClick={handleSave}
-                      disabled={!qrMatrixInfo}
-                      title="Save to history"
-                    >
-                      <Save size={16} /> Save
-                    </button>
-                    {/* Share button — only shown when Web Share API is available */}
-                    {typeof navigator !== 'undefined' && navigator.canShare && (
-                      <button
-                        className="btn-share"
-                        onClick={handleShare}
-                        disabled={!qrMatrixInfo}
-                        title="Share QR code"
-                      >
-                        <Share2 size={16} /> Share
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Single split-button: left side triggers download, right side opens format picker */}
-                  <div className="download-split-wrapper" ref={downloadBtnRef}>
-                    <div className={`download-split-btn${!qrMatrixInfo ? ' disabled' : ''}`}>
-
-                      {/* Left: trigger download in currently selected format */}
-                      <button
-                        className="download-split-main"
-                        disabled={!qrMatrixInfo}
-                        onClick={() => handleDownload(selectedFormat, FORMAT_MAP[selectedFormat])}
-                      >
-                        {downloadingFormat === selectedFormat
-                          ? <Loader2 size={17} className="spinning" />
-                          : <Download size={17} />
-                        }
-                        Download {selectedFormat}
-                      </button>
-
-                      {/* Divider */}
-                      <span className="download-split-divider" />
-
-                      {/* Right: open format picker dropdown */}
-                      <button
-                        className={`download-split-chevron${formatDropdownOpen ? ' open' : ''}`}
-                        disabled={!qrMatrixInfo}
-                        onClick={() => setFormatDropdownOpen(v => !v)}
-                        aria-label="Choose download format"
-                      >
-                        <ChevronDown size={15} />
-                      </button>
+              <section className="qr-preview-card">
+                <div className={`qr-preview-wrapper ${getFrameClass()}`}>
+                  {!qrMatrixInfo ? (
+                    <div className="preview-placeholder">
+                      <span className="preview-placeholder-icon">
+                        <QrCode size={80} color="var(--accent-primary)" strokeWidth={1} />
+                      </span>
+                      <span className="preview-placeholder-text">Your QR code will appear here</span>
                     </div>
+                  ) : (
+                    <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                  )}
+                </div>
 
-                    {/* Format picker dropdown */}
-                    {formatDropdownOpen && (
-                      <div className="download-format-dropdown">
-                        <div className="download-format-dropdown-label">Choose format</div>
-                        {[
-                          { label: 'PNG',  tip: 'Best for web & sharing',    ext: '.png', Icon: FileImage, color: '#00F0FF' },
-                          { label: 'SVG',  tip: 'Vector — scales to any size', ext: '.svg', Icon: FileCode, color: '#7000FF' },
-                          { label: 'PDF',  tip: 'Best for documents & print', ext: '.pdf', Icon: FileText, color: '#FF007F' },
-                          { label: 'JPG',  tip: 'Compressed — smaller file',  ext: '.jpg', Icon: FileImage, color: '#FFD54F' },
-                        ].map(({ label, tip, ext, Icon, color }) => (
-                          <button
-                            key={label}
-                            className={`download-format-option${selectedFormat === label ? ' active' : ''}`}
-                            onClick={() => {
-                              setSelectedFormat(label);
-                              setFormatDropdownOpen(false);
-                            }}
-                          >
-                              <div className="download-format-icon-wrapper" style={{ '--icon-color': color }}>
-                                <Icon size={24} strokeWidth={1.5} />
-                              </div>
-                              <span className="download-format-name">{label}</span>
+                {/* Action buttons row */}
+                <div className="qr-action-row">
+                  <button className="qr-action-btn" onClick={handleCopyToClipboard} disabled={!qrMatrixInfo} title="Copy image">
+                    <Copy size={16} /> Copy
+                  </button>
+                  <button className="qr-action-btn" onClick={handleSave} disabled={!qrMatrixInfo} title="Save to history">
+                    <Save size={16} /> Save
+                  </button>
+                  {typeof navigator !== 'undefined' && navigator.canShare && (
+                    <button className="qr-action-btn" onClick={handleShare} disabled={!qrMatrixInfo} title="Share">
+                      <Share2 size={16} /> Share
+                    </button>
+                  )}
+                </div>
 
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                {/* Download button with dropdown */}
+                <div className="download-split-wrapper" ref={downloadBtnRef}>
+                  <div className={`download-split-btn${!qrMatrixInfo ? ' disabled' : ''}`}>
+                    <button
+                      className="download-split-main"
+                      disabled={!qrMatrixInfo}
+                      onClick={() => handleDownload(selectedFormat, FORMAT_MAP[selectedFormat])}
+                    >
+                      {downloadingFormat === selectedFormat
+                        ? <Loader2 size={17} className="spinning" />
+                        : <Download size={17} />
+                      }
+                      Download {selectedFormat}
+                    </button>
+                    <span className="download-split-divider" />
+                    <button
+                      className={`download-split-chevron${formatDropdownOpen ? ' open' : ''}`}
+                      disabled={!qrMatrixInfo}
+                      onClick={() => setFormatDropdownOpen(v => !v)}
+                      aria-label="Choose download format"
+                    >
+                      <ChevronDown size={15} />
+                    </button>
                   </div>
 
+                  {formatDropdownOpen && (
+                    <div className="download-format-dropdown">
+                      <div className="download-format-dropdown-label">Choose format</div>
+                      {[
+                        { label: 'PNG', Icon: FileImage, color: '#00F0FF' },
+                        { label: 'SVG', Icon: FileCode, color: '#7000FF' },
+                        { label: 'PDF', Icon: FileText, color: '#FF007F' },
+                        { label: 'JPG', Icon: FileImage, color: '#FFD54F' },
+                      ].map(({ label, Icon, color }) => (
+                        <button
+                          key={label}
+                          className={`download-format-option${selectedFormat === label ? ' active' : ''}`}
+                          onClick={() => { setSelectedFormat(label); setFormatDropdownOpen(false); }}
+                        >
+                          <div className="download-format-icon-wrapper" style={{ '--icon-color': color }}>
+                            <Icon size={24} strokeWidth={1.5} />
+                          </div>
+                          <span className="download-format-name">{label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </section>
             </ErrorBoundary>
+
+            {/* ── Tab Panel Content ── */}
+            <section className="tab-panel-area">
+              {/* Content Tab */}
+              {activeTab === 'content' && (
+                <div className="tab-panel fade-in" id="panel-content">
+                  <div className="panel-section">
+                    <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
+                  </div>
+                  <div className="panel-section">
+                    <label className="panel-label">QR Type</label>
+                    <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
+                  </div>
+                </div>
+              )}
+
+              {/* Color Tab */}
+              {activeTab === 'color' && (
+                <div className="tab-panel fade-in" id="panel-color">
+                  <div className="panel-section">
+                    <label className="panel-label">Quick Presets</label>
+                    <div className="color-presets-row">
+                      {COLOR_PRESETS.map(preset => (
+                        <div
+                          key={preset.name}
+                          className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
+                          title={preset.name}
+                          style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                          onClick={() => {
+                            setQrColor(preset.qr);
+                            setBgColor(preset.bg);
+                            setBgTransparent(false);
+                            setActivePreset(preset.name);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="panel-section">
+                    <ColorPicker label="Background Color" value={bgColor} onChange={setBgColor} />
+                  </div>
+
+                  <div className="panel-section">
+                    <ColorPicker label="Dots Color" value={qrColor} onChange={setQrColor} />
+                  </div>
+
+                  <div className="panel-section">
+                    {!syncEyes ? (
+                      <div className="eye-colors-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <ColorPicker label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} />
+                        <ColorPicker label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} />
+                      </div>
+                    ) : (
+                      <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} />
+                    )}
+                    <div className="toggle-row">
+                      <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
+                      <span className="toggle-hint">When ON, eyes match dots color</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Shapes Tab */}
+              {activeTab === 'shapes' && (
+                <div className="tab-panel fade-in" id="panel-shapes">
+                  <div className="panel-section">
+                    <label className="panel-label">Dot Style</label>
+                    <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
+                  </div>
+                  <div className="panel-section">
+                    <label className="panel-label">Corner Style</label>
+                    <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
+                  </div>
+                </div>
+              )}
+
+              {/* Logo Tab */}
+              {activeTab === 'logo' && (
+                <div className="tab-panel fade-in" id="panel-logo">
+                  <div className="panel-section">
+                    <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
+                    <LogoPresets onLogoChange={setLogo} />
+                  </div>
+
+                  {logo && (
+                    <div className="panel-section">
+                      <Slider
+                        label="Logo Size"
+                        value={logoSize}
+                        min={0.1}
+                        max={0.4}
+                        step={0.01}
+                        onChange={setLogoSize}
+                      />
+                      <Slider
+                        label="Logo Padding"
+                        value={logoPadding}
+                        min={0}
+                        max={20}
+                        step={1}
+                        onChange={setLogoPadding}
+                        unit="px"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Frame Tab */}
+              {activeTab === 'frame' && (
+                <div className="tab-panel fade-in" id="panel-frame">
+                  <div className="panel-section">
+                    <label className="panel-label">Frame Style</label>
+                    <div className="frame-options-list">
+                      {FRAME_OPTIONS.map(opt => (
+                        <button
+                          key={opt.id}
+                          className={`frame-option-btn${frameStyle === opt.id ? ' active' : ''}`}
+                          onClick={() => setFrameStyle(opt.id)}
+                        >
+                          <span className="frame-option-icon">{opt.icon}</span>
+                          <span className="frame-option-label">{opt.label}</span>
+                          {frameStyle === opt.id && <span className="frame-option-check">✓</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Scan Reliability Tab */}
+              {activeTab === 'scan' && (
+                <div className="tab-panel fade-in" id="panel-scan">
+                  <div className="panel-section">
+                    <label className="panel-label">Scan Reliability</label>
+                    <div className="ec-buttons-row">
+                      {EC_LEVELS.map(lv => (
+                        <button
+                          key={lv.key}
+                          className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
+                          onClick={() => setErrorLevel(lv.key)}
+                        >
+                          <span className="ec-btn-letter">{lv.label}</span>
+                          <span className="ec-btn-pct">{lv.pct}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="panel-section">
+                    <label className="panel-label">Reliability Score</label>
+                    <div className="reliability-bar-track">
+                      <div
+                        className="reliability-bar-fill"
+                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+                      />
+                    </div>
+                    <p className="ec-description">
+                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </section>
           </>
-        ) : activeTab === 'scanner' ? (
+        ) : activePage === 'scanner' ? (
           <QRScanner />
         ) : (
-          <HistoryPage onLoadQR={handleLoadQR} />
+          <HistoryPage />
         )}
       </main>
 
-      {/* Toast Notification */}
+      {/* ── Bottom Navigation Bar (only in Generator) ── */}
+      {activePage === 'generator' && (
+        <nav className="bottom-nav">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`bottom-nav-tab${activeTab === tab.id ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span className="bottom-nav-indicator" />
+              <span className="bottom-nav-icon">
+                <tab.icon size={20} strokeWidth={2} />
+              </span>
+              <span className="bottom-nav-label">{tab.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+
+      {/* Toast */}
       {toast && (
         <div className={`toast ${toast.type}`}>
           {toast.type === 'success' ? (
