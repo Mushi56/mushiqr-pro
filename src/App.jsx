@@ -631,11 +631,10 @@ export default function App() {
                   </div>
 
                   <div className="panel-section">
-                    <ColorPicker label="Background Color" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
-                  </div>
-
-                  <div className="panel-section">
-                    <ColorPicker label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                    <div className="eye-colors-grid">
+                      <ColorPicker className="compact-picker" label="Background" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
+                      <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                    </div>
                   </div>
 
                   <div className="panel-section">
