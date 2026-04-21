@@ -2579,7 +2579,9 @@ input[type="range"]::-moz-range-thumb {
 
 /* ========================================
    QR SCANNER PAGE
-   ===.scanner-page {
+   ======================================== */
+
+.scanner-page {
   width: 100%;
   min-height: calc(100vh - 128px);
   display: flex;
@@ -3938,3 +3940,14 @@ input[type="range"]::-moz-range-thumb {
 }
 
 
+
+ . f a d e - i n   { 
+     a n i m a t i o n :   f a d e I n   0 . 3 s   e a s e - o u t   f o r w a r d s ; 
+ } 
+ 
+ @ k e y f r a m e s   f a d e I n   { 
+     f r o m   {   o p a c i t y :   0 ;   t r a n s f o r m :   t r a n s l a t e Y ( 1 0 p x ) ;   } 
+     t o   {   o p a c i t y :   1 ;   t r a n s f o r m :   t r a n s l a t e Y ( 0 ) ;   } 
+ } 
+  
+ 
