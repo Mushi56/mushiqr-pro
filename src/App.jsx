@@ -680,24 +680,25 @@ export default function App() {
         )}
       </main>
 
-      {/* ── Bottom Navigation Bar (only in Generator) ── */}
-      {activePage === 'generator' && (
-        <nav className="bottom-nav">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`bottom-nav-tab${activeTab === tab.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <span className="bottom-nav-indicator" />
-              <span className="bottom-nav-icon">
-                <tab.icon size={20} strokeWidth={2} />
-              </span>
-              <span className="bottom-nav-label">{tab.label}</span>
-            </button>
-          ))}
-        </nav>
-      )}
+      {/* ── Bottom Navigation Bar ── */}
+      <nav className="bottom-nav">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            className={`bottom-nav-tab${activeTab === tab.id && activePage === 'generator' ? ' active' : ''}`}
+            onClick={() => {
+              setActivePage('generator');
+              setActiveTab(tab.id);
+            }}
+          >
+            <div className="bottom-nav-highlight" />
+            <span className="bottom-nav-icon">
+              <tab.icon size={20} strokeWidth={2} />
+            </span>
+            <span className="bottom-nav-label">{tab.label}</span>
+          </button>
+        ))}
+      </nav>
 
       {/* Toast */}
       {toast && (

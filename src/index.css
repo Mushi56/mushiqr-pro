@@ -3235,20 +3235,33 @@ input[type="range"]::-moz-range-thumb {
   color: var(--accent-primary);
 }
 
-.bottom-nav-indicator {
+.bottom-nav-highlight {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 3px;
-  border-radius: 0 0 3px 3px;
-  background: var(--accent-primary);
-  transition: width var(--transition-base);
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 64px;
+  height: 36px;
+  background: var(--accent-soft);
+  border: 1.5px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: all var(--transition-base);
+  z-index: -1;
 }
 
-.bottom-nav-tab.active .bottom-nav-indicator {
-  width: 28px;
+.bottom-nav-tab.active .bottom-nav-highlight {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.bottom-nav-tab.active .bottom-nav-icon,
+.bottom-nav-tab.active .bottom-nav-label {
+  color: var(--accent-primary);
+}
+
+.bottom-nav-tab.active {
+  color: var(--accent-primary);
 }
 
 .bottom-nav-icon {
