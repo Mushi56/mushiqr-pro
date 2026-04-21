@@ -169,17 +169,25 @@ export default function App() {
 
   // ── Mobile App Fixes (Capacitor) ──
   useEffect(() => {
-    // 1. Full Screen Mode (Hide Status Bar)
-    const initStatusBar = async () => {
+    const updateStatusBar = async () => {
       try {
-        await StatusBar.hide();
+        await StatusBar.show();
+        if (theme === 'dark') {
+          await StatusBar.setStyle({ style: 'DARK' });
+          await StatusBar.setBackgroundColor({ color: '#030305' });
+        } else {
+          await StatusBar.setStyle({ style: 'LIGHT' });
+          await StatusBar.setBackgroundColor({ color: '#FDFDFF' });
+        }
       } catch (e) {
-        console.warn('StatusBar plugin not available or failed to hide.');
+        console.warn('StatusBar plugin failed to update:', e);
       }
     };
-    initStatusBar();
+    updateStatusBar();
+  }, [theme]);
 
-    // 2. Handle Android Back Button
+  useEffect(() => {
+    // Handle Android Back Button
     const backListener = CapApp.addListener('backButton', ({ canGoBack }) => {
       if (advPicker.open) {
         setAdvPicker(prev => ({ ...prev, open: false }));
@@ -195,9 +203,8 @@ export default function App() {
       }
 
       if (activePage !== 'generator') {
-        setActivePage('generator'); // Go back to generator instead of closing
+        setActivePage('generator');
       } else {
-        // If already at generator, we can exit or do nothing
         CapApp.exitApp();
       }
     });
