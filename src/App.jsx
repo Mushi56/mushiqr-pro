@@ -612,6 +612,65 @@ export default function App() {
                         unit="px"
                       />
                     </div>
+
+                    <div className="panel-section">
+                      <div className="toggle-row">
+                        <Toggle label="Smart Stroke" checked={logoOutline} onChange={setLogoOutline} />
+                        <span className="toggle-hint">Outline logo for better visibility</span>
+                      </div>
+                      {logoOutline && (
+                        <div className="nested-panel-section fade-in" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <ColorPicker label="Stroke Color" value={logoOutlineColor} onChange={setLogoOutlineColor} />
+                          <Slider
+                            label="Stroke Width"
+                            value={logoOutlineWidth}
+                            min={1}
+                            max={10}
+                            step={1}
+                            onChange={setLogoOutlineWidth}
+                            unit="px"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="panel-section">
+                      <div className="toggle-row">
+                        <Toggle label="Logo Background" checked={logoBackground} onChange={setLogoBackground} />
+                        <span className="toggle-hint">Add shape behind logo</span>
+                      </div>
+                      {logoBackground && (
+                        <div className="nested-panel-section fade-in" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} />
+                          <div className="selector-group">
+                            <label className="panel-label-sub">Shape</label>
+                            <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>
+                              {['circle', 'square'].map(s => (
+                                <button
+                                  key={s}
+                                  className={`tab-mini-btn ${logoBgShape === s ? 'active' : ''}`}
+                                  onClick={() => setLogoBgShape(s)}
+                                  style={{
+                                    flex: 1,
+                                    padding: '6px',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: logoBgShape === s ? 'var(--accent-primary)' : 'transparent',
+                                    color: logoBgShape === s ? '#fff' : 'var(--text-secondary)',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    textTransform: 'capitalize',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {s}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
