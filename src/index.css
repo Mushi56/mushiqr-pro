@@ -1187,8 +1187,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .download-format-option.active {
-  background: var(--accent-soft);
-  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-light);
 }
 
 .download-format-icon-wrapper {
