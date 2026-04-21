@@ -1100,8 +1100,8 @@ input[type="range"]::-moz-range-thumb {
   background: var(--bg-dropdown);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--accent-primary);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4), 0 0 15px var(--accent-glow);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
   border-radius: var(--radius-md);
   padding: 12px;
   z-index: 200;
