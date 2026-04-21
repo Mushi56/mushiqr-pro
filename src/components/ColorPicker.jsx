@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) {
   const [localValue, setLocalValue] = useState(value);
+  const nativeInputRef = useRef(null);
 
   // Sync with external value changes
   useEffect(() => {
@@ -12,7 +13,6 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) 
     const val = e.target.value;
     setLocalValue(val);
     
-    // Only trigger onChange if it's a valid hex code (3 or 6 chars + #)
     if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(val)) {
       let fullHex = val;
       if (val.length === 4) {
@@ -22,7 +22,16 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) 
     }
   };
 
-  // Safe color for the HTML color input: must be 7-char valid hex, else default to #000000
+  const handlePreviewClick = () => {
+    // Only use advanced picker on mobile (screen width < 768px)
+    if (window.innerWidth < 768 && onOpenAdvanced) {
+      onOpenAdvanced(safeColor, onChange);
+    } else {
+      // On desktop, trigger the native color input
+      nativeInputRef.current?.click();
+    }
+  };
+
   const safeColor = /^#[A-Fa-f0-9]{6}$/.test(localValue) ? localValue : '#000000';
 
   return (
@@ -32,10 +41,10 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) 
         <div 
           className="color-preview" 
           style={{ backgroundColor: safeColor, cursor: 'pointer' }}
-          onClick={() => onOpenAdvanced && onOpenAdvanced(safeColor, onChange)}
+          onClick={handlePreviewClick}
         >
-          {/* Keep the native picker hidden but available as fallback if needed */}
           <input
+            ref={nativeInputRef}
             type="color"
             value={safeColor}
             onChange={(e) => onChange(e.target.value)}
@@ -54,4 +63,5 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced }) 
     </div>
   );
 }
+
 
