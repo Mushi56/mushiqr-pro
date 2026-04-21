@@ -10,13 +10,18 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
   }, [value]);
 
   const handleTextChange = (e) => {
-    const val = e.target.value;
-    setLocalValue(val);
+    let val = e.target.value.trim();
     
-    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(val)) {
-      let fullHex = val;
-      if (val.length === 4) {
-        fullHex = '#' + val[1]+val[1] + val[2]+val[2] + val[3]+val[3];
+    // Auto-prefix with # if missing for internal processing
+    const internalVal = val.startsWith('#') ? val : '#' + val;
+    setLocalValue(internalVal);
+    
+    // Regex to validate 3 or 6 digit hex
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(internalVal)) {
+      let fullHex = internalVal;
+      // Convert 3-digit to 6-digit hex if needed
+      if (internalVal.length === 4) {
+        fullHex = '#' + internalVal[1]+internalVal[1] + internalVal[2]+internalVal[2] + internalVal[3]+internalVal[3];
       }
       onChange(fullHex);
     }
@@ -33,6 +38,7 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
   };
 
   const safeColor = /^#[A-Fa-f0-9]{6}$/.test(localValue) ? localValue : '#000000';
+  const displayValue = localValue.replace('#', '');
 
   return (
     <div className={`form-group ${className}`}>
@@ -54,8 +60,9 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
         <input
           className="color-hex"
           type="text"
-          value={localValue}
+          value={displayValue}
           onChange={handleTextChange}
+          placeholder="FFFFFF"
           spellCheck={false}
           maxLength={7}
         />
