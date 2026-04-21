@@ -50,13 +50,21 @@ import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
 /* ── Color Presets ── */
 const COLOR_PRESETS = [
   { name: 'Classic',  qr: '#000000', bg: '#ffffff' },
-  { name: 'Midnight', qr: '#ffffff', bg: '#0a0a1a' },
+  { name: 'Midnight', qr: '#ffffff', bg: '#030305' },
+  { name: 'Cyan Neon',qr: '#00F0FF', bg: '#0A0A0F' },
+  { name: 'Pink Neon',qr: '#FF007F', bg: '#0A0A0F' },
   { name: 'Ocean',    qr: '#0369a1', bg: '#e0f2fe' },
   { name: 'Forest',   qr: '#166534', bg: '#dcfce7' },
   { name: 'Sunset',   qr: '#9a3412', bg: '#fff7ed' },
   { name: 'Royal',    qr: '#4f46e5', bg: '#eef2ff' },
   { name: 'Rose',     qr: '#9f1239', bg: '#fff1f2' },
   { name: 'Gold',     qr: '#854d0e', bg: '#fefce8' },
+  { name: 'Mint',     qr: '#00D1B2', bg: '#F0FFF4' },
+  { name: 'Lavender', qr: '#8E44AD', bg: '#F4ECF7' },
+  { name: 'Solar',    qr: '#F39C12', bg: '#FCF3CF' },
+  { name: 'Emerald',  qr: '#27AE60', bg: '#E9F7EF' },
+  { name: 'Nordic',   qr: '#2C3E50', bg: '#ECF0F1' },
+  { name: 'Deep Sea', qr: '#00416A', bg: '#E1E8EB' },
 ];
 
 /* ── Frame options for Frame Tab ── */
