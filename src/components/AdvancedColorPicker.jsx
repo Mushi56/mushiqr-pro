@@ -82,6 +82,9 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
   };
 
   const onHueStart = (e) => {
+    e.target.setPointerCapture(e.pointerId);
+    const target = e.target;
+    
     const handleMove = (moveEvent) => {
       if (!wheelRef.current) return;
       const rect = wheelRef.current.getBoundingClientRect();
@@ -93,16 +96,23 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
       if (angle < 0) angle += 360;
       handleHsvUpdate(angle, stateRef.current.s, stateRef.current.v);
     };
-    const handleUp = () => {
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
+    
+    const handleUp = (upEvent) => {
+      target.releasePointerCapture(upEvent.pointerId);
+      target.removeEventListener('pointermove', handleMove);
+      target.removeEventListener('pointerup', handleUp);
     };
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
+    
+    target.addEventListener('pointermove', handleMove);
+    target.addEventListener('pointerup', handleUp);
     handleMove(e);
   };
 
   const onSVStart = (e) => {
+    e.stopPropagation();
+    e.target.setPointerCapture(e.pointerId);
+    const target = e.target;
+    
     const handleMove = (moveEvent) => {
       if (!diamondRef.current) return;
       const rect = diamondRef.current.getBoundingClientRect();
@@ -110,12 +120,15 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
       const y = Math.max(0, Math.min(1, (moveEvent.clientY - rect.top) / rect.height));
       handleHsvUpdate(stateRef.current.h, x * 100, (1 - y) * 100);
     };
-    const handleUp = () => {
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
+    
+    const handleUp = (upEvent) => {
+      target.releasePointerCapture(upEvent.pointerId);
+      target.removeEventListener('pointermove', handleMove);
+      target.removeEventListener('pointerup', handleUp);
     };
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
+    
+    target.addEventListener('pointermove', handleMove);
+    target.addEventListener('pointerup', handleUp);
     handleMove(e);
   };
 
@@ -150,10 +163,7 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
                 ref={diamondRef}
                 className="sv-diamond"
                 style={{ backgroundColor: `hsl(${h}, 100%, 50%)` }}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  onSVStart(e);
-                }}
+                onPointerDown={onSVStart}
               >
                 <div className="sv-gradient-white" />
                 <div className="sv-gradient-black" />
@@ -207,52 +217,6 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     </div>
   );
 }
-
-function RgbSlider({ label, value, max = 255, onChange, color }) {
-  return (
-    <div className="rgb-slider-row">
-      <span className="rgb-label">{label}</span>
-      <button className="rgb-step" onClick={() => onChange(Math.max(0, value - 1))}><Minus size={14} /></button>
-      <div className="rgb-track-container">
-        <input 
-          type="range" 
-          min="0" 
-          max={max} 
-          value={value} 
-          onChange={(e) => onChange(e.target.value)} 
-          className="rgb-range-input"
-          style={{ '--slider-color': color }}
-        />
-      </div>
-      <button className="rgb-step" onClick={() => onChange(Math.min(max, value + 1))}><Plus size={14} /></button>
-      <span className="rgb-value">{value}</span>
-    </div>
-  );
-}
-
-
-function RgbSlider({ label, value, max = 255, onChange, color }) {
-  return (
-    <div className="rgb-slider-row">
-      <span className="rgb-label">{label}</span>
-      <button className="rgb-step" onClick={() => onChange(Math.max(0, value - 1))}><Minus size={14} /></button>
-      <div className="rgb-track-container">
-        <input 
-          type="range" 
-          min="0" 
-          max={max} 
-          value={value} 
-          onChange={(e) => onChange(e.target.value)} 
-          className="rgb-range-input"
-          style={{ '--slider-color': color }}
-        />
-      </div>
-      <button className="rgb-step" onClick={() => onChange(Math.min(max, value + 1))}><Plus size={14} /></button>
-      <span className="rgb-value">{value}</span>
-    </div>
-  );
-}
-
 
 function RgbSlider({ label, value, max = 255, onChange, color }) {
   return (
