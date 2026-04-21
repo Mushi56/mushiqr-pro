@@ -12,7 +12,8 @@ import {
   ImagePlus,
   RefreshCcw,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 
 export default function QRScanner() {
@@ -22,13 +23,22 @@ export default function QRScanner() {
   const [copied, setCopied] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [cameraFacing, setCameraFacing] = useState('environment');
+  const [hasCameras, setHasCameras] = useState(false);
 
   const scannerRef = useRef(null);
   const html5QrRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Cleanup scanner on unmount
+  // Check for cameras on mount
   useEffect(() => {
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length > 0) {
+        setHasCameras(true);
+      }
+    }).catch(() => {
+      setHasCameras(false);
+    });
+
     return () => {
       stopScanner();
     };
@@ -37,12 +47,11 @@ export default function QRScanner() {
   const stopScanner = useCallback(async () => {
     if (html5QrRef.current) {
       try {
-        const state = html5QrRef.current.getState();
-        if (state === 2) { // SCANNING
+        if (html5QrRef.current.isScanning) {
           await html5QrRef.current.stop();
         }
       } catch (e) {
-        // ignore
+        console.error("Stop error:", e);
       }
       html5QrRef.current = null;
     }
@@ -56,16 +65,23 @@ export default function QRScanner() {
     if (!scannerRef.current) return;
 
     try {
+      // Ensure any existing instance is stopped
+      if (html5QrRef.current) {
+        await stopScanner();
+      }
+
       const html5Qr = new Html5Qrcode('qr-scanner-viewport');
       html5QrRef.current = html5Qr;
 
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+      };
+
       await html5Qr.start(
         { facingMode: cameraFacing },
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1.0,
-        },
+        config,
         (decodedText) => {
           setResult(decodedText);
           stopScanner();
@@ -75,7 +91,8 @@ export default function QRScanner() {
 
       setScanning(true);
     } catch (err) {
-      setError('Camera access denied or not available. Please allow camera permissions or try uploading an image.');
+      console.error("Start error:", err);
+      setError('Camera access denied or failed to start. Please check permissions.');
       setScanning(false);
     }
   }, [cameraFacing, stopScanner]);
@@ -84,16 +101,16 @@ export default function QRScanner() {
     if (!file) return;
     setResult(null);
     setError(null);
+    if (scanning) await stopScanner();
 
     try {
       const html5Qr = new Html5Qrcode('qr-scanner-file-temp');
       const decodedText = await html5Qr.scanFile(file, true);
       setResult(decodedText);
-      html5Qr.clear();
     } catch (err) {
-      setError('No QR code found in this image. Please try another image with a clear QR code.');
+      setError('No QR code found. Please try a clearer image.');
     }
-  }, []);
+  }, [scanning, stopScanner]);
 
   const handleFileDrop = useCallback((e) => {
     e.preventDefault();
@@ -111,7 +128,6 @@ export default function QRScanner() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
       const ta = document.createElement('textarea');
       ta.value = result;
       document.body.appendChild(ta);
@@ -125,8 +141,8 @@ export default function QRScanner() {
 
   const isURL = (text) => {
     try {
-      new URL(text);
-      return true;
+      const url = new URL(text);
+      return url.protocol === "http:" || url.protocol === "https:";
     } catch {
       return false;
     }
@@ -142,45 +158,33 @@ export default function QRScanner() {
     <div className="scanner-page">
       <div className="scanner-container">
         {/* Header */}
-        <div className="scanner-header">
-          <div className="scanner-header-icon">
-            <ScanLine size={24} />
-          </div>
-          <div>
-            <h2 className="scanner-title">QR Code Scanner</h2>
-            <p className="scanner-subtitle">Scan with camera or upload an image</p>
-          </div>
+        <div className="scanner-header-simple">
+          <h2 className="scanner-title">QR Scanner</h2>
+          <p className="scanner-subtitle">Scan or upload to decode</p>
         </div>
 
         {/* Result Display */}
         {result && (
-          <div className="scanner-result">
-            <div className="scanner-result-badge">
-              <CheckCircle2 size={18} />
-              <span>QR Code Detected</span>
+          <div className="scanner-result-card fade-in">
+            <div className="scanner-result-header">
+              <CheckCircle2 size={18} color="var(--success)" />
+              <span>Result Detected</span>
             </div>
-            <div className="scanner-result-content">
+            <div className="scanner-result-body">
               <p className="scanner-result-text">{result}</p>
             </div>
-            <div className="scanner-result-actions">
+            <div className="scanner-result-footer">
               <button className="scanner-action-btn primary" onClick={handleCopy}>
                 {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
-                {copied ? 'Copied!' : 'Copy'}
+                {copied ? 'Copied' : 'Copy'}
               </button>
               {isURL(result) && (
-                <a
-                  className="scanner-action-btn accent"
-                  href={result}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink size={16} />
-                  Open Link
+                <a className="scanner-action-btn accent" href={result} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink size={16} /> Open
                 </a>
               )}
               <button className="scanner-action-btn ghost" onClick={handleReset}>
-                <RefreshCw size={16} />
-                Scan Again
+                <RefreshCw size={16} /> New Scan
               </button>
             </div>
           </div>
@@ -188,91 +192,69 @@ export default function QRScanner() {
 
         {/* Error Display */}
         {error && (
-          <div className="scanner-error">
-            <X size={16} />
+          <div className="scanner-error-message fade-in">
+            <AlertCircle size={16} />
             <span>{error}</span>
+            <button className="error-close" onClick={() => setError(null)}><X size={14} /></button>
           </div>
         )}
 
         {/* Scanner Area */}
         {!result && (
-          <>
-            {/* Camera Scanner */}
-            <div className="scanner-viewport-wrapper">
-              <div
-                id="qr-scanner-viewport"
-                ref={scannerRef}
-                className={`scanner-viewport ${scanning ? 'active' : ''}`}
-              >
+          <div className="scanner-main-view">
+            <div 
+              className={`scanner-viewport-card ${dragOver ? 'drag-over' : ''} ${scanning ? 'is-scanning' : ''}`}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleFileDrop}
+            >
+              <div id="qr-scanner-viewport" ref={scannerRef} className="scanner-viewport">
                 {!scanning && (
-                  <div className="scanner-viewport-placeholder">
-                    <Camera size={48} strokeWidth={1} />
-                    <span>Camera preview will appear here</span>
+                  <div className="scanner-empty-state">
+                    <ScanLine size={64} strokeWidth={1} className="scan-icon-anim" />
+                    <p>Tap "Start Camera" or drop image here</p>
                   </div>
                 )}
               </div>
 
               {scanning && (
-                <div className="scanner-overlay">
-                  <div className="scanner-crosshair">
-                    <div className="crosshair-corner tl" />
-                    <div className="crosshair-corner tr" />
-                    <div className="crosshair-corner bl" />
-                    <div className="crosshair-corner br" />
-                    <div className="scanner-line" />
+                <div className="scanner-guide-overlay">
+                  <div className="scanner-guide-box">
+                    <div className="guide-corner tl" />
+                    <div className="guide-corner tr" />
+                    <div className="guide-corner bl" />
+                    <div className="guide-corner br" />
+                    <div className="scanner-laser-line" />
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Camera Controls */}
-            <div className="scanner-controls">
+            {/* Combined Controls */}
+            <div className="scanner-controls-group">
               {!scanning ? (
-                <button className="scanner-btn-start" onClick={startScanner}>
-                  <Camera size={20} />
-                  Start Camera Scan
+                <button className="scanner-main-btn start" onClick={startScanner}>
+                  <Camera size={18} /> Start Camera
                 </button>
               ) : (
-                <button className="scanner-btn-stop" onClick={stopScanner}>
-                  <X size={20} />
-                  Stop Camera
+                <button className="scanner-main-btn stop" onClick={stopScanner}>
+                  <X size={18} /> Stop Camera
                 </button>
               )}
 
-              <button
-                className="scanner-btn-flip"
-                onClick={() => {
-                  setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
-                  if (scanning) {
-                    stopScanner().then(() => setTimeout(startScanner, 300));
-                  }
-                }}
-                title="Switch Camera"
-              >
-                <RefreshCcw size={18} />
+              <button className="scanner-main-btn upload" onClick={() => fileInputRef.current?.click()}>
+                <Upload size={18} /> Upload Image
               </button>
-            </div>
 
-            {/* Divider */}
-            <div className="scanner-divider">
-              <div className="scanner-divider-line" />
-              <span className="scanner-divider-text">or</span>
-              <div className="scanner-divider-line" />
-            </div>
-
-            {/* File Upload Area */}
-            <div
-              className={`scanner-upload-zone ${dragOver ? 'drag-over' : ''}`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleFileDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <ImagePlus size={32} strokeWidth={1.5} />
-              <span className="scanner-upload-text">
-                Drop an image here or <strong>click to upload</strong>
-              </span>
-              <span className="scanner-upload-hint">Supports PNG, JPG, WEBP</span>
+              {scanning && (
+                <button className="scanner-icon-btn" onClick={() => {
+                  setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
+                  stopScanner().then(() => setTimeout(startScanner, 300));
+                }}>
+                  <RefreshCcw size={18} />
+                </button>
+              )}
+              
               <input
                 ref={fileInputRef}
                 type="file"
@@ -281,16 +263,14 @@ export default function QRScanner() {
                 onChange={(e) => handleFileUpload(e.target.files?.[0])}
               />
             </div>
-          </>
+          </div>
         )}
 
-        {/* Hidden temp element for file scanning */}
         <div id="qr-scanner-file-temp" style={{ display: 'none' }} />
 
-        {/* Info */}
-        <div className="scanner-info">
+        <div className="scanner-privacy-notice">
           <ShieldCheck size={14} />
-          <span>Scans are processed locally — your data never leaves your device.</span>
+          <span>Local processing — No data is sent to servers</span>
         </div>
       </div>
     </div>
