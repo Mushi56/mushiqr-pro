@@ -3410,42 +3410,44 @@ input[type="range"]::-moz-range-thumb {
 /* ── Color Presets Row (Horizontal Scroll) ── */
 .color-presets-row {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding: 4px 4px 12px;
-  margin: 0 -4px;
+  padding: 8px 0 16px;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* IE/Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   scroll-snap-type: x mandatory;
 }
 
 .color-presets-row::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
 .color-presets-row .color-preset-swatch {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-md);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-base);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.05);
   flex-shrink: 0;
   scroll-snap-align: start;
-  border: 2px solid transparent;
+  border: 2px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
 }
 
 .color-presets-row .color-preset-swatch:hover {
-  transform: scale(1.1);
+  transform: translateY(-4px) scale(1.1);
   border-color: var(--accent-primary);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .color-presets-row .color-preset-swatch.active {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 15px var(--accent-glow);
-  transform: scale(1.05);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 15px var(--accent-glow);
+  transform: translateY(-2px) scale(1.05);
 }
 
 /* ── Sync Eyes Toggle ── */
