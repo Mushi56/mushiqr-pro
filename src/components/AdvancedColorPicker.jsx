@@ -2,9 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Check, Plus, Minus } from 'lucide-react';
 
 export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel }) {
-  const [color, setColor] = useState(initialColor || '#ff0000');
   const [tempColor, setTempColor] = useState(initialColor || '#ff0000');
-  const [activeTab, setActiveTab] = useState('RGB'); // 'HSB' or 'RGB'
+  const [activeTab, setActiveTab] = useState('RGB');
+  
+  const wheelRef = useRef(null);
+  const diamondRef = useRef(null);
+  const isDraggingHue = useRef(false);
+  const isDraggingSV = useRef(false);
+
+  useEffect(() => {
+    if (isOpen) setTempColor(initialColor);
+  }, [isOpen, initialColor]);
 
   // Helper to convert hex to RGB
   const hexToRgb = (hex) => {
@@ -73,54 +81,81 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     setTempColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
   };
 
+  const updateHueFromPointer = (e) => {
+    if (!wheelRef.current) return;
+    const rect = wheelRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const x = e.clientX - centerX;
+    const y = e.clientY - centerY;
+    let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+    if (angle < 0) angle += 360;
+    handleHsvChange(angle, s, v);
+  };
+
+  const updateSVFromPointer = (e) => {
+    if (!diamondRef.current) return;
+    const rect = diamondRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+    handleHsvChange(h, x * 100, (1 - y) * 100);
+  };
+
+  useEffect(() => {
+    const handleMove = (e) => {
+      if (isDraggingHue.current) updateHueFromPointer(e);
+      if (isDraggingSV.current) updateSVFromPointer(e);
+    };
+    const handleUp = () => {
+      isDraggingHue.current = false;
+      isDraggingSV.current = false;
+    };
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+  }, [h, s, v]);
+
   if (!isOpen) return null;
 
   return (
     <div className="advanced-picker-overlay">
       <div className="advanced-picker-container">
-        {/* Header */}
         <header className="picker-header">
-          <button className="picker-close" onClick={onCancel}><X size={24} /></button>
+          <button className="picker-close" onClick={onCancel}><X size={20} /></button>
           <div className="picker-preview-dual">
             <div className="picker-preview-old" style={{ backgroundColor: initialColor }} />
             <div className="picker-preview-new" style={{ backgroundColor: tempColor }} />
           </div>
-          <button className="picker-confirm" onClick={() => onConfirm(tempColor)}><Check size={24} /></button>
+          <button className="picker-confirm" onClick={() => onConfirm(tempColor)}><Check size={20} /></button>
         </header>
 
-        {/* Color Wheel Section */}
         <div className="picker-wheel-area">
           <div className="picker-wheel-container">
-            {/* Hue Wheel */}
             <div 
+              ref={wheelRef}
               className="hue-wheel" 
               style={{ background: 'conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red)' }}
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-                let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-                if (angle < 0) angle += 360;
-                handleHsvChange(angle, s, v);
+              onPointerDown={(e) => {
+                isDraggingHue.current = true;
+                updateHueFromPointer(e);
               }}
             >
               <div 
                 className="hue-handle" 
-                style={{ transform: `rotate(${h - 90}deg) translateX(90px)` }}
+                style={{ transform: `rotate(${h - 90}deg) translateX(70px)` }}
               />
               
-              {/* Saturation/Value Diamond */}
               <div 
+                ref={diamondRef}
                 className="sv-diamond"
                 style={{ backgroundColor: `hsl(${h}, 100%, 50%)` }}
-                onClick={(e) => {
+                onPointerDown={(e) => {
                   e.stopPropagation();
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = (e.clientX - rect.left) / rect.width;
-                  const y = (e.clientY - rect.top) / rect.height;
-                  // Simplified diamond math: diamond is square rotated 45deg
-                  // We'll treat it as a square for simplicity in this version
-                  handleHsvChange(h, x * 100, (1 - y) * 100);
+                  isDraggingSV.current = true;
+                  updateSVFromPointer(e);
                 }}
               >
                 <div className="sv-gradient-white" />
@@ -134,19 +169,16 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="picker-tabs">
-          <button 
-            className={`picker-tab-btn ${activeTab === 'HSB' ? 'active' : ''}`}
-            onClick={() => setActiveTab('HSB')}
-          >HSB</button>
-          <button 
-            className={`picker-tab-btn ${activeTab === 'RGB' ? 'active' : ''}`}
-            onClick={() => setActiveTab('RGB')}
-          >RGB</button>
+          {['HSB', 'RGB'].map(tab => (
+            <button 
+              key={tab}
+              className={`picker-tab-btn ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >{tab}</button>
+          ))}
         </div>
 
-        {/* Sliders Area */}
         <div className="picker-sliders">
           {activeTab === 'RGB' ? (
             <>
@@ -166,6 +198,29 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     </div>
   );
 }
+
+function RgbSlider({ label, value, max = 255, onChange, color }) {
+  return (
+    <div className="rgb-slider-row">
+      <span className="rgb-label">{label}</span>
+      <button className="rgb-step" onClick={() => onChange(Math.max(0, value - 1))}><Minus size={14} /></button>
+      <div className="rgb-track-container">
+        <input 
+          type="range" 
+          min="0" 
+          max={max} 
+          value={value} 
+          onChange={(e) => onChange(e.target.value)} 
+          className="rgb-range-input"
+          style={{ '--slider-color': color }}
+        />
+      </div>
+      <button className="rgb-step" onClick={() => onChange(Math.min(max, value + 1))}><Plus size={14} /></button>
+      <span className="rgb-value">{value}</span>
+    </div>
+  );
+}
+
 
 function RgbSlider({ label, value, max = 255, onChange, color }) {
   return (

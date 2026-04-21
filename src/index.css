@@ -3703,14 +3703,17 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .advanced-picker-container {
-  width: 100%;
-  height: 100%;
-  max-width: 450px;
-  background: #000;
+  width: 90%;
+  max-height: 85vh;
+  max-width: 360px;
+  background: #111;
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 12px;
   position: relative;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   overflow-y: auto;
 }
 
@@ -3718,7 +3721,7 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 0 24px;
+  padding: 4px 0 16px;
 }
 
 .picker-close, .picker-confirm {
@@ -3739,10 +3742,10 @@ input[type="range"]::-moz-range-thumb {
 
 .picker-preview-dual {
   display: flex;
-  width: 160px;
-  height: 44px;
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 4px;
+  width: 120px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -3751,17 +3754,17 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .picker-wheel-area {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .picker-wheel-container {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 220px;
+  height: 220px;
 }
 
 .hue-wheel {
@@ -3770,25 +3773,26 @@ input[type="range"]::-moz-range-thumb {
   height: 100%;
   border-radius: 50%;
   cursor: crosshair;
+  touch-action: none;
 }
 
 .hue-wheel::after {
   content: '';
   position: absolute;
-  inset: 30px;
-  background: #000;
+  inset: 22px;
+  background: #111;
   border-radius: 50%;
 }
 
 .hue-handle {
   position: absolute;
-  top: calc(50% - 15px);
-  left: calc(50% - 15px);
-  width: 30px;
-  height: 30px;
+  top: calc(50% - 12px);
+  left: calc(50% - 12px);
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 2px solid #fff;
-  box-shadow: 0 0 8px rgba(0,0,0,0.8);
+  box-shadow: 0 0 6px rgba(0,0,0,0.6);
   pointer-events: none;
   z-index: 10;
 }
@@ -3797,13 +3801,14 @@ input[type="range"]::-moz-range-thumb {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   transform: translate(-50%, -50%) rotate(45deg);
   border-radius: 4px;
   overflow: hidden;
   z-index: 5;
   cursor: crosshair;
+  touch-action: none;
 }
 
 .sv-gradient-white {
@@ -3832,15 +3837,15 @@ input[type="range"]::-moz-range-thumb {
 .picker-tabs {
   display: flex;
   justify-content: center;
-  gap: 32px;
-  padding: 16px 0;
+  gap: 24px;
+  padding: 8px 0;
 }
 
 .picker-tab-btn {
   background: transparent;
   border: none;
-  color: #666;
-  font-size: 18px;
+  color: #555;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: color 0.2s;
@@ -3853,22 +3858,22 @@ input[type="range"]::-moz-range-thumb {
 .picker-sliders {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 8px 16px 32px;
+  gap: 8px;
+  padding: 8px 8px 16px;
 }
 
 .rgb-slider-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   color: #fff;
 }
 
 .rgb-label {
-  width: 20px;
+  width: 16px;
   font-weight: 700;
-  font-size: 16px;
-  color: #888;
+  font-size: 14px;
+  color: #777;
 }
 
 .rgb-step {
@@ -3879,16 +3884,16 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
 }
 
 .rgb-value {
-  width: 40px;
+  width: 32px;
   text-align: right;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .rgb-track-container {
@@ -3900,16 +3905,16 @@ input[type="range"]::-moz-range-thumb {
 .rgb-range-input {
   -webkit-appearance: none;
   width: 100%;
-  height: 8px;
-  background: #333;
+  height: 6px;
+  background: #222;
   border-radius: 4px;
   outline: none;
 }
 
 .rgb-range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   background: #fff;
   border-radius: 50%;
   cursor: pointer;
