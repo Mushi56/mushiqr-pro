@@ -406,13 +406,13 @@ export default function App() {
                     <History size={16} /> History
                   </button>
                   <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
-                  <button className="menu-link-btn" onClick={() => window.location.href = '/about'}>
+                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
                     <Info size={16} /> About
                   </button>
-                  <button className="menu-link-btn" onClick={() => window.location.href = '/privacy-policy'}>
+                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/privacy-policy'}>
                     <Shield size={16} /> Privacy Policy
                   </button>
-                  <button className="menu-link-btn" onClick={() => window.location.href = '/terms'}>
+                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/terms'}>
                     <FileIcon size={16} /> Terms of Service
                   </button>
                 </div>
