@@ -45,6 +45,7 @@ import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
 import AdvancedColorPicker from './components/AdvancedColorPicker';
 import { ScanLine, History } from 'lucide-react';
+import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
 
 /* ── Color Presets ── */
 const COLOR_PRESETS = [
@@ -426,7 +427,7 @@ export default function App() {
                 color: activePage === 'generator' ? '#000' : 'var(--text-primary)'
               }}
             >
-              <QrCode size={16} />
+              <MdOutlineQrCode2 size={20} />
             </button>
             <button
               className={`btn-theme-toggle`}
@@ -437,7 +438,7 @@ export default function App() {
                 color: activePage === 'scanner' ? '#000' : 'var(--text-primary)'
               }}
             >
-              <ScanLine size={16} />
+              <MdQrCodeScanner size={20} />
             </button>
           </div>
 
