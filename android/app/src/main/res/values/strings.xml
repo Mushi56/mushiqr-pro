@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Elite QR Generator</string>
-    <string name="title_activity_main">Elite QR Generator</string>
-    <string name="package_name">com.eliteqr.app</string>
-    <string name="custom_url_scheme">com.eliteqr.app</string>
+    <string name="app_name">Mushi QR Pro</string>
+    <string name="title_activity_main">Mushi QR Pro</string>
+    <string name="package_name">com.mushiqr.pro</string>
+    <string name="custom_url_scheme">com.mushiqr.pro</string>
 </resources>

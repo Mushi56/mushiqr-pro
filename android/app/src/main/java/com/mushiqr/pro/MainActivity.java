@@ -1,4 +1,4 @@
-package com.eliteqr.app;
+package com.mushiqr.pro;
 
 import com.getcapacitor.BridgeActivity;
 
