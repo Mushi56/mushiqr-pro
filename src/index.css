@@ -2871,9 +2871,6 @@ input[type="range"]::-moz-range-thumb {
   font-size: 12px;
   color: var(--text-muted);
   opacity: 0.8;
-});
-  background: rgba(0, 224, 168, 0.04);
-  color: var(--text-secondary);
 }
 
 .scanner-upload-zone.drag-over {
