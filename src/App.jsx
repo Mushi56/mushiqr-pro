@@ -414,19 +414,32 @@ export default function App() {
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
 
-        <div className="app-header-actions" style={{ display: 'flex', gap: '8px' }}>
-          <button
-            className="btn-theme-toggle"
-            onClick={() => {
-              const next = theme === 'dark' ? 'light' : 'dark';
-              setTheme(next);
-              savePreferences({ ...getPreferences(), theme: next });
-            }}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          >
-            {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
+        <div className="app-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {/* Main App Navigation */}
+          <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '20px', marginRight: '8px' }}>
+            <button
+              className={`btn-theme-toggle`}
+              onClick={() => setActivePage('generator')}
+              title="QR Generator"
+              style={{
+                background: activePage === 'generator' ? 'var(--accent-primary)' : 'transparent',
+                color: activePage === 'generator' ? '#000' : 'var(--text-primary)'
+              }}
+            >
+              <QrCode size={16} />
+            </button>
+            <button
+              className={`btn-theme-toggle`}
+              onClick={() => setActivePage('scanner')}
+              title="QR Scanner"
+              style={{
+                background: activePage === 'scanner' ? 'var(--accent-primary)' : 'transparent',
+                color: activePage === 'scanner' ? '#000' : 'var(--text-primary)'
+              }}
+            >
+              <ScanLine size={16} />
+            </button>
+          </div>
 
           <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
             <button
@@ -440,14 +453,20 @@ export default function App() {
             {isMenuOpen && (
               <div className="app-dropdown-menu fade-in">
                 <div className="menu-links">
-                  <button className={`menu-link-btn ${activePage === 'generator' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('generator'); }}>
-                    <QrCode size={16} /> QR Generator
-                  </button>
-                  <button className={`menu-link-btn ${activePage === 'scanner' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('scanner'); }}>
-                    <ScanLine size={16} /> QR Scanner
-                  </button>
                   <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('history'); }}>
                     <History size={16} /> History
+                  </button>
+                  <button
+                    className="menu-link-btn"
+                    onClick={() => {
+                      const next = theme === 'dark' ? 'light' : 'dark';
+                      setTheme(next);
+                      savePreferences({ ...getPreferences(), theme: next });
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />} 
+                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                   </button>
                   <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
                   <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
