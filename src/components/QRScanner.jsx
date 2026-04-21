@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
+import { Camera as CapCamera } from '@capacitor/camera';
 import {
   Camera,
   Upload,
@@ -65,6 +66,17 @@ export default function QRScanner() {
     if (!scannerRef.current) return;
 
     try {
+      // For Capacitor/Android: Request permission explicitly
+      try {
+        const perm = await CapCamera.requestPermissions();
+        if (perm.camera !== 'granted') {
+          setError('Camera permission is required to scan codes.');
+          return;
+        }
+      } catch (e) {
+        console.warn('Capacitor Camera plugin not available, falling back to browser API');
+      }
+
       // Ensure any existing instance is stopped
       if (html5QrRef.current) {
         await stopScanner();

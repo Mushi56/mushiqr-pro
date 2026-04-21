@@ -1,5 +1,23 @@
 {
   "appId": "com.mushiqr.pro",
   "appName": "MushiQR Pro",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#030305",
+      "overlaysWebView": true
+    },
+    "Camera": {
+      "presentationStyle": "fullscreen"
+    }
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
 }

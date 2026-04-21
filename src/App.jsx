@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback, Component } from 'react';
+import { App as CapApp } from '@capacitor/app';
+import { StatusBar } from '@capacitor/status-bar';
 import { 
   QrCode, 
   Sun, 
@@ -98,6 +100,46 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('content');
   const [activePage, setActivePage] = useState('generator'); // 'generator', 'scanner', 'history'
   const [theme, setTheme] = useState('dark');
+
+  // ── Mobile App Fixes (Capacitor) ──
+  useEffect(() => {
+    // 1. Full Screen Mode (Hide Status Bar)
+    const initStatusBar = async () => {
+      try {
+        await StatusBar.hide();
+      } catch (e) {
+        console.warn('StatusBar plugin not available or failed to hide.');
+      }
+    };
+    initStatusBar();
+
+    // 2. Handle Android Back Button
+    const backListener = CapApp.addListener('backButton', ({ canGoBack }) => {
+      if (advPicker.open) {
+        setAdvPicker(prev => ({ ...prev, open: false }));
+        return;
+      }
+      if (formatDropdownOpen) {
+        setFormatDropdownOpen(false);
+        return;
+      }
+      if (isMenuOpen) {
+        setIsMenuOpen(false);
+        return;
+      }
+
+      if (activePage !== 'generator') {
+        setActivePage('generator'); // Go back to generator instead of closing
+      } else {
+        // If already at generator, we can exit or do nothing
+        CapApp.exitApp();
+      }
+    });
+
+    return () => {
+      backListener.then(l => l.remove());
+    };
+  }, [activePage, advPicker.open, formatDropdownOpen, isMenuOpen]);
 
   // ── QR Content ──
   const [qrType, setQrType] = useState(QR_TYPES.URL);
