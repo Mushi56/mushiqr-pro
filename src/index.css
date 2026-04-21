@@ -3702,19 +3702,21 @@ input[type="range"]::-moz-range-thumb {
   backdrop-filter: blur(8px);
 }
 
-.advanced-picker-container {
-  width: 90%;
-  max-height: 85vh;
-  max-width: 360px;
-  background: #111;
-  display: flex;
-  flex-direction: column;
-  padding: 12px;
-  position: relative;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-  overflow-y: auto;
+/* ── Advanced Color Picker COMPACT v2 ── */
+.advanced-picker-overlay .advanced-picker-container {
+  width: 90% !important;
+  max-height: 80vh !important;
+  height: auto !important;
+  max-width: 360px !important;
+  background: #111 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 12px !important;
+  position: relative !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5) !important;
+  overflow-y: auto !important;
 }
 
 .picker-header {

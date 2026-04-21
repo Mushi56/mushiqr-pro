@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Check, Plus, Minus } from 'lucide-react';
 
 export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel }) {
@@ -7,29 +7,33 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
   
   const wheelRef = useRef(null);
   const diamondRef = useRef(null);
-  const isDraggingHue = useRef(false);
-  const isDraggingSV = useRef(false);
+  const stateRef = useRef({ h: 0, s: 0, v: 0 });
 
+  // Sync stateRef with current color
   useEffect(() => {
-    if (isOpen) setTempColor(initialColor);
+    if (isOpen) {
+      setTempColor(initialColor);
+      const rgb = hexToRgb(initialColor);
+      stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    }
   }, [isOpen, initialColor]);
 
   // Helper to convert hex to RGB
-  const hexToRgb = (hex) => {
+  function hexToRgb(hex) {
     const r = parseInt(hex.slice(1, 3), 16) || 0;
     const g = parseInt(hex.slice(3, 5), 16) || 0;
     const b = parseInt(hex.slice(5, 7), 16) || 0;
     return { r, g, b };
-  };
+  }
 
   // Helper to convert RGB to Hex
-  const rgbToHex = (r, g, b) => {
+  function rgbToHex(r, g, b) {
     const toHex = (n) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0');
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  };
+  }
 
   // Helper to convert RGB to HSV
-  const rgbToHsv = (r, g, b) => {
+  function rgbToHsv(r, g, b) {
     r /= 255; g /= 255; b /= 255;
     const max = Math.max(r, g, b), min = Math.min(r, g, b);
     let h, s, v = max;
@@ -46,10 +50,10 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
       h /= 6;
     }
     return { h: h * 360, s: s * 100, v: v * 100 };
-  };
+  }
 
   // Helper to convert HSV to RGB
-  const hsvToRgb = (h, s, v) => {
+  function hsvToRgb(h, s, v) {
     h /= 360; s /= 100; v /= 100;
     let r, g, b;
     const i = Math.floor(h * 6);
@@ -66,57 +70,54 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
       case 5: r = v, g = p, b = q; break;
     }
     return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
-  };
+  }
 
   const { r, g, b } = hexToRgb(tempColor);
-  const { h, s, v } = rgbToHsv(r, g, b);
+  const { h, s, v } = stateRef.current;
 
-  const handleRgbChange = (channel, val) => {
-    const newRgb = { r, g, b, [channel]: parseInt(val) || 0 };
-    setTempColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
+  const handleHsvUpdate = (newH, newS, newV) => {
+    stateRef.current = { h: newH, s: newS, v: newV };
+    const rgb = hsvToRgb(newH, newS, newV);
+    setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
   };
 
-  const handleHsvChange = (hue, sat, val) => {
-    const newRgb = hsvToRgb(hue, sat, val);
-    setTempColor(rgbToHex(newRgb.r, newRgb.g, newRgb.b));
-  };
-
-  const updateHueFromPointer = (e) => {
-    if (!wheelRef.current) return;
-    const rect = wheelRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const x = e.clientX - centerX;
-    const y = e.clientY - centerY;
-    let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-    if (angle < 0) angle += 360;
-    handleHsvChange(angle, s, v);
-  };
-
-  const updateSVFromPointer = (e) => {
-    if (!diamondRef.current) return;
-    const rect = diamondRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-    handleHsvChange(h, x * 100, (1 - y) * 100);
-  };
-
-  useEffect(() => {
-    const handleMove = (e) => {
-      if (isDraggingHue.current) updateHueFromPointer(e);
-      if (isDraggingSV.current) updateSVFromPointer(e);
+  const onHueStart = (e) => {
+    const handleMove = (moveEvent) => {
+      if (!wheelRef.current) return;
+      const rect = wheelRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const x = moveEvent.clientX - centerX;
+      const y = moveEvent.clientY - centerY;
+      let angle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+      if (angle < 0) angle += 360;
+      handleHsvUpdate(angle, stateRef.current.s, stateRef.current.v);
     };
     const handleUp = () => {
-      isDraggingHue.current = false;
-      isDraggingSV.current = false;
-    };
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
-    return () => {
       window.removeEventListener('pointermove', handleMove);
       window.removeEventListener('pointerup', handleUp);
     };
-  }, [h, s, v]);
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    handleMove(e);
+  };
+
+  const onSVStart = (e) => {
+    const handleMove = (moveEvent) => {
+      if (!diamondRef.current) return;
+      const rect = diamondRef.current.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (moveEvent.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (moveEvent.clientY - rect.top) / rect.height));
+      handleHsvUpdate(stateRef.current.h, x * 100, (1 - y) * 100);
+    };
+    const handleUp = () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    handleMove(e);
+  };
 
   if (!isOpen) return null;
 
@@ -138,10 +139,7 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
               ref={wheelRef}
               className="hue-wheel" 
               style={{ background: 'conic-gradient(from 0deg, red, yellow, lime, cyan, blue, magenta, red)' }}
-              onPointerDown={(e) => {
-                isDraggingHue.current = true;
-                updateHueFromPointer(e);
-              }}
+              onPointerDown={onHueStart}
             >
               <div 
                 className="hue-handle" 
@@ -154,8 +152,7 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
                 style={{ backgroundColor: `hsl(${h}, 100%, 50%)` }}
                 onPointerDown={(e) => {
                   e.stopPropagation();
-                  isDraggingSV.current = true;
-                  updateSVFromPointer(e);
+                  onSVStart(e);
                 }}
               >
                 <div className="sv-gradient-white" />
@@ -182,15 +179,27 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
         <div className="picker-sliders">
           {activeTab === 'RGB' ? (
             <>
-              <RgbSlider label="R" value={r} onChange={(v) => handleRgbChange('r', v)} color="red" />
-              <RgbSlider label="G" value={g} onChange={(v) => handleRgbChange('g', v)} color="green" />
-              <RgbSlider label="B" value={b} onChange={(v) => handleRgbChange('b', v)} color="blue" />
+              <RgbSlider label="R" value={r} onChange={(val) => {
+                const rgb = { r: parseInt(val), g, b };
+                setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+              }} color="red" />
+              <RgbSlider label="G" value={g} onChange={(val) => {
+                const rgb = { r, g: parseInt(val), b };
+                setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+              }} color="green" />
+              <RgbSlider label="B" value={b} onChange={(val) => {
+                const rgb = { r, g, b: parseInt(val) };
+                setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+              }} color="blue" />
             </>
           ) : (
             <>
-              <RgbSlider label="H" value={Math.round(h)} max={360} onChange={(v) => handleHsvChange(v, s, v)} color="#fff" />
-              <RgbSlider label="S" value={Math.round(s)} max={100} onChange={(v) => handleHsvChange(h, v, v)} color="#fff" />
-              <RgbSlider label="B" value={Math.round(v)} max={100} onChange={(v) => handleHsvChange(h, s, v)} color="#fff" />
+              <RgbSlider label="H" value={Math.round(h)} max={360} onChange={(val) => handleHsvUpdate(parseInt(val), s, v)} color="#fff" />
+              <RgbSlider label="S" value={Math.round(s)} max={100} onChange={(val) => handleHsvUpdate(h, parseInt(val), v)} color="#fff" />
+              <RgbSlider label="B" value={Math.round(v)} max={100} onChange={(val) => handleHsvUpdate(h, s, parseInt(val))} color="#fff" />
             </>
           )}
         </div>
@@ -198,6 +207,29 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     </div>
   );
 }
+
+function RgbSlider({ label, value, max = 255, onChange, color }) {
+  return (
+    <div className="rgb-slider-row">
+      <span className="rgb-label">{label}</span>
+      <button className="rgb-step" onClick={() => onChange(Math.max(0, value - 1))}><Minus size={14} /></button>
+      <div className="rgb-track-container">
+        <input 
+          type="range" 
+          min="0" 
+          max={max} 
+          value={value} 
+          onChange={(e) => onChange(e.target.value)} 
+          className="rgb-range-input"
+          style={{ '--slider-color': color }}
+        />
+      </div>
+      <button className="rgb-step" onClick={() => onChange(Math.min(max, value + 1))}><Plus size={14} /></button>
+      <span className="rgb-value">{value}</span>
+    </div>
+  );
+}
+
 
 function RgbSlider({ label, value, max = 255, onChange, color }) {
   return (
