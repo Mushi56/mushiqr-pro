@@ -156,7 +156,7 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
             >
               <div 
                 className="hue-handle" 
-                style={{ transform: `rotate(${h - 90}deg) translateX(70px)` }}
+                style={{ transform: `rotate(${h - 90}deg) translateX(99px)` }}
               />
               
               <div 
