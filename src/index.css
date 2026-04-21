@@ -666,12 +666,14 @@ body {
 }
 
 /* Compact version for side-by-side pickers */
+/* Compact version for side-by-side pickers */
 .compact-picker .color-hex {
-  padding: 0 10px;
+  padding: 0 8px;
   font-size: 13px;
   height: 38px;
   min-width: 0;
-  width: 100%;
+  flex: 1;
+  width: 0; /* Allow flex to take over */
   margin: 0;
 }
 
@@ -685,14 +687,32 @@ body {
   gap: 8px;
   width: 100%;
   display: flex;
+  align-items: center;
 }
 
 .eye-colors-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 4px;
   width: 100%;
+}
+
+@media (max-width: 360px) {
+  .eye-colors-grid {
+    gap: 8px;
+  }
+  .compact-picker .color-hex {
+    padding: 0 4px;
+    font-size: 11px;
+  }
+  .compact-picker .color-preview {
+    width: 32px;
+    height: 32px;
+  }
+  .compact-picker .color-hex {
+    height: 32px;
+  }
 }
 
 .eye-colors-grid .form-group {
