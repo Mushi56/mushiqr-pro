@@ -3,27 +3,55 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 
-/**
- * Export QR code in various formats
- */
+import { Media } from '@capacitor-community/media';
 
 async function saveFileNative(base64Data, filename) {
   try {
+    // 1. Write the base64 data to a temporary file in the Cache directory
     const savedFile = await Filesystem.writeFile({
       path: filename,
       data: base64Data,
-      directory: Directory.Documents
+      directory: Directory.Cache
     });
     
-    // Attempt to share/save to gallery for better UX
-    await Share.share({
-      title: 'MushiQR Pro',
-      url: savedFile.uri,
-      dialogTitle: 'Save or Share your QR Code'
-    });
+    // 2. If it's an image (PNG/JPG), save it directly to the gallery using Media plugin
+    if (filename.endsWith('.png') || filename.endsWith('.jpg')) {
+      await Media.savePhoto({
+        path: savedFile.uri,
+        album: 'MushiQR'
+      });
+      alert(`QR Code successfully saved to your Gallery!`);
+    } else {
+      // 3. If it's a PDF or SVG, save to Documents folder and show share sheet
+      const docFile = await Filesystem.writeFile({
+        path: filename,
+        data: base64Data,
+        directory: Directory.Documents
+      });
+      
+      await Share.share({
+        title: 'MushiQR Pro',
+        url: docFile.uri,
+        dialogTitle: 'Save or Share your QR Code'
+      });
+    }
   } catch (e) {
     console.error('File save failed', e);
-    alert('Failed to save file. Please ensure storage permissions are granted.');
+    // Fallback: If Media plugin fails, try sharing the cached file
+    try {
+      const fallbackFile = await Filesystem.writeFile({
+        path: filename,
+        data: base64Data,
+        directory: Directory.Cache
+      });
+      await Share.share({
+        title: 'MushiQR Pro',
+        url: fallbackFile.uri,
+        dialogTitle: 'Save or Share your QR Code'
+      });
+    } catch(shareErr) {
+      alert('Failed to save file. Please ensure storage permissions are granted.');
+    }
   }
 }
 
