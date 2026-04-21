@@ -626,7 +626,7 @@ export default function App() {
                           key={preset.name}
                           className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
                           title={preset.name}
-                          style={{ background: `linear-gradient(90deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                          style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
                           onClick={() => {
                             setQrColor(preset.qr);
                             setBgColor(preset.bg);

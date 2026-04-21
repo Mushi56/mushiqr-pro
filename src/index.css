@@ -3410,10 +3410,11 @@ input[type="range"]::-moz-range-thumb {
 /* ── Color Presets Row (Horizontal Scroll) ── */
 .color-presets-row {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding: 8px 0 16px;
+  padding: 4px 4px 12px;
+  margin: 0 -4px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -3425,29 +3426,24 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .color-presets-row .color-preset-swatch {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-base);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.05);
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.1);
   flex-shrink: 0;
   scroll-snap-align: start;
-  border: 2px solid var(--border-light);
-  position: relative;
-  overflow: hidden;
 }
 
 .color-presets-row .color-preset-swatch:hover {
-  transform: translateY(-4px) scale(1.1);
-  border-color: var(--accent-primary);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary);
 }
 
 .color-presets-row .color-preset-swatch.active {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 15px var(--accent-glow);
-  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary);
+  transform: translateY(-2px);
 }
 
 /* ── Sync Eyes Toggle ── */
