@@ -3962,15 +3962,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .picker-close, .picker-confirm {
-  background: transparent;
-  border: none;
   color: var(--text-primary);
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
 .picker-close:hover, .picker-confirm:hover {
@@ -3981,8 +3974,8 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   width: 120px;
   height: 36px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 12px;
   overflow: hidden;
 }
 
