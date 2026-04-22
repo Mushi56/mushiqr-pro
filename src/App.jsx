@@ -672,17 +672,19 @@ export default function App() {
 
                       <div className="dropdown-section">
                         <div className="dropdown-label">Actions</div>
-                        <button className="dropdown-action-item" onClick={() => { handleSave(); setFormatDropdownOpen(false); }}>
-                          <History size={18} /> Save to History
-                        </button>
-                        <button className="dropdown-action-item" onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}>
-                          <Copy size={18} /> Copy Image
-                        </button>
-                        {typeof navigator !== 'undefined' && navigator.canShare && (
-                          <button className="dropdown-action-item" onClick={() => { handleShare(); setFormatDropdownOpen(false); }}>
-                            <Share2 size={18} /> Share QR Code
+                        <div className="dropdown-actions-row">
+                          <button className="dropdown-action-btn primary" onClick={() => { handleSave(); setFormatDropdownOpen(false); }}>
+                            <History size={18} /> <span>Save to History</span>
                           </button>
-                        )}
+                          <button className="dropdown-action-btn" onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }} title="Copy Image">
+                            <Copy size={18} />
+                          </button>
+                          {typeof navigator !== 'undefined' && navigator.canShare && (
+                            <button className="dropdown-action-btn" onClick={() => { handleShare(); setFormatDropdownOpen(false); }} title="Share QR Code">
+                              <Share2 size={18} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
