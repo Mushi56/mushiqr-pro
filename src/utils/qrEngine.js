@@ -214,9 +214,6 @@ export function renderQR(canvas, options) {
   canvas.width = size;
   canvas.height = size;
 
-  const totalModules = moduleCount + quietZone * 2;
-  const cellSize = size / totalModules;
-
   // Clear canvas
   ctx.clearRect(0, 0, size, size);
 
@@ -226,7 +223,34 @@ export function renderQR(canvas, options) {
     ctx.fillRect(0, 0, size, size);
   }
 
-  // Draw frame if enabled (before QR so QR is on top)
+  // Define Content Area for the QR based on Frame Style
+  const padding = size * 0.03; 
+  let contentX = 0;
+  let contentY = 0;
+  let contentSize = size;
+
+  // Adjust content area for frames
+  if (frameStyle !== FRAME_STYLES.NONE) {
+    // Basic frame padding
+    contentX = padding + size * 0.04;
+    contentY = padding + size * 0.04;
+    contentSize = size - (contentX * 2);
+
+    if (frameStyle === FRAME_STYLES.SCAN_ME) {
+      const labelHeight = size * 0.16;
+      // Shrink and shift UP to avoid the bottom label
+      contentSize = size - (padding * 2) - labelHeight - (size * 0.1); 
+      contentX = (size - contentSize) / 2;
+      contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
+    } else if (frameStyle === FRAME_STYLES.TEXT_BOTTOM) {
+      const labelHeight = size * 0.1;
+      contentSize = size - (padding * 2) - labelHeight;
+      contentX = (size - contentSize) / 2;
+      contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
+    }
+  }
+
+  // Draw frame if enabled
   if (frameStyle !== FRAME_STYLES.NONE) {
     drawFrame(ctx, size, {
       frameStyle,
@@ -237,13 +261,19 @@ export function renderQR(canvas, options) {
     });
   }
 
+  const totalModules = moduleCount + quietZone * 2;
+  const cellSize = contentSize / totalModules;
+
   // Create gradient if enabled
   let fillStyle;
   if (gradientEnabled) {
     if (gradientType === 'linear') {
-      fillStyle = ctx.createLinearGradient(0, 0, size, size);
+      fillStyle = ctx.createLinearGradient(contentX, contentY, contentX + contentSize, contentY + contentSize);
     } else {
-      fillStyle = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      fillStyle = ctx.createRadialGradient(
+        contentX + contentSize / 2, contentY + contentSize / 2, 0, 
+        contentX + contentSize / 2, contentY + contentSize / 2, contentSize / 2
+      );
     }
     fillStyle.addColorStop(0, gradientColor1);
     fillStyle.addColorStop(1, gradientColor2);
@@ -256,8 +286,8 @@ export function renderQR(canvas, options) {
     for (let col = 0; col < moduleCount; col++) {
       if (!matrix[row][col]) continue;
 
-      const x = (col + quietZone) * cellSize;
-      const y = (row + quietZone) * cellSize;
+      const x = contentX + (col + quietZone) * cellSize;
+      const y = contentY + (row + quietZone) * cellSize;
 
       const isFinder = isFinderPattern(row, col, moduleCount);
 
@@ -266,14 +296,12 @@ export function renderQR(canvas, options) {
         const useEyeColor = eyeColor || (gradientEnabled ? gradientColor1 : qrColor);
         const useEyeOuterColor = eyeOuterColor || useEyeColor;
         
-        // Determine if this is outer or inner part
         const relRow = row - (finderInfo.centerRow - 3);
         const relCol = col - (finderInfo.centerCol - 3);
         const isOuterRing = relRow === 0 || relRow === 6 || relCol === 0 || relCol === 6;
         const isInnerDot = relRow >= 2 && relRow <= 4 && relCol >= 2 && relCol <= 4;
         
         ctx.fillStyle = isOuterRing ? useEyeOuterColor : (isInnerDot ? useEyeColor : useEyeOuterColor);
-        
         drawEyeModule(ctx, x, y, cellSize, eyeStyle, row, col, finderInfo, moduleCount, options);
       } else {
         const neighbors = {
@@ -290,6 +318,7 @@ export function renderQR(canvas, options) {
 
   // Draw logo
   if (logo) {
+    // Adjust logo drawing to be centered in content area
     drawLogo(ctx, logo, size, {
       logoSize,
       logoPadding,
@@ -300,6 +329,9 @@ export function renderQR(canvas, options) {
       logoOutlineColor,
       logoOutlineWidth,
       logoOutlineOpacity,
+      contentX,
+      contentY,
+      contentSize
     });
   }
 
@@ -575,12 +607,15 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
     logoOutlineColor,
     logoOutlineWidth,
     logoOutlineOpacity,
+    contentX = 0,
+    contentY = 0,
+    contentSize = canvasSize
   } = options;
 
-  const logoW = canvasSize * logoSize;
+  const logoW = contentSize * logoSize;
   const logoH = logoW * (logoImg.height / logoImg.width);
-  const logoX = (canvasSize - logoW) / 2;
-  const logoY = (canvasSize - logoH) / 2;
+  const logoX = contentX + (contentSize - logoW) / 2;
+  const logoY = contentY + (contentSize - logoH) / 2;
   const paddedW = logoW + logoPadding * 2;
   const paddedH = logoH + logoPadding * 2;
   const paddedX = logoX - logoPadding;
@@ -606,7 +641,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
     if (logoBgShape === 'circle') {
       const radius = Math.max(paddedW, paddedH) / 2;
       ctx.beginPath();
-      ctx.arc(canvasSize / 2, canvasSize / 2, radius, 0, Math.PI * 2);
+      ctx.arc(logoX + logoW/2, logoY + logoH/2, radius, 0, Math.PI * 2);
       ctx.fill();
     } else if (logoBgShape === 'rounded') {
       drawRoundedRect(ctx, paddedX, paddedY, paddedW, paddedH, 12);
@@ -658,35 +693,35 @@ function drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, 
  */
 function drawFrame(ctx, size, options) {
   const { frameStyle, frameText, frameColor, bgColor, bgTransparent } = options;
-  const padding = size * 0.05; // 5% padding
+  const padding = size * 0.03; // Moved closer to edge (3%) to give QR more room
   const innerSize = size - padding * 2;
   
   ctx.save();
   ctx.fillStyle = frameColor;
   ctx.strokeStyle = frameColor;
-  ctx.lineWidth = size * 0.02; // 2% line width
+  ctx.lineWidth = size * 0.025; // Slightly thicker for premium feel
   
   switch (frameStyle) {
     case FRAME_STYLES.SCAN_ME: {
-      // Draw a box with a label area at bottom
-      const labelHeight = size * 0.15;
-      const cornerRadius = size * 0.05;
+      const labelHeight = size * 0.16;
+      const cornerRadius = size * 0.06;
       
       // Main box outline
       ctx.beginPath();
       drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, cornerRadius);
       ctx.stroke();
       
-      // Label box at bottom
+      // Label box at bottom - slightly overlap stroke for seamless look
       ctx.beginPath();
       drawRoundedRectPath(ctx, padding, size - padding - labelHeight, innerSize, labelHeight, cornerRadius);
       ctx.fill();
       
       // Text
       ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
-      ctx.font = `bold ${labelHeight * 0.5}px Outfit, Segoe UI, sans-serif`;
+      ctx.font = `bold ${labelHeight * 0.45}px Outfit, Segoe UI, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      // Center text in label box
       ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2);
       break;
     }
@@ -694,7 +729,7 @@ function drawFrame(ctx, size, options) {
       const labelHeight = size * 0.1;
       ctx.font = `bold ${labelHeight * 0.7}px Outfit, Segoe UI, sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(frameText, size / 2, size - padding / 2);
+      ctx.fillText(frameText, size / 2, size - padding / 4);
       break;
     }
     case FRAME_STYLES.BOX: {
@@ -703,13 +738,12 @@ function drawFrame(ctx, size, options) {
     }
     case FRAME_STYLES.ROUNDED: {
       ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, size * 0.08);
+      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, size * 0.1);
       ctx.stroke();
       break;
     }
     case FRAME_STYLES.MODERN: {
-      const cornerSize = size * 0.15;
-      const t = ctx.lineWidth;
+      const cornerSize = size * 0.18;
       // TL
       ctx.beginPath();
       ctx.moveTo(padding, padding + cornerSize);
