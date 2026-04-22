@@ -412,22 +412,15 @@ export default function App() {
     if (!canvasRef.current) return;
     const dataString = formatQRData(qrType, qrData);
     if (!dataString) { showToast('Please enter QR data first', 'error'); return; }
-    
-    setDownloadingFormat('History');
-    
-    // Brief delay to show animation
-    setTimeout(() => {
-      saveToHistory({
-        qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
-        qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
-        dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
-        logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
-        logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-        thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
-      });
-      showToast('Saved in history');
-      setTimeout(() => setDownloadingFormat(null), 1500);
-    }, 600);
+    saveToHistory({
+      qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
+      qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
+      dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
+      logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+      logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+      thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
+    });
+    showToast('Saved to history');
   };
 
   // ── Generate QR Matrix ──
@@ -627,73 +620,70 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Action buttons row */}
-                <div className="qr-action-row">
-                  <button className="qr-action-btn" onClick={handleCopyToClipboard} disabled={!qrMatrixInfo} title="Copy image">
-                    <Copy size={16} /> Copy
-                  </button>
-                  {typeof navigator !== 'undefined' && navigator.canShare && (
-                    <button className="qr-action-btn" onClick={handleShare} disabled={!qrMatrixInfo} title="Share">
-                      <Share2 size={16} /> Share
-                    </button>
-                  )}
-                </div>
-
-                {/* Download button with dropdown */}
-                <div className="download-split-wrapper" ref={downloadBtnRef}>
-                  <div className={`download-split-btn${!qrMatrixInfo ? ' disabled' : ''}`}>
+                {/* Unified Save & Actions Button */}
+                <div className="save-split-wrapper" ref={downloadBtnRef}>
+                  <div className={`save-split-btn${!qrMatrixInfo ? ' disabled' : ''}`}>
                     <button
-                      className="download-split-main"
+                      className="save-split-main"
                       disabled={!qrMatrixInfo}
-                      onClick={() => {
-                        if (selectedFormat === 'History') {
-                          handleSave();
-                        } else {
-                          handleDownload(selectedFormat, FORMAT_MAP[selectedFormat]);
-                        }
-                      }}
+                      onClick={() => handleDownload(selectedFormat, FORMAT_MAP[selectedFormat])}
                     >
                       {downloadingFormat === selectedFormat
                         ? <Loader2 size={17} className="spinning" />
-                        : <Save size={17} />
+                        : <Download size={17} />
                       }
-                      {selectedFormat === 'History' 
-                        ? (downloadingFormat === 'History' ? 'Saved in History' : 'Save to History') 
-                        : `Save ${selectedFormat}`
-                      }
+                      Save {selectedFormat}
                     </button>
-                    <span className="download-split-divider" />
+                    <span className="save-split-divider" />
                     <button
-                      className={`download-split-chevron${formatDropdownOpen ? ' open' : ''}`}
+                      className={`save-split-chevron${formatDropdownOpen ? ' open' : ''}`}
                       disabled={!qrMatrixInfo}
                       onClick={() => setFormatDropdownOpen(v => !v)}
-                      aria-label="Choose download format"
+                      aria-label="Action menu"
                     >
                       <ChevronDown size={15} />
                     </button>
                   </div>
 
                   {formatDropdownOpen && (
-                    <div className="download-format-dropdown">
-                      <div className="download-format-dropdown-label">Choose Action</div>
-                      {[
-                        { label: 'PNG', Icon: FileImage, color: '#00F0FF' },
-                        { label: 'SVG', Icon: FileCode, color: '#7000FF' },
-                        { label: 'PDF', Icon: FileText, color: '#FF007F' },
-                        { label: 'JPG', Icon: FileImage, color: '#FFD54F' },
-                        { label: 'History', Icon: History, color: 'var(--accent-primary)' },
-                      ].map(({ label, Icon, color }) => (
-                        <button
-                          key={label}
-                          className={`download-format-option${selectedFormat === label ? ' active' : ''}`}
-                          onClick={() => { setSelectedFormat(label); setFormatDropdownOpen(false); }}
-                        >
-                          <div className="download-format-icon-wrapper" style={{ '--icon-color': color }}>
-                            <Icon size={24} strokeWidth={1.5} />
-                          </div>
-                          <span className="download-format-name">{label}</span>
+                    <div className="save-action-dropdown">
+                      <div className="dropdown-section">
+                        <div className="dropdown-label">Export Format</div>
+                        <div className="format-grid">
+                          {[
+                            { label: 'PNG', Icon: FileImage, color: '#00F0FF' },
+                            { label: 'SVG', Icon: FileCode, color: '#7000FF' },
+                            { label: 'PDF', Icon: FileText, color: '#FF007F' },
+                            { label: 'JPG', Icon: FileImage, color: '#FFD54F' },
+                          ].map(({ label, Icon, color }) => (
+                            <button
+                              key={label}
+                              className={`format-option${selectedFormat === label ? ' active' : ''}`}
+                              onClick={() => { setSelectedFormat(label); setFormatDropdownOpen(false); }}
+                            >
+                              <Icon size={18} color={selectedFormat === label ? 'var(--accent-primary)' : 'var(--text-secondary)'} />
+                              <span>{label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="dropdown-divider" />
+
+                      <div className="dropdown-section">
+                        <div className="dropdown-label">Actions</div>
+                        <button className="dropdown-action-item" onClick={() => { handleSave(); setFormatDropdownOpen(false); }}>
+                          <History size={18} /> Save to History
                         </button>
-                      ))}
+                        <button className="dropdown-action-item" onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}>
+                          <Copy size={18} /> Copy Image
+                        </button>
+                        {typeof navigator !== 'undefined' && navigator.canShare && (
+                          <button className="dropdown-action-item" onClick={() => { handleShare(); setFormatDropdownOpen(false); }}>
+                            <Share2 size={18} /> Share QR Code
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

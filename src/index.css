@@ -1102,124 +1102,187 @@ input[type="range"]::-moz-range-thumb {
    with a chevron that opens a format-picker dropdown.
    ======================================== */
 
-.download-split-wrapper {
+/* ── Unified Save Split Button ── */
+.save-split-wrapper {
   position: relative;
   width: 100%;
+  max-width: 100%; /* Covers the previous action area width */
+  margin-top: 4px;
 }
 
-.download-split-btn {
+.save-split-btn {
   display: flex;
-  align-items: stretch;
   width: 100%;
-  border-radius: var(--radius-md);
+  height: 50px;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--accent-gradient-animated);
-  background-size: 200% 200%;
-  animation: gradient-move 4s ease infinite;
-  box-shadow: 0 4px 16px var(--accent-glow);
-  transition: box-shadow var(--transition-base), transform var(--transition-base);
+  box-shadow: 0 8px 24px var(--accent-glow);
+  transition: all var(--transition-base);
 }
 
-.download-split-btn:not(.disabled):hover {
-  box-shadow: 0 8px 28px var(--accent-glow);
-  transform: translateY(-3px) scale(1.01);
+.save-split-btn:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px var(--accent-glow);
 }
 
-.download-split-btn.disabled {
-  opacity: 0.38;
-  pointer-events: none;
+.save-split-btn.disabled {
+  opacity: 0.5;
+  filter: grayscale(1);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-/* Left side — triggers the actual download */
-.download-split-main {
+.save-split-main {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  padding: 14px 20px;
+  gap: 12px;
   background: transparent;
   border: none;
-  color: white;
+  color: #000;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: -0.1px;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  padding-left: 20px;
 }
 
-.download-split-main:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.download-split-main:active {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-/* Thin vertical divider between the two halves */
-.download-split-divider {
+.save-split-divider {
   width: 1px;
-  background: rgba(255, 255, 255, 0.25);
-  flex-shrink: 0;
-  margin: 8px 0;
+  height: 26px;
+  background: rgba(0,0,0,0.15);
+  align-self: center;
 }
 
-/* Right side — opens the format picker */
-.download-split-chevron {
+.save-split-chevron {
+  width: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 14px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.85);
+  color: #000;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast);
-  flex-shrink: 0;
+  transition: background 0.2s;
 }
 
-.download-split-chevron:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
+.save-split-chevron:hover {
+  background: rgba(0,0,0,0.05);
 }
 
-.download-split-chevron:active {
-  background: rgba(0, 0, 0, 0.12);
+.save-split-chevron.open {
+  background: rgba(0,0,0,0.1);
 }
 
-.download-split-chevron > svg {
-  transition: transform var(--transition-base);
-}
-
-.download-split-chevron.open > svg {
-  transform: rotate(180deg);
-}
-
-/* Format picker */
-.download-split-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.download-format-dropdown {
+/* ── Save Action Dropdown ── */
+.save-action-dropdown {
   position: absolute;
   bottom: calc(100% + 12px);
   left: 0;
-  width: 100%;
-  background: var(--bg-dropdown);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  right: 0;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  z-index: 200;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  z-index: 1000;
+  padding: 16px;
+  animation: dropdownSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+@keyframes dropdownSlideUp {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dropdown-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding-left: 4px;
+}
+
+.format-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  animation: dropdownAppear 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-origin: bottom center;
+  gap: 10px;
+}
+
+.format-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.format-option span {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.format-option:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+}
+
+.format-option.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+}
+
+.format-option.active span {
+  color: var(--accent-primary);
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border-color);
+}
+
+.dropdown-action-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropdown-action-item:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateX(6px);
+}
+
+.dropdown-action-item svg {
+  color: var(--accent-primary);
 }
 
 @media (max-width: 480px) {
@@ -3312,9 +3375,9 @@ input[type="range"]::-moz-range-thumb {
   border-color: rgba(0,0,0,0.08);
 }
 
-/* Download button inside preview card */
-.qr-preview-card .download-split-wrapper {
-  max-width: 340px;
+/* Save button inside preview card */
+.qr-preview-card .save-split-wrapper {
+  max-width: 360px;
 }
 
 /* ── Bottom Navigation Bar ── */
@@ -3785,8 +3848,8 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .qr-action-row,
-  .qr-preview-card .download-split-wrapper {
-    max-width: 380px;
+  .qr-preview-card .save-split-wrapper {
+    max-width: 400px;
   }
 }
 
