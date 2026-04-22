@@ -1143,12 +1143,17 @@ input[type="range"]::-moz-range-thumb {
   gap: 12px;
   background: transparent;
   border: none;
-  color: #fff;
+  color: #fff !important;
   font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   padding-left: 20px;
+}
+
+.save-split-main svg,
+.save-split-main span {
+  color: #fff !important;
 }
 
 .save-split-divider {
@@ -1165,9 +1170,13 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   background: transparent;
   border: none;
-  color: #fff;
+  color: #fff !important;
   cursor: pointer;
   transition: background 0.2s;
+}
+
+.save-split-chevron svg {
+  color: #fff !important;
 }
 
 .save-split-chevron:hover {
