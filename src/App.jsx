@@ -68,8 +68,8 @@ const COLOR_PRESETS = [
 ];
 
 const MockQR = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M2 2h6v6H2V2zm10 0h6v6h-6V2zM2 12h6v6H2v-6zm11 0h2v2h-2v-2zm3 0h2v2h-2v-2zm-3 3h2v2h-2v-2zm3 3h2v2h-2v-2zm0-3h2v2h-2v-2z" fill="currentColor" />
+  <svg width="24" height="24" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0 0h7v7H0V0zm1 1v5h5V1H1zm1 1h3v3H2V2zm16-2h7v7h-7V0zm1 1v5h5V1h-5zm1 1h3v3h-3V2zM0 18h7v7H0v-7zm1 1v5h5V19H1zm1 1h3v3H2v-3zm18-5h1v1h-1v-1zm1 1h1v1h-1v-1zm0-1h1v1h-1v-1zm2 0h1v1h-1v-1zm0 1h1v1h-1v-1zm1 0h1v1h-1v-1zm0-1h1v1h-1v-1zm-4 2h1v1h-1v-1zm1 1h1v1h-1v-1zm0-1h1v1h-1v-1zm2 0h1v1h-1v-1zm0 1h1v1h-1v-1zm1 0h1v1h-1v-1zm0-1h1v1h-1v-1zm-4 2h1v1h-1v-1zm1 1h1v1h-1v-1zm0-1h1v1h-1v-1zm2 0h1v1h-1v-1zm0 1h1v1h-1v-1zm1 0h1v1h-1v-1zm0-1h1v1h-1v-1z" fill="currentColor" />
   </svg>
 );
 
@@ -77,14 +77,14 @@ const FRAME_OPTIONS = [
   { 
     id: FRAME_STYLES.NONE,    
     label: 'No Frame',       
-    icon: <MockQR /> 
+    icon: <div style={{ transform: 'scale(1.2)' }}><MockQR /></div> 
   },
   { 
     id: FRAME_STYLES.BOX,     
     label: 'Square',  
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="4" y="4" width="24" height="24" rx="1" />
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <rect x="3" y="3" width="34" height="34" rx="1" />
         <g transform="translate(8, 8)"><MockQR /></g>
       </svg>
     ) 
@@ -93,8 +93,8 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.ROUNDED, 
     label: 'Rounded', 
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="4" y="4" width="24" height="24" rx="6" />
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <rect x="3" y="3" width="34" height="34" rx="8" />
         <g transform="translate(8, 8)"><MockQR /></g>
       </svg>
     ) 
@@ -103,9 +103,9 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.MODERN,  
     label: 'Modern',     
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="4" y="4" width="24" height="24" rx="4" strokeDasharray="2 2" />
-        <rect x="6" y="6" width="20" height="20" rx="2" />
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <rect x="2" y="2" width="36" height="36" rx="4" strokeDasharray="1.5 1.5" strokeOpacity="0.4" />
+        <rect x="5" y="5" width="30" height="30" rx="3" />
         <g transform="translate(8, 8)"><MockQR /></g>
       </svg>
     ) 
@@ -114,8 +114,9 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.SCAN_ME, 
     label: 'Neon',      
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="3" y="3" width="26" height="26" rx="13" />
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <rect x="2" y="2" width="36" height="36" rx="18" />
+        <circle cx="20" cy="20" r="15" strokeOpacity="0.3" strokeDasharray="2 2" />
         <g transform="translate(8, 8)"><MockQR /></g>
       </svg>
     ) 
@@ -124,10 +125,11 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.TEXT_BOTTOM, 
     label: 'Stamp', 
     icon: (
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M4 4h24v18H4z" />
-        <path d="M4 22h24v6H4z" fill="currentColor" fillOpacity="0.1" />
-        <g transform="translate(8, 6)"><MockQR /></g>
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.2">
+        <path d="M4 2h32v24H4z" />
+        <path d="M4 26h32v10H4z" fill="currentColor" fillOpacity="0.1" stroke="none" />
+        <rect x="8" y="30" width="24" height="2" rx="1" fill="currentColor" fillOpacity="0.5" stroke="none" />
+        <g transform="translate(8, 4)"><MockQR /></g>
       </svg>
     ) 
   },
