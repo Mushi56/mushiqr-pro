@@ -4076,11 +4076,54 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: none;
 }
 
+.picker-hex-input-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 8px;
+}
+
+.hex-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+  width: 140px;
+}
+
+.hex-input-container:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.hex-hash {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.hex-text-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono, monospace);
+  font-size: 16px;
+  font-weight: 700;
+  width: 100%;
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 .picker-tabs {
   display: flex;
   justify-content: center;
-  gap: 24px;
-  padding: 8px 0;
+  gap: 32px;
+  padding: 12px 0 4px;
 }
 
 .picker-tab-btn {

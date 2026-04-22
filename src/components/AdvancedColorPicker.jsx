@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Check, Plus, Minus } from 'lucide-react';
+import { X, Check, Plus, Minus, Hash } from 'lucide-react';
 
 export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel }) {
   const [tempColor, setTempColor] = useState(initialColor || '#ff0000');
@@ -22,9 +22,10 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
   // Helper to convert hex to RGB
   function hexToRgb(hex) {
     if (!hex) return { r: 0, g: 0, b: 0 };
-    const r = parseInt(hex.slice(1, 3), 16) || 0;
-    const g = parseInt(hex.slice(3, 5), 16) || 0;
-    const b = parseInt(hex.slice(5, 7), 16) || 0;
+    const cleanHex = hex.startsWith('#') ? hex : '#' + hex;
+    const r = parseInt(cleanHex.slice(1, 3), 16) || 0;
+    const g = parseInt(cleanHex.slice(3, 5), 16) || 0;
+    const b = parseInt(cleanHex.slice(5, 7), 16) || 0;
     return { r, g, b };
   }
 
@@ -127,6 +128,16 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     window.removeEventListener('pointerup', onDragEnd);
   };
 
+  const handleHexChange = (e) => {
+    let val = e.target.value.trim();
+    if (!val.startsWith('#')) val = '#' + val;
+    setTempColor(val);
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(val)) {
+      const rgb = hexToRgb(val);
+      stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -182,6 +193,20 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
           </div>
         </div>
 
+        <div className="picker-hex-input-wrapper">
+          <div className="hex-input-container">
+            <span className="hex-hash">#</span>
+            <input 
+              type="text" 
+              className="hex-text-input" 
+              value={tempColor.replace('#', '').toUpperCase()} 
+              onChange={handleHexChange}
+              maxLength={6}
+              spellCheck={false}
+            />
+          </div>
+        </div>
+
         <div className="picker-tabs">
           {['HSB', 'RGB'].map(tab => (
             <button 
@@ -196,26 +221,26 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
           {activeTab === 'RGB' ? (
             <>
               <RgbSlider label="R" value={r} onChange={(val) => {
-                const rgb = { r: parseInt(val), g, b };
+                const rgb = { r: parseInt(val) || 0, g, b };
                 setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
                 stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
               }} color="#ff4d4d" />
               <RgbSlider label="G" value={g} onChange={(val) => {
-                const rgb = { r, g: parseInt(val), b };
+                const rgb = { r, g: parseInt(val) || 0, b };
                 setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
                 stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
               }} color="#2ecc71" />
               <RgbSlider label="B" value={b} onChange={(val) => {
-                const rgb = { r, g, b: parseInt(val) };
+                const rgb = { r, g, b: parseInt(val) || 0 };
                 setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
                 stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
               }} color="#3498db" />
             </>
           ) : (
             <>
-              <RgbSlider label="H" value={Math.round(h)} max={360} onChange={(val) => updateColor(parseInt(val), s, v)} color="var(--accent-primary)" />
-              <RgbSlider label="S" value={Math.round(s)} max={100} onChange={(val) => updateColor(h, parseInt(val), v)} color="var(--accent-primary)" />
-              <RgbSlider label="B" value={Math.round(v)} max={100} onChange={(val) => updateColor(h, s, parseInt(val))} color="var(--accent-primary)" />
+              <RgbSlider label="H" value={Math.round(h)} max={360} onChange={(val) => updateColor(parseInt(val) || 0, s, v)} color="var(--accent-primary)" />
+              <RgbSlider label="S" value={Math.round(s)} max={100} onChange={(val) => updateColor(h, parseInt(val) || 0, v)} color="var(--accent-primary)" />
+              <RgbSlider label="B" value={Math.round(v)} max={100} onChange={(val) => updateColor(h, s, parseInt(val) || 0)} color="var(--accent-primary)" />
             </>
           )}
         </div>
