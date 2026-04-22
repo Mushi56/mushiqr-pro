@@ -2734,7 +2734,7 @@ input[type="range"]::-moz-range-thumb {
 .btn-theme-toggle:hover {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
-  transform: rotate(20deg) scale(1.1);
+  transform: scale(1.1);
 }
 
 /* ========================================
@@ -3447,12 +3447,17 @@ input[type="range"]::-moz-range-thumb {
 
 .bottom-nav-tab.active {
   color: var(--accent-primary);
-  background: var(--accent-soft); /* Full area background */
+}
+
+.bottom-nav-tab.active .bottom-nav-icon {
+  background: var(--accent-soft);
+  border-radius: var(--radius-full);
+  padding: 4px 16px;
 }
 
 .bottom-nav-tab.active .bottom-nav-icon svg {
   fill: var(--accent-primary);
-  fill-opacity: 0.15; /* Subtle fill instead of solid */
+  fill-opacity: 1; /* Solid fill like a 'liked' icon */
 }
 
 .bottom-nav-highlight {
@@ -4373,7 +4378,7 @@ input[type="range"]::-moz-range-thumb {
 .logo-compact-upload-fixed:hover .btn-icon {
   background: var(--accent-primary);
   color: #000;
-  transform: scale(1.05) rotate(5deg);
+  transform: scale(1.05);
   box-shadow: 0 0 15px var(--accent-glow);
   border-color: transparent;
 }
