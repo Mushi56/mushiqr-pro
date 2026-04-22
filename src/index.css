@@ -1143,17 +1143,12 @@ input[type="range"]::-moz-range-thumb {
   gap: 12px;
   background: transparent;
   border: none;
-  color: #fff !important;
+  color: #fff;
   font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   padding-left: 20px;
-}
-
-.save-split-main svg,
-.save-split-main span {
-  color: #fff !important;
 }
 
 .save-split-divider {
@@ -1170,13 +1165,9 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   background: transparent;
   border: none;
-  color: #fff !important;
+  color: #fff;
   cursor: pointer;
   transition: background 0.2s;
-}
-
-.save-split-chevron svg {
-  color: #fff !important;
 }
 
 .save-split-chevron:hover {
@@ -1194,7 +1185,7 @@ input[type="range"]::-moz-range-thumb {
   left: 0;
   right: 0;
   background: var(--bg-dropdown-solid);
-  border: 1px solid var(--border-light);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: 0 15px 50px rgba(0,0,0,0.8);
   z-index: 1000;
@@ -2743,7 +2734,7 @@ input[type="range"]::-moz-range-thumb {
 .btn-theme-toggle:hover {
   background: var(--accent-soft);
   border-color: var(--accent-primary);
-  transform: scale(1.1);
+  transform: rotate(20deg) scale(1.1);
 }
 
 /* ========================================
@@ -3456,17 +3447,12 @@ input[type="range"]::-moz-range-thumb {
 
 .bottom-nav-tab.active {
   color: var(--accent-primary);
-}
-
-.bottom-nav-tab.active .bottom-nav-icon {
-  background: var(--accent-soft);
-  border-radius: var(--radius-full);
-  padding: 4px 16px;
+  background: var(--accent-soft); /* Full area background */
 }
 
 .bottom-nav-tab.active .bottom-nav-icon svg {
   fill: var(--accent-primary);
-  fill-opacity: 1; /* Solid fill like a 'liked' icon */
+  fill-opacity: 0.15; /* Subtle fill instead of solid */
 }
 
 .bottom-nav-highlight {
@@ -3939,7 +3925,7 @@ input[type="range"]::-moz-range-thumb {
   right: 0;
   width: 260px;
   background: #0A0A0F; /* Solid dark background */
-  border: 1px solid var(--border-light);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
   z-index: 3000;
@@ -4081,7 +4067,7 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   width: 120px;
   height: 36px;
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -4187,7 +4173,7 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
   gap: 8px;
   background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: 14px;
   padding: 10px 16px;
   transition: all 0.2s ease;
@@ -4387,7 +4373,7 @@ input[type="range"]::-moz-range-thumb {
 .logo-compact-upload-fixed:hover .btn-icon {
   background: var(--accent-primary);
   color: #000;
-  transform: scale(1.05);
+  transform: scale(1.05) rotate(5deg);
   box-shadow: 0 0 15px var(--accent-glow);
   border-color: transparent;
 }
