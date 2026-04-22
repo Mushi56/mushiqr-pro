@@ -34,13 +34,24 @@ const HomePage = ({ onQuickCreate, onNavigate, history = [] }) => {
           </button>
         </div>
         <div className="hero-qr-preview">
-          <div className="qr-box-decorative">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
-              <rect x="7" y="7" width="3" height="3" rx="0.5" fill="white" />
-              <rect x="14" y="7" width="3" height="3" rx="0.5" fill="white" />
-              <rect x="7" y="14" width="3" height="3" rx="0.5" fill="white" />
-              <path d="M14 14h1v1h-1zM15 15h1v1h-1zM16 14h1v1h-1zM14 16h1v1h-1zM16 16h1v1h-1z" fill="white" />
+          <div className="qr-box-decorative" style={{ color: 'white' }}>
+            <svg width="64" height="64" viewBox="0 0 21 21" fill="none">
+              <rect x="0" y="0" width="7" height="7" fill="currentColor" />
+              <rect x="1" y="1" width="5" height="5" fill="none" stroke="var(--accent-primary)" strokeWidth="1" />
+              <rect x="2" y="2" width="3" height="3" fill="currentColor" />
+              
+              <rect x="14" y="0" width="7" height="7" fill="currentColor" />
+              <rect x="15" y="1" width="5" height="5" fill="none" stroke="var(--accent-primary)" strokeWidth="1" />
+              <rect x="16" y="2" width="3" height="3" fill="currentColor" />
+              
+              <rect x="0" y="14" width="7" height="7" fill="currentColor" />
+              <rect x="1" y="15" width="5" height="5" fill="none" stroke="var(--accent-primary)" strokeWidth="1" />
+              <rect x="2" y="16" width="3" height="3" fill="currentColor" />
+              
+              <rect x="14" y="14" width="3" height="3" fill="currentColor" />
+              <rect x="18" y="14" width="3" height="3" fill="currentColor" />
+              <rect x="14" y="18" width="3" height="3" fill="currentColor" />
+              <rect x="18" y="18" width="3" height="3" fill="currentColor" />
             </svg>
           </div>
         </div>
