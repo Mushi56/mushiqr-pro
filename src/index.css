@@ -4022,14 +4022,14 @@ input[type="range"]::-moz-range-thumb {
   max-height: 85vh !important;
   height: auto !important;
   max-width: 420px !important;
-  background: var(--bg-card) !important;
+  background: #0A0A0F !important; /* Solid dark background */
   display: flex !important;
   flex-direction: column !important;
   padding: 20px 16px calc(80px + env(safe-area-inset-bottom)) !important; /* Lifted above the 64px navbar */
   position: relative !important;
   border-radius: 32px 32px 0 0 !important;
-  border-top: 1px solid var(--border-light) !important;
-  box-shadow: 0 -15px 60px rgba(0,0,0,0.7) !important;
+  border: none !important;
+  box-shadow: 0 -15px 60px rgba(0,0,0,0.8) !important;
   overflow-y: auto !important;
   overscroll-behavior: contain;
 }
