@@ -65,6 +65,7 @@
   --header-height: 80px;
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
+  --bg-dropdown-solid: #0D0D12;
 }
 
 /* Light Theme — High-end clean aesthetic */
@@ -99,6 +100,7 @@
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
 
   --bg-dropdown: rgba(255, 255, 255, 0.98);
+  --bg-dropdown-solid: #FFFFFF;
 }
 
 /* ========================================
@@ -1182,7 +1184,7 @@ input[type="range"]::-moz-range-thumb {
   bottom: calc(100% + 12px);
   left: 0;
   right: 0;
-  background: #0D0D12; /* Solid dark background */
+  background: var(--bg-dropdown-solid);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   box-shadow: 0 15px 50px rgba(0,0,0,0.8);
