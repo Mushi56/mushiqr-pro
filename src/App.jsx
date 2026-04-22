@@ -412,15 +412,22 @@ export default function App() {
     if (!canvasRef.current) return;
     const dataString = formatQRData(qrType, qrData);
     if (!dataString) { showToast('Please enter QR data first', 'error'); return; }
-    saveToHistory({
-      qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
-      qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
-      dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
-      logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
-      logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-      thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
-    });
-    showToast('Saved to history');
+    
+    setDownloadingFormat('History');
+    
+    // Brief delay to show animation
+    setTimeout(() => {
+      saveToHistory({
+        qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
+        qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
+        dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
+        logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+        logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+        thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
+      });
+      showToast('Saved in history');
+      setTimeout(() => setDownloadingFormat(null), 1500);
+    }, 600);
   };
 
   // ── Generate QR Matrix ──
@@ -650,7 +657,10 @@ export default function App() {
                         ? <Loader2 size={17} className="spinning" />
                         : <Save size={17} />
                       }
-                      {selectedFormat === 'History' ? 'Save to History' : `Save ${selectedFormat}`}
+                      {selectedFormat === 'History' 
+                        ? (downloadingFormat === 'History' ? 'Saved in History' : 'Save to History') 
+                        : `Save ${selectedFormat}`
+                      }
                     </button>
                     <span className="download-split-divider" />
                     <button
