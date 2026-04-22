@@ -975,10 +975,13 @@ input[type="range"]::-moz-range-thumb {
 
 .type-tabs {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  padding: 4px 0 12px;
-  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 4px 12px;
+  margin: 0 -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .type-tabs::-webkit-scrollbar {
@@ -1035,10 +1038,13 @@ input[type="range"]::-moz-range-thumb {
 
 .style-grid {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  padding: 4px 0 12px;
-  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 4px 12px;
+  margin: 0 -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .style-grid::-webkit-scrollbar {
@@ -3498,10 +3504,13 @@ input[type="range"]::-moz-range-thumb {
 /* ── Frame Options List ── */
 .frame-options-list {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  padding: 4px 0 12px;
-  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 4px 12px;
+  margin: 0 -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .frame-options-list::-webkit-scrollbar {
@@ -3569,10 +3578,13 @@ input[type="range"]::-moz-range-thumb {
 /* ── EC Level Buttons ── */
 .logo-presets-grid {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
-  padding: 4px 0 12px;
-  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 4px 12px;
+  margin: 0 -4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .logo-presets-grid::-webkit-scrollbar {
