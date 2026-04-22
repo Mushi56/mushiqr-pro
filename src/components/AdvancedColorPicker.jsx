@@ -152,8 +152,10 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
               <div 
                 className="hue-handle" 
                 style={{ 
-                  transform: `rotate(${h - 90}deg) translateX(85px)`,
-                  backgroundColor: `hsl(${h}, 100%, 50%)`
+                  transform: `rotate(${h - 90}deg) translateX(98px)`,
+                  backgroundColor: `hsl(${h}, 100%, 50%)`,
+                  border: '2px solid white',
+                  boxShadow: '0 0 10px rgba(0,0,0,0.5)'
                 }}
               />
               
@@ -170,7 +172,9 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
                   style={{ 
                     left: `${s}%`, 
                     top: `${100 - v}%`,
-                    backgroundColor: tempColor
+                    backgroundColor: tempColor,
+                    border: '2px solid white',
+                    boxShadow: '0 0 8px rgba(0,0,0,0.4)'
                   }}
                 />
               </div>

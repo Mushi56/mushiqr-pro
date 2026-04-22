@@ -3939,11 +3939,11 @@ input[type="range"]::-moz-range-thumb {
   background: var(--bg-card) !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 20px 16px 32px !important; /* Fixed excessive bottom padding */
+  padding: 20px 16px calc(80px + env(safe-area-inset-bottom)) !important; /* Lifted above the 64px navbar */
   position: relative !important;
-  border-radius: 28px 28px 0 0 !important;
+  border-radius: 32px 32px 0 0 !important;
   border-top: 1px solid var(--border-light) !important;
-  box-shadow: 0 -15px 50px rgba(0,0,0,0.6) !important;
+  box-shadow: 0 -15px 60px rgba(0,0,0,0.7) !important;
   overflow-y: auto !important;
   overscroll-behavior: contain;
 }
@@ -4000,8 +4000,8 @@ input[type="range"]::-moz-range-thumb {
 
 .picker-wheel-container {
   position: relative;
-  width: 190px;
-  height: 190px;
+  width: 220px; /* Increased from 190px */
+  height: 220px;
 }
 
 .hue-wheel {
@@ -4016,7 +4016,7 @@ input[type="range"]::-moz-range-thumb {
 .hue-wheel::after {
   content: '';
   position: absolute;
-  inset: 20px;
+  inset: 24px; /* Increased from 20px */
   background: var(--bg-card);
   border-radius: 50%;
 }
@@ -4042,14 +4042,15 @@ input[type="range"]::-moz-range-thumb {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 120px;
-  height: 120px;
+  width: 130px; /* Adjusted to fit the larger wheel hole */
+  height: 130px;
   transform: translate(-50%, -50%) rotate(45deg);
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
   z-index: 5;
   cursor: crosshair;
   touch-action: none;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
 .sv-gradient-white {
