@@ -67,14 +67,70 @@ const COLOR_PRESETS = [
   { name: 'Deep Sea', qr: '#00416A', bg: '#E1E8EB' },
 ];
 
-/* ── Frame options for Frame Tab ── */
+const MockQR = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M2 2h6v6H2V2zm10 0h6v6h-6V2zM2 12h6v6H2v-6zm11 0h2v2h-2v-2zm3 0h2v2h-2v-2zm-3 3h2v2h-2v-2zm3 3h2v2h-2v-2zm0-3h2v2h-2v-2z" fill="currentColor" />
+  </svg>
+);
+
 const FRAME_OPTIONS = [
-  { id: FRAME_STYLES.NONE,    label: 'No Frame',       icon: '⊘' },
-  { id: FRAME_STYLES.BOX,     label: 'Simple Border',  icon: '▢' },
-  { id: FRAME_STYLES.ROUNDED, label: 'Rounded Border', icon: '▣' },
-  { id: FRAME_STYLES.MODERN,  label: 'Shadow Box',     icon: '◈' },
-  { id: FRAME_STYLES.SCAN_ME, label: 'Neon Glow',      icon: '◇' },
-  { id: FRAME_STYLES.TEXT_BOTTOM, label: 'Vintage Stamp', icon: '◆' },
+  { 
+    id: FRAME_STYLES.NONE,    
+    label: 'No Frame',       
+    icon: <MockQR /> 
+  },
+  { 
+    id: FRAME_STYLES.BOX,     
+    label: 'Square',  
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="4" y="4" width="24" height="24" rx="1" />
+        <g transform="translate(8, 8)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.ROUNDED, 
+    label: 'Rounded', 
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="4" y="4" width="24" height="24" rx="6" />
+        <g transform="translate(8, 8)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.MODERN,  
+    label: 'Modern',     
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="4" y="4" width="24" height="24" rx="4" strokeDasharray="2 2" />
+        <rect x="6" y="6" width="20" height="20" rx="2" />
+        <g transform="translate(8, 8)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.SCAN_ME, 
+    label: 'Neon',      
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="3" width="26" height="26" rx="13" />
+        <g transform="translate(8, 8)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.TEXT_BOTTOM, 
+    label: 'Stamp', 
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M4 4h24v18H4z" />
+        <path d="M4 22h24v6H4z" fill="currentColor" fillOpacity="0.1" />
+        <g transform="translate(8, 6)"><MockQR /></g>
+      </svg>
+    ) 
+  },
 ];
 
 /* ── Error Correction Levels ── */
@@ -781,7 +837,6 @@ export default function App() {
                         >
                           <span className="frame-option-icon">{opt.icon}</span>
                           <span className="frame-option-label">{opt.label}</span>
-                          {frameStyle === opt.id && <span className="frame-option-check">✓</span>}
                         </button>
                       ))}
                     </div>
