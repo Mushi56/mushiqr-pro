@@ -144,12 +144,12 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     <div className="advanced-picker-overlay">
       <div className="advanced-picker-container">
         <header className="picker-header">
-          <button className="btn btn-ghost btn-icon picker-close" onClick={onCancel}><X size={20} /></button>
+          <button className="picker-close" onClick={onCancel}><X size={20} /></button>
           <div className="picker-preview-dual">
             <div className="picker-preview-old" style={{ backgroundColor: initialColor }} />
             <div className="picker-preview-new" style={{ backgroundColor: tempColor }} />
           </div>
-          <button className="btn btn-primary btn-icon picker-confirm" onClick={() => onConfirm(tempColor)}><Check size={20} /></button>
+          <button className="picker-confirm" onClick={() => onConfirm(tempColor)}><Check size={20} /></button>
         </header>
 
         <div className="picker-wheel-area">

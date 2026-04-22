@@ -4085,21 +4085,19 @@ input[type="range"]::-moz-range-thumb {
 .hex-input-container {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: var(--bg-input); /* Matches type-tab and other buttons */
-  border: none; /* Removed the stroke */
-  border-radius: 16px;
-  padding: 12px 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 150px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 10px 16px;
+  transition: all 0.2s ease;
+  width: 140px;
 }
 
 .hex-input-container:focus-within {
-  background: var(--bg-hover);
-  box-shadow: 0 8px 24px var(--accent-soft); /* Softer, light glow instead of strong red/pink */
-  transform: translateY(-2px);
-  outline: 1px solid var(--border-accent);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: translateY(-1px);
 }
 
 .hex-hash {
