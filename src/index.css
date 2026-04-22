@@ -103,17 +103,6 @@
   --bg-dropdown-solid: #FFFFFF;
 }
 
-.eyes-config-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 16px 0 8px;
-}
-
-.eyes-config-header .panel-label {
-  margin-bottom: 0;
-}
-
 /* ========================================
    RESET & BASE
    ======================================== */
