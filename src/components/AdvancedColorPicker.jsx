@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Check, Plus, Minus, Hash } from 'lucide-react';
 
-export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel }) {
+export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel, onChange }) {
   const [tempColor, setTempColor] = useState(initialColor || '#ff0000');
   const [activeTab, setActiveTab] = useState('RGB');
   
@@ -81,8 +81,10 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
   const updateColor = useCallback((newH, newS, newV) => {
     stateRef.current = { h: newH, s: newS, v: newV };
     const rgb = hsvToRgb(newH, newS, newV);
-    setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
-  }, []);
+    const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+    setTempColor(hex);
+    if (onChange) onChange(hex);
+  }, [onChange]);
 
   const handleHueMove = useCallback((e) => {
     if (!wheelRef.current) return;
@@ -135,6 +137,7 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(val)) {
       const rgb = hexToRgb(val);
       stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+      if (onChange) onChange(val);
     }
   };
 
@@ -222,18 +225,24 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
             <>
               <RgbSlider label="R" value={r} onChange={(val) => {
                 const rgb = { r: parseInt(val) || 0, g, b };
-                setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                setTempColor(hex);
                 stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+                if (onChange) onChange(hex);
               }} color="#ff4d4d" />
               <RgbSlider label="G" value={g} onChange={(val) => {
                 const rgb = { r, g: parseInt(val) || 0, b };
-                setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                setTempColor(hex);
                 stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+                if (onChange) onChange(hex);
               }} color="#2ecc71" />
               <RgbSlider label="B" value={b} onChange={(val) => {
                 const rgb = { r, g, b: parseInt(val) || 0 };
-                setTempColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                setTempColor(hex);
                 stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+                if (onChange) onChange(hex);
               }} color="#3498db" />
             </>
           ) : (

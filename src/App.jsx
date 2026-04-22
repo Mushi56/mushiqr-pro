@@ -592,11 +592,18 @@ export default function App() {
         <AdvancedColorPicker 
           isOpen={advPicker.open}
           initialColor={advPicker.color}
+          onChange={(newColor) => {
+            if (advPicker.setter) advPicker.setter(newColor);
+          }}
           onConfirm={(newColor) => {
             if (advPicker.setter) advPicker.setter(newColor);
             setAdvPicker({ ...advPicker, open: false });
           }}
-          onCancel={() => setAdvPicker({ ...advPicker, open: false })}
+          onCancel={() => {
+            // Restore original color if canceled
+            if (advPicker.setter) advPicker.setter(advPicker.color);
+            setAdvPicker({ ...advPicker, open: false });
+          }}
         />
       </header>
 
