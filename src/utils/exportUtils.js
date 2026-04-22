@@ -7,6 +7,14 @@ import { Media } from '@capacitor-community/media';
 
 async function saveFileNative(base64Data, filename) {
   try {
+    // Request permissions before saving
+    await Filesystem.requestPermissions();
+    try {
+      await Media.requestPermissions();
+    } catch (e) {
+      console.warn('Media permissions request failed', e);
+    }
+
     // 1. Write the base64 data to a temporary file in the Cache directory
     const savedFile = await Filesystem.writeFile({
       path: filename,

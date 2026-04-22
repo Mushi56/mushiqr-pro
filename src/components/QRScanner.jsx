@@ -66,18 +66,18 @@ export default function QRScanner() {
     if (!scannerRef.current) return;
 
     try {
-      // For Capacitor/Android: Request permission explicitly
+      // 1. Explicitly request permissions via Capacitor for Android
       try {
         const perm = await CapCamera.requestPermissions();
         if (perm.camera !== 'granted') {
-          setError('Camera permission is required to scan codes.');
+          setError('Camera permission is required.');
           return;
         }
       } catch (e) {
-        console.warn('Capacitor Camera plugin not available, falling back to browser API');
+        console.warn('Capacitor permission failed, fallback to browser');
       }
 
-      // Ensure any existing instance is stopped
+      // 2. Stop any existing instance
       if (html5QrRef.current) {
         await stopScanner();
       }
@@ -85,26 +85,43 @@ export default function QRScanner() {
       const html5Qr = new Html5Qrcode('qr-scanner-viewport');
       html5QrRef.current = html5Qr;
 
+      // 3. Try to get specific cameras to find the back one
+      const cameras = await Html5Qrcode.getCameras();
+      let cameraId = null;
+      
+      if (cameras && cameras.length > 0) {
+        // Try to find the back camera specifically by label
+        const backCamera = cameras.find(cam => cam.label.toLowerCase().includes('back') || cam.label.toLowerCase().includes('environment'));
+        cameraId = backCamera ? backCamera.id : cameras[0].id;
+      }
+
       const config = {
-        fps: 10,
+        fps: 15,
         qrbox: { width: 250, height: 250 },
         aspectRatio: 1.0,
       };
 
-      await html5Qr.start(
-        { facingMode: cameraFacing },
-        config,
-        (decodedText) => {
-          setResult(decodedText);
-          stopScanner();
-        },
-        () => {} // ignore scan failures
-      );
+      // Start with preferred cameraId or facingMode
+      if (cameraId) {
+        await html5Qr.start(
+          cameraId,
+          config,
+          (decodedText) => { setResult(decodedText); stopScanner(); },
+          () => {}
+        );
+      } else {
+        await html5Qr.start(
+          { facingMode: cameraFacing },
+          config,
+          (decodedText) => { setResult(decodedText); stopScanner(); },
+          () => {}
+        );
+      }
 
       setScanning(true);
     } catch (err) {
       console.error("Start error:", err);
-      setError('Camera access denied or failed to start. Please check permissions.');
+      setError('Camera failed to start. Please ensure other apps aren\'t using it.');
       setScanning(false);
     }
   }, [cameraFacing, stopScanner]);
