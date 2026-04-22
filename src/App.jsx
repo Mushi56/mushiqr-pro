@@ -717,19 +717,22 @@ export default function App() {
                       <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
                     </div>
 
+                    <div className="eyes-config-header" style={{ alignItems: 'flex-start' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <label className="panel-label" style={{ marginBottom: 0 }}>Eyes Color</label>
+                        <span className="toggle-hint" style={{ fontSize: '10px', marginTop: 0 }}>When ON, eyes match dots color</span>
+                      </div>
+                      <Toggle label="Sync" checked={syncEyes} onChange={setSyncEyes} />
+                    </div>
+
                     {!syncEyes ? (
                       <div className="eye-colors-grid">
                         <ColorPicker className="compact-picker" label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
                         <ColorPicker className="compact-picker" label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
                       </div>
                     ) : (
-                      <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
+                      <ColorPicker label="Shared Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
                     )}
-                    
-                    <div className="toggle-row" style={{ marginTop: '8px' }}>
-                      <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
-                      <span className="toggle-hint">When ON, eyes match dots color</span>
-                    </div>
                   </div>
 
                   <div style={{ marginTop: 'auto' }}>
