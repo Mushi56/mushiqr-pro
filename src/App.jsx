@@ -106,60 +106,62 @@ const FRAME_OPTIONS = [
   { 
     id: FRAME_STYLES.NONE,    
     label: 'No Frame',       
-    icon: <div style={{ transform: 'scale(1.4)' }}><MockQR /></div> 
+    icon: <div style={{ transform: 'scale(1.2)' }}><MockQR /></div> 
   },
   { 
-    id: FRAME_STYLES.BOX,     
-    label: 'Square',  
+    id: FRAME_STYLES.FRAME1,     
+    label: 'Style 1',  
     icon: (
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-        <rect x="2" y="2" width="48" height="48" rx="2" stroke="black" strokeWidth="3" />
+        <path d="M4 14V4h10M38 4h10v10M48 24v10H38M14 34H4V24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="4" y="38" width="44" height="10" rx="2" fill="currentColor" />
+        <g transform="translate(14, 10)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.FRAME2, 
+    label: 'Style 2', 
+    icon: (
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="8" stroke="currentColor" strokeWidth="2.5" />
+        <path d="M8 16V8h8M36 8h8v8M44 24v8H36M16 32H8V24" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="8" y="36" width="36" height="8" rx="2" fill="currentColor" />
+        <g transform="translate(14, 12)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.FRAME3,  
+    label: 'Style 3',     
+    icon: (
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="4" y="4" width="44" height="34" rx="4" stroke="currentColor" strokeWidth="4" />
+        <rect x="4" y="42" width="44" height="6" rx="1" fill="currentColor" />
+        <g transform="translate(14, 9)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.FRAME4, 
+    label: 'Style 4',      
+    icon: (
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="4" y="2" width="44" height="12" rx="2" fill="currentColor" />
+        <circle cx="12" cy="8" r="2" fill="white" fillOpacity="0.5" />
+        <circle cx="40" cy="8" r="2" fill="white" fillOpacity="0.5" />
+        <path d="M4 36v12h12M36 48h12V36" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <g transform="translate(14, 18)"><MockQR /></g>
+      </svg>
+    ) 
+  },
+  { 
+    id: FRAME_STYLES.FRAME5, 
+    label: 'Style 5', 
+    icon: (
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <path d="M4 14V4h10M38 4h10v10M48 38v10H38M14 48H4V38" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
         <g transform="translate(14, 14)"><MockQR /></g>
-      </svg>
-    ) 
-  },
-  { 
-    id: FRAME_STYLES.ROUNDED, 
-    label: 'Rounded', 
-    icon: (
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-        <rect x="2" y="2" width="48" height="48" rx="10" stroke="black" strokeWidth="3" />
-        <g transform="translate(14, 14)"><MockQR /></g>
-      </svg>
-    ) 
-  },
-  { 
-    id: FRAME_STYLES.MODERN,  
-    label: 'Modern',     
-    icon: (
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-        <rect x="2" y="2" width="48" height="48" rx="6" stroke="black" strokeWidth="1.5" strokeDasharray="4 2" />
-        <rect x="6" y="6" width="40" height="40" rx="3" stroke="black" strokeWidth="2.5" />
-        <g transform="translate(14, 14)"><MockQR /></g>
-      </svg>
-    ) 
-  },
-  { 
-    id: FRAME_STYLES.SCAN_ME, 
-    label: 'Scan Me',      
-    icon: (
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-        <rect x="2" y="2" width="48" height="48" rx="8" stroke="black" strokeWidth="3.5" />
-        <path d="M2 38h48v10c0 1-1 2-2 2H4c-1 0-2-1-2-2v-10z" fill="black" />
-        <rect x="14" y="42" width="24" height="2.5" rx="1" fill="white" />
-        <g transform="translate(14, 8)"><MockQR /></g>
-      </svg>
-    ) 
-  },
-  { 
-    id: FRAME_STYLES.TEXT_BOTTOM, 
-    label: 'Stamp', 
-    icon: (
-      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-        <path d="M2 2h48v34H2z" stroke="black" strokeWidth="3" />
-        <path d="M2 36h48v14H2z" fill="black" />
-        <circle cx="26" cy="43" r="3.5" fill="white" fillOpacity="0.6" />
-        <g transform="translate(14, 6)"><MockQR /></g>
       </svg>
     ) 
   },
