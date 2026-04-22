@@ -625,9 +625,6 @@ export default function App() {
                   <button className="qr-action-btn" onClick={handleCopyToClipboard} disabled={!qrMatrixInfo} title="Copy image">
                     <Copy size={16} /> Copy
                   </button>
-                  <button className="qr-action-btn" onClick={handleSave} disabled={!qrMatrixInfo} title="Save to history">
-                    <Save size={16} /> Save
-                  </button>
                   {typeof navigator !== 'undefined' && navigator.canShare && (
                     <button className="qr-action-btn" onClick={handleShare} disabled={!qrMatrixInfo} title="Share">
                       <Share2 size={16} /> Share
@@ -641,13 +638,19 @@ export default function App() {
                     <button
                       className="download-split-main"
                       disabled={!qrMatrixInfo}
-                      onClick={() => handleDownload(selectedFormat, FORMAT_MAP[selectedFormat])}
+                      onClick={() => {
+                        if (selectedFormat === 'History') {
+                          handleSave();
+                        } else {
+                          handleDownload(selectedFormat, FORMAT_MAP[selectedFormat]);
+                        }
+                      }}
                     >
                       {downloadingFormat === selectedFormat
                         ? <Loader2 size={17} className="spinning" />
-                        : <Download size={17} />
+                        : <Save size={17} />
                       }
-                      Download {selectedFormat}
+                      {selectedFormat === 'History' ? 'Save to History' : `Save ${selectedFormat}`}
                     </button>
                     <span className="download-split-divider" />
                     <button
@@ -662,12 +665,13 @@ export default function App() {
 
                   {formatDropdownOpen && (
                     <div className="download-format-dropdown">
-                      <div className="download-format-dropdown-label">Choose format</div>
+                      <div className="download-format-dropdown-label">Choose Action</div>
                       {[
                         { label: 'PNG', Icon: FileImage, color: '#00F0FF' },
                         { label: 'SVG', Icon: FileCode, color: '#7000FF' },
                         { label: 'PDF', Icon: FileText, color: '#FF007F' },
                         { label: 'JPG', Icon: FileImage, color: '#FFD54F' },
+                        { label: 'History', Icon: History, color: 'var(--accent-primary)' },
                       ].map(({ label, Icon, color }) => (
                         <button
                           key={label}
