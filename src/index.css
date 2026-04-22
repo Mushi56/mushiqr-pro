@@ -989,7 +989,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .type-tab {
-  flex: 0 0 85px; /* Fixed width for 1:1 */
+  flex: 0 0 88px;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
@@ -1052,7 +1052,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .style-option {
-  flex: 0 0 65px; /* Fixed width for 1:1 */
+  flex: 0 0 88px;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
@@ -3439,7 +3439,11 @@ input[type="range"]::-moz-range-thumb {
   font-weight: 700;
   color: var(--text-secondary);
   letter-spacing: -0.2px;
-  margin-bottom: 4px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.panel-label:first-child {
+  margin-top: 0;
 }
 
 /* ── Color Presets Row (Horizontal Scroll) ── */
@@ -3514,7 +3518,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .frame-option-btn {
-  flex: 0 0 90px;
+  flex: 0 0 88px;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
@@ -3588,7 +3592,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .logo-preset-btn {
-  flex: 0 0 90px;
+  flex: 0 0 88px;
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;
@@ -3629,13 +3633,10 @@ input[type="range"]::-moz-range-thumb {
 
 .ec-buttons-row {
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 4px 12px;
-  margin: 0 -4px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0 12px;
+  margin: 0;
 }
 
 .ec-buttons-row::-webkit-scrollbar {
@@ -3643,7 +3644,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .ec-btn {
-  flex: 0 0 85px;
+  flex: 0 0 23%; /* Approximately 4 items per row */
   aspect-ratio: 1 / 1;
   display: flex;
   flex-direction: column;

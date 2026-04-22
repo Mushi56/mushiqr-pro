@@ -393,7 +393,6 @@ export default function App() {
     { id: 'shapes',  label: 'Shapes',  icon: Hexagon },
     { id: 'logo',    label: 'Logo',    icon: ImageIcon },
     { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
-    { id: 'scan',    label: 'Reliability', icon: ShieldCheck },
   ];
 
   // ── Get the frame CSS class for the preview wrapper ──
@@ -605,60 +604,49 @@ export default function App() {
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
-                  <div className="panel-section">
-                    <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
-                  </div>
-                  <div className="panel-section">
-                    <label className="panel-label">QR Type</label>
-                    <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
-                  </div>
+                  <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
+                  <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
                 </div>
               )}
 
               {/* Color Tab */}
               {activeTab === 'color' && (
                 <div className="tab-panel fade-in" id="panel-color">
-                  <div className="panel-section">
-                    <label className="panel-label">Quick Presets</label>
-                    <div className="color-presets-row">
-                      {COLOR_PRESETS.map(preset => (
-                        <div
-                          key={preset.name}
-                          className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
-                          title={preset.name}
-                          style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
-                          onClick={() => {
-                            setQrColor(preset.qr);
-                            setBgColor(preset.bg);
-                            setBgTransparent(false);
-                            setActivePreset(preset.name);
-                          }}
-                        />
-                      ))}
-                    </div>
+                  <label className="panel-label">Quick Presets</label>
+                  <div className="color-presets-row">
+                    {COLOR_PRESETS.map(preset => (
+                      <div
+                        key={preset.name}
+                        className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
+                        title={preset.name}
+                        style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                        onClick={() => {
+                          setQrColor(preset.qr);
+                          setBgColor(preset.bg);
+                          setBgTransparent(false);
+                          setActivePreset(preset.name);
+                        }}
+                      />
+                    ))}
                   </div>
 
-                  <div className="panel-section">
+                  <div className="eye-colors-grid">
+                    <ColorPicker className="compact-picker" label="Background" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
+                    <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                  </div>
+
+                  {!syncEyes ? (
                     <div className="eye-colors-grid">
-                      <ColorPicker className="compact-picker" label="Background" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
-                      <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                      <ColorPicker className="compact-picker" label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
+                      <ColorPicker className="compact-picker" label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
                     </div>
-                  </div>
-
-                  <div className="panel-section">
-                    {!syncEyes ? (
-                      <div className="eye-colors-grid">
-                        <ColorPicker className="compact-picker" label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
-                        <ColorPicker className="compact-picker" label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
-                      </div>
-                    ) : (
-                      <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
-                    )}
-                    <div className="panel-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
-                    <div className="toggle-row">
-                      <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
-                      <span className="toggle-hint">When ON, eyes match dots color</span>
-                    </div>
+                  ) : (
+                    <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
+                  )}
+                  <div className="panel-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
+                  <div className="toggle-row">
+                    <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
+                    <span className="toggle-hint">When ON, eyes match dots color</span>
                   </div>
                 </div>
               )}
@@ -666,13 +654,30 @@ export default function App() {
               {/* Shapes Tab */}
               {activeTab === 'shapes' && (
                 <div className="tab-panel fade-in" id="panel-shapes">
-                  <div className="panel-section">
-                    <label className="panel-label">Dot Style</label>
-                    <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
+                  <label className="panel-label">Dot Style</label>
+                  <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
+                  
+                  <label className="panel-label">Corner Style</label>
+                  <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
+
+                  <label className="panel-label">Scan Reliability</label>
+                  <div className="ec-buttons-row">
+                    {EC_LEVELS.map(lv => (
+                      <button
+                        key={lv.key}
+                        className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
+                        onClick={() => setErrorLevel(lv.key)}
+                      >
+                        <span className="ec-btn-letter">{lv.label}</span>
+                        <span className="ec-btn-pct">{lv.pct}</span>
+                      </button>
+                    ))}
                   </div>
-                  <div className="panel-section">
-                    <label className="panel-label">Corner Style</label>
-                    <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
+                  <div className="reliability-bar-track" style={{ marginTop: '8px' }}>
+                    <div
+                      className="reliability-bar-fill"
+                      style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+                    />
                   </div>
                 </div>
               )}
@@ -680,91 +685,83 @@ export default function App() {
               {/* Logo Tab */}
               {activeTab === 'logo' && (
                 <div className="tab-panel fade-in" id="panel-logo">
-                  <div className="panel-section">
-                    <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
-                    <LogoPresets onLogoChange={setLogo} />
-                  </div>
+                  <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
+                  <LogoPresets onLogoChange={setLogo} />
 
                   {logo && (
                     <>
-                      <div className="panel-section">
-                        <Slider
-                          label="Logo Size"
-                          value={logoSize}
-                          min={0.1}
-                          max={0.4}
-                          step={0.01}
-                          onChange={setLogoSize}
-                        />
-                        <Slider
-                          label="Logo Padding"
-                          value={logoPadding}
-                          min={0}
-                          max={20}
-                          step={1}
-                          onChange={setLogoPadding}
-                          unit="px"
-                        />
-                      </div>
+                      <Slider
+                        label="Logo Size"
+                        value={logoSize}
+                        min={0.1}
+                        max={0.4}
+                        step={0.01}
+                        onChange={setLogoSize}
+                      />
+                      <Slider
+                        label="Logo Padding"
+                        value={logoPadding}
+                        min={0}
+                        max={20}
+                        step={1}
+                        onChange={setLogoPadding}
+                        unit="px"
+                      />
 
-                      <div className="panel-section">
-                        <div className="toggle-row">
-                          <Toggle label="Smart Stroke" checked={logoOutline} onChange={setLogoOutline} />
-                          <span className="toggle-hint">Outline logo for better visibility</span>
-                        </div>
-                        {logoOutline && (
-                          <div className="nested-panel-section fade-in" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ColorPicker label="Stroke Color" value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
-                            <Slider
-                              label="Stroke Width"
-                              value={logoOutlineWidth}
-                              min={1}
-                              max={10}
-                              step={1}
-                              onChange={setLogoOutlineWidth}
-                              unit="px"
-                            />
-                          </div>
-                        )}
+                      <div className="toggle-row">
+                        <Toggle label="Smart Stroke" checked={logoOutline} onChange={setLogoOutline} />
+                        <span className="toggle-hint">Outline logo for better visibility</span>
                       </div>
-
-                      <div className="panel-section">
-                        <div className="toggle-row">
-                          <Toggle label="Logo Background" checked={logoBackground} onChange={setLogoBackground} />
-                          <span className="toggle-hint">Add shape behind logo</span>
+                      {logoOutline && (
+                        <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <ColorPicker label="Stroke Color" value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
+                          <Slider
+                            label="Stroke Width"
+                            value={logoOutlineWidth}
+                            min={1}
+                            max={10}
+                            step={1}
+                            onChange={setLogoOutlineWidth}
+                            unit="px"
+                          />
                         </div>
-                        {logoBackground && (
-                          <div className="nested-panel-section fade-in" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
-                            <div className="selector-group">
-                              <label className="panel-label-sub">Shape</label>
-                              <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>
-                                {['circle', 'square'].map(s => (
-                                  <button
-                                    key={s}
-                                    className={`tab-mini-btn ${logoBgShape === s ? 'active' : ''}`}
-                                    onClick={() => setLogoBgShape(s)}
-                                    style={{
-                                      flex: 1,
-                                      padding: '6px',
-                                      borderRadius: '6px',
-                                      border: 'none',
-                                      background: logoBgShape === s ? 'var(--accent-primary)' : 'transparent',
-                                      color: logoBgShape === s ? '#fff' : 'var(--text-secondary)',
-                                      fontSize: '12px',
-                                      fontWeight: '600',
-                                      textTransform: 'capitalize',
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    {s}
-                                  </button>
-                                ))}
-                              </div>
+                      )}
+
+                      <div className="toggle-row">
+                        <Toggle label="Logo Background" checked={logoBackground} onChange={setLogoBackground} />
+                        <span className="toggle-hint">Add shape behind logo</span>
+                      </div>
+                      {logoBackground && (
+                        <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
+                          <div className="selector-group">
+                            <label className="panel-label-sub">Shape</label>
+                            <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>
+                              {['circle', 'square'].map(s => (
+                                <button
+                                  key={s}
+                                  className={`tab-mini-btn ${logoBgShape === s ? 'active' : ''}`}
+                                  onClick={() => setLogoBgShape(s)}
+                                  style={{
+                                    flex: 1,
+                                    padding: '6px',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    background: logoBgShape === s ? 'var(--accent-primary)' : 'transparent',
+                                    color: logoBgShape === s ? '#fff' : 'var(--text-secondary)',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    textTransform: 'capitalize',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {s}
+                                </button>
+                              ))}
                             </div>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -773,58 +770,23 @@ export default function App() {
               {/* Frame Tab */}
               {activeTab === 'frame' && (
                 <div className="tab-panel fade-in" id="panel-frame">
-                  <div className="panel-section">
-                    <label className="panel-label">Frame Style</label>
-                    <div className="frame-options-list">
-                      {FRAME_OPTIONS.map(opt => (
-                        <button
-                          key={opt.id}
-                          className={`frame-option-btn${frameStyle === opt.id ? ' active' : ''}`}
-                          onClick={() => setFrameStyle(opt.id)}
-                        >
-                          <span className="frame-option-icon">{opt.icon}</span>
-                          <span className="frame-option-label">{opt.label}</span>
-                          {frameStyle === opt.id && <span className="frame-option-check">✓</span>}
-                        </button>
-                      ))}
-                    </div>
+                  <label className="panel-label">Frame Style</label>
+                  <div className="frame-options-list">
+                    {FRAME_OPTIONS.map(opt => (
+                      <button
+                        key={opt.id}
+                        className={`frame-option-btn${frameStyle === opt.id ? ' active' : ''}`}
+                        onClick={() => setFrameStyle(opt.id)}
+                      >
+                        <span className="frame-option-icon">{opt.icon}</span>
+                        <span className="frame-option-label">{opt.label}</span>
+                        {frameStyle === opt.id && <span className="frame-option-check">✓</span>}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
 
-              {/* Scan Reliability Tab */}
-              {activeTab === 'scan' && (
-                <div className="tab-panel fade-in" id="panel-scan">
-                  <div className="panel-section">
-                    <label className="panel-label">Scan Reliability</label>
-                    <div className="ec-buttons-row">
-                      {EC_LEVELS.map(lv => (
-                        <button
-                          key={lv.key}
-                          className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
-                          onClick={() => setErrorLevel(lv.key)}
-                        >
-                          <span className="ec-btn-letter">{lv.label}</span>
-                          <span className="ec-btn-pct">{lv.pct}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="panel-section">
-                    <label className="panel-label">Reliability Score</label>
-                    <div className="reliability-bar-track">
-                      <div
-                        className="reliability-bar-fill"
-                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
-                      />
-                    </div>
-                    <p className="ec-description">
-                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
-                    </p>
-                  </div>
-                </div>
-              )}
             </section>
           </>
         ) : activePage === 'scanner' ? (
