@@ -2717,24 +2717,39 @@ input[type="range"]::-moz-range-thumb {
    ======================================== */
 
 .btn-theme-toggle {
+/* ── Header Navigation Pill ── */
+.header-nav-pill {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-elevated);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  margin-right: 12px;
+}
+
+.nav-pill-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-full);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-color);
+  background: transparent;
+  border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: var(--transition-base);
-  flex-shrink: 0;
+  transition: all var(--transition-base);
 }
 
-.btn-theme-toggle:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-primary);
-  transform: scale(1.1);
+.nav-pill-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.nav-pill-btn.active {
+  background: var(--accent-gradient);
+  color: #fff;
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 /* ========================================

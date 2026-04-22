@@ -518,26 +518,18 @@ export default function App() {
 
         <div className="app-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {/* Main App Navigation */}
-          <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '20px', marginRight: '8px' }}>
+          <div className="header-nav-pill">
             <button
-              className={`btn-theme-toggle`}
+              className={`nav-pill-btn ${activePage === 'generator' ? 'active' : ''}`}
               onClick={() => setActivePage('generator')}
               title="QR Generator"
-              style={{
-                background: activePage === 'generator' ? 'var(--accent-primary)' : 'transparent',
-                color: activePage === 'generator' ? '#000' : 'var(--text-primary)'
-              }}
             >
               <MdOutlineQrCode2 size={20} />
             </button>
             <button
-              className={`btn-theme-toggle`}
+              className={`nav-pill-btn ${activePage === 'scanner' ? 'active' : ''}`}
               onClick={() => setActivePage('scanner')}
               title="QR Scanner"
-              style={{
-                background: activePage === 'scanner' ? 'var(--accent-primary)' : 'transparent',
-                color: activePage === 'scanner' ? '#000' : 'var(--text-primary)'
-              }}
             >
               <MdQrCodeScanner size={20} />
             </button>
