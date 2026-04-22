@@ -4009,8 +4009,8 @@ input[type="range"]::-moz-range-thumb {
 .advanced-picker-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 2147483647; /* Highest possible z-index */
+  background: #000000; /* Solid black backdrop */
+  z-index: 2147483647;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -4019,13 +4019,13 @@ input[type="range"]::-moz-range-thumb {
 
 .advanced-picker-overlay .advanced-picker-container {
   width: 100% !important;
-  max-height: 85vh !important;
+  max-height: 90vh !important;
   height: auto !important;
   max-width: 420px !important;
   background: #000000 !important; /* Pure solid black background */
   display: flex !important;
   flex-direction: column !important;
-  padding: 20px 16px calc(80px + env(safe-area-inset-bottom)) !important; /* Lifted above the 64px navbar */
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom)) !important;
   position: relative !important;
   border-radius: 32px 32px 0 0 !important;
   border: none !important;
@@ -4103,7 +4103,7 @@ input[type="range"]::-moz-range-thumb {
   content: '';
   position: absolute;
   inset: 24px; /* Increased from 20px */
-  background: var(--bg-card);
+  background: #000000;
   border-radius: 50%;
 }
 
