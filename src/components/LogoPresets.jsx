@@ -47,7 +47,6 @@ export default function LogoPresets({ onLogoChange }) {
 
   return (
     <div className="logo-presets-container">
-      <label className="form-label" style={{ marginBottom: 8, display: 'block' }}>Quick Social Logos</label>
       <div className="logo-presets-grid">
         {LOGO_PRESETS.map((logo) => (
           <button
