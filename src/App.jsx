@@ -69,13 +69,14 @@ const COLOR_PRESETS = [
 
 const MockQR = () => (
   <svg width="24" height="24" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 0h7v7H0V0zm1 1v5h5V1H1zm1 1h3v3H2V2zm16-2h7v7h-7V0zm1 1v5h5V1h-5zm1 1h3v3h-3V2zM0 18h7v7H0v-7zm1 1v5h5V19H1zm1 1h3v3H2v-3zm18-5h1v1h-1v-1zm1 1h1v1h-1v-1zm0-1h1v1h-1v-1zm2 0h1v1h-1v-1zm0 1h1v1h-1v-1zm1 0h1v1h-1v-1zm0-1h1v1h-1v-1zm-4 2h1v1h-1v-1zm1 1h1v1h-1v-1zm0-1h1v1h-1v-1zm2 0h1v1h-1v-1zm0 1h1v1h-1v-1zm1 0h1v1h-1v-1zm0-1h1v1h-1v-1zm-4 2h1v1h-1v-1zm1 1h1v1h-1v-1zm0-1h1v1h-1v-1zm2 0h1v1h-1v-1zm0 1h1v1h-1v-1zm1 0h1v1h-1v-1zm0-1h1v1h-1v-1z" fill="url(#qr-grad)" />
-    <defs>
-      <linearGradient id="qr-grad" x1="0" y1="0" x2="25" y2="25" gradientUnits="userSpaceOnUse">
-        <stop stopColor="currentColor" />
-        <stop offset="1" stopColor="currentColor" stopOpacity="0.8" />
-      </linearGradient>
-    </defs>
+    {/* Top Left Finder */}
+    <path d="M0 0h7v7H0V0zm1 1v5h5V1H1zm1 1h3v3H2V2z" fill="currentColor" />
+    {/* Top Right Finder */}
+    <path d="M18 0h7v7h-7V0zm1 1v5h5V1h-5zm1 1h3v3h-3V2z" fill="currentColor" />
+    {/* Bottom Left Finder */}
+    <path d="M0 18h7v7H0v-7zm1 1v5h5V19H1zm1 1h3v3H2v-3z" fill="currentColor" />
+    {/* Pattern Data */}
+    <path d="M9 0h1v1H9V0zm2 0h1v1h-1V0zm2 0h2v1h-2V0zm1 2h1v1h-1V2zm-2 2h1v1h-1V4zm2 0h1v1h-1V4zm-4 1h1v1h-1V5zm5 0h1v1h-1V5zm-2 2h1v1h-1V7zm2 0h1v1h-1V7zm-8 2h1v1H9V9zm2 0h1v1h-1V9zm2 0h1v1h-1V9zm4 0h1v1h-1V9zm2 0h1v1h-1V9zm4 0h1v1h-1V9zm-8 2h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm-10 2h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm-10 2h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1z" fill="currentColor" />
   </svg>
 );
 
@@ -83,20 +84,15 @@ const FRAME_OPTIONS = [
   { 
     id: FRAME_STYLES.NONE,    
     label: 'No Frame',       
-    icon: (
-      <div style={{ transform: 'scale(1.3)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}>
-        <MockQR />
-      </div>
-    ) 
+    icon: <div style={{ transform: 'scale(1.2)' }}><MockQR /></div> 
   },
   { 
     id: FRAME_STYLES.BOX,     
     label: 'Square',  
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <rect x="3" y="3" width="34" height="34" rx="1" fill="var(--bg-input)" stroke="var(--border-light)" strokeWidth="1.5" />
-        <rect x="4.5" y="4.5" width="31" height="31" rx="0.5" stroke="currentColor" strokeWidth="1.2" />
-        <g transform="translate(8, 8)"><MockQR /></g>
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <rect x="2" y="2" width="40" height="40" rx="2" stroke="black" strokeWidth="3" />
+        <g transform="translate(10, 10)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -104,10 +100,9 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.ROUNDED, 
     label: 'Rounded', 
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <rect x="2" y="2" width="36" height="36" rx="10" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-        <rect x="4" y="4" width="32" height="32" rx="8" stroke="currentColor" strokeWidth="1.5" />
-        <g transform="translate(8, 8)"><MockQR /></g>
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <rect x="2" y="2" width="40" height="40" rx="8" stroke="black" strokeWidth="3" />
+        <g transform="translate(10, 10)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -115,34 +110,22 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.MODERN,  
     label: 'Modern',     
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <defs>
-          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="1" />
-            <feOffset dx="0" dy="2" result="offsetblur" />
-            <feComponentTransfer><feFuncA type="linear" slope="0.2"/></feComponentTransfer>
-            <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
-        <rect x="4" y="4" width="32" height="32" rx="6" fill="white" filter="url(#shadow)" />
-        <rect x="4" y="4" width="32" height="32" rx="6" stroke="currentColor" strokeWidth="1.5" />
-        <g transform="translate(8, 8)"><MockQR /></g>
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <rect x="2" y="2" width="40" height="40" rx="4" stroke="black" strokeWidth="1.5" strokeDasharray="3 2" />
+        <rect x="5" y="5" width="34" height="34" rx="2" stroke="black" strokeWidth="2" />
+        <g transform="translate(10, 10)"><MockQR /></g>
       </svg>
     ) 
   },
   { 
     id: FRAME_STYLES.SCAN_ME, 
-    label: 'Neon',      
+    label: 'Scan Me',      
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <defs>
-          <filter id="neon" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <rect x="3" y="3" width="34" height="34" rx="17" stroke="var(--accent-primary)" strokeWidth="2" filter="url(#neon)" />
-        <g transform="translate(8, 8)"><MockQR /></g>
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <rect x="2" y="2" width="40" height="40" rx="6" stroke="black" strokeWidth="3" />
+        <path d="M2 32h40v8c0 1-1 2-2 2H4c-1 0-2-1-2-2v-8z" fill="black" />
+        <rect x="12" y="36" width="20" height="2" rx="1" fill="white" />
+        <g transform="translate(10, 6)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -150,11 +133,11 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.TEXT_BOTTOM, 
     label: 'Stamp', 
     icon: (
-      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <path d="M4 2h32v24H4z" fill="white" stroke="#CBD5E1" strokeWidth="1" />
-        <path d="M4 26h32v10H4z" fill="var(--accent-primary)" />
-        <rect x="12" y="30" width="16" height="2" rx="1" fill="white" fillOpacity="0.8" />
-        <g transform="translate(8, 4)"><MockQR /></g>
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <path d="M2 2h40v28H2z" stroke="black" strokeWidth="3" />
+        <path d="M2 30h40v12H2z" fill="black" />
+        <circle cx="22" cy="36" r="3" fill="white" fillOpacity="0.5" />
+        <g transform="translate(10, 4)"><MockQR /></g>
       </svg>
     ) 
   },
