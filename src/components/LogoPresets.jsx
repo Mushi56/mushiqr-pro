@@ -65,7 +65,6 @@ export default function LogoPresets({ onLogoChange }) {
                 crossOrigin="anonymous"
               />
             </div>
-            <span className="logo-preset-name">{logo.name}</span>
           </button>
         ))}
       </div>
