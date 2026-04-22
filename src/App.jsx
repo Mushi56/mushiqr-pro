@@ -44,8 +44,9 @@ import { saveToHistory, getPreferences, savePreferences } from './utils/storage'
 import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
 import AdvancedColorPicker from './components/AdvancedColorPicker';
-import { ScanLine, History } from 'lucide-react';
+import { ScanLine, History, Home, Settings, Bookmark } from 'lucide-react';
 import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
+import HomePage from './components/HomePage';
 
 /* ── Color Presets ── */
 const COLOR_PRESETS = [
@@ -193,7 +194,7 @@ class ErrorBoundary extends Component {
 export default function App() {
   // ── Tab & Theme ──
   const [activeTab, setActiveTab] = useState('content');
-  const [activePage, setActivePage] = useState('generator'); // 'generator', 'scanner', 'history'
+  const [activePage, setActivePage] = useState('home'); // 'home', 'generator', 'scanner', 'history', 'saved', 'settings'
   const [theme, setTheme] = useState('dark');
 
 
@@ -908,30 +909,289 @@ export default function App() {
 
             </section>
           </>
+        {activePage === 'home' ? (
+          <HomePage 
+            onQuickCreate={(type) => {
+              setQrType(type);
+              setActivePage('generator');
+            }}
+            onNavigate={setActivePage}
+            history={[]} // Pass actual history here
+          />
+        ) : activePage === 'generator' ? (
+          <>
+            <section className="qr-preview-card">
+              <div className={`qr-preview-wrapper ${getFrameClass()}`}>
+                <canvas 
+                  ref={canvasRef} 
+                  className="preview-canvas"
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                />
+              </div>
+
+              <div className="qr-action-row">
+                <button className="qr-action-btn" onClick={handleCopyToClipboard}>
+                  <Copy size={18} /> Copy
+                </button>
+                <button className="qr-action-btn" onClick={handleShare}>
+                  <Share2 size={18} /> Share
+                </button>
+                <button className="qr-action-btn" onClick={handleSave}>
+                  <Save size={18} /> Save
+                </button>
+              </div>
+
+              <div className="download-split-wrapper" style={{ width: '100%', maxWidth: '340px' }}>
+                <div style={{ position: 'relative', width: '100%' }} ref={downloadBtnRef}>
+                  <button 
+                    className="btn btn-primary btn-lg" 
+                    style={{ width: '100%', justifyContent: 'space-between', padding: '0 20px' }}
+                    onClick={() => setFormatDropdownOpen(!formatDropdownOpen)}
+                    disabled={downloadingFormat !== null}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {downloadingFormat ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
+                      <span>{downloadingFormat ? `Exporting ${downloadingFormat}...` : `Download ${selectedFormat}`}</span>
+                    </div>
+                    <ChevronDown size={20} className={formatDropdownOpen ? 'rotate-180' : ''} style={{ transition: 'transform 0.3s' }} />
+                  </button>
+
+                  {formatDropdownOpen && (
+                    <div className="download-format-dropdown fade-in" style={{ bottom: 'calc(100% + 12px)', top: 'auto' }}>
+                      <div className="download-format-grid">
+                        {Object.entries(FORMAT_MAP).map(([fmt, fn]) => (
+                          <button 
+                            key={fmt} 
+                            className={`download-format-option ${selectedFormat === fmt ? 'active' : ''}`}
+                            onClick={() => {
+                              setSelectedFormat(fmt);
+                              setFormatDropdownOpen(false);
+                              handleDownload(fmt, fn);
+                            }}
+                          >
+                            <div className="download-format-icon-wrapper">
+                              {fmt === 'PNG' && <FileImage size={20} />}
+                              {fmt === 'SVG' && <FileCode size={20} />}
+                              {fmt === 'PDF' && <FileText size={20} />}
+                              {fmt === 'JPG' && <ImageIcon size={20} />}
+                            </div>
+                            <div className="download-format-info">
+                              <span className="download-format-name">{fmt}</span>
+                            </div>
+                            {selectedFormat === fmt && <CheckCircle2 className="download-format-check" size={14} />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* Rest of the generator tabs */}
+            <section className="tab-panel-area">
+              <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
+              <div className="panel-divider" />
+              
+              {/* Content Tab */}
+              {activeTab === 'content' && (
+                <div className="tab-panel fade-in" id="panel-content">
+                  <QRDataInput type={qrType} data={qrData} onDataChange={setQrData} />
+                </div>
+              )}
+
+              {/* Color Tab */}
+              {activeTab === 'color' && (
+                <div className="tab-panel fade-in" id="panel-color">
+                  <div className="panel-section">
+                    <ColorPicker label="QR Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                    <ColorPicker label="Background" value={bgColor} onChange={setBgColor} disabled={bgTransparent} onOpenAdvanced={handleOpenAdv} />
+                    <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
+                  </div>
+                  
+                  <div className="panel-section">
+                    <label className="panel-label">Color Presets</label>
+                    <div className="color-presets-row">
+                      {COLOR_PRESETS.map(p => (
+                        <div 
+                          key={p.name}
+                          className={`color-preset-swatch ${qrColor === p.qr && bgColor === p.bg ? 'active' : ''}`}
+                          style={{ background: `linear-gradient(135deg, ${p.qr} 50%, ${p.bg} 50%)` }}
+                          onClick={() => { setQrColor(p.qr); setBgColor(p.bg); setBgTransparent(false); }}
+                          title={p.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Shapes Tab */}
+              {activeTab === 'shapes' && (
+                <div className="tab-panel fade-in" id="panel-shapes">
+                  <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
+                  <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
+                </div>
+              )}
+
+              {/* Logo Tab */}
+              {activeTab === 'logo' && (
+                <div className="tab-panel fade-in" id="panel-logo" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div className="panel-section">
+                    <LogoUpload onLogoChange={setLogo} currentLogo={logo} />
+                    
+                    {logo && (
+                      <>
+                        <div className="panel-divider" />
+                        <Slider label="Logo Size" value={logoSize} min={0.1} max={0.3} step={0.01} onChange={setLogoSize} unit="%" />
+                        <Slider label="Inner Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
+                        
+                        <div className="toggle-row">
+                          <Toggle label="Logo Outline" checked={logoOutline} onChange={setLogoOutline} />
+                        </div>
+                        {logoOutline && (
+                          <div className="nested-panel-section fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <ColorPicker label="Outline Color" value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
+                            <Slider 
+                              label="Thickness" 
+                              value={logoOutlineWidth}
+                              min={1}
+                              max={10}
+                              step={1}
+                              onChange={setLogoOutlineWidth}
+                              unit="px"
+                            />
+                          </div>
+                        )}
+
+                        <div className="toggle-row">
+                          <Toggle label="Logo Background" checked={logoBackground} onChange={setLogoBackground} />
+                          <span className="toggle-hint">Add shape behind logo</span>
+                        </div>
+                        {logoBackground && (
+                          <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
+                            <div className="selector-group">
+                              <label className="panel-label-sub">Shape</label>
+                              <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>
+                                {['circle', 'square'].map(s => (
+                                  <button
+                                    key={s}
+                                    className={`tab-mini-btn ${logoBgShape === s ? 'active' : ''}`}
+                                    onClick={() => setLogoBgShape(s)}
+                                    style={{
+                                      flex: 1,
+                                      padding: '6px',
+                                      borderRadius: '6px',
+                                      border: 'none',
+                                      background: logoBgShape === s ? 'var(--accent-primary)' : 'transparent',
+                                      color: logoBgShape === s ? '#fff' : 'var(--text-secondary)',
+                                      fontSize: '12px',
+                                      fontWeight: '600',
+                                      textTransform: 'capitalize',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {s}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
+                    <label className="panel-label">Quick Social Logos</label>
+                    <LogoPresets onLogoChange={setLogo} />
+                  </div>
+                </div>
+              )}
+
+              {/* Scan Reliability Tab */}
+              {activeTab === 'scan' && (
+                <div className="tab-panel fade-in" id="panel-scan">
+                  <div>
+                    <p className="ec-description">
+                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
+                    </p>
+                  </div>
+                  <div style={{ marginTop: 'auto' }}>
+                    <label className="panel-label">Scan Reliability</label>
+                    <div className="ec-buttons-row">
+                      {EC_LEVELS.map(lv => (
+                        <button
+                          key={lv.key}
+                          className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
+                          onClick={() => setErrorLevel(lv.key)}
+                        >
+                          <span className="ec-btn-letter">{lv.label}</span>
+                          <span className="ec-btn-pct">{lv.pct}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="reliability-bar-track" style={{ marginTop: '8px' }}>
+                      <div
+                        className="reliability-bar-fill"
+                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            </section>
+          </>
         ) : activePage === 'scanner' ? (
           <QRScanner />
-        ) : (
+        ) : activePage === 'history' || activePage === 'saved' ? (
           <HistoryPage />
+        ) : (
+          <div className="tab-panel fade-in">
+            <h2 className="section-title">Settings</h2>
+            <p className="text-secondary">App settings will appear here.</p>
+          </div>
         )}
       </main>
 
-      {/* ── Bottom Navigation Bar (Only for Generator) ── */}
+      {/* ── Bottom Navigation Bar (App Level) ── */}
+      <nav className="bottom-nav">
+        {[
+          { id: 'home', label: 'Home', icon: Home },
+          { id: 'saved', label: 'Saved', icon: Bookmark },
+          { id: 'scanner', label: 'Scanner', icon: MdQrCodeScanner, isCenter: true },
+          { id: 'history', label: 'History', icon: History },
+          { id: 'settings', label: 'Settings', icon: Settings },
+        ].map(item => (
+          <button
+            key={item.id}
+            className={`bottom-nav-tab${activePage === item.id ? ' active' : ''} ${item.isCenter ? 'center-tab' : ''}`}
+            onClick={() => setActivePage(item.id)}
+          >
+            <span className="bottom-nav-icon">
+              <item.icon size={item.isCenter ? 28 : 20} strokeWidth={2.5} />
+            </span>
+            {!item.isCenter && <span className="bottom-nav-label">{item.label}</span>}
+          </button>
+        ))}
+      </nav>
+
+      {/* Generator Tabs (Only shown when in Generator) */}
       {activePage === 'generator' && (
-        <nav className="bottom-nav">
+        <div className="generator-tabs-bar">
           {TABS.map(tab => (
             <button
               key={tab.id}
-              className={`bottom-nav-tab${activeTab === tab.id ? ' active' : ''}`}
+              className={`gen-tab-btn${activeTab === tab.id ? ' active' : ''}`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <div className="bottom-nav-highlight" />
-              <span className="bottom-nav-icon">
-                <tab.icon size={20} strokeWidth={2} />
-              </span>
-              <span className="bottom-nav-label">{tab.label}</span>
+              <tab.icon size={16} />
+              <span>{tab.label}</span>
             </button>
           ))}
-        </nav>
+        </div>
       )}
 
       {/* Toast */}
