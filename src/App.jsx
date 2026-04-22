@@ -393,6 +393,7 @@ export default function App() {
     { id: 'shapes',  label: 'Shapes',  icon: Hexagon },
     { id: 'logo',    label: 'Logo',    icon: ImageIcon },
     { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
+    { id: 'scan',    label: 'Scan',    icon: ShieldCheck },
   ];
 
   // ── Get the frame CSS class for the preview wrapper ──
@@ -656,29 +657,8 @@ export default function App() {
                 <div className="tab-panel fade-in" id="panel-shapes">
                   <label className="panel-label">Dot Style</label>
                   <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
-                  
                   <label className="panel-label">Corner Style</label>
                   <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
-
-                  <label className="panel-label">Scan Reliability</label>
-                  <div className="ec-buttons-row">
-                    {EC_LEVELS.map(lv => (
-                      <button
-                        key={lv.key}
-                        className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
-                        onClick={() => setErrorLevel(lv.key)}
-                      >
-                        <span className="ec-btn-letter">{lv.label}</span>
-                        <span className="ec-btn-pct">{lv.pct}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="reliability-bar-track" style={{ marginTop: '8px' }}>
-                    <div
-                      className="reliability-bar-fill"
-                      style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
-                    />
-                  </div>
                 </div>
               )}
 
@@ -784,6 +764,34 @@ export default function App() {
                       </button>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Scan Reliability Tab */}
+              {activeTab === 'scan' && (
+                <div className="tab-panel fade-in" id="panel-scan">
+                  <label className="panel-label">Scan Reliability</label>
+                  <div className="ec-buttons-row">
+                    {EC_LEVELS.map(lv => (
+                      <button
+                        key={lv.key}
+                        className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
+                        onClick={() => setErrorLevel(lv.key)}
+                      >
+                        <span className="ec-btn-letter">{lv.label}</span>
+                        <span className="ec-btn-pct">{lv.pct}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="reliability-bar-track" style={{ marginTop: '8px' }}>
+                    <div
+                      className="reliability-bar-fill"
+                      style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+                    />
+                  </div>
+                  <p className="ec-description" style={{ marginTop: '12px' }}>
+                    {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
+                  </p>
                 </div>
               )}
 
