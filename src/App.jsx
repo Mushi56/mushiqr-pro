@@ -478,7 +478,7 @@ export default function App() {
     { id: 'color',   label: 'Color',   icon: Palette },
     { id: 'shapes',  label: 'Shapes',  icon: Hexagon },
     { id: 'logo',    label: 'Logo',    icon: ImageIcon },
-    { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
+    // { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
     { id: 'scan',    label: 'Scan',    icon: ShieldCheck },
   ];
 
@@ -853,8 +853,8 @@ export default function App() {
                 </div>
               )}
 
-              {/* Frame Tab */}
-              {activeTab === 'frame' && (
+              {/* Frame Tab - Temporarily Hidden */}
+              {/* activeTab === 'frame' && (
                 <div className="tab-panel fade-in" id="panel-frame">
                   <div style={{ marginTop: 'auto' }}>
                     <label className="panel-label">Frame Style</label>
@@ -872,7 +872,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              )}
+              ) */}
 
               {/* Scan Reliability Tab */}
               {activeTab === 'scan' && (
