@@ -249,6 +249,7 @@ export default function App() {
   const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
   const [toast, setToast] = useState(null);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
+  const [history, setHistory] = useState([]);
 
   // ── Advanced Picker State ──
   const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
@@ -318,11 +319,21 @@ export default function App() {
     }
   }, [syncEyes, qrColor]);
 
-  // ── Load preferences ──
+  // ── Load preferences & History ──
   useEffect(() => {
     const prefs = getPreferences();
     if (prefs.theme) setTheme(prefs.theme);
-  }, []);
+    
+    // Load history for Home Page
+    const fetchHistory = async () => {
+      try {
+        const { getHistory } = await import('./utils/storage');
+        const h = getHistory();
+        setHistory(h);
+      } catch (e) { console.error(e); }
+    };
+    fetchHistory();
+  }, [activePage]);
 
   // ── Bump canvas animation key ──
   useEffect(() => {
@@ -874,7 +885,7 @@ export default function App() {
               setActivePage('generator');
             }}
             onNavigate={setActivePage}
-            history={[]} // Pass actual history here
+            history={history} // Passing real history from storage
           />
         ) : activePage === 'generator' ? (
           <>
