@@ -121,11 +121,12 @@ export const EYE_STYLES = {
 // Frame styles
 export const FRAME_STYLES = {
   NONE: 'none',
-  FRAME1: 'frame1', // Corner brackets + Bottom Bar
-  FRAME2: 'frame2', // Full Rounded Border + Inner Corners + Bottom Bar
-  FRAME3: 'frame3', // Simple Thick Rounded Border + Bottom Bar
-  FRAME4: 'frame4', // Corner brackets + Top Bar with holes
-  FRAME5: 'frame5', // Minimalist Corner brackets
+  SCAN_ME: 'scan-me',
+  TEXT_BOTTOM: 'text-bottom',
+  TEXT_TOP: 'text-top',
+  BOX: 'box',
+  ROUNDED: 'rounded',
+  MODERN: 'modern',
 };
 
 /**
@@ -228,17 +229,12 @@ export function renderQR(canvas, options) {
   let contentY = 0;
   let contentSize = size;
 
-  // Adjust content area for frames
+  // Adjust content area for frames to give proper breathing space
   if (frameStyle !== FRAME_STYLES.NONE) {
-    // Basic frame padding
-    contentX = padding + size * 0.04;
-    contentY = padding + size * 0.04;
-    contentSize = size - (contentX * 2);
-
     if (frameStyle === FRAME_STYLES.SCAN_ME) {
       const labelHeight = size * 0.16;
-      // Shrink and shift UP to avoid the bottom label
-      contentSize = size - (padding * 2) - labelHeight - (size * 0.1); 
+      // Shrink and shift UP to give more breathing space
+      contentSize = size - (padding * 2) - labelHeight - (size * 0.12); 
       contentX = (size - contentSize) / 2;
       contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
     } else if (frameStyle === FRAME_STYLES.TEXT_BOTTOM) {
@@ -246,6 +242,11 @@ export function renderQR(canvas, options) {
       contentSize = size - (padding * 2) - labelHeight;
       contentX = (size - contentSize) / 2;
       contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
+    } else {
+      // Basic frame padding
+      contentX = padding + size * 0.08;
+      contentY = padding + size * 0.08;
+      contentSize = size - (contentX * 2);
     }
   }
 
@@ -701,178 +702,89 @@ function drawFrame(ctx, size, options) {
   ctx.lineWidth = size * 0.025; // Slightly thicker for premium feel
   
   switch (frameStyle) {
-    case FRAME_STYLES.FRAME1: {
-      const cornerSize = size * 0.15;
-      const labelHeight = size * 0.15;
-      const cornerRadius = size * 0.03;
+    case FRAME_STYLES.SCAN_ME: {
+      const labelHeight = size * 0.16;
+      const cornerRadius = size * 0.08;
       
-      // 4 Corner Brackets
-      ctx.lineWidth = size * 0.03;
-      // TL
+      // Removed Main box outline for cleaner look
+      
+      // Label box at bottom - solid pill style
       ctx.beginPath();
-      ctx.moveTo(padding, padding + cornerSize);
-      ctx.quadraticCurveTo(padding, padding, padding + cornerSize, padding);
-      ctx.stroke();
-      // TR
-      ctx.beginPath();
-      ctx.moveTo(size - padding - cornerSize, padding);
-      ctx.quadraticCurveTo(size - padding, padding, size - padding, padding + cornerSize);
-      ctx.stroke();
-      // BR
-      ctx.beginPath();
-      ctx.moveTo(size - padding, size - padding - cornerSize - labelHeight);
-      ctx.quadraticCurveTo(size - padding, size - padding - labelHeight, size - padding - cornerSize, size - padding - labelHeight);
-      ctx.stroke();
-      // BL
-      ctx.beginPath();
-      ctx.moveTo(padding + cornerSize, size - padding - labelHeight);
-      ctx.quadraticCurveTo(padding, size - padding - labelHeight, padding, size - padding - cornerSize - labelHeight);
-      ctx.stroke();
-
-      // Bottom Bar
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, size - padding - labelHeight + size * 0.02, innerSize, labelHeight - size * 0.02, size * 0.02);
+      const labelPadding = size * 0.02;
+      drawRoundedRectPath(ctx, padding + labelPadding, size - padding - labelHeight + labelPadding, innerSize - labelPadding * 2, labelHeight - labelPadding * 2, cornerRadius * 0.5);
       ctx.fill();
       
+      // Indicator line/pill at the very bottom of the label box
+      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
+      const indicatorW = innerSize * 0.2;
+      const indicatorH = size * 0.01;
+      ctx.beginPath();
+      drawRoundedRectPath(ctx, (size - indicatorW) / 2, size - padding - labelHeight * 0.25, indicatorW, indicatorH, indicatorH / 2);
+      ctx.fill();
+
+      // Text
+      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
+      ctx.font = `bold ${labelHeight * 0.42}px Outfit, Segoe UI, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 1.7);
+      break;
+    }
+    case FRAME_STYLES.TEXT_BOTTOM: {
+      const labelHeight = size * 0.12;
+      const cornerRadius = size * 0.04;
+      
+      // Removed outer box for cleaner look
+      
+      // Solid Stamp label at bottom
+      ctx.beginPath();
+      drawRoundedRectPath(ctx, padding + size * 0.05, size - padding - labelHeight, innerSize - size * 0.1, labelHeight, cornerRadius);
+      ctx.fill();
+
       // Text
       ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
       ctx.font = `bold ${labelHeight * 0.45}px Outfit, Segoe UI, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2 + size * 0.01);
+      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2);
       break;
     }
-    case FRAME_STYLES.FRAME2: {
-      const labelHeight = size * 0.18;
-      const cornerRadius = size * 0.08;
-      const innerMargin = size * 0.04;
-      
-      // Outer Rounded Box
-      ctx.lineWidth = size * 0.025;
+    case FRAME_STYLES.BOX: {
+      ctx.strokeRect(padding, padding, innerSize, innerSize);
+      break;
+    }
+    case FRAME_STYLES.ROUNDED: {
       ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, cornerRadius);
+      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, size * 0.1);
       ctx.stroke();
-
-      // Inner Corner Brackets
-      const innerPadding = padding + innerMargin;
-      const cornerSize = size * 0.1;
-      ctx.lineWidth = size * 0.015;
+      break;
+    }
+    case FRAME_STYLES.MODERN: {
+      const cornerSize = size * 0.18;
       // TL
       ctx.beginPath();
-      ctx.moveTo(innerPadding, innerPadding + cornerSize);
-      ctx.lineTo(innerPadding, innerPadding);
-      ctx.lineTo(innerPadding + cornerSize, innerPadding);
+      ctx.moveTo(padding, padding + cornerSize);
+      ctx.lineTo(padding, padding);
+      ctx.lineTo(padding + cornerSize, padding);
       ctx.stroke();
       // TR
       ctx.beginPath();
-      ctx.moveTo(size - innerPadding - cornerSize, innerPadding);
-      ctx.lineTo(size - innerPadding, innerPadding);
-      ctx.lineTo(size - innerPadding, innerPadding + cornerSize);
+      ctx.moveTo(size - padding - cornerSize, padding);
+      ctx.lineTo(size - padding, padding);
+      ctx.lineTo(size - padding, padding + cornerSize);
       ctx.stroke();
       // BR
       ctx.beginPath();
-      ctx.moveTo(size - innerPadding, size - innerPadding - cornerSize - labelHeight);
-      ctx.lineTo(size - innerPadding, size - innerPadding - labelHeight);
-      ctx.lineTo(size - innerPadding - cornerSize, size - innerPadding - labelHeight);
+      ctx.moveTo(size - padding, size - padding - cornerSize);
+      ctx.lineTo(size - padding, size - padding);
+      ctx.lineTo(size - padding - cornerSize, size - padding);
       ctx.stroke();
       // BL
       ctx.beginPath();
-      ctx.moveTo(innerPadding + cornerSize, size - innerPadding - labelHeight);
-      ctx.lineTo(innerPadding, size - innerPadding - labelHeight);
-      ctx.lineTo(innerPadding, size - innerPadding - cornerSize - labelHeight);
+      ctx.moveTo(padding + cornerSize, size - padding);
+      ctx.lineTo(padding, size - padding);
+      ctx.lineTo(padding, size - padding - cornerSize);
       ctx.stroke();
-
-      // Bottom Label area
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding + innerMargin, size - padding - labelHeight + size * 0.02, innerSize - innerMargin * 2, labelHeight - innerMargin - size * 0.02, size * 0.04);
-      ctx.fill();
-
-      // Text
-      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
-      ctx.font = `bold ${labelHeight * 0.4}px Outfit, Segoe UI, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2 + size * 0.01);
-      break;
-    }
-    case FRAME_STYLES.FRAME3: {
-      const labelHeight = size * 0.14;
-      const cornerRadius = size * 0.05;
-      
-      // Simple Thick Border
-      ctx.lineWidth = size * 0.04;
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize - labelHeight, cornerRadius);
-      ctx.stroke();
-
-      // Bottom Bar
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, size - padding - labelHeight + size * 0.02, innerSize, labelHeight - size * 0.02, size * 0.02);
-      ctx.fill();
-
-      // Text
-      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
-      ctx.font = `bold ${labelHeight * 0.5}px Outfit, Segoe UI, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2 + size * 0.01);
-      break;
-    }
-    case FRAME_STYLES.FRAME4: {
-      const labelHeight = size * 0.16;
-      const cornerSize = size * 0.15;
-      
-      // Top Bar with holes
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, padding, innerSize, labelHeight, size * 0.02);
-      ctx.fill();
-
-      // Punch holes
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(padding + innerSize * 0.2, padding + labelHeight / 2, labelHeight * 0.2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(padding + innerSize * 0.8, padding + labelHeight / 2, labelHeight * 0.2, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalCompositeOperation = 'source-over';
-
-      // Corner brackets at bottom
-      ctx.lineWidth = size * 0.03;
-      // BL
-      ctx.beginPath();
-      ctx.moveTo(padding, size - padding - cornerSize);
-      ctx.quadraticCurveTo(padding, size - padding, padding + cornerSize, size - padding);
-      ctx.stroke();
-      // BR
-      ctx.beginPath();
-      ctx.moveTo(size - padding - cornerSize, size - padding);
-      ctx.quadraticCurveTo(size - padding, size - padding, size - padding, size - padding - cornerSize);
-      ctx.stroke();
-      // TL (connected to top bar)
-      ctx.beginPath();
-      ctx.moveTo(padding, padding + labelHeight);
-      ctx.lineTo(padding, padding + labelHeight + cornerSize);
-      ctx.stroke();
-      // TR (connected to top bar)
-      ctx.beginPath();
-      ctx.moveTo(size - padding, padding + labelHeight);
-      ctx.lineTo(size - padding, padding + labelHeight + cornerSize);
-      ctx.stroke();
-
-      break;
-    }
-    case FRAME_STYLES.FRAME5: {
-      const cornerSize = size * 0.2;
-      ctx.lineWidth = size * 0.035;
-      // TL
-      ctx.beginPath(); ctx.moveTo(padding, padding + cornerSize); ctx.quadraticCurveTo(padding, padding, padding + cornerSize, padding); ctx.stroke();
-      // TR
-      ctx.beginPath(); ctx.moveTo(size - padding - cornerSize, padding); ctx.quadraticCurveTo(size - padding, padding, size - padding, padding + cornerSize); ctx.stroke();
-      // BR
-      ctx.beginPath(); ctx.moveTo(size - padding, size - padding - cornerSize); ctx.quadraticCurveTo(size - padding, size - padding, size - padding - cornerSize, size - padding); ctx.stroke();
-      // BL
-      ctx.beginPath(); ctx.moveTo(padding + cornerSize, size - padding); ctx.quadraticCurveTo(padding, size - padding, padding, size - padding - cornerSize); ctx.stroke();
       break;
     }
   }

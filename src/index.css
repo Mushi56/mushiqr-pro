@@ -3265,9 +3265,9 @@ input[type="range"]::-moz-range-thumb {
   border-color: var(--accent-primary);
 }
 .qr-preview-wrapper.frame-vintage-stamp {
-  border: 4px dashed var(--text-tertiary);
-  border-radius: var(--radius-md);
-  padding: 24px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* ── QR Action Buttons Row ── */
