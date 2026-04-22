@@ -205,6 +205,69 @@ body {
   box-shadow: var(--shadow-glow);
 }
 
+.app-header-centered {
+  height: 80px;
+  padding: 0 20px;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.app-branding-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-mushi {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--accent-primary);
+  line-height: 1;
+}
+
+.brand-subtitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.header-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.header-icon-btn:active {
+  background: var(--bg-hover);
+}
+
+.header-icon-btn.premium-btn {
+  color: #ffb800; /* Gold color for the crown */
+  background: var(--bg-card);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
 .app-logo-text {
   font-family: 'Outfit', sans-serif;
   font-size: 20px;

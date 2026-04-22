@@ -28,7 +28,8 @@ import {
   Info,
   Shield,
   FileText as FileIcon,
-  ExternalLink
+  ExternalLink,
+  Crown
 } from 'lucide-react';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -497,99 +498,56 @@ export default function App() {
 
   return (
     <div className="app redesigned">
-      {/* ── Header ── */}
-      <header className="app-header">
-        <div className="app-logo">
-          <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
-            {logoImgError ? (
-              <div className="app-logo-fallback">
-                <QrCode size={24} color="white" />
-              </div>
-            ) : (
-              <img
-                src="/logo.png"
-                alt="Mushi QR Pro"
-                style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', display: 'block' }}
-                onError={() => setLogoImgError(true)}
-              />
-            )}
-          </div>
-          <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
+      {/* ── Header (Matches Reference) ── */}
+      <header className="app-header-centered">
+        <button 
+          className="header-icon-btn" 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <Menu size={24} />
+        </button>
+
+        <div className="app-branding-centered">
+          <h1 className="brand-mushi">MUSHI</h1>
+          <p className="brand-subtitle">QR Code Pro</p>
         </div>
 
-        <div className="app-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {/* Main App Navigation */}
-          <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '20px', marginRight: '8px' }}>
-            <button
-              className={`btn-theme-toggle`}
-              onClick={() => setActivePage('generator')}
-              title="QR Generator"
-              style={{
-                background: activePage === 'generator' ? 'var(--accent-primary)' : 'transparent',
-                color: activePage === 'generator' ? '#000' : 'var(--text-primary)'
-              }}
-            >
-              <MdOutlineQrCode2 size={20} />
-            </button>
-            <button
-              className={`btn-theme-toggle`}
-              onClick={() => setActivePage('scanner')}
-              title="QR Scanner"
-              style={{
-                background: activePage === 'scanner' ? 'var(--accent-primary)' : 'transparent',
-                color: activePage === 'scanner' ? '#000' : 'var(--text-primary)'
-              }}
-            >
-              <MdQrCodeScanner size={20} />
-            </button>
-          </div>
+        <button className="header-icon-btn premium-btn">
+          <Crown size={22} fill="currentColor" />
+        </button>
 
-          <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
-            <button
-              className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <Menu size={20} />
-            </button>
-
-            {isMenuOpen && (
-              <div className="app-dropdown-menu fade-in">
-                <div className="menu-links">
-                  <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('history'); }}>
-                    <History size={16} /> History
-                  </button>
-                  <button
-                    className="menu-link-btn"
-                    onClick={() => {
-                      const next = theme === 'dark' ? 'light' : 'dark';
-                      setTheme(next);
-                      savePreferences({ ...getPreferences(), theme: next });
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />} 
-                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                  </button>
-                  <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
-                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
-                    <Info size={16} /> About
-                  </button>
-                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/privacy-policy'}>
-                    <Shield size={16} /> Privacy Policy
-                  </button>
-                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/terms'}>
-                    <FileIcon size={16} /> Terms of Service
-                  </button>
-                </div>
-                <div className="menu-footer">
-                  <p>© 2026 MushiQR Pro</p>
-                  <p>All rights reserved</p>
-                </div>
-              </div>
-            )}
+        {isMenuOpen && (
+          <div className="app-dropdown-menu fade-in" ref={menuRef}>
+            <div className="menu-links">
+              <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('history'); }}>
+                <History size={16} /> History
+              </button>
+              <button
+                className="menu-link-btn"
+                onClick={() => {
+                  const next = theme === 'dark' ? 'light' : 'dark';
+                  setTheme(next);
+                  savePreferences({ ...getPreferences(), theme: next });
+                  setIsMenuOpen(false);
+                }}
+              >
+                {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />} 
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </button>
+              <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
+              <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
+                <Info size={16} /> About
+              </button>
+              <button className="menu-link-btn" onClick={() => window.location.hash = '#/privacy-policy'}>
+                <Shield size={16} /> Privacy Policy
+              </button>
+              <button className="menu-link-btn" onClick={() => window.location.hash = '#/terms'}>
+                <FileIcon size={16} /> Terms of Service
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+      </header>
         <AdvancedColorPicker 
           isOpen={advPicker.open}
           initialColor={advPicker.color}
