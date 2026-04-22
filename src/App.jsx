@@ -67,32 +67,54 @@ const COLOR_PRESETS = [
   { name: 'Deep Sea', qr: '#00416A', bg: '#E1E8EB' },
 ];
 
-const MockQR = () => (
-  <svg width="24" height="24" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Top Left Finder */}
-    <path d="M0 0h7v7H0V0zm1 1v5h5V1H1zm1 1h3v3H2V2z" fill="currentColor" />
-    {/* Top Right Finder */}
-    <path d="M18 0h7v7h-7V0zm1 1v5h5V1h-5zm1 1h3v3h-3V2z" fill="currentColor" />
-    {/* Bottom Left Finder */}
-    <path d="M0 18h7v7H0v-7zm1 1v5h5V19H1zm1 1h3v3H2v-3z" fill="currentColor" />
-    {/* Pattern Data */}
-    <path d="M9 0h1v1H9V0zm2 0h1v1h-1V0zm2 0h2v1h-2V0zm1 2h1v1h-1V2zm-2 2h1v1h-1V4zm2 0h1v1h-1V4zm-4 1h1v1h-1V5zm5 0h1v1h-1V5zm-2 2h1v1h-1V7zm2 0h1v1h-1V7zm-8 2h1v1H9V9zm2 0h1v1h-1V9zm2 0h1v1h-1V9zm4 0h1v1h-1V9zm2 0h1v1h-1V9zm4 0h1v1h-1V9zm-8 2h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1zm-10 2h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm6 0h1v1h-1v-1zm2 0h1v1h-1v-1zm-10 2h1v1h-1v-1zm2 0h1v1h-1v-1zm4 0h1v1h-1v-1zm2 0h1v1h-1v-1z" fill="currentColor" />
-  </svg>
-);
+const MockQR = () => {
+  const size = 21;
+  // Actual "Hello World" (Level M) pattern bits (Simplified representation for clarity)
+  const pattern = [
+    "11111110010101111111",
+    "10000010110001000001",
+    "10111010101011011101",
+    "10111010001101011101",
+    "10111010111001011101",
+    "10000010001111000001",
+    "11111110101010111111",
+    "00000000110100000000",
+    "11011101101111111010",
+    "00101001101001011011",
+    "11101100011110011010",
+    "00000000101100111011",
+    "11111110111001101010",
+    "10000010111101011111",
+    "10111010001010110010",
+    "10111010111110111101",
+    "10111010101010001111",
+    "10000010110111110101",
+    "11111110101011011010"
+  ];
+  return (
+    <svg width="24" height="24" viewBox="0 0 21 21" fill="none">
+      {pattern.map((row, y) => 
+        row.split('').map((bit, x) => bit === '1' ? (
+          <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill="currentColor" />
+        ) : null)
+      )}
+    </svg>
+  );
+};
 
 const FRAME_OPTIONS = [
   { 
     id: FRAME_STYLES.NONE,    
     label: 'No Frame',       
-    icon: <div style={{ transform: 'scale(1.2)' }}><MockQR /></div> 
+    icon: <div style={{ transform: 'scale(1.4)' }}><MockQR /></div> 
   },
   { 
     id: FRAME_STYLES.BOX,     
     label: 'Square',  
     icon: (
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-        <rect x="2" y="2" width="40" height="40" rx="2" stroke="black" strokeWidth="3" />
-        <g transform="translate(10, 10)"><MockQR /></g>
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="2" stroke="black" strokeWidth="3" />
+        <g transform="translate(14, 14)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -100,9 +122,9 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.ROUNDED, 
     label: 'Rounded', 
     icon: (
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-        <rect x="2" y="2" width="40" height="40" rx="8" stroke="black" strokeWidth="3" />
-        <g transform="translate(10, 10)"><MockQR /></g>
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="10" stroke="black" strokeWidth="3" />
+        <g transform="translate(14, 14)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -110,10 +132,10 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.MODERN,  
     label: 'Modern',     
     icon: (
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-        <rect x="2" y="2" width="40" height="40" rx="4" stroke="black" strokeWidth="1.5" strokeDasharray="3 2" />
-        <rect x="5" y="5" width="34" height="34" rx="2" stroke="black" strokeWidth="2" />
-        <g transform="translate(10, 10)"><MockQR /></g>
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="6" stroke="black" strokeWidth="1.5" strokeDasharray="4 2" />
+        <rect x="6" y="6" width="40" height="40" rx="3" stroke="black" strokeWidth="2.5" />
+        <g transform="translate(14, 14)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -121,11 +143,11 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.SCAN_ME, 
     label: 'Scan Me',      
     icon: (
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-        <rect x="2" y="2" width="40" height="40" rx="6" stroke="black" strokeWidth="3" />
-        <path d="M2 32h40v8c0 1-1 2-2 2H4c-1 0-2-1-2-2v-8z" fill="black" />
-        <rect x="12" y="36" width="20" height="2" rx="1" fill="white" />
-        <g transform="translate(10, 6)"><MockQR /></g>
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <rect x="2" y="2" width="48" height="48" rx="8" stroke="black" strokeWidth="3.5" />
+        <path d="M2 38h48v10c0 1-1 2-2 2H4c-1 0-2-1-2-2v-10z" fill="black" />
+        <rect x="14" y="42" width="24" height="2.5" rx="1" fill="white" />
+        <g transform="translate(14, 8)"><MockQR /></g>
       </svg>
     ) 
   },
@@ -133,11 +155,11 @@ const FRAME_OPTIONS = [
     id: FRAME_STYLES.TEXT_BOTTOM, 
     label: 'Stamp', 
     icon: (
-      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-        <path d="M2 2h40v28H2z" stroke="black" strokeWidth="3" />
-        <path d="M2 30h40v12H2z" fill="black" />
-        <circle cx="22" cy="36" r="3" fill="white" fillOpacity="0.5" />
-        <g transform="translate(10, 4)"><MockQR /></g>
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+        <path d="M2 2h48v34H2z" stroke="black" strokeWidth="3" />
+        <path d="M2 36h48v14H2z" fill="black" />
+        <circle cx="26" cy="43" r="3.5" fill="white" fillOpacity="0.6" />
+        <g transform="translate(14, 6)"><MockQR /></g>
       </svg>
     ) 
   },
