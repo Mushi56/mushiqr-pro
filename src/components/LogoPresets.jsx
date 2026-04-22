@@ -57,12 +57,15 @@ export default function LogoPresets({ onLogoChange }) {
             title={logo.name}
             style={{ '--brand-color': logo.color }}
           >
-            <img 
-              src={logo.url} 
-              alt={logo.name} 
-              loading="lazy"
-              crossOrigin="anonymous"
-            />
+            <div className="logo-preset-icon">
+              <img 
+                src={logo.url} 
+                alt={logo.name} 
+                loading="lazy"
+                crossOrigin="anonymous"
+              />
+            </div>
+            <span className="logo-preset-name">{logo.name}</span>
           </button>
         ))}
       </div>

@@ -145,9 +145,9 @@ export function DotStyleSelector({ value, onChange }) {
           key={style}
           className={`style-option ${value === style ? 'active' : ''}`}
           onClick={() => onChange(style)}
+          title={style}
         >
           <div className="style-option-preview">{preview}</div>
-          {style}
         </button>
       ))}
     </div>
@@ -162,9 +162,9 @@ export function EyeStyleSelector({ value, onChange }) {
           key={style}
           className={`style-option ${value === style ? 'active' : ''}`}
           onClick={() => onChange(style)}
+          title={style}
         >
           <div className="style-option-preview">{preview}</div>
-          {style}
         </button>
       ))}
     </div>
