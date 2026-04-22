@@ -1143,7 +1143,7 @@ input[type="range"]::-moz-range-thumb {
   gap: 12px;
   background: transparent;
   border: none;
-  color: #000;
+  color: #fff;
   font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 700;
@@ -1154,7 +1154,7 @@ input[type="range"]::-moz-range-thumb {
 .save-split-divider {
   width: 1px;
   height: 26px;
-  background: rgba(0,0,0,0.15);
+  background: rgba(255,255,255,0.2);
   align-self: center;
 }
 
@@ -1165,7 +1165,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   background: transparent;
   border: none;
-  color: #000;
+  color: #fff;
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -1229,7 +1229,7 @@ input[type="range"]::-moz-range-thumb {
   gap: 6px;
   padding: 12px 4px;
   background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s;
@@ -1272,7 +1272,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   height: 48px;
   background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: var(--radius-md);
   color: var(--text-primary);
   cursor: pointer;
@@ -3616,7 +3616,7 @@ input[type="range"]::-moz-range-thumb {
   gap: 4px;
   padding: 4px;
   background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -3700,7 +3700,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   padding: 8px;
   background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -3752,7 +3752,7 @@ input[type="range"]::-moz-range-thumb {
   gap: 4px;
   padding: 8px;
   background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-base);
@@ -3906,7 +3906,7 @@ input[type="range"]::-moz-range-thumb {
   height: 38px;
   border-radius: var(--radius-md);
   background: var(--bg-elevated);
-  border: 1px solid var(--border-color);
+  border: none;
   color: var(--text-primary);
   cursor: pointer;
   transition: var(--transition-base);
