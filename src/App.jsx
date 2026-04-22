@@ -717,18 +717,27 @@ export default function App() {
                       <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
                     </div>
 
-                    {!syncEyes ? (
-                      <div className="eye-colors-grid">
-                        <ColorPicker className="compact-picker" label="Inner Eyes" value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
-                        <ColorPicker className="compact-picker" label="Outer Eyes" value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
-                      </div>
-                    ) : (
-                      <ColorPicker label="Eyes Color" value={qrColor} onChange={() => {}} onOpenAdvanced={handleOpenAdv} />
-                    )}
-                    
-                    <div className="toggle-row" style={{ marginTop: '8px' }}>
-                      <Toggle label="Sync Eyes" checked={syncEyes} onChange={setSyncEyes} />
-                      <span className="toggle-hint">When ON, eyes match dots color</span>
+                    <div className="toggle-row" style={{ marginBottom: '12px' }}>
+                      <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
+                    </div>
+
+                    <div className="eye-colors-grid">
+                      <ColorPicker 
+                        className="compact-picker" 
+                        label="Inner Eyes" 
+                        value={syncEyes ? qrColor : (eyeColor || qrColor)} 
+                        onChange={setEyeColor} 
+                        onOpenAdvanced={handleOpenAdv}
+                        disabled={syncEyes}
+                      />
+                      <ColorPicker 
+                        className="compact-picker" 
+                        label="Outer Eyes" 
+                        value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
+                        onChange={setEyeOuterColor} 
+                        onOpenAdvanced={handleOpenAdv}
+                        disabled={syncEyes}
+                      />
                     </div>
                   </div>
 

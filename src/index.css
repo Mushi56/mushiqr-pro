@@ -4294,6 +4294,17 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
 
+.form-group.disabled .form-label {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.color-preview.disabled {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+  cursor: not-allowed !important;
+}
+
 .fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
