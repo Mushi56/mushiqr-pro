@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import {
   Camera,
   Copy,
@@ -18,26 +19,11 @@ import {
 } from 'lucide-react';
 
 /**
- * Production QR Scanner for Capacitor + Web.
- *
- * Key design decisions to avoid Android black-screen:
- *
- * 1. The html5-qrcode container (#qr-scanner-viewport) is NEVER managed by
- *    React's virtual DOM. It lives as an empty div that html5-qrcode owns
- *    entirely. React overlays (loading, error, idle) sit ON TOP via absolute
- *    positioning, not INSIDE the same element. This prevents React and
- *    html5-qrcode from fighting over DOM ownership.
- *
- * 2. No preflight getUserMedia() test. On Android, grabbing and releasing the
- *    camera then immediately re-grabbing it causes the hardware to hang.
- *    We let html5-qrcode handle the single getUserMedia call.
- *
- * 3. Capacitor's BridgeWebChromeClient already handles onPermissionRequest.
- *    MainActivity.java pre-requests the Android CAMERA permission at launch
- *    so the WebView permission auto-grants without a dialog.
+ * Production QR Scanner — auto-opens camera on entry,
+ * auto-redirects URL results to the device browser.
  */
 export default function QRScanner({ onBack }) {
-  const [status, setStatus] = useState('IDLE');
+  const [status, setStatus] = useState('LOADING'); // start in LOADING immediately
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -88,6 +74,38 @@ export default function QRScanner({ onBack }) {
     if (onBack) onBack();
   }, [stopScanner, onBack]);
 
+  // ─── Check if text is a URL ───
+  const isURL = useCallback((text) => {
+    try {
+      const u = new URL(text);
+      return u.protocol === 'http:' || u.protocol === 'https:';
+    } catch { return false; }
+  }, []);
+
+  // ─── Handle scanned result ───
+  const handleScanResult = useCallback((decodedText) => {
+    if (!mountedRef.current) return;
+
+    // If it's a URL, open it directly in the default browser
+    if (isURL(decodedText)) {
+      stopScanner();
+      // On native Android, use the system browser
+      if (Capacitor.isNativePlatform()) {
+        window.open(decodedText, '_system');
+      } else {
+        window.open(decodedText, '_blank');
+      }
+      // Go back to generator after opening
+      if (onBack) onBack();
+      return;
+    }
+
+    // For non-URL content, show the result card
+    setResult(decodedText);
+    setStatus('RESULT');
+    stopScanner();
+  }, [isURL, stopScanner, onBack]);
+
   // ─── Start scanning ───
   const startScanner = useCallback(async () => {
     if (busyRef.current) return;
@@ -99,26 +117,17 @@ export default function QRScanner({ onBack }) {
     setStatus('LOADING');
 
     try {
-      // 1. Clean up any previous instance
       await stopScanner();
-
-      // 2. Small delay to let Android release camera hardware
       await new Promise(r => setTimeout(r, 300));
       if (!mountedRef.current) { busyRef.current = false; return; }
 
-      // 3. Verify the container div exists
       const el = document.getElementById('qr-scanner-viewport');
-      if (!el) {
-        throw new Error('Scanner viewport element not found.');
-      }
-      // Clear any leftover content from a previous session
+      if (!el) throw new Error('Scanner viewport element not found.');
       el.innerHTML = '';
 
-      // 4. Create html5-qrcode instance
       const html5Qr = new Html5Qrcode('qr-scanner-viewport');
       html5QrRef.current = html5Qr;
 
-      // 5. Scanner config
       const config = {
         fps: 10,
         qrbox: (vw, vh) => {
@@ -129,20 +138,13 @@ export default function QRScanner({ onBack }) {
         disableFlip: false,
       };
 
-      // 6. Start with facingMode constraint (most reliable)
       const cameraId = { facingMode: facingBack ? 'environment' : 'user' };
 
-      // 7. Race against a generous timeout (15s for slow Android devices)
       const startPromise = html5Qr.start(
         cameraId,
         config,
-        (decodedText) => {
-          if (!mountedRef.current) return;
-          setResult(decodedText);
-          setStatus('RESULT');
-          stopScanner();
-        },
-        () => {} // ignore per-frame failures
+        (decodedText) => handleScanResult(decodedText),
+        () => {}
       );
 
       const timeoutPromise = new Promise((_, rej) =>
@@ -165,7 +167,7 @@ export default function QRScanner({ onBack }) {
       let msg = 'Failed to start camera.';
       const m = typeof err?.message === 'string' ? err.message : '';
       if (m.includes('NotAllowed') || m.includes('Permission'))
-        msg = 'Camera permission denied. Please allow camera access in your device Settings → Apps → MushiQR Pro → Permissions.';
+        msg = 'Camera permission denied. Please allow camera access in Settings → Apps → MushiQR Pro → Permissions.';
       else if (m.includes('NotReadable') || m.includes('Could not start') || m.includes('in use'))
         msg = 'Camera is in use by another app. Close all camera apps, then try again.';
       else if (m.includes('NotFound') || m.includes('Requested device not found'))
@@ -178,7 +180,16 @@ export default function QRScanner({ onBack }) {
       setStatus('ERROR');
       await stopScanner();
     }
-  }, [facingBack, stopScanner]);
+  }, [facingBack, stopScanner, handleScanResult]);
+
+  // ─── AUTO-START camera on mount ───
+  useEffect(() => {
+    // Small delay to let the DOM render the viewport div first
+    const timer = setTimeout(() => {
+      if (mountedRef.current) startScanner();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ─── Switch camera ───
   const switchCamera = useCallback(async () => {
@@ -187,22 +198,23 @@ export default function QRScanner({ onBack }) {
     setTimeout(() => { if (mountedRef.current) startScanner(); }, 400);
   }, [stopScanner, startScanner]);
 
-  // ─── Close live scanner, return to idle ───
+  // ─── Close live scanner ───
   const closeScanner = useCallback(async () => {
     await stopScanner();
-    if (mountedRef.current) setStatus('IDLE');
-  }, [stopScanner]);
+    if (mountedRef.current) safeBack();
+  }, [stopScanner, safeBack]);
 
   // ─── Scan from file ───
   const handleFileUpload = async (file) => {
     if (!file) return;
+    await stopScanner();
     setStatus('LOADING');
     setResult(null);
     setError(null);
     try {
       const qr = new Html5Qrcode('qr-scanner-file-temp');
       const text = await qr.scanFile(file, true);
-      if (mountedRef.current) { setResult(text); setStatus('RESULT'); }
+      if (mountedRef.current) handleScanResult(text);
     } catch {
       if (mountedRef.current) {
         setError('No QR code found in this image. Try a clearer photo.');
@@ -224,11 +236,6 @@ export default function QRScanner({ onBack }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const isURL = (t) => {
-    try { const u = new URL(t); return u.protocol === 'http:' || u.protocol === 'https:'; }
-    catch { return false; }
-  };
-
   // ─── Render ───
   const showViewport = status !== 'RESULT';
 
@@ -236,18 +243,24 @@ export default function QRScanner({ onBack }) {
     <div className="scanner-page fade-in">
       <div className="scanner-container">
 
-        {/* ── HEADER: always visible, always has back button ── */}
+        {/* ── HEADER: always visible ── */}
         <header className="scanner-nav-header">
           <button className="scanner-back-btn" onClick={safeBack} aria-label="Go back">
             <ArrowLeft size={22} />
           </button>
           <div className="scanner-nav-title"><h3>QR Scanner</h3></div>
-          <div style={{ width: 42 }} />
+          {/* Gallery upload button in header */}
+          <button className="scanner-back-btn" onClick={() => fileInputRef.current?.click()} aria-label="Upload from gallery">
+            <ImagePlus size={20} />
+          </button>
+          <input type="file" ref={fileInputRef} accept="image/*"
+                 onChange={e => handleFileUpload(e.target.files?.[0])}
+                 style={{ display: 'none' }} />
         </header>
 
         <div className="scanner-main-content">
 
-          {/* ── RESULT CARD ── */}
+          {/* ── RESULT CARD (non-URL results only) ── */}
           {status === 'RESULT' && (
             <div className="scanner-result-overlay fade-in">
               <div className="scanner-result-card">
@@ -259,14 +272,8 @@ export default function QRScanner({ onBack }) {
                     {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
                     {copied ? 'Copied' : 'Copy'}
                   </button>
-                  {isURL(result) && (
-                    <a className="res-btn open" href={result} target="_blank" rel="noopener noreferrer"
-                       style={{ textDecoration: 'none', background: 'var(--accent-primary)', color: '#000' }}>
-                      <ExternalLink size={18} /> Open
-                    </a>
-                  )}
                 </div>
-                <button className="res-retry-btn" onClick={() => setStatus('IDLE')}
+                <button className="res-retry-btn" onClick={() => startScanner()}
                         style={{ marginTop: 16, background: 'transparent', border: 'none',
                                  color: 'var(--text-secondary)', cursor: 'pointer',
                                  display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -280,12 +287,7 @@ export default function QRScanner({ onBack }) {
           {showViewport && (
             <div className="scanner-viewport-wrapper">
 
-              {/*
-                CRITICAL: This div is ONLY for html5-qrcode.
-                React never puts children inside it.
-                It's always in the DOM so html5-qrcode can find it.
-                Visibility is controlled via CSS, not conditional rendering.
-              */}
+              {/* html5-qrcode owns this div — React never puts children in it */}
               <div
                 id="qr-scanner-viewport"
                 className="scanner-view-box"
@@ -295,22 +297,7 @@ export default function QRScanner({ onBack }) {
                 }}
               />
 
-              {/* Overlays sit ON TOP of (not inside) the viewport */}
-              {status === 'IDLE' && (
-                <div className="scanner-state-overlay">
-                  <div className="scanner-placeholder">
-                    <div className="placeholder-icon">
-                      <ScanLine size={64} className="pulse-anim" />
-                    </div>
-                    <p>Point your camera at a QR code</p>
-                    <button className="scanner-start-trigger" onClick={startScanner}>
-                      <Camera size={18} style={{ marginRight: 8 }} />
-                      Open Camera
-                    </button>
-                  </div>
-                </div>
-              )}
-
+              {/* LOADING overlay */}
               {status === 'LOADING' && (
                 <div className="scanner-state-overlay">
                   <div className="scanner-loading-state">
@@ -320,6 +307,7 @@ export default function QRScanner({ onBack }) {
                 </div>
               )}
 
+              {/* ERROR overlay */}
               {status === 'ERROR' && (
                 <div className="scanner-state-overlay">
                   <div className="scanner-error-state">
@@ -332,7 +320,7 @@ export default function QRScanner({ onBack }) {
                 </div>
               )}
 
-              {/* Corner guides + controls while scanning */}
+              {/* Scanning overlay: corners + controls */}
               {status === 'SCANNING' && (
                 <div className="scanner-overlay-guide">
                   <div className="guide-box">
@@ -350,18 +338,6 @@ export default function QRScanner({ onBack }) {
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-          {/* ── UPLOAD FROM GALLERY ── */}
-          {status === 'IDLE' && (
-            <div className="scanner-alt-actions">
-              <button className="alt-upload-btn" onClick={() => fileInputRef.current?.click()}>
-                <ImagePlus size={20} /><span>Scan from Gallery</span>
-              </button>
-              <input type="file" ref={fileInputRef} accept="image/*"
-                     onChange={e => handleFileUpload(e.target.files?.[0])}
-                     style={{ display: 'none' }} />
             </div>
           )}
         </div>

@@ -2,64 +2,107 @@ import { jsPDF } from 'jspdf';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-
 import { Media } from '@capacitor-community/media';
+
+/**
+ * Save an image to the device gallery on Android.
+ * Handles permissions for Android 10-14+.
+ */
+async function saveToGallery(base64Data, filename) {
+  // Request all relevant permissions
+  try { await Filesystem.requestPermissions(); } catch {}
+  try { await Media.requestPermissions(); } catch {}
+
+  // Write to cache first
+  const tempFile = await Filesystem.writeFile({
+    path: filename,
+    data: base64Data,
+    directory: Directory.Cache,
+  });
+
+  // Try saving to gallery via Media plugin
+  try {
+    // Ensure album exists
+    let albums = [];
+    try {
+      const result = await Media.getAlbums();
+      albums = result.albums || [];
+    } catch {}
+
+    let albumId = albums.find(a => a.name === 'MushiQR')?.identifier;
+    if (!albumId) {
+      try {
+        albumId = (await Media.createAlbum({ name: 'MushiQR' })).id;
+      } catch {
+        // Some devices don't support creating albums, save to default
+      }
+    }
+
+    const saveOpts = { path: tempFile.uri };
+    if (albumId) saveOpts.albumIdentifier = albumId;
+
+    await Media.savePhoto(saveOpts);
+    alert('QR Code saved to Gallery!');
+    return;
+  } catch (mediaErr) {
+    console.warn('Media.savePhoto failed, trying fallback:', mediaErr);
+  }
+
+  // Fallback: Save to Documents and share
+  try {
+    const docFile = await Filesystem.writeFile({
+      path: filename,
+      data: base64Data,
+      directory: Directory.Documents,
+    });
+    await Share.share({
+      title: 'MushiQR Pro - Save QR Code',
+      url: docFile.uri,
+      dialogTitle: 'Save or Share your QR Code',
+    });
+  } catch {
+    // Last resort: try sharing the cache file
+    try {
+      await Share.share({
+        title: 'MushiQR Pro - Save QR Code',
+        url: tempFile.uri,
+        dialogTitle: 'Save or Share your QR Code',
+      });
+    } catch {
+      alert('Could not save. Please try using the Share option instead.');
+    }
+  }
+}
+
+/**
+ * Save non-image files (PDF, SVG) via share sheet.
+ */
+async function saveFileViaShare(base64Data, filename) {
+  try { await Filesystem.requestPermissions(); } catch {}
+
+  const savedFile = await Filesystem.writeFile({
+    path: filename,
+    data: base64Data,
+    directory: Directory.Cache,
+  });
+
+  await Share.share({
+    title: 'MushiQR Pro',
+    url: savedFile.uri,
+    dialogTitle: 'Save or Share your QR Code',
+  });
+}
 
 async function saveFileNative(base64Data, filename) {
   try {
-    // Request permissions before saving
-    await Filesystem.requestPermissions();
-    try {
-      await Media.requestPermissions();
-    } catch (e) {
-      console.warn('Media permissions request failed', e);
-    }
-
-    // 1. Write the base64 data to a temporary file in the Cache directory
-    const savedFile = await Filesystem.writeFile({
-      path: filename,
-      data: base64Data,
-      directory: Directory.Cache
-    });
-    
-    // 2. If it's an image (PNG/JPG), save it directly to the gallery using Media plugin
     if (filename.endsWith('.png') || filename.endsWith('.jpg')) {
-      await Media.savePhoto({
-        path: savedFile.uri,
-        album: 'MushiQR'
-      });
-      alert(`QR Code successfully saved to your Gallery!`);
+      await saveToGallery(base64Data, filename);
     } else {
-      // 3. If it's a PDF or SVG, save to Documents folder and show share sheet
-      const docFile = await Filesystem.writeFile({
-        path: filename,
-        data: base64Data,
-        directory: Directory.Documents
-      });
-      
-      await Share.share({
-        title: 'MushiQR Pro',
-        url: docFile.uri,
-        dialogTitle: 'Save or Share your QR Code'
-      });
+      await saveFileViaShare(base64Data, filename);
     }
   } catch (e) {
-    console.error('File save failed', e);
-    // Fallback: If Media plugin fails, try sharing the cached file
-    try {
-      const fallbackFile = await Filesystem.writeFile({
-        path: filename,
-        data: base64Data,
-        directory: Directory.Cache
-      });
-      await Share.share({
-        title: 'MushiQR Pro',
-        url: fallbackFile.uri,
-        dialogTitle: 'Save or Share your QR Code'
-      });
-    } catch(shareErr) {
-      alert('Failed to save file. Please ensure storage permissions are granted.');
-    }
+    console.error('File save failed:', e);
+    alert('Failed to save file. Please try again.');
   }
 }
 
