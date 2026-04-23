@@ -17,25 +17,25 @@ import {
   Calendar,
   Instagram,
   Facebook,
-  Twitter,
-  Linkedin
+  Linkedin,
+  Twitter
 } from 'lucide-react';
 import { QR_TYPES } from '../utils/qrEngine';
 
 const TYPE_CONFIG = {
   [QR_TYPES.URL]: { icon: Link, label: 'URL' },
   [QR_TYPES.WIFI]: { icon: Wifi, label: 'WiFi' },
-  [QR_TYPES.WHATSAPP]: { icon: MessageCircle, label: 'WhatsApp' },
   [QR_TYPES.INSTAGRAM]: { icon: Instagram, label: 'Instagram' },
   [QR_TYPES.FACEBOOK]: { icon: Facebook, label: 'Facebook' },
+  [QR_TYPES.X]: { icon: Twitter, label: 'X' },
+  [QR_TYPES.LINKEDIN]: { icon: Linkedin, label: 'LinkedIn' },
+  [QR_TYPES.WHATSAPP]: { icon: MessageCircle, label: 'WhatsApp' },
   [QR_TYPES.TEXT]: { icon: Type, label: 'Text' },
   [QR_TYPES.PHONE]: { icon: Phone, label: 'Phone' },
-  [QR_TYPES.YOUTUBE]: { icon: Play, label: 'YouTube' },
-  [QR_TYPES.TWITTER]: { icon: Twitter, label: 'Twitter' },
-  [QR_TYPES.LINKEDIN]: { icon: Linkedin, label: 'LinkedIn' },
   [QR_TYPES.VCARD]: { icon: Contact, label: 'vCard' },
   [QR_TYPES.IMAGE]: { icon: ImageIcon, label: 'Image' },
   [QR_TYPES.PDF]: { icon: FileText, label: 'PDF' },
+  [QR_TYPES.YOUTUBE]: { icon: Play, label: 'YouTube' },
   [QR_TYPES.EMAIL]: { icon: Mail, label: 'Email' },
   [QR_TYPES.SMS]: { icon: MessageSquare, label: 'SMS' },
   [QR_TYPES.LOCATION]: { icon: MapPin, label: 'Location' },

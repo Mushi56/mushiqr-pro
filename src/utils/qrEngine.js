@@ -24,7 +24,7 @@ export const QR_TYPES = {
   YOUTUBE: 'youtube',
   INSTAGRAM: 'instagram',
   FACEBOOK: 'facebook',
-  TWITTER: 'twitter',
+  X: 'x',
   LINKEDIN: 'linkedin',
 };
 
@@ -71,11 +71,15 @@ export function formatQRData(type, data) {
       return `${data.cryptoType || 'bitcoin'}:${data.address || ''}${data.amount ? '?amount=' + data.amount : ''}`;
     case QR_TYPES.WHATSAPP:
       return `https://wa.me/${(data.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(data.message || '')}`;
-    case QR_TYPES.YOUTUBE:
     case QR_TYPES.INSTAGRAM:
+      return `https://instagram.com/${(data.username || '').replace('@', '')}`;
     case QR_TYPES.FACEBOOK:
-    case QR_TYPES.TWITTER:
+      return `https://facebook.com/${data.username || ''}`;
+    case QR_TYPES.X:
+      return `https://x.com/${(data.username || '').replace('@', '')}`;
     case QR_TYPES.LINKEDIN:
+      return `https://linkedin.com/in/${data.username || ''}`;
+    case QR_TYPES.YOUTUBE:
     case QR_TYPES.PDF:
     case QR_TYPES.IMAGE:
     case QR_TYPES.AUDIO:

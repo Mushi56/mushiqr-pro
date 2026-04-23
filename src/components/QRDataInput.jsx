@@ -392,6 +392,22 @@ export default function QRDataInput({ type, data, onChange }) {
           <input className="form-input" type="url" placeholder="https://youtube.com/watch?v=..." value={data.url || ''} onChange={(e) => updateField('url', e.target.value)} />
         </div>
       );
+    
+    case QR_TYPES.INSTAGRAM:
+    case QR_TYPES.FACEBOOK:
+    case QR_TYPES.X:
+    case QR_TYPES.LINKEDIN:
+      return (
+        <div className="form-group">
+          <label className="form-label" style={{ textTransform: 'capitalize' }}>{type} Username</label>
+          <input
+            className="form-input"
+            placeholder={type === 'instagram' ? '@username' : 'username'}
+            value={data.username || ''}
+            onChange={(e) => updateField('username', e.target.value)}
+          />
+        </div>
+      );
 
         }
       })()}
