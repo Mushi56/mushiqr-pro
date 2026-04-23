@@ -3675,13 +3675,13 @@ input[type="range"]::-moz-range-thumb {
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ EC Level Buttons Ã¢â€â‚¬Ã¢â€â‚¬ */
 .logo-presets-grid {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 4px 12px;
-  margin: 0 -4px;
-  -webkit-overflow-scrolling: touch;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 250px;
+  padding: 8px 4px;
+  margin: 0;
   scrollbar-width: none;
 }
 
@@ -3690,7 +3690,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .logo-preset-btn {
-  flex: 0 0 18.2%;
+  width: 100%;
   aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
@@ -5121,20 +5121,4 @@ input[type="range"]::-moz-range-thumb {
 
 .row-picker-btn {
   margin-top: 0 !important;
-}
-
-.color-picker-swatch {
-  position: sticky;
-  left: 0;
-  z-index: 20;
-  background-color: var(--bg-card) !important;
-  box-shadow: 10px 0 15px -10px rgba(0,0,0,0.5);
-  margin-right: 4px;
-  flex-shrink: 0;
-}
-
-/* Light mode background fix */
-[data-theme="light"] .color-picker-swatch {
-  background-color: #fff !important;
-  box-shadow: 10px 0 15px -10px rgba(0,0,0,0.1);
 }
