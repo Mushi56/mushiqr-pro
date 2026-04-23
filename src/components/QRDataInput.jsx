@@ -1,11 +1,33 @@
+import { useEffect, useRef } from 'react';
 import { QR_TYPES } from '../utils/qrEngine';
 
 export default function QRDataInput({ type, data, onChange }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Focus first input after modal opens
+    const timer = setTimeout(() => {
+      const firstInput = containerRef.current?.querySelector('input, textarea, select');
+      if (firstInput) {
+        firstInput.focus();
+        // Move cursor to end if it's text
+        if (typeof firstInput.setSelectionRange === 'function' && firstInput.value) {
+          const len = firstInput.value.length;
+          firstInput.setSelectionRange(len, len);
+        }
+      }
+    }, 350); // Delay slightly more than modal animation
+    return () => clearTimeout(timer);
+  }, [type]);
+
   const updateField = (field, value) => {
     onChange({ ...data, [field]: value });
   };
 
-  switch (type) {
+  return (
+    <div ref={containerRef}>
+      {(() => {
+        switch (type) {
     case QR_TYPES.URL:
       return (
         <div className="form-group">
@@ -371,7 +393,8 @@ export default function QRDataInput({ type, data, onChange }) {
         </div>
       );
 
-    default:
-      return null;
-  }
+        }
+      })()}
+    </div>
+  );
 }
