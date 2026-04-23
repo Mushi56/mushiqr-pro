@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function ColorPicker({ label, value, onChange, onOpenAdvanced, className = '', disabled = false }) {
+export default function ColorPicker({ label, value, onChange, onOpenAdvanced, className = '', disabled = false, isSwatch = false, icon: Icon }) {
   const [localValue, setLocalValue] = useState(value);
   const nativeInputRef = useRef(null);
 
@@ -23,6 +23,36 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
 
   const safeColor = /^#[A-Fa-f0-9]{6}$/.test(localValue) ? localValue : '#000000';
 
+  if (isSwatch) {
+    return (
+      <div 
+        className={`swatch-item color-picker-swatch ${className} ${disabled ? 'disabled' : ''}`}
+        style={{ 
+          backgroundColor: safeColor, 
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden'
+        }}
+        onClick={handlePreviewClick}
+      >
+        {Icon && <Icon size={20} color="white" style={{ opacity: 0.9, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />}
+        {!disabled && (
+          <input
+            ref={nativeInputRef}
+            type="color"
+            value={safeColor}
+            onChange={(e) => onChange(e.target.value)}
+            style={{ opacity: 0, position: 'absolute', inset: 0, pointerEvents: 'none' }}
+          />
+        )}
+        <div className="swatch-indicator-picker" />
+      </div>
+    );
+  }
+
   return (
     <div className={`form-group ${className} ${disabled ? 'disabled' : ''}`}>
       {label && <label className="form-label">{label}</label>}
@@ -36,10 +66,14 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
             height: '44px',
             borderRadius: '12px',
             opacity: disabled ? 0.4 : 1,
-            filter: disabled ? 'grayscale(0.5)' : 'none'
+            filter: disabled ? 'grayscale(0.5)' : 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
           onClick={handlePreviewClick}
         >
+          {Icon && <Icon size={20} color="white" />}
           {!disabled && (
             <input
               ref={nativeInputRef}

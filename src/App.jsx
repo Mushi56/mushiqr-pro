@@ -783,14 +783,15 @@ export default function App() {
                     <div className="color-row-item">
                       <div className="color-row-header">
                         <label className="panel-label">Background Color</label>
+                      </div>
+                      <div className="swatch-grid-mini">
                         <ColorPicker 
-                          className="row-picker-btn" 
+                          isSwatch={true}
+                          icon={Palette}
                           value={bgColor} 
                           onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} 
                           onOpenAdvanced={handleOpenAdv} 
                         />
-                      </div>
-                      <div className="swatch-grid-mini">
                         {SWATCH_PRESETS.map(color => (
                           <div 
                             key={color} 
@@ -806,14 +807,15 @@ export default function App() {
                     <div className="color-row-item">
                       <div className="color-row-header">
                         <label className="panel-label">Dots Color</label>
+                      </div>
+                      <div className="swatch-grid-mini">
                         <ColorPicker 
-                          className="row-picker-btn" 
+                          isSwatch={true}
+                          icon={Palette}
                           value={qrColor} 
                           onChange={(c) => { setQrColor(c); setLogoOutlineColor(c); }} 
                           onOpenAdvanced={handleOpenAdv} 
                         />
-                      </div>
-                      <div className="swatch-grid-mini">
                         {SWATCH_PRESETS.map(color => (
                           <div 
                             key={color} 
@@ -833,15 +835,16 @@ export default function App() {
                     <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
                       <div className="color-row-header">
                         <label className="panel-label">Inner Eyes Color</label>
+                      </div>
+                      <div className="swatch-grid-mini">
                         <ColorPicker 
-                          className="row-picker-btn" 
+                          isSwatch={true}
+                          icon={Palette}
                           value={syncEyes ? qrColor : (eyeColor || qrColor)} 
                           onChange={setEyeColor} 
                           onOpenAdvanced={handleOpenAdv}
                           disabled={syncEyes}
                         />
-                      </div>
-                      <div className="swatch-grid-mini">
                         {SWATCH_PRESETS.map(color => (
                           <div 
                             key={color} 
@@ -857,15 +860,16 @@ export default function App() {
                     <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
                       <div className="color-row-header">
                         <label className="panel-label">Outer Eyes Color</label>
+                      </div>
+                      <div className="swatch-grid-mini">
                         <ColorPicker 
-                          className="row-picker-btn" 
+                          isSwatch={true}
+                          icon={Palette}
                           value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
                           onChange={setEyeOuterColor} 
                           onOpenAdvanced={handleOpenAdv}
                           disabled={syncEyes}
                         />
-                      </div>
-                      <div className="swatch-grid-mini">
                         {SWATCH_PRESETS.map(color => (
                           <div 
                             key={color} 
