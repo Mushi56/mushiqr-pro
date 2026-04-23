@@ -4667,18 +4667,16 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0; /* Reduced space between camera and buttons */
+  padding: 6px 0; /* Minimal space between camera and buttons */
   z-index: 20;
 }
 
 .scanner-bar-title {
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text-tertiary); /* Same as footer text */
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  align-self: flex-start; /* Align with tops of the buttons */
-  margin-top: 10px; /* Fine-tune top alignment */
 }
 
 .scanner-ctrl-btn {
