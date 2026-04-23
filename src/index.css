@@ -4669,14 +4669,31 @@ input[type="range"]::-moz-range-thumb {
 /* Controls Bar */
 .scanner-controls-bar {
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 6px 0; /* Minimal space between camera and buttons */
+  justify-content: space-around; /* Better spacing for square buttons */
+  padding: 12px 0;
   z-index: 20;
 }
+
+.scanner-controls-bar .type-tab {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  flex: none;
+  padding: 0;
+  gap: 2px;
+  font-size: 8px;
+  border-radius: 14px;
+}
+
+.scanner-controls-bar .type-tab .type-tab-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
 
 .scanner-bar-title {
   font-size: 13px;

@@ -460,7 +460,7 @@ export default function QRScanner({ onBack }) {
             <div className="scanner-controls-bar">
               <button className="type-tab" onClick={() => fileInputRef.current?.click()}>
                 <span className="type-tab-icon">
-                  <ImagePlus size={20} strokeWidth={1.5} />
+                  <ImagePlus size={18} strokeWidth={1.5} />
                 </span>
                 Gallery
               </button>
@@ -469,7 +469,7 @@ export default function QRScanner({ onBack }) {
 
               <button className="type-tab active" onClick={closeScanner}>
                 <span className="type-tab-icon">
-                  <X size={20} strokeWidth={1.5} />
+                  <X size={18} strokeWidth={1.5} />
                 </span>
                 Close
               </button>
