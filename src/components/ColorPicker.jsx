@@ -23,6 +23,16 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
 
   const safeColor = /^#[A-Fa-f0-9]{6}$/.test(localValue) ? localValue : '#000000';
 
+  // Helper for contrast
+  const isLight = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 155;
+  };
+  const iconColor = isLight(safeColor) ? '#000000' : '#ffffff';
+
   if (isSwatch) {
     return (
       <div 
@@ -30,15 +40,18 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
         style={{ 
           backgroundColor: safeColor, 
           cursor: disabled ? 'not-allowed' : 'pointer',
-          position: 'relative',
+          position: 'sticky',
+          left: 0,
+          zIndex: 20,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          flexShrink: 0
         }}
         onClick={handlePreviewClick}
       >
-        {Icon && <Icon size={20} color="white" style={{ opacity: 0.9, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />}
+        {Icon && <Icon size={20} color={iconColor} style={{ opacity: 0.9 }} />}
         {!disabled && (
           <input
             ref={nativeInputRef}
@@ -73,7 +86,7 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
           }}
           onClick={handlePreviewClick}
         >
-          {Icon && <Icon size={20} color="white" />}
+          {Icon && <Icon size={20} color={iconColor} />}
           {!disabled && (
             <input
               ref={nativeInputRef}
