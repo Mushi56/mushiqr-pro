@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
+import { App } from '@capacitor/app';
 import { Camera as CapCamera } from '@capacitor/camera';
 import {
   Camera,
@@ -12,36 +13,43 @@ import {
   RefreshCw,
   ImagePlus,
   RefreshCcw,
-  Zap,
-  ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  Loader2,
+  ShieldCheck
 } from 'lucide-react';
 
-export default function QRScanner() {
-  const [scanning, setScanning] = useState(false);
+export default function QRScanner({ onBack }) {
+  const [status, setStatus] = useState('IDLE'); // 'IDLE', 'REQUESTING', 'LOADING', 'SCANNING', 'ERROR', 'RESULT'
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   const [cameraFacing, setCameraFacing] = useState('environment');
-  const [hasCameras, setHasCameras] = useState(false);
-
+  
   const scannerRef = useRef(null);
   const html5QrRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Check for cameras on mount
+  // 1. Handle Android System Back Button
   useEffect(() => {
-    Html5Qrcode.getCameras().then(cameras => {
-      if (cameras && cameras.length > 0) {
-        setHasCameras(true);
-      }
-    }).catch(() => {
-      setHasCameras(false);
+    let isMounted = true;
+    const backListener = App.addListener('backButton', () => {
+      if (!isMounted) return;
+      handleBack();
     });
 
     return () => {
-      stopScanner();
+      isMounted = false;
+      backListener.then(l => l.remove());
+    };
+  }, []);
+
+  // 2. Clean up camera on unmount
+  useEffect(() => {
+    return () => {
+      if (html5QrRef.current) {
+        html5QrRef.current.stop().catch(() => {});
+      }
     };
   }, []);
 
@@ -52,111 +60,120 @@ export default function QRScanner() {
           await html5QrRef.current.stop();
         }
       } catch (e) {
-        console.error("Stop error:", e);
+        console.warn("Scanner stop error:", e);
       }
       html5QrRef.current = null;
     }
-    setScanning(false);
   }, []);
 
   const startScanner = useCallback(async () => {
+    if (status === 'LOADING') return;
+    
     setResult(null);
     setError(null);
-
-    if (!scannerRef.current) return;
+    setStatus('REQUESTING');
 
     try {
-      // 1. Explicitly request permissions via Capacitor for Android
-      try {
-        const perm = await CapCamera.requestPermissions();
-        if (perm.camera !== 'granted') {
-          setError('Camera permission is required.');
-          return;
-        }
-      } catch (e) {
-        console.warn('Capacitor permission failed, fallback to browser');
+      // Step 1: Explicitly request camera permission via Capacitor
+      const perm = await CapCamera.requestPermissions();
+      if (perm.camera !== 'granted') {
+        setStatus('ERROR');
+        setError('Camera permission is required. Please enable it in your device settings.');
+        return;
       }
 
-      // 2. Stop any existing instance
-      if (html5QrRef.current) {
-        await stopScanner();
-      }
+      setStatus('LOADING');
 
+      // Step 2: Initialize html5-qrcode
+      await stopScanner();
+      
       const html5Qr = new Html5Qrcode('qr-scanner-viewport');
       html5QrRef.current = html5Qr;
 
-      // 3. Try to get specific cameras to find the back one
-      const cameras = await Html5Qrcode.getCameras();
-      let cameraId = null;
+      // Step 3: Fetch cameras to find the best back camera
+      const cameras = await Html5Qrcode.getCameras().catch(() => []);
+      let targetCamera = { facingMode: cameraFacing };
       
       if (cameras && cameras.length > 0) {
-        // Try to find the back camera specifically by label
-        const backCamera = cameras.find(cam => cam.label.toLowerCase().includes('back') || cam.label.toLowerCase().includes('environment'));
-        cameraId = backCamera ? backCamera.id : cameras[0].id;
+        const backCam = cameras.find(c => 
+          c.label.toLowerCase().includes('back') || 
+          c.label.toLowerCase().includes('environment') ||
+          c.label.toLowerCase().includes('rear')
+        );
+        if (backCam && cameraFacing === 'environment') {
+          targetCamera = backCam.id;
+        } else if (cameraFacing === 'user') {
+          const frontCam = cameras.find(c => c.label.toLowerCase().includes('front') || c.label.toLowerCase().includes('user'));
+          if (frontCam) targetCamera = frontCam.id;
+        }
       }
 
       const config = {
-        fps: 15,
-        qrbox: { width: 250, height: 250 },
+        fps: 10,
+        qrbox: (viewWidth, viewHeight) => {
+          const size = Math.min(viewWidth, viewHeight) * 0.7;
+          return { width: size, height: size };
+        },
         aspectRatio: 1.0,
       };
 
-      // Start with preferred cameraId or facingMode
-      if (cameraId) {
-        await html5Qr.start(
-          cameraId,
-          config,
-          (decodedText) => { setResult(decodedText); stopScanner(); },
-          () => {}
-        );
-      } else {
-        await html5Qr.start(
-          { facingMode: cameraFacing },
-          config,
-          (decodedText) => { setResult(decodedText); stopScanner(); },
-          () => {}
-        );
-      }
+      // Step 4: Start scanning with a safety timeout
+      const startPromise = html5Qr.start(
+        targetCamera,
+        config,
+        (decodedText) => {
+          setResult(decodedText);
+          setStatus('RESULT');
+          stopScanner();
+        },
+        () => {} // silent scan failures
+      );
 
-      setScanning(true);
+      // 10 second timeout for camera start
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Camera initialization timed out. Please try again.')), 10000)
+      );
+
+      await Promise.race([startPromise, timeoutPromise]);
+      setStatus('SCANNING');
+
     } catch (err) {
-      console.error("Start error:", err);
-      setError('Camera failed to start. Please ensure other apps aren\'t using it.');
-      setScanning(false);
+      console.error("Scanner error:", err);
+      setError(err.message || 'Failed to start camera. Ensure it is not being used by another app.');
+      setStatus('ERROR');
+      await stopScanner();
     }
-  }, [cameraFacing, stopScanner]);
+  }, [cameraFacing, stopScanner, status]);
 
-  const handleFileUpload = useCallback(async (file) => {
+  const handleBack = () => {
+    stopScanner();
+    if (onBack) onBack();
+  };
+
+  const handleFileUpload = async (file) => {
     if (!file) return;
+    setStatus('LOADING');
     setResult(null);
     setError(null);
-    if (scanning) await stopScanner();
 
     try {
       const html5Qr = new Html5Qrcode('qr-scanner-file-temp');
       const decodedText = await html5Qr.scanFile(file, true);
       setResult(decodedText);
+      setStatus('RESULT');
     } catch (err) {
-      setError('No QR code found. Please try a clearer image.');
+      setError('No QR code found in this image. Try a clearer photo.');
+      setStatus('ERROR');
     }
-  }, [scanning, stopScanner]);
+  };
 
-  const handleFileDrop = useCallback((e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const file = e.dataTransfer?.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      handleFileUpload(file);
-    }
-  }, [handleFileUpload]);
-
-  const handleCopy = useCallback(async () => {
+  const handleCopy = async () => {
     if (!result) return;
     try {
       await navigator.clipboard.writeText(result);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } catch (err) {
       const ta = document.createElement('textarea');
       ta.value = result;
       document.body.appendChild(ta);
@@ -166,7 +183,7 @@ export default function QRScanner() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [result]);
+  };
 
   const isURL = (text) => {
     try {
@@ -177,131 +194,139 @@ export default function QRScanner() {
     }
   };
 
-  const handleReset = () => {
-    setResult(null);
-    setError(null);
-    setCopied(false);
-  };
-
   return (
-    <div className="scanner-page">
+    <div className="scanner-page fade-in">
       <div className="scanner-container">
-        {/* Header */}
-        <div className="scanner-header-simple">
-          <h2 className="scanner-title">QR Scanner</h2>
-          <p className="scanner-subtitle">Scan or upload to decode</p>
-        </div>
-
-        {/* Result Display */}
-        {result && (
-          <div className="scanner-result-card fade-in">
-            <div className="scanner-result-header">
-              <CheckCircle2 size={18} color="var(--success)" />
-              <span>Result Detected</span>
-            </div>
-            <div className="scanner-result-body">
-              <p className="scanner-result-text">{result}</p>
-            </div>
-            <div className="scanner-result-footer">
-              <button className="scanner-action-btn primary" onClick={handleCopy}>
-                {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
-                {copied ? 'Copied' : 'Copy'}
-              </button>
-              {isURL(result) && (
-                <a className="scanner-action-btn accent" href={result} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink size={16} /> Open
-                </a>
-              )}
-              <button className="scanner-action-btn ghost" onClick={handleReset}>
-                <RefreshCw size={16} /> New Scan
-              </button>
-            </div>
+        {/* Persistent Header */}
+        <header className="scanner-nav-header">
+          <button className="scanner-back-btn" onClick={handleBack} aria-label="Go back">
+            <ArrowLeft size={22} />
+          </button>
+          <div className="scanner-nav-title">
+            <h3>QR Scanner</h3>
           </div>
-        )}
+          <div style={{ width: 42 }} />
+        </header>
 
-        {/* Error Display */}
-        {error && (
-          <div className="scanner-error-message fade-in">
-            <AlertCircle size={16} />
-            <span>{error}</span>
-            <button className="error-close" onClick={() => setError(null)}><X size={14} /></button>
-          </div>
-        )}
+        <div className="scanner-main-content">
+          {/* Result View */}
+          {status === 'RESULT' && (
+            <div className="scanner-result-overlay fade-in">
+              <div className="scanner-result-card">
+                <div className="res-icon">
+                  <CheckCircle2 size={48} color="var(--success)" />
+                </div>
+                <h4>QR Code Detected</h4>
+                <div className="res-data-box">
+                  <p>{result}</p>
+                </div>
+                <div className="res-actions">
+                  <button className="res-btn copy" onClick={handleCopy}>
+                    {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                  {isURL(result) && (
+                    <a className="res-btn open" href={result} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', background: 'var(--accent-primary)', color: '#000' }}>
+                      <ExternalLink size={18} /> Open
+                    </a>
+                  )}
+                </div>
+                <button className="res-retry-btn" onClick={() => setStatus('IDLE')} style={{ marginTop: '16px', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                  <RefreshCw size={14} style={{ marginRight: '4px' }} /> Scan Another
+                </button>
+              </div>
+            </div>
+          )}
 
-        {/* Scanner Area */}
-        {!result && (
-          <div className="scanner-main-view">
-            <div 
-              className={`scanner-viewport-card ${dragOver ? 'drag-over' : ''} ${scanning ? 'is-scanning' : ''}`}
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={handleFileDrop}
-            >
-              <div id="qr-scanner-viewport" ref={scannerRef} className="scanner-viewport">
-                {!scanning && (
-                  <div className="scanner-empty-state">
-                    <ScanLine size={64} strokeWidth={1} className="scan-icon-anim" />
-                    <p>Tap "Start Camera" or drop image here</p>
+          {/* Scanner Viewport Area */}
+          {(status !== 'RESULT') && (
+            <div className="scanner-viewport-wrapper">
+              <div 
+                id="qr-scanner-viewport" 
+                className={`scanner-view-box ${status === 'SCANNING' ? 'active' : ''}`}
+              >
+                {status === 'IDLE' && (
+                  <div className="scanner-placeholder">
+                    <div className="placeholder-icon">
+                      <ScanLine size={64} className="pulse-anim" />
+                    </div>
+                    <p>Point your camera at a QR code</p>
+                    <button className="scanner-start-trigger" onClick={startScanner}>
+                      <Camera size={18} style={{ marginRight: '8px' }} />
+                      Open Camera
+                    </button>
+                  </div>
+                )}
+
+                {(status === 'LOADING' || status === 'REQUESTING') && (
+                  <div className="scanner-loading-state">
+                    <Loader2 size={48} className="spinning" color="var(--accent-primary)" />
+                    <p>{status === 'REQUESTING' ? 'Requesting Permissions...' : 'Starting Camera...'}</p>
+                  </div>
+                )}
+
+                {status === 'ERROR' && (
+                  <div className="scanner-error-state">
+                    <AlertCircle size={48} color="var(--error)" />
+                    <p className="err-msg">{error}</p>
+                    <button className="error-retry-btn" onClick={startScanner}>
+                      <RefreshCcw size={16} /> Try Again
+                    </button>
                   </div>
                 )}
               </div>
 
-              {scanning && (
-                <div className="scanner-guide-overlay">
-                  <div className="scanner-guide-box">
-                    <div className="guide-corner tl" />
-                    <div className="guide-corner tr" />
-                    <div className="guide-corner bl" />
-                    <div className="guide-corner br" />
-                    <div className="scanner-laser-line" />
+              {status === 'SCANNING' && (
+                <div className="scanner-overlay-guide">
+                  <div className="guide-box">
+                    <div className="corner tl" />
+                    <div className="corner tr" />
+                    <div className="corner bl" />
+                    <div className="corner br" />
+                    <div className="laser-line" />
+                  </div>
+                  <div className="scanner-controls-overlay">
+                    <button className="overlay-icon-btn" onClick={() => {
+                      setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
+                      setTimeout(startScanner, 100);
+                    }} title="Switch Camera">
+                      <RefreshCcw size={20} />
+                    </button>
+                    <button className="overlay-icon-btn close" onClick={() => setStatus('IDLE')}>
+                      <X size={20} />
+                    </button>
                   </div>
                 </div>
               )}
             </div>
+          )}
 
-            {/* Combined Controls */}
-            <div className="scanner-controls-group">
-              {!scanning ? (
-                <button className="scanner-main-btn start" onClick={startScanner}>
-                  <Camera size={18} /> Start Camera
-                </button>
-              ) : (
-                <button className="scanner-main-btn stop" onClick={stopScanner}>
-                  <X size={18} /> Stop Camera
-                </button>
-              )}
-
-              <button className="scanner-main-btn upload" onClick={() => fileInputRef.current?.click()}>
-                <Upload size={18} /> Upload Image
+          {/* Upload Alternative */}
+          {status === 'IDLE' && (
+            <div className="scanner-alt-actions">
+              <button className="alt-upload-btn" onClick={() => fileInputRef.current?.click()}>
+                <ImagePlus size={20} />
+                <span>Scan from Gallery</span>
               </button>
-
-              {scanning && (
-                <button className="scanner-icon-btn" onClick={() => {
-                  setCameraFacing(prev => prev === 'environment' ? 'user' : 'environment');
-                  stopScanner().then(() => setTimeout(startScanner, 300));
-                }}>
-                  <RefreshCcw size={18} />
-                </button>
-              )}
-              
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                accept="image/*" 
                 onChange={(e) => handleFileUpload(e.target.files?.[0])}
+                style={{ display: 'none' }}
               />
             </div>
-          </div>
-        )}
-
-        <div id="qr-scanner-file-temp" style={{ display: 'none' }} />
-
-        <div className="scanner-privacy-notice">
-          <ShieldCheck size={14} />
-          <span>Local processing — No data is sent to servers</span>
+          )}
         </div>
+
+        <footer className="scanner-footer-info">
+          <ShieldCheck size={14} />
+          <span>Local Scanning • Secure & Private</span>
+        </footer>
       </div>
+      
+      {/* Hidden temp div for file scanning */}
+      <div id="qr-scanner-file-temp" style={{ display: 'none' }} />
     </div>
   );
 }

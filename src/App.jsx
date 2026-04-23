@@ -931,7 +931,7 @@ export default function App() {
             </section>
           </>
         ) : activePage === 'scanner' ? (
-          <QRScanner />
+          <QRScanner onBack={() => setActivePage('generator')} />
         ) : (
           <HistoryPage />
         )}
