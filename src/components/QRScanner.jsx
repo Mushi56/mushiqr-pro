@@ -16,7 +16,10 @@ import {
   AlertCircle,
   ArrowLeft,
   Loader2,
-  ShieldCheck
+  ShieldCheck,
+  Search,
+  Minus,
+  Plus
 } from 'lucide-react';
 
 export default function QRScanner({ onBack }) {
@@ -25,11 +28,14 @@ export default function QRScanner({ onBack }) {
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [facingBack, setFacingBack] = useState(true);
+  const [zoom, setZoom] = useState(1);
+  const [zoomCapabilities, setZoomCapabilities] = useState(null);
 
   const html5QrRef = useRef(null);
   const fileInputRef = useRef(null);
   const mountedRef = useRef(true);
   const busyRef = useRef(false);
+  const touchStateRef = useRef({ distance: 0, initialZoom: 1 });
 
   useEffect(() => {
     mountedRef.current = true;
@@ -59,12 +65,33 @@ export default function QRScanner({ onBack }) {
     try { if (qr.isScanning) await qr.stop(); } catch {}
     try { qr.clear(); } catch {}
     html5QrRef.current = null;
+    setZoomCapabilities(null);
   }, []);
 
   const safeBack = useCallback(() => {
     stopScanner();
     if (onBack) onBack();
   }, [stopScanner, onBack]);
+
+  // Apply zoom to the running video track
+  const applyZoom = useCallback(async (value) => {
+    const qr = html5QrRef.current;
+    if (!qr || !qr.isScanning) return;
+    
+    try {
+      const track = qr.getRunningTrack();
+      if (track && typeof track.applyConstraints === 'function') {
+        const capabilities = track.getCapabilities();
+        if (capabilities.zoom) {
+          const val = Math.min(Math.max(value, capabilities.zoom.min), capabilities.zoom.max);
+          await track.applyConstraints({ advanced: [{ zoom: val }] });
+          setZoom(val);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to apply zoom:', err);
+    }
+  }, []);
 
   // Broader URL detection — catches http://, https://, and www. prefixed strings
   const isURL = useCallback((text) => {
@@ -128,6 +155,7 @@ export default function QRScanner({ onBack }) {
     setResult(null);
     setError(null);
     setStatus('LOADING');
+    setZoom(1);
 
     try {
       await stopScanner();
@@ -160,22 +188,33 @@ export default function QRScanner({ onBack }) {
 
       const cameraId = { facingMode: facingBack ? 'environment' : 'user' };
 
-      const startPromise = html5Qr.start(
+      await html5Qr.start(
         cameraId,
         config,
         (decodedText) => handleScanResult(decodedText),
         () => {}
       );
 
-      const timeoutPromise = new Promise((_, rej) =>
-        setTimeout(() => rej(new Error(
-          'Camera took too long to start. Please close other camera apps and try again.'
-        )), 15000)
-      );
-
-      await Promise.race([startPromise, timeoutPromise]);
-
       if (!mountedRef.current) { busyRef.current = false; return; }
+      
+      // Detect zoom capabilities after start
+      try {
+        const track = html5Qr.getRunningTrack();
+        if (track) {
+          const capabilities = track.getCapabilities();
+          if (capabilities.zoom) {
+            setZoomCapabilities({
+              min: capabilities.zoom.min || 1,
+              max: Math.min(capabilities.zoom.max || 10, 10), // Limit to 10x as requested
+              step: capabilities.zoom.step || 0.1
+            });
+            setZoom(capabilities.zoom.min || 1);
+          }
+        }
+      } catch (e) {
+        console.warn('Zoom detection failed:', e);
+      }
+
       busyRef.current = false;
       setStatus('SCANNING');
 
@@ -251,6 +290,29 @@ export default function QRScanner({ onBack }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Pinch to Zoom Logic
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 2 && zoomCapabilities) {
+      const dist = Math.hypot(
+        e.touches[0].pageX - e.touches[1].pageX,
+        e.touches[0].pageY - e.touches[1].pageY
+      );
+      touchStateRef.current = { distance: dist, initialZoom: zoom };
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 2 && zoomCapabilities) {
+      const dist = Math.hypot(
+        e.touches[0].pageX - e.touches[1].pageX,
+        e.touches[0].pageY - e.touches[1].pageY
+      );
+      const scale = dist / touchStateRef.current.distance;
+      const newZoom = touchStateRef.current.initialZoom * scale;
+      applyZoom(newZoom);
+    }
+  };
+
   const showViewport = status !== 'RESULT';
 
   return (
@@ -293,7 +355,11 @@ export default function QRScanner({ onBack }) {
 
           {/* SCANNER AREA */}
           {showViewport && (
-            <div className="scanner-viewport-wrapper">
+            <div 
+              className="scanner-viewport-wrapper"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+            >
 
               {/* Camera viewport — html5-qrcode owns this */}
               <div
@@ -309,6 +375,34 @@ export default function QRScanner({ onBack }) {
               {status === 'SCANNING' && (
                 <div className="scanner-overlay-guide">
                   <div className="scanner-laser-line" />
+                </div>
+              )}
+
+              {/* ZOOM SLIDER - Premium Camera Style */}
+              {status === 'SCANNING' && zoomCapabilities && (
+                <div className="scanner-zoom-container fade-in">
+                  <div className="zoom-slider-wrapper glass-panel">
+                    <button className="zoom-btn" onClick={() => applyZoom(zoom - 0.5)}>
+                      <Minus size={16} />
+                    </button>
+                    <div className="slider-track-container">
+                      <input
+                        type="range"
+                        min={zoomCapabilities.min}
+                        max={zoomCapabilities.max}
+                        step={zoomCapabilities.step}
+                        value={zoom}
+                        onChange={(e) => applyZoom(parseFloat(e.target.value))}
+                        className="premium-zoom-slider"
+                      />
+                    </div>
+                    <button className="zoom-btn" onClick={() => applyZoom(zoom + 0.5)}>
+                      <Plus size={16} />
+                    </button>
+                    <div className="zoom-indicator">
+                      {zoom.toFixed(1)}x
+                    </div>
+                  </div>
                 </div>
               )}
 
