@@ -142,18 +142,19 @@ export default function QRScanner({ onBack }) {
       html5QrRef.current = html5Qr;
 
       const config = {
-        fps: 20, // Increased FPS for smoother preview
+        fps: 30, // Max standard FPS for smooth video
         qrbox: (vw, vh) => {
-          const s = Math.floor(Math.min(vw, vh) * 0.75);
+          const s = Math.floor(Math.min(vw, vh) * 0.8);
           return { width: s, height: s };
         },
         aspectRatio: 0.75, 
         disableFlip: false,
-        // Request high resolution video constraints for crystal clear preview
+        // Request maximum possible resolution and high frame rate
         videoConstraints: {
           facingMode: facingBack ? 'environment' : 'user',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { min: 640, ideal: 1920, max: 3840 },
+          height: { min: 480, ideal: 1080, max: 2160 },
+          frameRate: { ideal: 30, max: 60 }
         }
       };
 
