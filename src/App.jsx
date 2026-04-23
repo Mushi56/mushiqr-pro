@@ -197,6 +197,8 @@ export default function App() {
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
   const [isDataPopupOpen, setIsDataPopupOpen] = useState(false);
+  const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
+  const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
 
   const MINI_PRESETS = [
     '#000000', '#FFFFFF', '#FF007F', '#00F0FF', '#7000FF', '#00FF9D', 
@@ -301,9 +303,6 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
 
-  // ── Advanced Picker State ──
-  const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
-  const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
   const [selectedFormat, setSelectedFormat] = useState('PNG');
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
