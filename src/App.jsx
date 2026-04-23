@@ -1021,14 +1021,15 @@ export default function App() {
               {/* Scan Reliability Tab */}
               {activeTab === 'scan' && (
                 <div className="tab-panel fade-in" id="panel-scan">
-                  <div>
-                    <p className="ec-description">
-                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
-                    </p>
-                  </div>
                   <div style={{ marginTop: 'auto' }}>
                     <label className="panel-label">Scan Reliability</label>
-                    <div className="ec-buttons-row">
+                    <div className="reliability-bar-track" style={{ marginTop: '12px', marginBottom: '16px' }}>
+                      <div
+                        className="reliability-bar-fill"
+                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+                      />
+                    </div>
+                    <div className="ec-buttons-row" style={{ marginBottom: '20px' }}>
                       {EC_LEVELS.map(lv => (
                         <button
                           key={lv.key}
@@ -1040,11 +1041,10 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-                    <div className="reliability-bar-track" style={{ marginTop: '8px' }}>
-                      <div
-                        className="reliability-bar-fill"
-                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
-                      />
+                    <div>
+                      <p className="ec-description" style={{ fontSize: '13px', opacity: 0.8 }}>
+                        {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
+                      </p>
                     </div>
                   </div>
                 </div>
