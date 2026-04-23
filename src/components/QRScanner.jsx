@@ -229,7 +229,7 @@ export default function QRScanner({ onBack }) {
       let msg = 'Failed to start camera.';
       const m = typeof err?.message === 'string' ? err.message : '';
       if (m.includes('NotAllowed') || m.includes('Permission'))
-        msg = 'Camera permission denied. Please allow camera access in Settings → Apps → MushiQR Pro → Permissions.';
+        msg = 'Camera permission denied. Please allow camera access in Settings → Apps → Mushi QR Pro → Permissions.';
       else if (m.includes('NotReadable') || m.includes('Could not start') || m.includes('in use'))
         msg = 'Camera is in use by another app. Close all camera apps, then try again.';
       else if (m.includes('NotFound') || m.includes('Requested device not found'))
