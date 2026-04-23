@@ -196,47 +196,6 @@ export default function App() {
   const [activePage, setActivePage] = useState('generator'); // 'generator', 'scanner', 'history'
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
-  const [isDataPopupOpen, setIsDataPopupOpen] = useState(false);
-  const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
-  const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
-
-  const MINI_PRESETS = [
-    '#000000', '#FFFFFF', '#FF007F', '#00F0FF', '#7000FF', '#00FF9D', 
-    '#FFD54F', '#FF5252', '#00E676', '#2979FF', '#FF9100', '#651FFF',
-    '#00E5FF', '#D500F9', '#1DE9B6', '#C6FF00'
-  ];
-
-  const ColorRow = ({ label, value, onChange, disabled }) => (
-    <div className="color-row">
-      <div className="color-row-label">{label}</div>
-      <div className="color-row-controls">
-        <div className="color-row-presets">
-          {MINI_PRESETS.map(c => (
-            <div 
-              key={c} 
-              className={`mini-swatch${value?.toUpperCase() === c.toUpperCase() ? ' active' : ''}`}
-              style={{ backgroundColor: c }}
-              onClick={() => !disabled && onChange(c)}
-            />
-          ))}
-        </div>
-        <ColorPicker 
-          className="compact-picker" 
-          label="Picker" 
-          value={value} 
-          onChange={onChange} 
-          onOpenAdvanced={handleOpenAdv}
-          disabled={disabled}
-        />
-      </div>
-    </div>
-  );
-
-  // Sync Logo Colors (Task 3)
-  useEffect(() => {
-    setLogoBgColor(bgColor);
-    setLogoOutlineColor(bgColor);
-  }, [bgColor]);
 
   // Resolve Auto Theme
   useEffect(() => {
@@ -303,6 +262,9 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
 
+  // ── Advanced Picker State ──
+  const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
+  const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
   const [selectedFormat, setSelectedFormat] = useState('PNG');
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
@@ -793,57 +755,68 @@ export default function App() {
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
-                  <div style={{ padding: '20px 0' }}>
-                    <label className="panel-label">Choose QR Type</label>
-                    <QRTypeSelector 
-                      activeType={qrType} 
-                      onTypeChange={(t) => {
-                        setQrType(t);
-                        setIsDataPopupOpen(true);
-                      }} 
-                    />
+                  <div>
+                    <label className="panel-label">Type Content</label>
+                    <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
                   </div>
-                  
-                  {isDataPopupOpen && (
-                    <div className="advanced-picker-overlay" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)' }}>
-                      <div className="advanced-picker-container" style={{ paddingBottom: '40px' }}>
-                        <header className="picker-header">
-                          <button className="picker-close" onClick={() => setIsDataPopupOpen(false)}><X size={20} /></button>
-                          <div style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>{qrType} Content</div>
-                          <button className="picker-confirm" onClick={() => setIsDataPopupOpen(false)}><Check size={20} /></button>
-                        </header>
-                        <div style={{ padding: '20px 0' }}>
-                          <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  <div style={{ marginTop: 'auto' }}>
+                    <label className="panel-label">QR Code Type</label>
+                    <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
+                  </div>
                 </div>
               )}
 
               {/* Color Tab */}
               {activeTab === 'color' && (
-                <div className="tab-panel fade-in" id="panel-color" style={{ overflowY: 'auto', maxHeight: '500px' }}>
-                  <div className="color-settings-grid">
-                    <ColorRow label="Background Color" value={bgColor} onChange={setBgColor} />
-                    <ColorRow label="Dots Color" value={qrColor} onChange={setQrColor} />
-                    
-                    <div className="toggle-row" style={{ padding: '8px 0', borderTop: '1px solid var(--border-color)' }}>
+                <div className="tab-panel fade-in" id="panel-color">
+                  <div>
+                    <div className="eye-colors-grid">
+                      <ColorPicker className="compact-picker" label="Background" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
+                      <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                    </div>
+
+                    <div className="toggle-row" style={{ marginBottom: '12px' }}>
                       <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
                     </div>
 
-                    <ColorRow 
-                      label="Inner Eyes Color" 
-                      value={syncEyes ? qrColor : (eyeColor || qrColor)} 
-                      onChange={setEyeColor} 
-                      disabled={syncEyes}
-                    />
-                    <ColorRow 
-                      label="Outer Eyes Color" 
-                      value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
-                      onChange={setEyeOuterColor} 
-                      disabled={syncEyes}
-                    />
+                    <div className="eye-colors-grid">
+                      <ColorPicker 
+                        className="compact-picker" 
+                        label="Inner Eyes" 
+                        value={syncEyes ? qrColor : (eyeColor || qrColor)} 
+                        onChange={setEyeColor} 
+                        onOpenAdvanced={handleOpenAdv}
+                        disabled={syncEyes}
+                      />
+                      <ColorPicker 
+                        className="compact-picker" 
+                        label="Outer Eyes" 
+                        value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
+                        onChange={setEyeOuterColor} 
+                        onOpenAdvanced={handleOpenAdv}
+                        disabled={syncEyes}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: 'auto' }}>
+                    <label className="panel-label">Quick Presets</label>
+                    <div className="color-presets-row">
+                      {COLOR_PRESETS.map(preset => (
+                        <div
+                          key={preset.name}
+                          className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
+                          title={preset.name}
+                          style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                          onClick={() => {
+                            setQrColor(preset.qr);
+                            setBgColor(preset.bg);
+                            setBgTransparent(false);
+                            setActivePreset(preset.name);
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

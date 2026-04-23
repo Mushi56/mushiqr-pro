@@ -1,5 +1,4 @@
-import { useState, useRef } from 'react';
-import { UploadCloud, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const LOGO_PRESETS = [
   { slug: 'whatsapp', name: 'WhatsApp', color: '#25D366', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/70/af/4a/70af4af2-a08e-a810-b6d5-42027416f9f1/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-85-220.png/512x512bb.jpg' },
@@ -21,9 +20,8 @@ const LOGO_PRESETS = [
   { slug: 'spotify', name: 'Spotify', color: '#1DB954', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/22/32/d22232a2-e63b-1f9c-cf70-3029be26b00c/AppIcon-0-0-1x_U007epad-0-1-0-0-sRGB-85-220.png/512x512bb.jpg' },
 ];
 
-export default function LogoPresets({ onLogoChange, logo }) {
+export default function LogoPresets({ onLogoChange }) {
   const [loading, setLoading] = useState(null);
-  const fileInputRef = useRef(null);
 
   const handleSelect = (slug, name, url) => {
     setLoading(slug);
@@ -47,56 +45,21 @@ export default function LogoPresets({ onLogoChange, logo }) {
     img.src = src;
   };
 
-  const handleFileUpload = (file) => {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        onLogoChange({
-          image: img,
-          name: file.name,
-          size: 0,
-          src: e.target.result
-        });
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-
   return (
     <div className="logo-presets-container">
       <div className="logo-presets-grid">
-        {/* Upload Button (Task 8) */}
-        <button 
-          className="logo-preset-btn upload-btn"
-          onClick={() => fileInputRef.current?.click()}
-          style={{ border: '2px dashed var(--border-color)', background: 'var(--bg-elevated)', display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', justifyContent: 'center' }}
-        >
-          <UploadCloud size={24} color="var(--accent-primary)" />
-          <span style={{ fontSize: '10px', fontWeight: 'bold', color: 'var(--text-secondary)' }}>Upload</span>
-        </button>
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          style={{ display: 'none' }} 
-          accept="image/*"
-          onChange={(e) => handleFileUpload(e.target.files?.[0])}
-        />
-
-        {LOGO_PRESETS.map((logoItem) => (
+        {LOGO_PRESETS.map((logo) => (
           <button
-            key={logoItem.slug}
-            className={`logo-preset-btn ${loading === logoItem.slug ? 'loading' : ''}`}
-            onClick={() => handleSelect(logoItem.slug, logoItem.name, logoItem.url)}
-            title={logoItem.name}
-            style={{ '--brand-color': logoItem.color }}
+            key={logo.slug}
+            className={`logo-preset-btn ${loading === logo.slug ? 'loading' : ''}`}
+            onClick={() => handleSelect(logo.slug, logo.name, logo.url)}
+            title={logo.name}
+            style={{ '--brand-color': logo.color }}
           >
             <div className="logo-preset-icon">
               <img 
-                src={logoItem.url} 
-                alt={logoItem.name} 
+                src={logo.url} 
+                alt={logo.name} 
                 loading="lazy"
                 crossOrigin="anonymous"
               />
