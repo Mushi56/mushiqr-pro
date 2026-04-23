@@ -777,7 +777,7 @@ export default function App() {
                           onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} 
                           onOpenAdvanced={handleOpenAdv} 
                         />
-                        {SWATCH_PRESETS.map(color => (
+                        {[ '#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2) ].map(color => (
                           <div 
                             key={color} 
                             className={`swatch-item${bgColor === color ? ' active' : ''}`}
@@ -1023,12 +1023,6 @@ export default function App() {
                 <div className="tab-panel fade-in" id="panel-scan">
                   <div style={{ marginTop: 'auto' }}>
                     <label className="panel-label">Scan Reliability</label>
-                    <div className="reliability-bar-track" style={{ marginTop: '12px', marginBottom: '16px' }}>
-                      <div
-                        className="reliability-bar-fill"
-                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
-                      />
-                    </div>
                     <div className="ec-buttons-row" style={{ marginBottom: '20px' }}>
                       {EC_LEVELS.map(lv => (
                         <button
@@ -1040,6 +1034,12 @@ export default function App() {
                           <span className="ec-btn-pct">{lv.pct}</span>
                         </button>
                       ))}
+                    </div>
+                    <div className="reliability-bar-track" style={{ marginBottom: '20px' }}>
+                      <div
+                        className="reliability-bar-fill"
+                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+                      />
                     </div>
                     <div>
                       <p className="ec-description" style={{ fontSize: '13px', opacity: 0.8 }}>
