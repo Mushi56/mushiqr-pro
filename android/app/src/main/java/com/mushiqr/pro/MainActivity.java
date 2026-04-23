@@ -1,31 +1,38 @@
 package com.mushiqr.pro;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.webkit.WebChromeClient;
-import android.webkit.PermissionRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
 
+    private static final int CAMERA_REQUEST_CODE = 100;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+        // Request Android-level camera permission immediately on launch.
+        // This ensures the system permission is granted BEFORE the WebView
+        // ever tries to use getUserMedia(). Capacitor's BridgeWebChromeClient
+        // already handles the WebView-level onPermissionRequest by launching
+        // a permission dialog, but if the Android permission is already granted,
+        // it auto-grants instantly without showing a dialog.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{ Manifest.permission.CAMERA },
+                    CAMERA_REQUEST_CODE);
+        }
 
-        // Grant WebView camera/microphone permission requests automatically.
-        // This is CRITICAL for html5-qrcode to access the camera inside the WebView.
+        // Configure WebView for camera streaming
         WebView webView = getBridge().getWebView();
-        webView.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public void onPermissionRequest(PermissionRequest request) {
-                // Auto-grant camera and microphone permissions to the WebView
-                request.grant(request.getResources());
-            }
-        });
+        WebSettings settings = webView.getSettings();
+        settings.setMediaPlaybackRequiresUserGesture(false);
     }
 }
