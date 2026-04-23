@@ -18,12 +18,8 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
-/**
- * Production QR Scanner — auto-opens camera on entry,
- * auto-redirects URL results to the device browser.
- */
 export default function QRScanner({ onBack }) {
-  const [status, setStatus] = useState('LOADING'); // start in LOADING immediately
+  const [status, setStatus] = useState('LOADING');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
@@ -34,19 +30,16 @@ export default function QRScanner({ onBack }) {
   const mountedRef = useRef(true);
   const busyRef = useRef(false);
 
-  // Track mount
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
 
-  // Android hardware back button
   useEffect(() => {
     const lp = App.addListener('backButton', () => safeBack());
     return () => { lp.then(l => l.remove()).catch(() => {}); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Hard cleanup on unmount
   useEffect(() => {
     return () => {
       const qr = html5QrRef.current;
@@ -58,7 +51,6 @@ export default function QRScanner({ onBack }) {
     };
   }, []);
 
-  // ─── Stop scanner safely ───
   const stopScanner = useCallback(async () => {
     busyRef.current = false;
     const qr = html5QrRef.current;
@@ -68,13 +60,11 @@ export default function QRScanner({ onBack }) {
     html5QrRef.current = null;
   }, []);
 
-  // ─── Back navigation ───
   const safeBack = useCallback(() => {
     stopScanner();
     if (onBack) onBack();
   }, [stopScanner, onBack]);
 
-  // ─── Check if text is a URL ───
   const isURL = useCallback((text) => {
     try {
       const u = new URL(text);
@@ -82,31 +72,23 @@ export default function QRScanner({ onBack }) {
     } catch { return false; }
   }, []);
 
-  // ─── Handle scanned result ───
   const handleScanResult = useCallback((decodedText) => {
     if (!mountedRef.current) return;
-
-    // If it's a URL, open it directly in the default browser
     if (isURL(decodedText)) {
       stopScanner();
-      // On native Android, use the system browser
       if (Capacitor.isNativePlatform()) {
         window.open(decodedText, '_system');
       } else {
         window.open(decodedText, '_blank');
       }
-      // Go back to generator after opening
       if (onBack) onBack();
       return;
     }
-
-    // For non-URL content, show the result card
     setResult(decodedText);
     setStatus('RESULT');
     stopScanner();
   }, [isURL, stopScanner, onBack]);
 
-  // ─── Start scanning ───
   const startScanner = useCallback(async () => {
     if (busyRef.current) return;
     busyRef.current = true;
@@ -131,10 +113,10 @@ export default function QRScanner({ onBack }) {
       const config = {
         fps: 10,
         qrbox: (vw, vh) => {
-          const s = Math.floor(Math.min(vw, vh) * 0.65);
+          const s = Math.floor(Math.min(vw, vh) * 0.7);
           return { width: s, height: s };
         },
-        aspectRatio: 1.0,
+        aspectRatio: 0.75, // 3:4 aspect ratio (taller)
         disableFlip: false,
       };
 
@@ -182,29 +164,25 @@ export default function QRScanner({ onBack }) {
     }
   }, [facingBack, stopScanner, handleScanResult]);
 
-  // ─── AUTO-START camera on mount ───
+  // Auto-start camera on mount
   useEffect(() => {
-    // Small delay to let the DOM render the viewport div first
     const timer = setTimeout(() => {
       if (mountedRef.current) startScanner();
     }, 200);
     return () => clearTimeout(timer);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ─── Switch camera ───
   const switchCamera = useCallback(async () => {
     await stopScanner();
     setFacingBack(p => !p);
     setTimeout(() => { if (mountedRef.current) startScanner(); }, 400);
   }, [stopScanner, startScanner]);
 
-  // ─── Close live scanner ───
   const closeScanner = useCallback(async () => {
     await stopScanner();
     if (mountedRef.current) safeBack();
   }, [stopScanner, safeBack]);
 
-  // ─── Scan from file ───
   const handleFileUpload = async (file) => {
     if (!file) return;
     await stopScanner();
@@ -223,7 +201,6 @@ export default function QRScanner({ onBack }) {
     }
   };
 
-  // ─── Copy ───
   const handleCopy = async () => {
     if (!result) return;
     try { await navigator.clipboard.writeText(result); } catch {
@@ -236,31 +213,24 @@ export default function QRScanner({ onBack }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ─── Render ───
   const showViewport = status !== 'RESULT';
 
   return (
     <div className="scanner-page fade-in">
       <div className="scanner-container">
 
-        {/* ── HEADER: always visible ── */}
+        {/* Header */}
         <header className="scanner-nav-header">
           <button className="scanner-back-btn" onClick={safeBack} aria-label="Go back">
             <ArrowLeft size={22} />
           </button>
           <div className="scanner-nav-title"><h3>QR Scanner</h3></div>
-          {/* Gallery upload button in header */}
-          <button className="scanner-back-btn" onClick={() => fileInputRef.current?.click()} aria-label="Upload from gallery">
-            <ImagePlus size={20} />
-          </button>
-          <input type="file" ref={fileInputRef} accept="image/*"
-                 onChange={e => handleFileUpload(e.target.files?.[0])}
-                 style={{ display: 'none' }} />
+          <div style={{ width: 42 }} />
         </header>
 
         <div className="scanner-main-content">
 
-          {/* ── RESULT CARD (non-URL results only) ── */}
+          {/* RESULT CARD */}
           {status === 'RESULT' && (
             <div className="scanner-result-overlay fade-in">
               <div className="scanner-result-card">
@@ -283,11 +253,11 @@ export default function QRScanner({ onBack }) {
             </div>
           )}
 
-          {/* ── SCANNER AREA ── */}
+          {/* SCANNER AREA */}
           {showViewport && (
             <div className="scanner-viewport-wrapper">
 
-              {/* html5-qrcode owns this div — React never puts children in it */}
+              {/* Camera viewport — html5-qrcode owns this */}
               <div
                 id="qr-scanner-viewport"
                 className="scanner-view-box"
@@ -296,6 +266,13 @@ export default function QRScanner({ onBack }) {
                   position: status === 'SCANNING' ? 'relative' : 'absolute',
                 }}
               />
+
+              {/* Animated scan line only (no corner boxes) */}
+              {status === 'SCANNING' && (
+                <div className="scanner-overlay-guide">
+                  <div className="scanner-laser-line" />
+                </div>
+              )}
 
               {/* LOADING overlay */}
               {status === 'LOADING' && (
@@ -319,25 +296,45 @@ export default function QRScanner({ onBack }) {
                   </div>
                 </div>
               )}
+            </div>
+          )}
 
-              {/* Scanning overlay: corners + controls */}
-              {status === 'SCANNING' && (
-                <div className="scanner-overlay-guide">
-                  <div className="guide-box">
-                    <div className="corner tl" /><div className="corner tr" />
-                    <div className="corner bl" /><div className="corner br" />
-                    <div className="laser-line" />
-                  </div>
-                  <div className="scanner-controls-overlay">
-                    <button className="overlay-icon-btn" onClick={switchCamera} title="Switch Camera">
-                      <RefreshCcw size={20} />
-                    </button>
-                    <button className="overlay-icon-btn close" onClick={closeScanner}>
-                      <X size={20} />
-                    </button>
-                  </div>
-                </div>
-              )}
+          {/* CONTROLS BAR — below camera preview */}
+          {status === 'SCANNING' && (
+            <div className="scanner-controls-bar">
+              <button className="scanner-ctrl-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
+                <ImagePlus size={22} />
+                <span>Gallery</span>
+              </button>
+              <button className="scanner-ctrl-btn primary" onClick={switchCamera} title="Switch Camera">
+                <RefreshCcw size={22} />
+                <span>Flip</span>
+              </button>
+              <button className="scanner-ctrl-btn danger" onClick={closeScanner} title="Close Scanner">
+                <X size={22} />
+                <span>Close</span>
+              </button>
+              <input type="file" ref={fileInputRef} accept="image/*"
+                     onChange={e => handleFileUpload(e.target.files?.[0])}
+                     style={{ display: 'none' }} />
+            </div>
+          )}
+
+          {/* Controls for error/loading states */}
+          {(status === 'LOADING' || status === 'ERROR') && (
+            <div className="scanner-controls-bar">
+              <button className="scanner-ctrl-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
+                <ImagePlus size={22} />
+                <span>Gallery</span>
+              </button>
+              <div style={{ flex: 1 }} />
+              <button className="scanner-ctrl-btn danger" onClick={closeScanner} title="Close Scanner">
+                <X size={22} />
+                <span>Close</span>
+              </button>
+              <input type="file" ref={fileInputRef} accept="image/*"
+                     onChange={e => handleFileUpload(e.target.files?.[0])}
+                     style={{ display: 'none' }} />
             </div>
           )}
         </div>

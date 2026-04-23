@@ -1,13 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ========================================
-   DESIGN SYSTEM â€” QR Code Generator Pro
+   DESIGN SYSTEM Ã¢â‚¬â€ QR Code Generator Pro
    ======================================== */
 
 :root {
-  /* Colors â€” Dark Theme (Ultra-Premium, Sleek Dark Mode) */
+  /* Colors Ã¢â‚¬â€ Dark Theme (Ultra-Premium, Sleek Dark Mode) */
   --bg-primary: #030305;
   --bg-secondary: #0A0A0F;
   --bg-tertiary: #12121A;
@@ -60,7 +60,7 @@
   --font-display: 'Outfit', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  /* Widened from 340px â€” gives controls room to breathe */
+  /* Widened from 340px Ã¢â‚¬â€ gives controls room to breathe */
   --sidebar-width: 400px;
   --header-height: 80px;
 
@@ -68,7 +68,7 @@
   --bg-dropdown-solid: #0D0D12;
 }
 
-/* Light Theme â€” High-end clean aesthetic */
+/* Light Theme Ã¢â‚¬â€ High-end clean aesthetic */
 [data-theme="light"] {
   --bg-primary: #FDFDFF;
   --bg-secondary: #FFFFFF;
@@ -280,7 +280,7 @@ body {
   box-shadow: 1px 0 10px rgba(0, 0, 0, 0.01);
 }
 
-/* Preview panel fills remaining height and never scrolls â€” it's always visible */
+/* Preview panel fills remaining height and never scrolls Ã¢â‚¬â€ it's always visible */
 .preview-panel {
   flex: 1;
   display: flex;
@@ -1104,7 +1104,7 @@ input[type="range"]::-moz-range-thumb {
    with a chevron that opens a format-picker dropdown.
    ======================================== */
 
-/* â”€â”€ Unified Save Split Button â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Unified Save Split Button Ã¢â€â‚¬Ã¢â€â‚¬ */
 .save-split-wrapper {
   position: relative;
   width: 100%;
@@ -1178,7 +1178,7 @@ input[type="range"]::-moz-range-thumb {
   background: rgba(0,0,0,0.1);
 }
 
-/* â”€â”€ Save Action Dropdown â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Save Action Dropdown Ã¢â€â‚¬Ã¢â€â‚¬ */
 .save-action-dropdown {
   position: absolute;
   bottom: calc(100% + 12px);
@@ -1514,7 +1514,7 @@ input[type="range"]::-moz-range-thumb {
   animation: spin 0.75s linear infinite;
 }
 
-/* Save to History button â€” sits alongside Copy and Share */
+/* Save to History button Ã¢â‚¬â€ sits alongside Copy and Share */
 .btn-save {
   flex: 1;
   display: flex;
@@ -1884,7 +1884,7 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
 }
 
-/* NAV TABS (in header â€” always visible on desktop) */
+/* NAV TABS (in header Ã¢â‚¬â€ always visible on desktop) */
 
 .header-nav {
   display: flex;
@@ -2038,7 +2038,7 @@ input[type="range"]::-moz-range-thumb {
     margin: 0 auto;
   }
 
-  /* Sidebar is normal flow â€” scrolls inside app-main */
+  /* Sidebar is normal flow Ã¢â‚¬â€ scrolls inside app-main */
   .sidebar {
     width: 100%;
     height: auto;
@@ -2074,7 +2074,7 @@ input[type="range"]::-moz-range-thumb {
     font-size: 18px;
   }
 
-  /* Hide nav tabs on mobile â€” hamburger menu handles navigation */
+  /* Hide nav tabs on mobile Ã¢â‚¬â€ hamburger menu handles navigation */
   .header-nav {
     display: none;
   }
@@ -2227,7 +2227,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 17 â€” Theme Toggle Tooltip
+   FIX 17 Ã¢â‚¬â€ Theme Toggle Tooltip
    ======================================== */
 
 .theme-toggle-wrapper {
@@ -2258,7 +2258,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 18 â€” Color Palette Presets
+   FIX 18 Ã¢â‚¬â€ Color Palette Presets
    ======================================== */
 
 .color-presets {
@@ -2287,7 +2287,7 @@ input[type="range"]::-moz-range-thumb {
   z-index: 10;
 }
 
-/* Active state â€” shows which preset is currently applied */
+/* Active state Ã¢â‚¬â€ shows which preset is currently applied */
 .color-preset-swatch.active {
   box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary), 0 4px 12px rgba(0,0,0,0.3);
   transform: translateY(-2px);
@@ -2295,7 +2295,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 19 â€” QR Type Quick Templates
+   FIX 19 Ã¢â‚¬â€ QR Type Quick Templates
    ======================================== */
 
 .quick-templates {
@@ -2354,7 +2354,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 20 â€” Scan Me Frame
+   FIX 20 Ã¢â‚¬â€ Scan Me Frame
    ======================================== */
 
 .scan-frame-toggle {
@@ -2415,7 +2415,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 26 â€” Phone Mockup Frame
+   FIX 26 Ã¢â‚¬â€ Phone Mockup Frame
    ======================================== */
 
 .phone-preview-toggle {
@@ -2500,7 +2500,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 15 â€” Loading state for download buttons (already has spin)
+   FIX 15 Ã¢â‚¬â€ Loading state for download buttons (already has spin)
    ======================================== */
 
 .download-btn-icon {
@@ -2510,7 +2510,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 10 â€” Logo fallback
+   FIX 10 Ã¢â‚¬â€ Logo fallback
    ======================================== */
 
 .app-logo-fallback {
@@ -2525,7 +2525,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   FIX 7 â€” Share button
+   FIX 7 Ã¢â‚¬â€ Share button
    ======================================== */
 
 .btn-share {
@@ -2660,13 +2660,13 @@ input[type="range"]::-moz-range-thumb {
   line-height: 1;
 }
 
-/* Icon slot â€” always first child (svg from lucide) */
+/* Icon slot Ã¢â‚¬â€ always first child (svg from lucide) */
 .app-menu-item > svg {
   flex-shrink: 0;
   opacity: 0.7;
 }
 
-/* Label slot â€” the span text */
+/* Label slot Ã¢â‚¬â€ the span text */
 .app-menu-item > .menu-label {
   flex: 1;
 }
@@ -3239,10 +3239,10 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* ========================================
-   REDESIGNED UI â€” Bottom Nav + Tab Panels
+   REDESIGNED UI Ã¢â‚¬â€ Bottom Nav + Tab Panels
    ======================================== */
 
-/* â”€â”€ App Layout (Redesigned) â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ App Layout (Redesigned) Ã¢â€â‚¬Ã¢â€â‚¬ */
 .app.redesigned {
   display: flex;
   flex-direction: column;
@@ -3268,7 +3268,7 @@ input[type="range"]::-moz-range-thumb {
   -webkit-overflow-scrolling: touch;
 }
 
-/* â”€â”€ QR Preview Card â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ QR Preview Card Ã¢â€â‚¬Ã¢â€â‚¬ */
 .qr-preview-card {
   position: sticky;
   top: 0;
@@ -3356,7 +3356,7 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: none;
 }
 
-/* â”€â”€ QR Action Buttons Row â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ QR Action Buttons Row Ã¢â€â‚¬Ã¢â€â‚¬ */
 .qr-action-row {
   display: flex;
   gap: 10px;
@@ -3403,7 +3403,7 @@ input[type="range"]::-moz-range-thumb {
   max-width: 360px;
 }
 
-/* â”€â”€ Bottom Navigation Bar â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Bottom Navigation Bar Ã¢â€â‚¬Ã¢â€â‚¬ */
 .bottom-nav {
   display: flex;
   align-items: stretch;
@@ -3492,7 +3492,7 @@ input[type="range"]::-moz-range-thumb {
   line-height: 1;
 }
 
-/* â”€â”€ Tab Panel Area â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Tab Panel Area Ã¢â€â‚¬Ã¢â€â‚¬ */
 .tab-panel-area {
   flex: 1;
   padding: 0;
@@ -3535,7 +3535,7 @@ input[type="range"]::-moz-range-thumb {
   margin-top: 0;
 }
 
-/* â”€â”€ Color Presets Row (Horizontal Scroll) â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Color Presets Row (Horizontal Scroll) Ã¢â€â‚¬Ã¢â€â‚¬ */
 .color-presets-row {
   display: flex;
   gap: 12px;
@@ -3574,7 +3574,7 @@ input[type="range"]::-moz-range-thumb {
   transform: translateY(-2px);
 }
 
-/* â”€â”€ Sync Eyes Toggle â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Sync Eyes Toggle Ã¢â€â‚¬Ã¢â€â‚¬ */
 .toggle-row {
   display: flex;
   align-items: center;
@@ -3590,7 +3590,7 @@ input[type="range"]::-moz-range-thumb {
   flex: 1;
 }
 
-/* â”€â”€ Frame Options List â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Frame Options List Ã¢â€â‚¬Ã¢â€â‚¬ */
 .frame-options-list {
   display: flex;
   gap: 8px;
@@ -3676,7 +3676,7 @@ input[type="range"]::-moz-range-thumb {
   background: rgba(0,240,255,0.06);
 }
 
-/* â”€â”€ EC Level Buttons â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ EC Level Buttons Ã¢â€â‚¬Ã¢â€â‚¬ */
 .logo-presets-grid {
   display: flex;
   gap: 8px;
@@ -3810,7 +3810,7 @@ input[type="range"]::-moz-range-thumb {
   color: var(--accent-primary);
 }
 
-/* â”€â”€ Reliability Bar â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Reliability Bar Ã¢â€â‚¬Ã¢â€â‚¬ */
 .reliability-bar-track {
   width: 100%;
   height: 8px;
@@ -3833,7 +3833,7 @@ input[type="range"]::-moz-range-thumb {
   margin: 0;
 }
 
-/* â”€â”€ Desktop / Tablet: Wider Layout â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Desktop / Tablet: Wider Layout Ã¢â€â‚¬Ã¢â€â‚¬ */
 @media (min-width: 768px) {
   .app.redesigned .app-header {
     height: 64px;
@@ -3891,7 +3891,7 @@ input[type="range"]::-moz-range-thumb {
   }
 }
 
-/* â”€â”€ Header Menu â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Header Menu Ã¢â€â‚¬Ã¢â€â‚¬ */
 .app-header-actions {
   display: flex;
   align-items: center;
@@ -4005,7 +4005,7 @@ input[type="range"]::-moz-range-thumb {
   background: #f9fafb;
 }
 
-/* â”€â”€ Advanced Color Picker â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Advanced Color Picker Ã¢â€â‚¬Ã¢â€â‚¬ */
 .advanced-picker-overlay {
   position: fixed;
   inset: 0;
@@ -4313,7 +4313,7 @@ input[type="range"]::-moz-range-thumb {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* â”€â”€ Premium Logo Upload (Sleek Redesign) â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Premium Logo Upload (Sleek Redesign) Ã¢â€â‚¬Ã¢â€â‚¬ */
 .logo-compact-upload-fixed {
   width: 100%;
   padding: 16px 20px;
@@ -4410,7 +4410,7 @@ input[type="range"]::-moz-range-thumb {
   letter-spacing: normal;
 }
 
-/* â”€â”€ Active Logo Card â”€â”€ */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Active Logo Card Ã¢â€â‚¬Ã¢â€â‚¬ */
 .logo-compact-card-fixed {
   width: 100%;
   padding: 10px;
@@ -4500,7 +4500,7 @@ input[type="range"]::-moz-range-thumb {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── QR Scanner Redesign ── */
+/* â”€â”€ QR Scanner Redesign â”€â”€ */
 .scanner-page {
   position: fixed;
   top: 0;
@@ -4568,11 +4568,14 @@ input[type="range"]::-moz-range-thumb {
 .scanner-viewport-wrapper {
   width: 100%;
   max-width: 500px;
-  aspect-ratio: 1;
+  aspect-ratio: 3 / 4;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 0 auto;
 }
 
 .scanner-view-box {
@@ -4580,6 +4583,7 @@ input[type="range"]::-moz-range-thumb {
   height: 100%;
   background: #111;
   overflow: hidden;
+  border-radius: 16px;
 }
 
 .scanner-state-overlay {
@@ -4593,6 +4597,7 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
   background: #111;
   z-index: 5;
+  border-radius: 16px;
 }
 
 #qr-scanner-viewport {
@@ -4678,6 +4683,7 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
+/* â”€â”€ Laser scan line (no corner boxes) â”€â”€ */
 .scanner-overlay-guide {
   position: absolute;
   top: 0;
@@ -4685,95 +4691,74 @@ input[type="range"]::-moz-range-thumb {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  z-index: 4;
 }
 
-.guide-box {
-  width: 70%;
-  aspect-ratio: 1;
-  position: relative;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.corner {
+.scanner-laser-line {
   position: absolute;
-  width: 30px;
-  height: 30px;
-  border: 4px solid var(--accent-primary);
-}
-
-.corner.tl { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
-.corner.tr { top: -4px; right: -4px; border-left: 0; border-bottom: 0; }
-.corner.bl { bottom: -4px; left: -4px; border-right: 0; border-top: 0; }
-.corner.br { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
-
-.laser-line {
-  position: absolute;
-  top: 0;
-  left: 5%;
-  width: 90%;
-  height: 2px;
+  left: 8%;
+  width: 84%;
+  height: 3px;
   background: var(--accent-primary);
-  box-shadow: 0 0 15px var(--accent-primary);
-  animation: scan 3s infinite linear;
+  box-shadow: 0 0 20px var(--accent-primary), 0 0 60px var(--accent-primary);
+  border-radius: 2px;
+  animation: scan 3s infinite ease-in-out;
 }
 
 @keyframes scan {
-  0% { top: 5%; }
-  50% { top: 95%; }
-  100% { top: 5%; }
+  0% { top: 8%; }
+  50% { top: 92%; }
+  100% { top: 8%; }
 }
 
-.scanner-controls-overlay {
-  position: absolute;
-  bottom: 20px;
-  display: flex;
-  gap: 20px;
-  pointer-events: auto;
-}
-
-.overlay-icon-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+/* â”€â”€ Controls bar below camera â”€â”€ */
+.scanner-controls-bar {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(5px);
+  justify-content: space-around;
+  padding: 20px 16px;
+  gap: 12px;
 }
 
-.overlay-icon-btn.close {
-  background: rgba(255, 77, 77, 0.2);
-  border-color: rgba(255, 77, 77, 0.3);
-}
-
-.scanner-alt-actions {
-  margin-top: 40px;
+.scanner-ctrl-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.alt-upload-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: white;
-  font-weight: 500;
+  gap: 6px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
+  transition: all 0.2s;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  min-width: 72px;
 }
 
+.scanner-ctrl-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.scanner-ctrl-btn.primary {
+  background: rgba(var(--accent-primary-rgb, 216, 27, 96), 0.15);
+  border-color: rgba(var(--accent-primary-rgb, 216, 27, 96), 0.3);
+  color: var(--accent-primary);
+}
+
+.scanner-ctrl-btn.danger {
+  background: rgba(255, 77, 77, 0.12);
+  border-color: rgba(255, 77, 77, 0.25);
+  color: #ff6b6b;
+}
+
+/* â”€â”€ Result overlay â”€â”€ */
 .scanner-result-overlay {
   position: absolute;
   top: 0;
@@ -4893,3 +4878,4 @@ input[type="range"]::-moz-range-thumb {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
