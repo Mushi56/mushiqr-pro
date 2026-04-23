@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { UploadCloud, X, CheckCircle2 } from 'lucide-react';
 
 const LOGO_PRESETS = [
   { slug: 'whatsapp', name: 'WhatsApp', color: '#25D366', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/70/af/4a/70af4af2-a08e-a810-b6d5-42027416f9f1/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-0-85-220.png/512x512bb.jpg' },
@@ -20,13 +21,30 @@ const LOGO_PRESETS = [
   { slug: 'spotify', name: 'Spotify', color: '#1DB954', url: 'https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d2/22/32/d22232a2-e63b-1f9c-cf70-3029be26b00c/AppIcon-0-0-1x_U007epad-0-1-0-0-sRGB-85-220.png/512x512bb.jpg' },
 ];
 
-export default function LogoPresets({ onLogoChange }) {
+export default function LogoPresets({ logo, onLogoChange, onLogoRemove }) {
   const [loading, setLoading] = useState(null);
+  const inputRef = useRef(null);
+
+  const handleFile = useCallback((file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        onLogoChange({
+          image: img,
+          name: file.name,
+          size: file.size,
+          src: e.target.result,
+        });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }, [onLogoChange]);
 
   const handleSelect = (slug, name, url) => {
     setLoading(slug);
-    const src = url;
-    
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
@@ -34,7 +52,7 @@ export default function LogoPresets({ onLogoChange }) {
         image: img,
         name: name,
         size: 0,
-        src: src,
+        src: url,
       });
       setLoading(null);
     };
@@ -42,27 +60,46 @@ export default function LogoPresets({ onLogoChange }) {
       console.error(`Failed to load logo: ${name}`);
       setLoading(null);
     };
-    img.src = src;
+    img.src = url;
   };
 
   return (
     <div className="logo-presets-container">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/svg+xml,image/webp"
+        onChange={(e) => e.target.files[0] && handleFile(e.target.files[0])}
+        hidden
+      />
       <div className="logo-presets-grid">
-        {LOGO_PRESETS.map((logo) => (
+        {/* Upload Tile */}
+        <button
+          className={`logo-preset-btn upload-tile ${logo && !LOGO_PRESETS.some(p => p.url === logo.src) ? 'active' : ''}`}
+          onClick={() => logo && !LOGO_PRESETS.some(p => p.url === logo.src) ? onLogoRemove() : inputRef.current?.click()}
+          title="Upload Custom Logo"
+          style={{ background: 'var(--bg-elevated)', border: '2px dashed var(--border-light)' }}
+        >
+          {logo && !LOGO_PRESETS.some(p => p.url === logo.src) ? (
+            <div className="logo-preset-icon" style={{ position: 'relative' }}>
+              <img src={logo.src} alt="Custom" style={{ opacity: 0.5 }} />
+              <X size={16} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--error)' }} />
+            </div>
+          ) : (
+            <UploadCloud size={24} color="var(--accent-primary)" />
+          )}
+        </button>
+
+        {LOGO_PRESETS.map((p) => (
           <button
-            key={logo.slug}
-            className={`logo-preset-btn ${loading === logo.slug ? 'loading' : ''}`}
-            onClick={() => handleSelect(logo.slug, logo.name, logo.url)}
-            title={logo.name}
-            style={{ '--brand-color': logo.color }}
+            key={p.slug}
+            className={`logo-preset-btn ${loading === p.slug ? 'loading' : ''} ${logo?.src === p.url ? 'active' : ''}`}
+            onClick={() => handleSelect(p.slug, p.name, p.url)}
+            title={p.name}
+            style={{ '--brand-color': p.color }}
           >
             <div className="logo-preset-icon">
-              <img 
-                src={logo.url} 
-                alt={logo.name} 
-                loading="lazy"
-                crossOrigin="anonymous"
-              />
+              <img src={p.url} alt={p.name} loading="lazy" crossOrigin="anonymous" />
             </div>
           </button>
         ))}

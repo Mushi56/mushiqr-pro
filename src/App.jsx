@@ -925,8 +925,6 @@ export default function App() {
               {activeTab === 'logo' && (
                 <div className="tab-panel fade-in" id="panel-logo" style={{ overflowY: 'auto' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <LogoUpload logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
-
                     {logo && (
                       <>
                         <Slider
@@ -1006,8 +1004,11 @@ export default function App() {
                   </div>
 
                   <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
-                    <label className="panel-label">Quick Social Logos</label>
-                    <LogoPresets onLogoChange={setLogo} />
+                    <LogoPresets 
+                      logo={logo} 
+                      onLogoChange={setLogo} 
+                      onLogoRemove={() => setLogo(null)} 
+                    />
                   </div>
                 </div>
               )}
