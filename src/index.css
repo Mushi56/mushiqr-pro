@@ -5069,12 +5069,34 @@ input[type="range"]::-moz-range-thumb {
 
 .swatch-grid-mini {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding-bottom: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 2px 14px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.swatch-grid-mini::-webkit-scrollbar {
+  display: none;
+}
+
+.color-presets-row {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 2px 14px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.color-presets-row::-webkit-scrollbar {
+  display: none;
 }
 
 .swatch-item {
+  flex-shrink: 0;
   width: 44px;
   height: 44px;
   border-radius: 12px;
