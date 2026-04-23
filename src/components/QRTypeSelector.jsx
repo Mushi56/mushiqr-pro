@@ -14,21 +14,23 @@ import {
   Coins,
   MessageCircle,
   Play,
-  Calendar,
-  Instagram,
-  Facebook,
-  Linkedin,
-  Twitter
+  Calendar
 } from 'lucide-react';
+import { 
+  FaInstagram, 
+  FaFacebookF, 
+  FaXTwitter, 
+  FaLinkedinIn 
+} from 'react-icons/fa6';
 import { QR_TYPES } from '../utils/qrEngine';
 
 const TYPE_CONFIG = {
   [QR_TYPES.URL]: { icon: Link, label: 'URL' },
   [QR_TYPES.WIFI]: { icon: Wifi, label: 'WiFi' },
-  [QR_TYPES.INSTAGRAM]: { icon: Instagram, label: 'Instagram' },
-  [QR_TYPES.FACEBOOK]: { icon: Facebook, label: 'Facebook' },
-  [QR_TYPES.X]: { icon: Twitter, label: 'X' },
-  [QR_TYPES.LINKEDIN]: { icon: Linkedin, label: 'LinkedIn' },
+  [QR_TYPES.INSTAGRAM]: { icon: FaInstagram, label: 'Instagram' },
+  [QR_TYPES.FACEBOOK]: { icon: FaFacebookF, label: 'Facebook' },
+  [QR_TYPES.X]: { icon: FaXTwitter, label: 'X' },
+  [QR_TYPES.LINKEDIN]: { icon: FaLinkedinIn, label: 'LinkedIn' },
   [QR_TYPES.WHATSAPP]: { icon: MessageCircle, label: 'WhatsApp' },
   [QR_TYPES.TEXT]: { icon: Type, label: 'Text' },
   [QR_TYPES.PHONE]: { icon: Phone, label: 'Phone' },
