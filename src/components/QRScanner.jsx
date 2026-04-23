@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import {
   Camera,
   Copy,
@@ -65,29 +66,59 @@ export default function QRScanner({ onBack }) {
     if (onBack) onBack();
   }, [stopScanner, onBack]);
 
+  // Broader URL detection — catches http://, https://, and www. prefixed strings
   const isURL = useCallback((text) => {
+    if (!text || typeof text !== 'string') return false;
+    const trimmed = text.trim();
+    // Direct protocol check
     try {
-      const u = new URL(text);
-      return u.protocol === 'http:' || u.protocol === 'https:';
-    } catch { return false; }
+      const u = new URL(trimmed);
+      if (u.protocol === 'http:' || u.protocol === 'https:') return true;
+    } catch { /* not a full URL, try other patterns */ }
+    // Check for www. prefix (without protocol)
+    if (/^www\./i.test(trimmed)) return true;
+    // Check for common domain patterns like example.com, sub.example.org etc.
+    if (/^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.[a-z]{2,}(\/.*)?$/i.test(trimmed)) return true;
+    return false;
   }, []);
+
+  // Normalize URL — ensure it has a protocol prefix
+  const normalizeURL = useCallback((text) => {
+    const trimmed = text.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return 'https://' + trimmed;
+  }, []);
+
+  // Open URL in the device's default external browser (Chrome, etc.)
+  const openInBrowser = useCallback(async (url) => {
+    const fullUrl = normalizeURL(url);
+    if (Capacitor.isNativePlatform()) {
+      try {
+        // Browser.open launches the system default browser (Chrome, etc.)
+        await Browser.open({ url: fullUrl, windowName: '_system' });
+      } catch {
+        // Fallback if Browser plugin fails
+        window.open(fullUrl, '_system');
+      }
+    } else {
+      window.open(fullUrl, '_blank');
+    }
+  }, [normalizeURL]);
 
   const handleScanResult = useCallback((decodedText) => {
     if (!mountedRef.current) return;
     if (isURL(decodedText)) {
+      // URL detected → stop scanner, open in external browser, go back
       stopScanner();
-      if (Capacitor.isNativePlatform()) {
-        window.open(decodedText, '_system');
-      } else {
-        window.open(decodedText, '_blank');
-      }
+      openInBrowser(decodedText);
       if (onBack) onBack();
       return;
     }
+    // Non-URL content → show result card
     setResult(decodedText);
     setStatus('RESULT');
     stopScanner();
-  }, [isURL, stopScanner, onBack]);
+  }, [isURL, stopScanner, openInBrowser, onBack]);
 
   const startScanner = useCallback(async () => {
     if (busyRef.current) return;
