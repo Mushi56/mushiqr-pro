@@ -5122,3 +5122,19 @@ input[type="range"]::-moz-range-thumb {
 .row-picker-btn {
   margin-top: 0 !important;
 }
+
+.color-picker-swatch {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  background-color: var(--bg-card) !important;
+  box-shadow: 10px 0 15px -10px rgba(0,0,0,0.5);
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* Light mode background fix */
+[data-theme="light"] .color-picker-swatch {
+  background-color: #fff !important;
+  box-shadow: 10px 0 15px -10px rgba(0,0,0,0.1);
+}
