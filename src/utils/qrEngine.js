@@ -133,7 +133,7 @@ export const EYE_STYLES = {
   DIAMOND: 'diamond',
   GEOMETRIC: 'geometric',
   MODERN: 'modern',
-  DENSO: 'denso',
+  LCD: 'lcd',
 };
 
 // Frame styles
@@ -598,12 +598,27 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       // Hole
       ctx.moveTo(14, 6); ctx.lineTo(22, 14); ctx.lineTo(14, 22); ctx.lineTo(6, 14); ctx.closePath();
       break;
-    default: // SQUARE / DENSO
+    case EYE_STYLES.LCD:
+      // Handled separately below to allow for a unique segmented look
+      break;
+    default: // SQUARE
       ctx.rect(0, 0, 28, 28);
       ctx.rect(4, 4, 20, 20);
       break;
   }
   ctx.fill('evenodd');
+
+  // 1.1 Special case for LCD ring (if we want dashed look, we do it after fill)
+  if (style === EYE_STYLES.LCD) {
+    ctx.fillStyle = outerColor;
+    ctx.beginPath();
+    // Segmented bars to look like LCD
+    ctx.rect(6, 1, 16, 2.5);
+    ctx.rect(24.5, 6, 2.5, 16);
+    ctx.rect(6, 24.5, 16, 2.5);
+    ctx.rect(1, 6, 2.5, 16);
+    ctx.fill();
+  }
 
   // 2. Draw Inner Dot
   ctx.fillStyle = innerColor;
@@ -616,6 +631,7 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
     case EYE_STYLES.HEXAGON:
     case EYE_STYLES.STAR:
     case EYE_STYLES.HEART:
+    case EYE_STYLES.LCD:
       ctx.arc(14, 14, 6, 0, Math.PI * 2);
       break;
     case EYE_STYLES.TRIANGLE:
@@ -632,7 +648,7 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
     case EYE_STYLES.DIAMOND:
       ctx.moveTo(14, 8); ctx.lineTo(20, 14); ctx.lineTo(14, 20); ctx.lineTo(8, 14); ctx.closePath();
       break;
-    default: // SQUARE / DENSO
+    default: // SQUARE
       ctx.rect(8, 8, 12, 12);
       break;
   }

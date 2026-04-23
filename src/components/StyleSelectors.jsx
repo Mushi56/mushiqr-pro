@@ -166,10 +166,10 @@ const EYE_PREVIEWS = {
       <rect x="10" y="10" width="8" height="8" rx="0.5" fill="currentColor" />
     </svg>
   ),
-  [EYE_STYLES.DENSO]: (
+  [EYE_STYLES.LCD]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <rect x="0" y="0" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="4" />
-      <rect x="8" y="8" width="12" height="12" fill="currentColor" />
+      <path d="M4 2h20M26 4v20M24 26H4M2 24V4" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeDasharray="5 3" />
+      <rect x="9" y="9" width="10" height="10" rx="2" fill="currentColor" />
     </svg>
   ),
 };
