@@ -22,6 +22,10 @@ export const QR_TYPES = {
   CRYPTO: 'crypto',
   WHATSAPP: 'whatsapp',
   YOUTUBE: 'youtube',
+  INSTAGRAM: 'instagram',
+  FACEBOOK: 'facebook',
+  TWITTER: 'twitter',
+  LINKEDIN: 'linkedin',
 };
 
 export function formatQRData(type, data) {
@@ -68,6 +72,10 @@ export function formatQRData(type, data) {
     case QR_TYPES.WHATSAPP:
       return `https://wa.me/${(data.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(data.message || '')}`;
     case QR_TYPES.YOUTUBE:
+    case QR_TYPES.INSTAGRAM:
+    case QR_TYPES.FACEBOOK:
+    case QR_TYPES.TWITTER:
+    case QR_TYPES.LINKEDIN:
     case QR_TYPES.PDF:
     case QR_TYPES.IMAGE:
     case QR_TYPES.AUDIO:

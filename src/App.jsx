@@ -757,9 +757,6 @@ export default function App() {
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <label className="panel-label" style={{ textAlign: 'center', marginBottom: '20px', fontSize: '15px' }}>
-                      Select QR Content Type
-                    </label>
                     <QRTypeSelector 
                       activeType={qrType} 
                       onTypeChange={(type) => { 
