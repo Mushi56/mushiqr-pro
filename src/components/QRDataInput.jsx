@@ -67,7 +67,7 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
           <div className="input-recommendation">
             <Info size={12} style={{ marginRight: '4px' }} />
-            Stay under 300 for best scanning
+            Keeping it brief ensures a smooth scanning experience! ✨
           </div>
         </div>
       );
@@ -147,7 +147,7 @@ export default function QRDataInput({ type, data, onChange }) {
             </div>
             <div className="input-recommendation">
               <Info size={12} style={{ marginRight: '4px' }} />
-              Stay under 300 for best scanning
+              Keeping it brief ensures a smooth scanning experience! ✨
             </div>
           </div>
         </>
@@ -196,7 +196,7 @@ export default function QRDataInput({ type, data, onChange }) {
             </div>
             <div className="input-recommendation">
               <Info size={12} style={{ marginRight: '4px' }} />
-              Stay under 300 for best scanning
+              Keeping it brief ensures a smooth scanning experience! ✨
             </div>
           </div>
         </>
@@ -426,7 +426,7 @@ export default function QRDataInput({ type, data, onChange }) {
             </div>
             <div className="input-recommendation">
               <Info size={12} style={{ marginRight: '4px' }} />
-              Stay under 300 for best scanning
+              Keeping it brief ensures a smooth scanning experience! ✨
             </div>
           </div>
         </>
