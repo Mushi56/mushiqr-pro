@@ -614,7 +614,12 @@ export default function App() {
                         <circle cx="12" cy="12" r="10" />
                       </svg>
                     )}
-                    Theme: <span style={{ textTransform: 'capitalize', marginLeft: 4 }}>{theme}</span>
+                    Theme <span style={{ 
+                      textTransform: 'capitalize', 
+                      marginLeft: 4,
+                      color: theme === 'dark' ? '#818cf8' : theme === 'light' ? '#fbbf24' : '#2dd4bf',
+                      fontWeight: 'bold'
+                    }}>{theme}</span>
                   </button>
                   <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
                   <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
