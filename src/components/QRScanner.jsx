@@ -324,8 +324,8 @@ export default function QRScanner({ onBack }) {
           <button className="scanner-back-btn" onClick={safeBack} aria-label="Go back">
             <ArrowLeft size={22} />
           </button>
-          <div className="scanner-nav-title"><h3>QR Scanner</h3></div>
-          <div style={{ width: 42 }} />
+          <div className="scanner-nav-title"></div>
+          <div style={{ width: 44 }} />
         </header>
 
         <div className="scanner-main-content">
@@ -452,19 +452,19 @@ export default function QRScanner({ onBack }) {
             </div>
           )}
 
-          {/* CONTROLS BAR — redesigned with compact buttons matching type-tab style */}
+          {/* CONTROLS BAR — redesigned with Scan text in center */}
           {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
             <div className="scanner-controls-bar">
-              {/* Gallery button redesigned to match .type-tab style */}
-              <button className="type-tab" onClick={() => fileInputRef.current?.click()} style={{ flex: 'none', width: '64px', height: '64px' }}>
+              <button className="type-tab" onClick={() => fileInputRef.current?.click()}>
                 <span className="type-tab-icon">
                   <ImagePlus size={20} strokeWidth={1.5} />
                 </span>
                 Gallery
               </button>
               
-              {/* Close button redesigned to be more compact */}
-              <button className="type-tab active" onClick={closeScanner} style={{ flex: 'none', width: '64px', height: '64px' }}>
+              <div className="scanner-bar-title">Scan</div>
+
+              <button className="type-tab active" onClick={closeScanner}>
                 <span className="type-tab-icon">
                   <X size={20} strokeWidth={1.5} />
                 </span>
