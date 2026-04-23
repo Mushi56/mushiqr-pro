@@ -4657,8 +4657,8 @@ input[type="range"]::-moz-range-thumb {
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Gallery on left, Close on right */
-  padding: 30px 32px;
+  justify-content: space-between;
+  padding: 30px 20px; /* Matched core app side padding */
   z-index: 20;
 }
 
