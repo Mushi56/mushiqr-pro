@@ -294,28 +294,28 @@ export function renderQR(canvas, options) {
   }
 
   // Draw QR modules
-  for (let row = 0; row < moduleCount; row++) {
-    for (let col = 0; col < moduleCount; col++) {
-      if (!matrix[row][col]) continue;
+    for (let row = 0; row < moduleCount; row++) {
+      for (let col = 0; col < moduleCount; col++) {
+        const isFinder = isFinderPattern(row, col, moduleCount);
+        const x = contentX + (col + quietZone) * cellSize;
+        const y = contentY + (row + quietZone) * cellSize;
 
-      const x = contentX + (col + quietZone) * cellSize;
-      const y = contentY + (row + quietZone) * cellSize;
+        if (isFinder) {
+          const finderInfo = getFinderPatternInfo(row, col, moduleCount);
+          const relRow = row - (finderInfo.centerRow - 3);
+          const relCol = col - (finderInfo.centerCol - 3);
+          
+          // Only draw the entire eye once from the top-left cell (0,0 relative)
+          if (relRow === 0 && relCol === 0) {
+            const useEyeColor = eyeColor || (gradientEnabled ? gradientColor1 : qrColor);
+            const useEyeOuterColor = eyeOuterColor || useEyeColor;
+            drawEye(ctx, x, y, cellSize * 7, eyeStyle, useEyeOuterColor, useEyeColor);
+          }
+          continue;
+        }
 
-      const isFinder = isFinderPattern(row, col, moduleCount);
+        if (!matrix[row][col]) continue;
 
-      if (isFinder) {
-        const finderInfo = getFinderPatternInfo(row, col, moduleCount);
-        const useEyeColor = eyeColor || (gradientEnabled ? gradientColor1 : qrColor);
-        const useEyeOuterColor = eyeOuterColor || useEyeColor;
-        
-        const relRow = row - (finderInfo.centerRow - 3);
-        const relCol = col - (finderInfo.centerCol - 3);
-        const isOuterRing = relRow === 0 || relRow === 6 || relCol === 0 || relCol === 6;
-        const isInnerDot = relRow >= 2 && relRow <= 4 && relCol >= 2 && relCol <= 4;
-        
-        ctx.fillStyle = isOuterRing ? useEyeOuterColor : (isInnerDot ? useEyeColor : useEyeOuterColor);
-        drawEyeModule(ctx, x, y, cellSize, eyeStyle, row, col, finderInfo, moduleCount, options);
-      } else {
         const neighbors = {
           top: row > 0 && matrix[row-1][col] && !isFinderPattern(row-1, col, moduleCount),
           bottom: row < moduleCount - 1 && matrix[row+1][col] && !isFinderPattern(row+1, col, moduleCount),
@@ -326,7 +326,6 @@ export function renderQR(canvas, options) {
         drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, options);
       }
     }
-  }
 
   // Draw logo
   if (logo) {
@@ -483,89 +482,95 @@ function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = {}) {
 /**
  * Draw eye module
  */
-function drawEyeModule(ctx, x, y, size, style, row, col, finderInfo, moduleCount, options = {}) {
-  const eyePadding = options.eyePadding !== undefined ? options.eyePadding : 2;
-  const padding = (size * eyePadding) / 100;
-  const s = size - padding * 2;
-
+/**
+ * Draw the full 7x7 eye (finder pattern) as a single unit
+ */
+function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
+  const s = size / 28; // Scale factor from 28x28 coordinate space
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  
+  // 1. Draw Outer Ring (using even-odd fill for the hole)
+  ctx.fillStyle = outerColor;
+  ctx.beginPath();
   switch (style) {
-    case EYE_STYLES.ROUNDED:
-      drawRoundedRect(ctx, x + padding, y + padding, s, s, s * 0.35);
-      break;
     case EYE_STYLES.CIRCLE:
-      ctx.beginPath();
-      ctx.arc(x + size / 2, y + size / 2, s / 2, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.arc(14, 14, 14, 0, Math.PI * 2);
+      ctx.moveTo(24, 14);
+      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
       break;
-    case EYE_STYLES.LEAF: {
-      const r = s * 0.45;
-      ctx.beginPath();
-      ctx.moveTo(x + padding, y + padding);
-      ctx.lineTo(x + padding + s - r, y + padding);
-      ctx.arcTo(x + padding + s, y + padding, x + padding + s, y + padding + r, r);
-      ctx.lineTo(x + padding + s, y + padding + s);
-      ctx.lineTo(x + padding + r, y + padding + s);
-      ctx.arcTo(x + padding, y + padding + s, x + padding, y + padding + s - r, r);
-      ctx.closePath();
-      ctx.fill();
+    case EYE_STYLES.ROUNDED:
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 8);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, 4);
       break;
-    }
-    case EYE_STYLES.FLOWER: {
-      const cx = x + size / 2, cy = y + size / 2, r = s/2;
-      ctx.beginPath();
+    case EYE_STYLES.LEAF:
+      // Outer
+      ctx.moveTo(0, 0); ctx.lineTo(20, 0); ctx.quadraticCurveTo(28, 0, 28, 8); ctx.lineTo(28, 28); ctx.lineTo(8, 28); ctx.quadraticCurveTo(0, 28, 0, 20); ctx.closePath();
+      // Inner Hole
+      ctx.moveTo(4, 4); ctx.lineTo(20, 4); ctx.quadraticCurveTo(24, 4, 24, 8); ctx.lineTo(24, 24); ctx.lineTo(8, 24); ctx.quadraticCurveTo(4, 24, 4, 20); ctx.closePath();
+      break;
+    case EYE_STYLES.FLOWER:
+      // Outer Petals
       for (let i = 0; i < 12; i++) {
         const a = i * Math.PI / 6;
-        const pr = i % 2 === 0 ? r : r * 0.7;
-        ctx.lineTo(cx + pr * Math.cos(a), cy + pr * Math.sin(a));
+        const r = i % 2 === 0 ? 14 : 11;
+        ctx.lineTo(14 + r * Math.cos(a), 14 + r * Math.sin(a));
       }
-      ctx.closePath(); ctx.fill();
+      ctx.closePath();
+      // Hole
+      ctx.moveTo(14 + 10, 14);
+      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
       break;
-    }
-    case EYE_STYLES.SHIELD: {
-      ctx.beginPath();
-      ctx.moveTo(x + padding, y + padding);
-      ctx.lineTo(x + size - padding, y + padding);
-      ctx.lineTo(x + size - padding, y + size * 0.6);
-      ctx.quadraticCurveTo(x + size - padding, y + size - padding, x + size/2, y + size - padding);
-      ctx.quadraticCurveTo(x + padding, y + size - padding, x + padding, y + size * 0.6);
-      ctx.closePath(); ctx.fill();
+    case EYE_STYLES.SHIELD:
+      // Outer
+      ctx.moveTo(0, 2); ctx.lineTo(28, 2); ctx.lineTo(28, 14); ctx.quadraticCurveTo(28, 24, 14, 28); ctx.quadraticCurveTo(0, 24, 0, 14); ctx.closePath();
+      // Hole
+      ctx.moveTo(4, 6); ctx.lineTo(24, 6); ctx.lineTo(24, 14); ctx.quadraticCurveTo(24, 20, 14, 24); ctx.quadraticCurveTo(4, 20, 4, 14); ctx.closePath();
       break;
-    }
-    case EYE_STYLES.OCTAGON: {
-      const r = s / 2, cx = x + size / 2, cy = y + size / 2;
-      ctx.beginPath();
-      for (let i = 0; i < 8; i++) {
-        const a = (i * Math.PI / 4) + Math.PI / 8;
-        ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
-      }
-      ctx.closePath(); ctx.fill();
+    case EYE_STYLES.OCTAGON:
+      // Outer
+      ctx.moveTo(9, 0); ctx.lineTo(19, 0); ctx.lineTo(28, 9); ctx.lineTo(28, 19); ctx.lineTo(19, 28); ctx.lineTo(9, 28); ctx.lineTo(0, 19); ctx.lineTo(0, 9); ctx.closePath();
+      // Hole
+      ctx.moveTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24); ctx.lineTo(4, 18); ctx.lineTo(4, 10); ctx.closePath();
       break;
-    }
-    case EYE_STYLES.DIAMOND: {
-      ctx.beginPath();
-      ctx.moveTo(x + size / 2, y + padding);
-      ctx.lineTo(x + size - padding, y + size / 2);
-      ctx.lineTo(x + size / 2, y + size - padding);
-      ctx.lineTo(x + padding, y + size / 2);
-      ctx.closePath(); ctx.fill();
+    case EYE_STYLES.DIAMOND:
+      // Outer
+      ctx.moveTo(14, 0); ctx.lineTo(28, 14); ctx.lineTo(14, 28); ctx.lineTo(0, 14); ctx.closePath();
+      // Hole
+      ctx.moveTo(14, 6); ctx.lineTo(22, 14); ctx.lineTo(14, 22); ctx.lineTo(6, 14); ctx.closePath();
       break;
-    }
-    case EYE_STYLES.DENSO: {
-      const finderInfo = getFinderPatternInfo(row, col, moduleCount);
-      const relRow = row - (finderInfo.centerRow - 3);
-      const relCol = col - (finderInfo.centerCol - 3);
-      // Denso finder patterns are 7x7. Outer 1px frame, then 1px gap, then 3x3 inner square.
-      const isOuter = relRow === 0 || relRow === 6 || relCol === 0 || relCol === 6;
-      const isInner = relRow >= 2 && relRow <= 4 && relCol >= 2 && relCol <= 4;
-      if (isOuter || isInner) {
-         ctx.fillRect(x, y, size + 0.5, size + 0.5);
-      }
-      break;
-    }
-    default: // SQUARE
-      ctx.fillRect(x + padding, y + padding, s, s);
+    default: // SQUARE / DENSO
+      ctx.rect(0, 0, 28, 28);
+      ctx.rect(4, 4, 20, 20);
       break;
   }
+  ctx.fill('evenodd');
+
+  // 2. Draw Inner Dot
+  ctx.fillStyle = innerColor;
+  ctx.beginPath();
+  switch (style) {
+    case EYE_STYLES.CIRCLE:
+    case EYE_STYLES.FLOWER:
+    case EYE_STYLES.SHIELD:
+    case EYE_STYLES.OCTAGON:
+      ctx.arc(14, 14, 6, 0, Math.PI * 2);
+      break;
+    case EYE_STYLES.ROUNDED:
+    case EYE_STYLES.LEAF:
+      drawRoundedRectPath(ctx, 8, 8, 12, 12, 4);
+      break;
+    case EYE_STYLES.DIAMOND:
+      ctx.moveTo(14, 8); ctx.lineTo(20, 14); ctx.lineTo(14, 20); ctx.lineTo(8, 14); ctx.closePath();
+      break;
+    default: // SQUARE / DENSO
+      ctx.rect(8, 8, 12, 12);
+      break;
+  }
+  ctx.fill();
+  
+  ctx.restore();
 }
 
 /**
