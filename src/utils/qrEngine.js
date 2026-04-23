@@ -126,7 +126,13 @@ export const EYE_STYLES = {
   FLOWER: 'flower',
   SHIELD: 'shield',
   OCTAGON: 'octagon',
+  HEXAGON: 'hexagon',
+  STAR: 'star',
+  HEART: 'heart',
+  TRIANGLE: 'triangle',
   DIAMOND: 'diamond',
+  GEOMETRIC: 'geometric',
+  MODERN: 'modern',
   DENSO: 'denso',
 };
 
@@ -534,6 +540,58 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       // Hole
       ctx.moveTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24); ctx.lineTo(4, 18); ctx.lineTo(4, 10); ctx.closePath();
       break;
+    case EYE_STYLES.HEXAGON:
+      // Outer
+      ctx.moveTo(14, 0); ctx.lineTo(26, 7); ctx.lineTo(26, 21); ctx.lineTo(14, 28); ctx.lineTo(2, 21); ctx.lineTo(2, 7); ctx.closePath();
+      // Hole
+      ctx.moveTo(14, 5); ctx.lineTo(22, 9); ctx.lineTo(22, 19); ctx.lineTo(14, 23); ctx.lineTo(6, 19); ctx.lineTo(6, 9); ctx.closePath();
+      break;
+    case EYE_STYLES.STAR:
+      // Outer Star
+      for (let i = 0; i < 10; i++) {
+        const a = i * Math.PI / 5 - Math.PI / 2;
+        const r = i % 2 === 0 ? 14 : 6;
+        ctx.lineTo(14 + r * Math.cos(a), 14 + r * Math.sin(a));
+      }
+      ctx.closePath();
+      // Hole
+      ctx.moveTo(14 + 10, 14);
+      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
+      break;
+    case EYE_STYLES.HEART:
+      // Outer Heart
+      ctx.moveTo(14, 26);
+      ctx.bezierCurveTo(2, 18, 0, 12, 0, 8);
+      ctx.bezierCurveTo(0, 2, 6, 0, 10, 0);
+      ctx.bezierCurveTo(14, 0, 14, 4, 14, 4);
+      ctx.bezierCurveTo(14, 4, 14, 0, 18, 0);
+      ctx.bezierCurveTo(22, 0, 28, 2, 28, 8);
+      ctx.bezierCurveTo(28, 12, 26, 18, 14, 26);
+      ctx.closePath();
+      // Hole
+      ctx.moveTo(14 + 10, 14);
+      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
+      break;
+    case EYE_STYLES.TRIANGLE:
+      // Outer
+      ctx.moveTo(14, 0); ctx.lineTo(28, 26); ctx.lineTo(0, 26); ctx.closePath();
+      // Hole
+      ctx.moveTo(14, 6); ctx.lineTo(22, 22); ctx.lineTo(6, 22); ctx.closePath();
+      break;
+    case EYE_STYLES.GEOMETRIC:
+      // Outer
+      ctx.moveTo(0, 0); ctx.lineTo(28, 0); ctx.lineTo(28, 10); ctx.lineTo(18, 10); ctx.lineTo(18, 18); ctx.lineTo(10, 18); ctx.lineTo(10, 28); ctx.lineTo(0, 28); ctx.closePath();
+      // Hole
+      ctx.moveTo(4, 4); ctx.lineTo(24, 4); ctx.lineTo(24, 8); ctx.lineTo(14, 8); ctx.lineTo(14, 14); ctx.lineTo(8, 14); ctx.lineTo(8, 24); ctx.lineTo(4, 24); ctx.closePath();
+      break;
+    case EYE_STYLES.MODERN:
+      // Outer
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 2);
+      drawRoundedRectPath(ctx, 3, 3, 22, 22, 1);
+      // Extra inner ring
+      drawRoundedRectPath(ctx, 6, 6, 16, 16, 1);
+      drawRoundedRectPath(ctx, 9, 9, 10, 10, 0.5);
+      break;
     case EYE_STYLES.DIAMOND:
       // Outer
       ctx.moveTo(14, 0); ctx.lineTo(28, 14); ctx.lineTo(14, 28); ctx.lineTo(0, 14); ctx.closePath();
@@ -555,11 +613,21 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
     case EYE_STYLES.FLOWER:
     case EYE_STYLES.SHIELD:
     case EYE_STYLES.OCTAGON:
+    case EYE_STYLES.HEXAGON:
+    case EYE_STYLES.STAR:
+    case EYE_STYLES.HEART:
       ctx.arc(14, 14, 6, 0, Math.PI * 2);
+      break;
+    case EYE_STYLES.TRIANGLE:
+      ctx.arc(14, 18, 4, 0, Math.PI * 2);
       break;
     case EYE_STYLES.ROUNDED:
     case EYE_STYLES.LEAF:
+    case EYE_STYLES.MODERN:
       drawRoundedRectPath(ctx, 8, 8, 12, 12, 4);
+      break;
+    case EYE_STYLES.GEOMETRIC:
+      ctx.rect(8, 8, 8, 8);
       break;
     case EYE_STYLES.DIAMOND:
       ctx.moveTo(14, 8); ctx.lineTo(20, 14); ctx.lineTo(14, 20); ctx.lineTo(8, 14); ctx.closePath();

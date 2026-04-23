@@ -129,6 +129,43 @@ const EYE_PREVIEWS = {
       <rect x="10" y="10" width="8" height="8" transform="rotate(45 14 14)" fill="currentColor" />
     </svg>
   ),
+  [EYE_STYLES.HEXAGON]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <polygon points="14,1 26,7 26,21 14,27 2,21 2,7" fill="none" stroke="currentColor" strokeWidth="3" />
+      <circle cx="14" cy="14" r="5" fill="currentColor" />
+    </svg>
+  ),
+  [EYE_STYLES.STAR]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <path d="M14 1 L18 10 L27 10 L20 16 L23 25 L14 20 L5 25 L8 16 L1 10 L10 10 Z" fill="none" stroke="currentColor" strokeWidth="2.5" />
+      <circle cx="14" cy="14" r="4" fill="currentColor" />
+    </svg>
+  ),
+  [EYE_STYLES.HEART]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <path d="M14 26s-12-7.5-12-14.5a6.5 6.5 0 0 1 12-3.5 6.5 6.5 0 0 1 12 3.5c0 7-12 14.5-12 14.5z" fill="none" stroke="currentColor" strokeWidth="2.5" />
+      <circle cx="14" cy="14" r="4" fill="currentColor" />
+    </svg>
+  ),
+  [EYE_STYLES.TRIANGLE]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <polygon points="14,2 26,25 2,25" fill="none" stroke="currentColor" strokeWidth="3" />
+      <circle cx="14" cy="17" r="4" fill="currentColor" />
+    </svg>
+  ),
+  [EYE_STYLES.GEOMETRIC]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <path d="M2 2 L26 2 L26 10 L18 10 L18 18 L10 18 L10 26 L2 26 Z" fill="none" stroke="currentColor" strokeWidth="3" />
+      <rect x="8" y="8" width="6" height="6" fill="currentColor" />
+    </svg>
+  ),
+  [EYE_STYLES.MODERN]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <rect x="2" y="2" width="24" height="24" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
+      <rect x="6" y="6" width="16" height="16" rx="1" fill="none" stroke="currentColor" strokeWidth="2" />
+      <rect x="10" y="10" width="8" height="8" rx="0.5" fill="currentColor" />
+    </svg>
+  ),
   [EYE_STYLES.DENSO]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
       <rect x="0" y="0" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="4" />
