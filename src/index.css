@@ -4006,15 +4006,137 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Advanced Color Picker Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── QR Type Grid (5 per row) ── */
+.type-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  padding: 4px;
+}
+
+.type-tab {
+  flex-direction: column;
+  height: auto !important;
+  padding: 12px 4px !important;
+  font-size: 11px !important;
+  gap: 8px !important;
+}
+
+.type-tab-icon {
+  width: 40px !important;
+  height: 40px !important;
+  margin: 0 !important;
+}
+
+/* ── Vertical Social Logos ── */
+.logo-presets-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  padding: 16px 4px !important;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.logo-preset-btn {
+  aspect-ratio: 1/1 !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* ── Advanced Color Picker Overlay (Fix Bug 1) ── */
 .advanced-picker-overlay {
   position: fixed;
   inset: 0;
-  background: #000000; /* Solid black backdrop */
+  background: rgba(0, 0, 0, 0.4); /* Semi-transparent backdrop */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index: 2147483647;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  padding: env(safe-area-inset-top) 0 0;
+}
+
+.advanced-picker-overlay .advanced-picker-container {
+  width: 100% !important;
+  max-height: 85vh !important;
+  height: auto !important;
+  max-width: 420px !important;
+  background: var(--bg-glass) !important;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 24px 20px calc(30px + env(safe-area-inset-bottom)) !important;
+  position: relative !important;
+  border-radius: 32px 32px 0 0 !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 -20px 80px rgba(0,0,0,0.5) !important;
+}
+
+/* ── Color customization rows (Task 3) ── */
+.color-settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px 0;
+}
+
+.color-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.color-row-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.color-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.color-row-presets {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0;
+  flex: 1;
+}
+
+.mini-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-color);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.mini-swatch.active {
+  transform: scale(1.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ── Input Spacing (Task 7) ── */
+.qr-input-field {
+  padding: 16px 20px !important; /* Increased padding */
+  margin-bottom: 12px;
+}
+
+/* ── Keyboard Fix (Task 6) ── */
+.app-main-redesigned {
+  overflow-y: auto;
+  height: calc(100vh - 140px); /* Adjust for header and navbar */
+  scroll-behavior: smooth;
 }
 
 .advanced-picker-overlay .advanced-picker-container {
