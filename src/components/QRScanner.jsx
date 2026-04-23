@@ -320,12 +320,15 @@ export default function QRScanner({ onBack }) {
       <div className="scanner-container">
 
         {/* Header */}
+        {/* Header — Aligned with camera sides */}
         <header className="scanner-nav-header">
-          <button className="scanner-back-btn" onClick={safeBack} aria-label="Go back">
-            <ArrowLeft size={22} />
-          </button>
-          <div className="scanner-nav-title"></div>
-          <div style={{ width: 44 }} />
+          <div className="scanner-header-inner">
+            <button className="scanner-back-btn" onClick={safeBack} aria-label="Go back">
+              <ArrowLeft size={22} />
+            </button>
+            <div className="scanner-nav-title"></div>
+            <div style={{ width: 44 }} />
+          </div>
         </header>
 
         <div className="scanner-main-content">
