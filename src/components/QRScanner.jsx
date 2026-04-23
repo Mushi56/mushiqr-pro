@@ -298,19 +298,40 @@ export default function QRScanner({ onBack }) {
                 }}
               />
 
-              {/* Animated scan line only (no corner boxes) */}
+              {/* Animated scan line only */}
               {status === 'SCANNING' && (
                 <div className="scanner-overlay-guide">
                   <div className="scanner-laser-line" />
                 </div>
               )}
 
-              {/* LOADING overlay */}
-              {status === 'LOADING' && (
-                <div className="scanner-state-overlay">
-                  <div className="scanner-loading-state">
-                    <Loader2 size={48} className="spinning" color="var(--accent-primary)" />
-                    <p>Starting Camera...</p>
+              {/* RESULT CARD - Glassmorphism style */}
+              {status === 'RESULT' && (
+                <div className="scanner-result-overlay fade-in">
+                  <div className="scanner-result-card glass-panel">
+                    <div className="res-icon-wrapper">
+                      <div className="res-icon-circle">
+                        <ShieldCheck size={42} color="var(--accent-primary)" />
+                      </div>
+                    </div>
+                    <h4>Success!</h4>
+                    <p className="res-subtitle">QR Code Decoded Successfully</p>
+                    
+                    <div className="res-data-box">
+                      <p>{result}</p>
+                    </div>
+
+                    <div className="res-actions">
+                      <button className="res-btn copy-btn" onClick={handleCopy}>
+                        {copied ? <CheckCircle2 size={20} /> : <Copy size={20} />}
+                        <span>{copied ? 'Copied!' : 'Copy Text'}</span>
+                      </button>
+                    </div>
+
+                    <button className="res-retry-link" onClick={() => startScanner()}>
+                      <RefreshCw size={16} />
+                      <span>Scan Another Code</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -330,37 +351,19 @@ export default function QRScanner({ onBack }) {
             </div>
           )}
 
-          {/* CONTROLS BAR — below camera preview */}
-          {status === 'SCANNING' && (
+          {/* CONTROLS BAR — glassmorphism style */}
+          {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
             <div className="scanner-controls-bar">
-              <button className="scanner-ctrl-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
-                <ImagePlus size={22} />
+              <button className="scanner-ctrl-btn glass-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
+                <ImagePlus size={24} />
                 <span>Gallery</span>
               </button>
-              <button className="scanner-ctrl-btn primary" onClick={switchCamera} title="Switch Camera">
-                <RefreshCcw size={22} />
+              <button className="scanner-ctrl-btn glass-btn primary" onClick={switchCamera} title="Switch Camera">
+                <RefreshCcw size={24} />
                 <span>Flip</span>
               </button>
-              <button className="scanner-ctrl-btn danger" onClick={closeScanner} title="Close Scanner">
-                <X size={22} />
-                <span>Close</span>
-              </button>
-              <input type="file" ref={fileInputRef} accept="image/*"
-                     onChange={e => handleFileUpload(e.target.files?.[0])}
-                     style={{ display: 'none' }} />
-            </div>
-          )}
-
-          {/* Controls for error/loading states */}
-          {(status === 'LOADING' || status === 'ERROR') && (
-            <div className="scanner-controls-bar">
-              <button className="scanner-ctrl-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
-                <ImagePlus size={22} />
-                <span>Gallery</span>
-              </button>
-              <div style={{ flex: 1 }} />
-              <button className="scanner-ctrl-btn danger" onClick={closeScanner} title="Close Scanner">
-                <X size={22} />
+              <button className="scanner-ctrl-btn glass-btn danger" onClick={closeScanner} title="Close Scanner">
+                <X size={24} />
                 <span>Close</span>
               </button>
               <input type="file" ref={fileInputRef} accept="image/*"
@@ -371,7 +374,7 @@ export default function QRScanner({ onBack }) {
         </div>
 
         <footer className="scanner-footer-info">
-          <ShieldCheck size={14} /><span>Local Scanning • Secure & Private</span>
+          <ShieldCheck size={14} /><span>Secure Local Processing</span>
         </footer>
       </div>
 
