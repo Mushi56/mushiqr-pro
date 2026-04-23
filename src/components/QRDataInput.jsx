@@ -29,7 +29,7 @@ export default function QRDataInput({ type, data, onChange }) {
     <div ref={containerRef}>
       {(() => {
         switch (type) {
-    case QR_TYPES.URL: {
+    case QR_TYPES.URL:
       return (
         <div className="form-group">
           <label className="form-label">URL</label>
@@ -47,9 +47,8 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
-    case QR_TYPES.TEXT: {
+    case QR_TYPES.TEXT:
       const charCount = (data.text || '').length;
       return (
         <div className="form-group">
@@ -72,9 +71,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </div>
       );
-    }
 
-    case QR_TYPES.WIFI: {
+    case QR_TYPES.WIFI:
       return (
         <>
           <div className="form-group">
@@ -110,9 +108,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.EMAIL: {
+    case QR_TYPES.EMAIL:
       return (
         <>
           <div className="form-group">
@@ -155,9 +152,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.PHONE: {
+    case QR_TYPES.PHONE:
       return (
         <div className="form-group">
           <label className="form-label">Phone Number</label>
@@ -170,9 +166,8 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
-    case QR_TYPES.SMS: {
+    case QR_TYPES.SMS:
       return (
         <>
           <div className="form-group">
@@ -206,9 +201,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.VCARD: {
+    case QR_TYPES.VCARD:
       return (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -281,9 +275,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.LOCATION: {
+    case QR_TYPES.LOCATION:
       return (
         <>
           <div className="form-group">
@@ -306,9 +299,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.PDF: {
+    case QR_TYPES.PDF:
       return (
         <div className="form-group">
           <label className="form-label">PDF File Link</label>
@@ -321,9 +313,8 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
-    case QR_TYPES.IMAGE: {
+    case QR_TYPES.IMAGE:
       return (
         <div className="form-group">
           <label className="form-label">Image Link</label>
@@ -336,9 +327,8 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
-    case QR_TYPES.AUDIO: {
+    case QR_TYPES.AUDIO:
       return (
         <div className="form-group">
           <label className="form-label">Audio Link (Spotify, Soundcloud, etc.)</label>
@@ -351,9 +341,8 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
-    case QR_TYPES.DOCUMENT: {
+    case QR_TYPES.DOCUMENT:
       return (
         <div className="form-group">
           <label className="form-label">Document Link (Google Drive, Dropbox, etc.)</label>
@@ -366,9 +355,8 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
-    case QR_TYPES.EVENT: {
+    case QR_TYPES.EVENT:
       return (
         <>
           <div className="form-group">
@@ -391,9 +379,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.CRYPTO: {
+    case QR_TYPES.CRYPTO:
       return (
         <>
           <div className="form-group">
@@ -415,9 +402,8 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.WHATSAPP: {
+    case QR_TYPES.WHATSAPP:
       return (
         <>
           <div className="form-group">
@@ -445,21 +431,19 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
         </>
       );
-    }
 
-    case QR_TYPES.YOUTUBE: {
+    case QR_TYPES.YOUTUBE:
       return (
         <div className="form-group">
           <label className="form-label">YouTube Video Link</label>
           <input className="form-input" type="url" placeholder="https://youtube.com/watch?v=..." value={data.url || ''} onChange={(e) => updateField('url', e.target.value)} />
         </div>
       );
-    }
     
     case QR_TYPES.INSTAGRAM:
     case QR_TYPES.FACEBOOK:
     case QR_TYPES.X:
-    case QR_TYPES.LINKEDIN: {
+    case QR_TYPES.LINKEDIN:
       return (
         <div className="form-group">
           <label className="form-label" style={{ textTransform: 'capitalize' }}>{type} Username</label>
@@ -471,7 +455,6 @@ export default function QRDataInput({ type, data, onChange }) {
           />
         </div>
       );
-    }
 
         }
       })()}

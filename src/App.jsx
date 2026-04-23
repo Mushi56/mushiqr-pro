@@ -642,7 +642,7 @@ export default function App() {
                   </button>
                 </div>
                 <div className="menu-footer">
-                  <p>© 2026 Mushi QR Pro</p>
+                  <p>© 2026 MushiQR Pro</p>
                   <p>All rights reserved</p>
                 </div>
               </div>

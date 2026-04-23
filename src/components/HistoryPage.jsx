@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getHistory, deleteFromHistory, clearHistory } from '../utils/storage';
 import { SearchX, Trash2, ArrowDownToLine, RefreshCw } from 'lucide-react';
 
 export default function HistoryPage({ onLoadQR }) {
-  const [history, setHistory] = useState(() => getHistory());
+  const [history, setHistory] = useState([]);
 
+  useEffect(() => {
+    setHistory(getHistory());
+  }, []);
 
   const handleDelete = (id) => {
     const updated = deleteFromHistory(id);

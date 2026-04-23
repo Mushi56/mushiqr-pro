@@ -4618,15 +4618,6 @@ input[type="range"]::-moz-range-thumb {
   object-fit: cover !important;
 }
 
-/* Remove video pause/play icon overlay in some browsers */
-#qr-scanner-viewport video::-webkit-media-controls,
-#qr-scanner-viewport video::-webkit-media-controls-start-playback-button,
-#qr-scanner-viewport video::-webkit-media-controls-play-button,
-#qr-scanner-viewport video::-webkit-media-controls-panel {
-  display: none !important;
-  -webkit-appearance: none;
-}
-
 /* Glassmorphism Utilities (Theme-Aware) */
 .glass-panel {
   background: var(--bg-glass);
@@ -4683,16 +4674,16 @@ input[type="range"]::-moz-range-thumb {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 2px 0; /* Reduced to move scan text closer to camera */
+  padding: 6px 0; /* Minimal space between camera and buttons */
   z-index: 20;
 }
 
 .scanner-bar-title {
-  font-size: 11px; /* Decreased size */
+  font-size: 13px;
   font-weight: 700;
-  color: var(--text-tertiary);
+  color: var(--text-tertiary); /* Same as footer text */
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.5px;
 }
 
 .scanner-ctrl-btn {
@@ -4701,17 +4692,13 @@ input[type="range"]::-moz-range-thumb {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 12px 10px; /* Refined padding for consistency */
-  border-radius: 18px;
-  background: var(--bg-hover);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+  gap: 8px;
+  padding: 16px 12px;
+  border-radius: 20px;
   cursor: pointer;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 .scanner-ctrl-btn:hover {

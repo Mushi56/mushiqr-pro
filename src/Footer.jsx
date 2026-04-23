@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function Footer() {
   return (
     <footer className="app-footer">
-      <p className="app-footer-text">© 2026 Mushi QR Pro · All rights reserved</p>
+      <p className="app-footer-text">© 2026 MushiQR Pro · All rights reserved</p>
       <div className="app-footer-links">
         <Link to="/" className="app-footer-link">Generator</Link>
         <span className="app-footer-dot">·</span>

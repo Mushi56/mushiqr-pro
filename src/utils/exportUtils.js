@@ -10,8 +10,8 @@ import { Media } from '@capacitor-community/media';
  */
 async function saveToGallery(base64Data, filename) {
   // Request all relevant permissions
-  try { await Filesystem.requestPermissions(); } catch (_e) { /* ignore */ }
-  try { await Media.requestPermissions(); } catch (_e) { /* ignore */ }
+  try { await Filesystem.requestPermissions(); } catch {}
+  try { await Media.requestPermissions(); } catch {}
 
   // Write to cache first
   const tempFile = await Filesystem.writeFile({
@@ -27,7 +27,7 @@ async function saveToGallery(base64Data, filename) {
     try {
       const result = await Media.getAlbums();
       albums = result.albums || [];
-    } catch (_e) { /* ignore */ }
+    } catch {}
 
     let albumId = albums.find(a => a.name === 'MushiQR')?.identifier;
     if (!albumId) {
@@ -56,7 +56,7 @@ async function saveToGallery(base64Data, filename) {
       directory: Directory.Documents,
     });
     await Share.share({
-      title: 'Mushi QR Pro - Save QR Code',
+      title: 'MushiQR Pro - Save QR Code',
       url: docFile.uri,
       dialogTitle: 'Save or Share your QR Code',
     });
@@ -64,7 +64,7 @@ async function saveToGallery(base64Data, filename) {
     // Last resort: try sharing the cache file
     try {
       await Share.share({
-        title: 'Mushi QR Pro - Save QR Code',
+        title: 'MushiQR Pro - Save QR Code',
         url: tempFile.uri,
         dialogTitle: 'Save or Share your QR Code',
       });
@@ -78,7 +78,7 @@ async function saveToGallery(base64Data, filename) {
  * Save non-image files (PDF, SVG) via share sheet.
  */
 async function saveFileViaShare(base64Data, filename) {
-  try { await Filesystem.requestPermissions(); } catch (_e) { /* ignore */ }
+  try { await Filesystem.requestPermissions(); } catch {}
 
   const savedFile = await Filesystem.writeFile({
     path: filename,
@@ -87,7 +87,7 @@ async function saveFileViaShare(base64Data, filename) {
   });
 
   await Share.share({
-    title: 'Mushi QR Pro',
+    title: 'MushiQR Pro',
     url: savedFile.uri,
     dialogTitle: 'Save or Share your QR Code',
   });

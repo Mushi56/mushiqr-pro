@@ -8,7 +8,7 @@ export default function About() {
     <div style={styles.container}>
       <div style={styles.hero}>
         <div style={styles.badge}>About Us</div>
-        <h1 style={styles.title}>Mushi QR Pro</h1>
+        <h1 style={styles.title}>MushiQR Pro</h1>
         <p style={styles.subtitle}>
           The fastest, simplest, and most powerful free QR code generator on the web.
         </p>
@@ -24,7 +24,7 @@ export default function About() {
       <div style={styles.card}>
         <h2 style={styles.cardTitle}>Our Mission</h2>
         <p style={styles.cardText}>
-          Mushi QR Pro was built with one goal: to give everyone access to a
+          MushiQR Pro was built with one goal: to give everyone access to a
           professional-grade QR code generator — completely free. Whether you're a
           small business owner, a student, or a developer, you deserve powerful
           tools without paying a subscription fee.
