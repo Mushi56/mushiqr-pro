@@ -144,8 +144,8 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
   if (!isOpen) return null;
 
   return (
-    <div className="advanced-picker-overlay">
-      <div className="advanced-picker-container">
+    <div className="advanced-picker-overlay" onClick={onCancel}>
+      <div className="advanced-picker-container" onClick={e => e.stopPropagation()}>
         <header className="picker-header">
           <button className="picker-close" onClick={onCancel}><X size={20} /></button>
           <div className="picker-preview-dual">

@@ -4006,35 +4006,45 @@ input[type="range"]::-moz-range-thumb {
 .advanced-picker-overlay {
   position: fixed;
   inset: 0;
-  background: #000000; /* Solid black backdrop */
-  z-index: 2147483647;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 3000;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  padding: 0 16px 80px; /* 80px to be safely above 64px bottom nav */
+  animation: modalFadeIn 0.3s ease-out;
 }
 
 .advanced-picker-overlay .advanced-picker-container {
   width: 100% !important;
-  max-height: 90vh !important;
-  height: auto !important;
-  max-width: 420px !important;
-  background: #000000 !important; /* Pure solid black background */
+  max-width: 440px !important;
+  max-height: 85vh !important;
+  background: var(--bg-dropdown-solid) !important;
   display: flex !important;
   flex-direction: column !important;
-  padding: 20px 16px calc(20px + env(safe-area-inset-bottom)) !important;
+  padding: 24px 20px !important;
   position: relative !important;
-  border-radius: 32px 32px 0 0 !important;
-  border: none !important;
-  box-shadow: 0 -15px 60px rgba(0,0,0,0.9) !important;
+  border-radius: 32px !important;
+  border: 1px solid var(--border-light) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
   overflow-y: auto !important;
-  overscroll-behavior: contain;
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Ensure light mode works correctly */
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 [data-theme="light"] .advanced-picker-overlay .advanced-picker-container {
   background: #ffffff !important;
-  border-top: 1px solid rgba(0,0,0,0.05) !important;
 }
 
 .picker-header {

@@ -649,22 +649,6 @@ export default function App() {
             )}
           </div>
         </div>
-        <AdvancedColorPicker 
-          isOpen={advPicker.open}
-          initialColor={advPicker.color}
-          onChange={(newColor) => {
-            if (advPicker.setter) advPicker.setter(newColor);
-          }}
-          onConfirm={(newColor) => {
-            if (advPicker.setter) advPicker.setter(newColor);
-            setAdvPicker({ ...advPicker, open: false });
-          }}
-          onCancel={() => {
-            // Restore original color if canceled
-            if (advPicker.setter) advPicker.setter(advPicker.color);
-            setAdvPicker({ ...advPicker, open: false });
-          }}
-        />
       </header>
 
       {/* ── Main Content Area ── */}
@@ -1128,6 +1112,23 @@ export default function App() {
           {toast.message}
         </div>
       )}
+      {/* Advanced Color Picker Modal */}
+      <AdvancedColorPicker 
+        isOpen={advPicker.open}
+        initialColor={advPicker.color}
+        onChange={(newColor) => {
+          if (advPicker.setter) advPicker.setter(newColor);
+        }}
+        onConfirm={(newColor) => {
+          if (advPicker.setter) advPicker.setter(newColor);
+          setAdvPicker({ ...advPicker, open: false });
+        }}
+        onCancel={() => {
+          // Restore original color if canceled
+          if (advPicker.setter) advPicker.setter(advPicker.color);
+          setAdvPicker({ ...advPicker, open: false });
+        }}
+      />
     </div>
   );
 }
