@@ -266,6 +266,7 @@ export default function App() {
   const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
   const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
   const [selectedFormat, setSelectedFormat] = useState('PNG');
+  const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
   const [qrAnimKey, setQrAnimKey] = useState(0);
@@ -754,14 +755,18 @@ export default function App() {
             <section className="tab-panel-area">
               {/* Content Tab */}
               {activeTab === 'content' && (
-                <div className="tab-panel fade-in" id="panel-content">
-                  <div>
-                    <label className="panel-label">Type Content</label>
-                    <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
-                  </div>
-                  <div style={{ marginTop: 'auto' }}>
-                    <label className="panel-label">QR Code Type</label>
-                    <QRTypeSelector activeType={qrType} onTypeChange={setQrType} />
+                <div className="tab-panel fade-in" id="panel-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <label className="panel-label" style={{ textAlign: 'center', marginBottom: '20px', fontSize: '15px' }}>
+                      Select QR Content Type
+                    </label>
+                    <QRTypeSelector 
+                      activeType={qrType} 
+                      onTypeChange={(type) => { 
+                        setQrType(type); 
+                        setIsDataModalOpen(true); 
+                      }} 
+                    />
                   </div>
                 </div>
               )}
@@ -1005,6 +1010,29 @@ export default function App() {
             </button>
           ))}
         </nav>
+      )}
+
+      {/* ── QR Data Modal ── */}
+      {isDataModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsDataModalOpen(false)}>
+          <div className="modal-container glass-panel" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-header-title">
+                <h3>{qrType.split('_').join(' ')}</h3>
+                <p>Enter the details below</p>
+              </div>
+              <button className="modal-close" onClick={() => setIsDataModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-content">
+              <QRDataInput type={qrType} data={qrData} onChange={setQrData} />
+            </div>
+            <button className="modal-done-btn" onClick={() => setIsDataModalOpen(false)}>
+              Update QR Code
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Toast */}
