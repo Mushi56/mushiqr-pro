@@ -37,6 +37,21 @@ export default function QRScanner({ onBack }) {
   const busyRef = useRef(false);
   const touchStateRef = useRef({ distance: 0, initialZoom: 1 });
 
+  const stopScanner = useCallback(async () => {
+    busyRef.current = false;
+    const qr = html5QrRef.current;
+    if (!qr) return;
+    try { if (qr.isScanning) await qr.stop(); } catch (_e) { /* ignore */ }
+    try { qr.clear(); } catch (_e) { /* ignore */ }
+    html5QrRef.current = null;
+    setZoomCapabilities(null);
+  }, []);
+
+  const safeBack = useCallback(() => {
+    stopScanner();
+    if (onBack) onBack();
+  }, [stopScanner, onBack]);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
@@ -58,20 +73,7 @@ export default function QRScanner({ onBack }) {
     };
   }, []);
 
-  const stopScanner = useCallback(async () => {
-    busyRef.current = false;
-    const qr = html5QrRef.current;
-    if (!qr) return;
-    try { if (qr.isScanning) await qr.stop(); } catch {}
-    try { qr.clear(); } catch {}
-    html5QrRef.current = null;
-    setZoomCapabilities(null);
-  }, []);
 
-  const safeBack = useCallback(() => {
-    stopScanner();
-    if (onBack) onBack();
-  }, [stopScanner, onBack]);
 
   // Apply zoom to the running video track
   const applyZoom = useCallback(async (value) => {
@@ -146,6 +148,7 @@ export default function QRScanner({ onBack }) {
     setStatus('RESULT');
     stopScanner();
   }, [isURL, stopScanner, openInBrowser, onBack]);
+
 
   const startScanner = useCallback(async () => {
     if (busyRef.current) return;
@@ -249,11 +252,6 @@ export default function QRScanner({ onBack }) {
     return () => clearTimeout(timer);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const switchCamera = useCallback(async () => {
-    await stopScanner();
-    setFacingBack(p => !p);
-    setTimeout(() => { if (mountedRef.current) startScanner(); }, 400);
-  }, [stopScanner, startScanner]);
 
   const closeScanner = useCallback(async () => {
     await stopScanner();
@@ -458,18 +456,18 @@ export default function QRScanner({ onBack }) {
           {/* CONTROLS BAR — redesigned with Scan text in center */}
           {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
             <div className="scanner-controls-bar">
-              <button className="type-tab" onClick={() => fileInputRef.current?.click()}>
+              <button className="scanner-ctrl-btn primary" onClick={() => fileInputRef.current?.click()}>
                 <span className="type-tab-icon">
-                  <ImagePlus size={20} strokeWidth={1.5} />
+                  <ImagePlus size={24} strokeWidth={1.5} />
                 </span>
                 Gallery
               </button>
               
               <div className="scanner-bar-title">Scan</div>
 
-              <button className="type-tab active" onClick={closeScanner}>
+              <button className="scanner-ctrl-btn danger" onClick={closeScanner}>
                 <span className="type-tab-icon">
-                  <X size={20} strokeWidth={1.5} />
+                  <X size={24} strokeWidth={1.5} />
                 </span>
                 Close
               </button>

@@ -5,7 +5,6 @@ import App from './App.jsx';
 import About from './About.jsx';
 import PrivacyPolicy from './PrivacyPolicy.jsx';
 import Terms from './Terms.jsx';
-import Footer from './Footer.jsx';
 import './index.css';
 
 createRoot(document.getElementById('root')).render(
