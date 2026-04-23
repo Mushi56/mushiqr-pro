@@ -617,7 +617,7 @@ export default function App() {
                     Theme <span style={{ 
                       textTransform: 'capitalize', 
                       marginLeft: 4,
-                      color: theme === 'dark' ? '#818cf8' : theme === 'light' ? '#fbbf24' : '#2dd4bf',
+                      color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF007F' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF007F'),
                       fontWeight: 'bold'
                     }}>{theme}</span>
                   </button>
