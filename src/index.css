@@ -4501,18 +4501,18 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* â”€â”€ QR Scanner Redesign â”€â”€ */
-/* â”€â”€ QR Scanner Premium Redesign â”€â”€ */
+/* â”€â”€ QR Scanner Theme-Aware Redesign â”€â”€ */
 .scanner-page {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: var(--bg-primary);
   z-index: 2000;
   display: flex;
   flex-direction: column;
-  color: white;
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -4522,10 +4522,10 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .scanner-back-btn {
@@ -4535,16 +4535,16 @@ input[type="range"]::-moz-range-thumb {
   align-items: center;
   justify-content: center;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .scanner-back-btn:active {
   transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--bg-elevated);
 }
 
 .scanner-nav-title h3 {
@@ -4552,9 +4552,7 @@ input[type="range"]::-moz-range-thumb {
   font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
 }
 
 .scanner-main-content {
@@ -4565,7 +4563,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: radial-gradient(circle at center, #111 0%, #000 100%);
+  background: var(--bg-primary);
 }
 
 .scanner-viewport-wrapper {
@@ -4583,11 +4581,11 @@ input[type="range"]::-moz-range-thumb {
 .scanner-view-box {
   width: 100%;
   height: 100%;
-  background: #000;
+  background: #000; /* Keep camera background dark for better contrast */
   overflow: hidden;
 }
 
-/* Hide html5-qrcode default UI elements (the box/shaded region) */
+/* Hide html5-qrcode default UI elements */
 #qr-scanner-viewport > div {
   border: none !important;
 }
@@ -4598,28 +4596,27 @@ input[type="range"]::-moz-range-thumb {
   background: transparent !important;
 }
 
-/* Ensure video fills the viewport */
 #qr-scanner-viewport video {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
 }
 
-/* Glassmorphism Utilities */
+/* Glassmorphism Utilities (Theme-Aware) */
 .glass-panel {
-  background: rgba(25, 25, 27, 0.7);
+  background: var(--bg-glass);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
 }
 
 .glass-btn {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-hover);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -4642,8 +4639,7 @@ input[type="range"]::-moz-range-thumb {
   background: var(--accent-primary);
   box-shadow: 
     0 0 15px var(--accent-primary),
-    0 0 30px var(--accent-primary),
-    0 0 45px rgba(var(--accent-primary-rgb, 216, 27, 96), 0.5);
+    0 0 30px var(--accent-primary);
   border-radius: 4px;
   animation: premium-scan 2.5s infinite ease-in-out;
 }
@@ -4683,8 +4679,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .scanner-ctrl-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--bg-hover);
+  border-color: var(--border-light);
 }
 
 .scanner-ctrl-btn:active {
@@ -4692,8 +4688,8 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .scanner-ctrl-btn.primary {
-  background: rgba(var(--accent-primary-rgb, 216, 27, 96), 0.1);
-  border-color: rgba(var(--accent-primary-rgb, 216, 27, 96), 0.3);
+  background: var(--accent-soft);
+  border-color: var(--border-accent);
   color: var(--accent-primary);
 }
 
@@ -4710,7 +4706,7 @@ input[type="range"]::-moz-range-thumb {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -4743,32 +4739,32 @@ input[type="range"]::-moz-range-thumb {
 .res-icon-circle {
   width: 84px;
   height: 84px;
-  background: rgba(var(--accent-primary-rgb, 216, 27, 96), 0.15);
+  background: var(--accent-soft);
   border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 30px rgba(var(--accent-primary-rgb, 216, 27, 96), 0.2);
+  box-shadow: 0 0 30px var(--accent-glow);
 }
 
 .scanner-result-card h4 {
   margin: 0;
   font-size: 24px;
   font-weight: 800;
-  color: white;
+  color: var(--text-primary);
 }
 
 .res-subtitle {
   margin: 8px 0 24px 0;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .res-data-box {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 20px;
   margin-bottom: 28px;
@@ -4779,9 +4775,10 @@ input[type="range"]::-moz-range-thumb {
   margin: 0;
   font-size: 16px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
 }
+
 
 .res-actions {
   width: 100%;
