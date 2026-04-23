@@ -316,10 +316,29 @@ export default function App() {
     }
   }, [syncEyes, qrColor]);
 
-  // ── Load preferences ──
+  // ── Auto Theme Logic ──
   useEffect(() => {
     const prefs = getPreferences();
-    if (prefs.theme) setTheme(prefs.theme);
+    if (prefs.theme) {
+      setTheme(prefs.theme);
+    } else {
+      // Auto-detect system preference if no user preference is saved
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(systemDark ? 'dark' : 'light');
+    }
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => {
+      // Only auto-update if the user hasn't explicitly set a preference
+      const currentPrefs = getPreferences();
+      if (!currentPrefs.theme) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   // ── Bump canvas animation key ──
