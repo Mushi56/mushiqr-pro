@@ -194,7 +194,21 @@ export default function App() {
   // ── Tab & Theme ──
   const [activeTab, setActiveTab] = useState('content');
   const [activePage, setActivePage] = useState('generator'); // 'generator', 'scanner', 'history'
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('auto');
+  const [effectiveTheme, setEffectiveTheme] = useState('dark');
+
+  // Resolve Auto Theme
+  useEffect(() => {
+    if (theme === 'auto') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      const check = (e) => setEffectiveTheme(e.matches ? 'dark' : 'light');
+      setEffectiveTheme(mq.matches ? 'dark' : 'light');
+      mq.addEventListener('change', check);
+      return () => mq.removeEventListener('change', check);
+    } else {
+      setEffectiveTheme(theme);
+    }
+  }, [theme]);
 
 
 
@@ -266,7 +280,7 @@ export default function App() {
     const updateStatusBar = async () => {
       try {
         await StatusBar.show();
-        if (theme === 'dark') {
+        if (effectiveTheme === 'dark') {
           await StatusBar.setStyle({ style: 'DARK' });
           await StatusBar.setBackgroundColor({ color: '#030305' });
         } else {
@@ -278,7 +292,7 @@ export default function App() {
       }
     };
     updateStatusBar();
-  }, [theme]);
+  }, [effectiveTheme]);
 
   useEffect(() => {
     // Handle Android Back Button
@@ -357,8 +371,8 @@ export default function App() {
 
   // ── Update body theme ──
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    document.documentElement.setAttribute('data-theme', effectiveTheme);
+  }, [effectiveTheme]);
 
   // ── Close dropdown/menu on outside click ──
   useEffect(() => {
@@ -580,14 +594,17 @@ export default function App() {
                   <button
                     className="menu-link-btn"
                     onClick={() => {
-                      const next = theme === 'dark' ? 'light' : 'dark';
+                      let next;
+                      if (theme === 'dark') next = 'light';
+                      else if (theme === 'light') next = 'auto';
+                      else next = 'dark';
+                      
                       setTheme(next);
                       savePreferences({ ...getPreferences(), theme: next });
-                      setIsMenuOpen(false);
                     }}
                   >
-                    {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />} 
-                    {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                    {theme === 'dark' ? <Moon size={16} /> : theme === 'light' ? <Sun size={16} /> : <div style={{ display:'flex', alignItems:'center', justifyContent:'center', width:16, height:16, border:'2px solid currentColor', borderRadius:'50%', borderTopColor:'transparent' }} />} 
+                    Theme: <span style={{ textTransform: 'capitalize', marginLeft: 4 }}>{theme}</span>
                   </button>
                   <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
                   <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
