@@ -5132,3 +5132,41 @@ input[type="range"]::-moz-range-thumb {
 .row-picker-btn {
   margin-top: 0 !important;
 }
+
+.input-wrapper-with-counter {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-inner-counter {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  background: var(--bg-elevated);
+  padding: 2px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border-color);
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+.input-inner-counter.limit-reached {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.1);
+  border-color: rgba(255, 59, 48, 0.3);
+}
+
+.input-recommendation {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}

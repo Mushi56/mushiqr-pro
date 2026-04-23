@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Info } from 'lucide-react';
 import { QR_TYPES } from '../utils/qrEngine';
 
 export default function QRDataInput({ type, data, onChange }) {
@@ -48,15 +49,26 @@ export default function QRDataInput({ type, data, onChange }) {
       );
 
     case QR_TYPES.TEXT:
+      const charCount = (data.text || '').length;
       return (
         <div className="form-group">
           <label className="form-label">Text</label>
-          <textarea
-            className="form-textarea"
-            placeholder="Enter your text..."
-            value={data.text || ''}
-            onChange={(e) => updateField('text', e.target.value)}
-          />
+          <div className="input-wrapper-with-counter">
+            <textarea
+              className="form-textarea"
+              placeholder="Enter your text..."
+              value={data.text || ''}
+              onChange={(e) => updateField('text', e.target.value)}
+              style={{ paddingBottom: '30px' }}
+            />
+            <span className={`input-inner-counter ${charCount > 300 ? 'limit-reached' : ''}`}>
+              {charCount} / 300
+            </span>
+          </div>
+          <div className="input-recommendation">
+            <Info size={12} style={{ marginRight: '4px' }} />
+            Stay under 300 for best scanning
+          </div>
         </div>
       );
 
@@ -121,12 +133,22 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
           <div className="form-group">
             <label className="form-label">Body</label>
-            <textarea
-              className="form-textarea"
-              placeholder="Email body..."
-              value={data.body || ''}
-              onChange={(e) => updateField('body', e.target.value)}
-            />
+            <div className="input-wrapper-with-counter">
+              <textarea
+                className="form-textarea"
+                placeholder="Email body..."
+                value={data.body || ''}
+                onChange={(e) => updateField('body', e.target.value)}
+                style={{ paddingBottom: '30px' }}
+              />
+              <span className={`input-inner-counter ${(data.body || '').length > 300 ? 'limit-reached' : ''}`}>
+                {(data.body || '').length} / 300
+              </span>
+            </div>
+            <div className="input-recommendation">
+              <Info size={12} style={{ marginRight: '4px' }} />
+              Stay under 300 for best scanning
+            </div>
           </div>
         </>
       );
@@ -160,12 +182,22 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
           <div className="form-group">
             <label className="form-label">Message</label>
-            <textarea
-              className="form-textarea"
-              placeholder="Your message..."
-              value={data.message || ''}
-              onChange={(e) => updateField('message', e.target.value)}
-            />
+            <div className="input-wrapper-with-counter">
+              <textarea
+                className="form-textarea"
+                placeholder="Your message..."
+                value={data.message || ''}
+                onChange={(e) => updateField('message', e.target.value)}
+                style={{ paddingBottom: '30px' }}
+              />
+              <span className={`input-inner-counter ${(data.message || '').length > 300 ? 'limit-reached' : ''}`}>
+                {(data.message || '').length} / 300
+              </span>
+            </div>
+            <div className="input-recommendation">
+              <Info size={12} style={{ marginRight: '4px' }} />
+              Stay under 300 for best scanning
+            </div>
           </div>
         </>
       );
@@ -380,7 +412,22 @@ export default function QRDataInput({ type, data, onChange }) {
           </div>
           <div className="form-group">
             <label className="form-label">Pre-filled Message</label>
-            <textarea className="form-textarea" placeholder="Hello! I'm interested in..." value={data.message || ''} onChange={(e) => updateField('message', e.target.value)} />
+            <div className="input-wrapper-with-counter">
+              <textarea 
+                className="form-textarea" 
+                placeholder="Hello! I'm interested in..." 
+                value={data.message || ''} 
+                onChange={(e) => updateField('message', e.target.value)} 
+                style={{ paddingBottom: '30px' }}
+              />
+              <span className={`input-inner-counter ${(data.message || '').length > 300 ? 'limit-reached' : ''}`}>
+                {(data.message || '').length} / 300
+              </span>
+            </div>
+            <div className="input-recommendation">
+              <Info size={12} style={{ marginRight: '4px' }} />
+              Stay under 300 for best scanning
+            </div>
           </div>
         </>
       );
