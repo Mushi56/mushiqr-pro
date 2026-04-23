@@ -161,7 +161,7 @@ export default function QRScanner({ onBack }) {
       const decodedText = await html5Qr.scanFile(file, true);
       setResult(decodedText);
       setStatus('RESULT');
-    } catch (err) {
+    } catch {
       setError('No QR code found in this image. Try a clearer photo.');
       setStatus('ERROR');
     }

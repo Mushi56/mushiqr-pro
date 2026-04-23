@@ -461,24 +461,6 @@ function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = {}) {
       ctx.fill();
       break;
     }
-    case DOT_STYLES.FLUID: {
-      const r = size * 0.45;
-      ctx.beginPath();
-      // TL corner
-      if (top || left) ctx.moveTo(x, y);
-      else { ctx.moveTo(x + r, y); ctx.arcTo(x, y, x, y + r, r); }
-      // BL corner
-      if (bottom || left) ctx.lineTo(x, y + size);
-      else { ctx.lineTo(x, y + size - r); ctx.arcTo(x, y + size, x + r, y + size, r); }
-      // BR corner
-      if (bottom || right) ctx.lineTo(x + size, y + size);
-      else { ctx.lineTo(x + size - r, y + size); ctx.arcTo(x + size, y + size, x + size, y + size - r, r); }
-      // TR corner
-      if (top || right) ctx.lineTo(x + size, y);
-      else { ctx.lineTo(x + size, y + r); ctx.arcTo(x + size, y, x + size - r, y, r); }
-      ctx.closePath(); ctx.fill();
-      break;
-    }
     default: // SQUARE
       // Use 0.5px overfill to eliminate sub-pixel anti-aliasing gaps between adjacent modules
       ctx.fillRect(x + padding, y + padding, s + 0.5, s + 0.5);
