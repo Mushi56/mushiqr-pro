@@ -5097,25 +5097,6 @@ input[type="range"]::-moz-range-thumb {
   z-index: 5;
 }
 
-.swatch-item.active::after {
-  content: '✓';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-/* Light Mode Checkmark Adjustment */
-[data-theme="light"] .swatch-item[style*="background-color: #FFFFFF"].active::after,
-[data-theme="light"] .swatch-item[style*="background-color: #ffffff"].active::after {
-  color: #000;
-}
-
 .row-picker-btn {
   margin-top: 0 !important;
 }

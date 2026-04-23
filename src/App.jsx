@@ -18,6 +18,7 @@ import {
   FileText,
   Pencil,
   Palette,
+  Pipette,
   Hexagon,
   Image as ImageIcon,
   LayoutGrid,
@@ -787,7 +788,7 @@ export default function App() {
                       <div className="swatch-grid-mini">
                         <ColorPicker 
                           isSwatch={true}
-                          icon={Palette}
+                          icon={Pipette}
                           value={bgColor} 
                           onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} 
                           onOpenAdvanced={handleOpenAdv} 
@@ -811,7 +812,7 @@ export default function App() {
                       <div className="swatch-grid-mini">
                         <ColorPicker 
                           isSwatch={true}
-                          icon={Palette}
+                          icon={Pipette}
                           value={qrColor} 
                           onChange={(c) => { setQrColor(c); setLogoOutlineColor(c); }} 
                           onOpenAdvanced={handleOpenAdv} 
@@ -839,7 +840,7 @@ export default function App() {
                       <div className="swatch-grid-mini">
                         <ColorPicker 
                           isSwatch={true}
-                          icon={Palette}
+                          icon={Pipette}
                           value={syncEyes ? qrColor : (eyeColor || qrColor)} 
                           onChange={setEyeColor} 
                           onOpenAdvanced={handleOpenAdv}
@@ -864,7 +865,7 @@ export default function App() {
                       <div className="swatch-grid-mini">
                         <ColorPicker 
                           isSwatch={true}
-                          icon={Palette}
+                          icon={Pipette}
                           value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
                           onChange={setEyeOuterColor} 
                           onOpenAdvanced={handleOpenAdv}
