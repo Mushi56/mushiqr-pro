@@ -351,21 +351,22 @@ export default function QRScanner({ onBack }) {
             </div>
           )}
 
-          {/* CONTROLS BAR — glassmorphism style */}
+          {/* CONTROLS BAR — redesigned with single close button matching type-tab style */}
           {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
             <div className="scanner-controls-bar">
               <button className="scanner-ctrl-btn glass-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
                 <ImagePlus size={24} />
                 <span>Gallery</span>
               </button>
-              <button className="scanner-ctrl-btn glass-btn primary" onClick={switchCamera} title="Switch Camera">
-                <RefreshCcw size={24} />
-                <span>Flip</span>
+              
+              {/* Close button redesigned to match .type-tab style */}
+              <button className="type-tab active" onClick={closeScanner} style={{ flex: 'none', width: '70px', height: '70px' }}>
+                <span className="type-tab-icon">
+                  <X size={22} strokeWidth={1.5} />
+                </span>
+                Close
               </button>
-              <button className="scanner-ctrl-btn glass-btn danger" onClick={closeScanner} title="Close Scanner">
-                <X size={24} />
-                <span>Close</span>
-              </button>
+
               <input type="file" ref={fileInputRef} accept="image/*"
                      onChange={e => handleFileUpload(e.target.files?.[0])}
                      style={{ display: 'none' }} />
