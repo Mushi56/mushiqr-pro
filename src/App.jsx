@@ -603,8 +603,18 @@ export default function App() {
                       savePreferences({ ...getPreferences(), theme: next });
                     }}
                   >
-                    {theme === 'dark' ? <Moon size={16} /> : theme === 'light' ? <Sun size={16} /> : <div style={{ display:'flex', alignItems:'center', justifyContent:'center', width:16, height:16, border:'2px solid currentColor', borderRadius:'50%', borderTopColor:'transparent' }} />} 
-                    Theme: <span style={{ textTransform: 'capitalize', marginLeft: 4 }}>{theme}</span>
+                    {theme === 'dark' ? (
+                      <Moon size={16} />
+                    ) : theme === 'light' ? (
+                      <Sun size={16} />
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2v20" />
+                        <path d="M12 2a10 10 0 0 0 0 20V2z" fill="currentColor" />
+                        <circle cx="12" cy="12" r="10" />
+                      </svg>
+                    )}
+                    <span style={{ textTransform: 'capitalize' }}>{theme} Mode</span>
                   </button>
                   <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
                   <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
