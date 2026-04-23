@@ -142,13 +142,19 @@ export default function QRScanner({ onBack }) {
       html5QrRef.current = html5Qr;
 
       const config = {
-        fps: 10,
+        fps: 20, // Increased FPS for smoother preview
         qrbox: (vw, vh) => {
-          const s = Math.floor(Math.min(vw, vh) * 0.7);
+          const s = Math.floor(Math.min(vw, vh) * 0.75);
           return { width: s, height: s };
         },
-        aspectRatio: 0.75, // 3:4 aspect ratio (taller)
+        aspectRatio: 0.75, 
         disableFlip: false,
+        // Request high resolution video constraints for crystal clear preview
+        videoConstraints: {
+          facingMode: facingBack ? 'environment' : 'user',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        }
       };
 
       const cameraId = { facingMode: facingBack ? 'environment' : 'user' };
@@ -351,18 +357,21 @@ export default function QRScanner({ onBack }) {
             </div>
           )}
 
-          {/* CONTROLS BAR — redesigned with single close button matching type-tab style */}
+          {/* CONTROLS BAR — redesigned with compact buttons matching type-tab style */}
           {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
             <div className="scanner-controls-bar">
-              <button className="scanner-ctrl-btn glass-btn" onClick={() => fileInputRef.current?.click()} title="Upload from Gallery">
-                <ImagePlus size={24} />
-                <span>Gallery</span>
+              {/* Gallery button redesigned to match .type-tab style */}
+              <button className="type-tab" onClick={() => fileInputRef.current?.click()} style={{ flex: 'none', width: '64px', height: '64px' }}>
+                <span className="type-tab-icon">
+                  <ImagePlus size={20} strokeWidth={1.5} />
+                </span>
+                Gallery
               </button>
               
-              {/* Close button redesigned to match .type-tab style */}
-              <button className="type-tab active" onClick={closeScanner} style={{ flex: 'none', width: '70px', height: '70px' }}>
+              {/* Close button redesigned to be more compact */}
+              <button className="type-tab active" onClick={closeScanner} style={{ flex: 'none', width: '64px', height: '64px' }}>
                 <span className="type-tab-icon">
-                  <X size={22} strokeWidth={1.5} />
+                  <X size={20} strokeWidth={1.5} />
                 </span>
                 Close
               </button>
