@@ -5038,3 +5038,84 @@ input[type="range"]::-moz-range-thumb {
 .modal-done-btn:active {
   transform: scale(0.98);
 }
+
+/* ── Color Customization Rows ── */
+.color-customization-rows {
+  margin-bottom: 24px;
+}
+
+.color-row-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: opacity 0.3s ease;
+}
+
+.color-row-item.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+.color-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.color-row-header .panel-label {
+  margin-bottom: 0;
+}
+
+.swatch-grid-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.swatch-item {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.swatch-item:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
+
+.swatch-item.active {
+  border-color: var(--accent-primary);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--accent-glow), var(--shadow-md);
+  z-index: 5;
+}
+
+.swatch-item.active::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Light Mode Checkmark Adjustment */
+[data-theme="light"] .swatch-item[style*="background-color: #FFFFFF"].active::after,
+[data-theme="light"] .swatch-item[style*="background-color: #ffffff"].active::after {
+  color: #000;
+}
+
+.row-picker-btn {
+  margin-top: 0 !important;
+}

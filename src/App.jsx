@@ -67,6 +67,13 @@ const COLOR_PRESETS = [
   { name: 'Deep Sea', qr: '#00416A', bg: '#E1E8EB' },
 ];
 
+const SWATCH_PRESETS = [
+  '#000000', '#FFFFFF', '#FF3B30', '#34C759', 
+  '#007AFF', '#FFCC00', '#AF52DE', '#FF9500', 
+  '#5856D6', '#FF2D55', '#00F0FF', '#7000FF', 
+  '#FF007F', '#00D1FF', '#FFD700', '#8E8E93'
+];
+
 const MockQR = () => {
   const size = 21;
   // Actual "Hello World" (Level M) pattern bits (Simplified representation for clarity)
@@ -770,39 +777,109 @@ export default function App() {
 
               {/* Color Tab */}
               {activeTab === 'color' && (
-                <div className="tab-panel fade-in" id="panel-color">
-                  <div>
-                    <div className="eye-colors-grid">
-                      <ColorPicker className="compact-picker" label="Background" value={bgColor} onChange={setBgColor} onOpenAdvanced={handleOpenAdv} />
-                      <ColorPicker className="compact-picker" label="Dots Color" value={qrColor} onChange={setQrColor} onOpenAdvanced={handleOpenAdv} />
+                <div className="tab-panel fade-in" id="panel-color" style={{ overflowY: 'auto', paddingRight: '4px' }}>
+                  <div className="color-customization-rows" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {/* Background Color Row */}
+                    <div className="color-row-item">
+                      <div className="color-row-header">
+                        <label className="panel-label">Background Color</label>
+                        <ColorPicker 
+                          className="row-picker-btn" 
+                          value={bgColor} 
+                          onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} 
+                          onOpenAdvanced={handleOpenAdv} 
+                        />
+                      </div>
+                      <div className="swatch-grid-mini">
+                        {SWATCH_PRESETS.map(color => (
+                          <div 
+                            key={color} 
+                            className={`swatch-item${bgColor === color ? ' active' : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => { setBgColor(color); setLogoBgColor(color); setBgTransparent(false); }}
+                          />
+                        ))}
+                      </div>
                     </div>
 
-                    <div className="toggle-row" style={{ marginBottom: '12px' }}>
+                    {/* Dots Color Row */}
+                    <div className="color-row-item">
+                      <div className="color-row-header">
+                        <label className="panel-label">Dots Color</label>
+                        <ColorPicker 
+                          className="row-picker-btn" 
+                          value={qrColor} 
+                          onChange={(c) => { setQrColor(c); setLogoOutlineColor(c); }} 
+                          onOpenAdvanced={handleOpenAdv} 
+                        />
+                      </div>
+                      <div className="swatch-grid-mini">
+                        {SWATCH_PRESETS.map(color => (
+                          <div 
+                            key={color} 
+                            className={`swatch-item${qrColor === color ? ' active' : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => { setQrColor(color); setLogoOutlineColor(color); }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="toggle-row" style={{ margin: '4px 0', background: 'var(--bg-hover)', padding: '10px 14px', borderRadius: '14px' }}>
                       <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
                     </div>
 
-                    <div className="eye-colors-grid">
-                      <ColorPicker 
-                        className="compact-picker" 
-                        label="Inner Eyes" 
-                        value={syncEyes ? qrColor : (eyeColor || qrColor)} 
-                        onChange={setEyeColor} 
-                        onOpenAdvanced={handleOpenAdv}
-                        disabled={syncEyes}
-                      />
-                      <ColorPicker 
-                        className="compact-picker" 
-                        label="Outer Eyes" 
-                        value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
-                        onChange={setEyeOuterColor} 
-                        onOpenAdvanced={handleOpenAdv}
-                        disabled={syncEyes}
-                      />
+                    {/* Inner Eyes Color Row */}
+                    <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
+                      <div className="color-row-header">
+                        <label className="panel-label">Inner Eyes Color</label>
+                        <ColorPicker 
+                          className="row-picker-btn" 
+                          value={syncEyes ? qrColor : (eyeColor || qrColor)} 
+                          onChange={setEyeColor} 
+                          onOpenAdvanced={handleOpenAdv}
+                          disabled={syncEyes}
+                        />
+                      </div>
+                      <div className="swatch-grid-mini">
+                        {SWATCH_PRESETS.map(color => (
+                          <div 
+                            key={color} 
+                            className={`swatch-item${(syncEyes ? qrColor : eyeColor) === color ? ' active' : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => !syncEyes && setEyeColor(color)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Outer Eyes Color Row */}
+                    <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
+                      <div className="color-row-header">
+                        <label className="panel-label">Outer Eyes Color</label>
+                        <ColorPicker 
+                          className="row-picker-btn" 
+                          value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
+                          onChange={setEyeOuterColor} 
+                          onOpenAdvanced={handleOpenAdv}
+                          disabled={syncEyes}
+                        />
+                      </div>
+                      <div className="swatch-grid-mini">
+                        {SWATCH_PRESETS.map(color => (
+                          <div 
+                            key={color} 
+                            className={`swatch-item${(syncEyes ? qrColor : eyeOuterColor) === color ? ' active' : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => !syncEyes && setEyeOuterColor(color)}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  <div style={{ marginTop: 'auto' }}>
-                    <label className="panel-label">Quick Presets</label>
+                  <div style={{ marginTop: '24px' }}>
+                    <label className="panel-label">Quick Themes</label>
                     <div className="color-presets-row">
                       {COLOR_PRESETS.map(preset => (
                         <div
@@ -813,6 +890,8 @@ export default function App() {
                           onClick={() => {
                             setQrColor(preset.qr);
                             setBgColor(preset.bg);
+                            setLogoBgColor(preset.bg);
+                            setLogoOutlineColor(preset.qr);
                             setBgTransparent(false);
                             setActivePreset(preset.name);
                           }}
