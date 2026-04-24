@@ -2501,7 +2501,7 @@ input[type="range"]::-moz-range-thumb {
   background: #FFFFFF;
   border-color: var(--accent-primary);
   color: var(--accent-primary);
-  box-shadow: 0 8px 20px rgba(0, 240, 255, 0.08);
+  box-shadow: 0 8px 20px rgba(214, 0, 54, 0.08);
 }
 
 /* ========================================
@@ -3564,7 +3564,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .qr-preview-wrapper.frame-neon-glow {
-  box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow), 0 0 60px rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow), 0 0 60px rgba(214, 0, 54, 0.1);
   border-color: var(--accent-primary);
 }
 
@@ -3894,7 +3894,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 [data-theme="light"] .frame-option-btn.active {
-  background: rgba(0, 240, 255, 0.06);
+  background: var(--accent-soft);
 }
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ EC Level Buttons Ã¢â€â‚¬Ã¢â€â‚¬ */
