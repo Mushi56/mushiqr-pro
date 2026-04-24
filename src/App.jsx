@@ -776,35 +776,34 @@ export default function App() {
               {/* Color Tab */}
               {activeTab === 'color' && (
                 <div className="tab-panel fade-in" id="panel-color" style={{ overflowY: 'auto', paddingRight: '4px' }}>
-                  <div className="color-customization-rows" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    {/* Background Color Row */}
-                    <div className="color-row-item">
-                      <div className="color-row-header">
-                        <label className="panel-label">Background Color</label>
-                      </div>
-                      <div className="swatch-grid-mini">
-                        <ColorPicker
-                          isSwatch={true}
-                          icon={Pipette}
-                          value={bgColor}
-                          onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }}
-                          onOpenAdvanced={handleOpenAdv}
-                        />
-                        {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
+                  <div className="color-customization-rows" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {/* Quick Themes Section */}
+                    <div>
+                      <label className="panel-label">Quick Themes</label>
+                      <div className="color-presets-row">
+                        {COLOR_PRESETS.map(preset => (
                           <div
-                            key={color}
-                            className={`swatch-item${bgColor === color ? ' active' : ''}`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => { setBgColor(color); setLogoBgColor(color); setBgTransparent(false); }}
+                            key={preset.name}
+                            className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
+                            title={preset.name}
+                            style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
+                            onClick={() => {
+                              setQrColor(preset.qr);
+                              setBgColor(preset.bg);
+                              setLogoBgColor(preset.bg);
+                              setLogoOutlineColor(preset.qr);
+                              setBgTransparent(false);
+                              setActivePreset(preset.name);
+                            }}
                           />
                         ))}
                       </div>
                     </div>
 
-                    {/* Dots Color Row */}
+                    {/* Dots Row */}
                     <div className="color-row-item">
                       <div className="color-row-header">
-                        <label className="panel-label">Dots Color</label>
+                        <label className="panel-label">Dots</label>
                       </div>
                       <div className="swatch-grid-mini">
                         <ColorPicker
@@ -825,15 +824,38 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="toggle-row" style={{ margin: '12px 0 16px' }}>
+                    {/* Background Row */}
+                    <div className="color-row-item">
+                      <div className="color-row-header">
+                        <label className="panel-label">Background</label>
+                      </div>
+                      <div className="swatch-grid-mini">
+                        <ColorPicker
+                          isSwatch={true}
+                          icon={Pipette}
+                          value={bgColor}
+                          onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }}
+                          onOpenAdvanced={handleOpenAdv}
+                        />
+                        {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
+                          <div
+                            key={color}
+                            className={`swatch-item${bgColor === color ? ' active' : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => { setBgColor(color); setLogoBgColor(color); setBgTransparent(false); }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="toggle-row">
                       <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
                     </div>
 
-
-                    {/* Inner Eyes Color Row */}
+                    {/* Inner Eyes Row */}
                     <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
                       <div className="color-row-header">
-                        <label className="panel-label">Inner Eyes Color</label>
+                        <label className="panel-label">Inner Eyes</label>
                       </div>
                       <div className="swatch-grid-mini">
                         <ColorPicker
@@ -855,10 +877,10 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Outer Eyes Color Row */}
+                    {/* Outer Eyes Row */}
                     <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
                       <div className="color-row-header">
-                        <label className="panel-label">Outer Eyes Color</label>
+                        <label className="panel-label">Outer Eyes</label>
                       </div>
                       <div className="swatch-grid-mini">
                         <ColorPicker
@@ -878,28 +900,6 @@ export default function App() {
                           />
                         ))}
                       </div>
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: '24px' }}>
-                    <label className="panel-label">Quick Themes</label>
-                    <div className="color-presets-row">
-                      {COLOR_PRESETS.map(preset => (
-                        <div
-                          key={preset.name}
-                          className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
-                          title={preset.name}
-                          style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
-                          onClick={() => {
-                            setQrColor(preset.qr);
-                            setBgColor(preset.bg);
-                            setLogoBgColor(preset.bg);
-                            setLogoOutlineColor(preset.qr);
-                            setBgTransparent(false);
-                            setActivePreset(preset.name);
-                          }}
-                        />
-                      ))}
                     </div>
                   </div>
                 </div>
