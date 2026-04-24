@@ -317,8 +317,6 @@ export default function QRScanner({ onBack }) {
 
   return (
     <div className="scanner-page fade-in">
-      <div className="scanner-container">
-
         {/* Header */}
         {/* Header — Aligned with camera sides */}
         <header className="scanner-nav-header">
@@ -484,7 +482,6 @@ export default function QRScanner({ onBack }) {
         <footer className="scanner-footer-info">
           <ShieldCheck size={14} /><span>Secure Local Processing</span>
         </footer>
-      </div>
 
       <div id="qr-scanner-file-temp" style={{ display: 'none' }} />
     </div>

@@ -3428,7 +3428,7 @@ input[type="range"]::-moz-range-thumb {
 /* Mobile adjustments */
 @media (max-width: 640px) {
   .scanner-page {
-    padding: 20px 16px;
+    padding: 0;
   }
 
   .scanner-title {
@@ -4875,12 +4875,10 @@ input[type="range"]::-moz-range-thumb {
 .scanner-header-inner {
   width: 100%;
   max-width: 500px;
-  /* Same as camera and controls */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
-  /* Flush with camera sides */
+  padding: 0 16px;
 }
 
 .scanner-back-btn {
