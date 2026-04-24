@@ -5044,6 +5044,15 @@ input[type="range"]::-moz-range-thumb {
   object-fit: cover !important;
 }
 
+/* Hide Android/WebKit default video play button and controls */
+#qr-scanner-viewport video::-webkit-media-controls-start-playback-button,
+#qr-scanner-viewport video::-webkit-media-controls-play-button,
+#qr-scanner-viewport video::-webkit-media-controls {
+  display: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+}
+
 /* Glassmorphism Utilities (Theme-Aware) */
 .glass-panel {
   background: var(--bg-glass);
