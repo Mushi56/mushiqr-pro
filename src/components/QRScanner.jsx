@@ -436,14 +436,12 @@ export default function QRScanner({ onBack }) {
                   </div>
                 </div>
 
-                <div style={{ padding: '0 20px 20px', display: 'flex', gap: '12px' }}>
-                  <button className="modal-done-btn" onClick={handleCopy} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
-                    {copied ? 'Copied!' : 'Copy Text'}
+                <div style={{ padding: '0 24px 24px', display: 'flex', gap: '12px' }}>
+                  <button className="modal-done-btn" onClick={handleCopy} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {copied ? <CheckCircle2 size={22} /> : <Copy size={22} />}
                   </button>
-                  <button className="modal-done-btn" onClick={() => startScanner()} style={{ flex: 1, background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <RefreshCw size={18} />
-                    Scan Another
+                  <button className="modal-done-btn" onClick={() => startScanner()} style={{ flex: 1, background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <RefreshCw size={22} />
                   </button>
                 </div>
               </div>
