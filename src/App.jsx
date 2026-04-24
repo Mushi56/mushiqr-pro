@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
-import { 
-  QrCode, 
-  Sun, 
-  Moon, 
-  CheckCircle2, 
+import {
+  QrCode,
+  Sun,
+  Moon,
+  CheckCircle2,
   XCircle,
   Save,
   Download,
@@ -50,28 +50,28 @@ import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
 
 /* ── Color Presets ── */
 const COLOR_PRESETS = [
-  { name: 'Classic',  qr: '#000000', bg: '#ffffff' },
+  { name: 'Classic', qr: '#000000', bg: '#ffffff' },
   { name: 'Midnight', qr: '#ffffff', bg: '#030305' },
-  { name: 'Cyan Neon',qr: '#00F0FF', bg: '#0A0A0F' },
-  { name: 'Pink Neon',qr: '#FF007F', bg: '#0A0A0F' },
-  { name: 'Ocean',    qr: '#0369a1', bg: '#e0f2fe' },
-  { name: 'Forest',   qr: '#166534', bg: '#dcfce7' },
-  { name: 'Sunset',   qr: '#9a3412', bg: '#fff7ed' },
-  { name: 'Royal',    qr: '#4f46e5', bg: '#eef2ff' },
-  { name: 'Rose',     qr: '#9f1239', bg: '#fff1f2' },
-  { name: 'Gold',     qr: '#854d0e', bg: '#fefce8' },
-  { name: 'Mint',     qr: '#00D1B2', bg: '#F0FFF4' },
+  { name: 'Cyan Neon', qr: '#00F0FF', bg: '#0A0A0F' },
+  { name: 'Pink Neon', qr: '#FF007F', bg: '#0A0A0F' },
+  { name: 'Ocean', qr: '#0369a1', bg: '#e0f2fe' },
+  { name: 'Forest', qr: '#166534', bg: '#dcfce7' },
+  { name: 'Sunset', qr: '#9a3412', bg: '#fff7ed' },
+  { name: 'Royal', qr: '#4f46e5', bg: '#eef2ff' },
+  { name: 'Rose', qr: '#9f1239', bg: '#fff1f2' },
+  { name: 'Gold', qr: '#854d0e', bg: '#fefce8' },
+  { name: 'Mint', qr: '#00D1B2', bg: '#F0FFF4' },
   { name: 'Lavender', qr: '#8E44AD', bg: '#F4ECF7' },
-  { name: 'Solar',    qr: '#F39C12', bg: '#FCF3CF' },
-  { name: 'Emerald',  qr: '#27AE60', bg: '#E9F7EF' },
-  { name: 'Nordic',   qr: '#2C3E50', bg: '#ECF0F1' },
+  { name: 'Solar', qr: '#F39C12', bg: '#FCF3CF' },
+  { name: 'Emerald', qr: '#27AE60', bg: '#E9F7EF' },
+  { name: 'Nordic', qr: '#2C3E50', bg: '#ECF0F1' },
   { name: 'Deep Sea', qr: '#00416A', bg: '#E1E8EB' },
 ];
 
 const SWATCH_PRESETS = [
-  '#000000', '#FFFFFF', '#FF3B30', '#34C759', 
-  '#007AFF', '#FFCC00', '#AF52DE', '#FF9500', 
-  '#5856D6', '#FF2D55', '#00F0FF', '#7000FF', 
+  '#000000', '#FFFFFF', '#FF3B30', '#34C759',
+  '#007AFF', '#FFCC00', '#AF52DE', '#FF9500',
+  '#5856D6', '#FF2D55', '#00F0FF', '#7000FF',
   '#FF007F', '#00D1FF', '#FFD700', '#8E8E93'
 ];
 
@@ -101,7 +101,7 @@ const MockQR = () => {
   ];
   return (
     <svg width="24" height="24" viewBox="0 0 21 21" fill="none">
-      {pattern.map((row, y) => 
+      {pattern.map((row, y) =>
         row.split('').map((bit, x) => bit === '1' ? (
           <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill="currentColor" />
         ) : null)
@@ -111,71 +111,71 @@ const MockQR = () => {
 };
 
 const FRAME_OPTIONS = [
-  { 
-    id: FRAME_STYLES.NONE,    
-    label: 'No Frame',       
-    icon: <div style={{ transform: 'scale(1.4)' }}><MockQR /></div> 
+  {
+    id: FRAME_STYLES.NONE,
+    label: 'No Frame',
+    icon: <div style={{ transform: 'scale(1.4)' }}><MockQR /></div>
   },
-  { 
-    id: FRAME_STYLES.BOX,     
-    label: 'Square',  
+  {
+    id: FRAME_STYLES.BOX,
+    label: 'Square',
     icon: (
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <rect x="2" y="2" width="48" height="48" rx="2" stroke="black" strokeWidth="3" />
         <g transform="translate(14, 14)"><MockQR /></g>
       </svg>
-    ) 
+    )
   },
-  { 
-    id: FRAME_STYLES.ROUNDED, 
-    label: 'Rounded', 
+  {
+    id: FRAME_STYLES.ROUNDED,
+    label: 'Rounded',
     icon: (
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <rect x="2" y="2" width="48" height="48" rx="10" stroke="black" strokeWidth="3" />
         <g transform="translate(14, 14)"><MockQR /></g>
       </svg>
-    ) 
+    )
   },
-  { 
-    id: FRAME_STYLES.MODERN,  
-    label: 'Modern',     
+  {
+    id: FRAME_STYLES.MODERN,
+    label: 'Modern',
     icon: (
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <rect x="2" y="2" width="48" height="48" rx="6" stroke="black" strokeWidth="1.5" strokeDasharray="4 2" />
         <rect x="6" y="6" width="40" height="40" rx="3" stroke="black" strokeWidth="2.5" />
         <g transform="translate(14, 14)"><MockQR /></g>
       </svg>
-    ) 
+    )
   },
-  { 
-    id: FRAME_STYLES.SCAN_ME, 
-    label: 'Scan Me',      
+  {
+    id: FRAME_STYLES.SCAN_ME,
+    label: 'Scan Me',
     icon: (
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <path d="M4 38h44v10c0 1-1 2-2 2H6c-1 0-2-1-2-2v-10z" fill="black" />
         <rect x="18" y="44" width="16" height="2" rx="1" fill="white" fillOpacity="0.8" />
         <g transform="translate(14, 10)"><MockQR /></g>
       </svg>
-    ) 
+    )
   },
-  { 
-    id: FRAME_STYLES.TEXT_BOTTOM, 
-    label: 'Stamp', 
+  {
+    id: FRAME_STYLES.TEXT_BOTTOM,
+    label: 'Stamp',
     icon: (
       <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
         <rect x="6" y="38" width="40" height="10" rx="2" fill="black" />
         <rect x="18" y="42" width="16" height="2" rx="1" fill="white" fillOpacity="0.5" />
         <g transform="translate(14, 10)"><MockQR /></g>
       </svg>
-    ) 
+    )
   },
 ];
 
 /* ── Error Correction Levels ── */
 const EC_LEVELS = [
-  { key: 'L', label: 'L', pct: '7%',  width: 25,  desc: 'Low error correction. Best for simple QR codes with clean printing and close-range scanning.' },
-  { key: 'M', label: 'M', pct: '15%', width: 50,  desc: 'Medium error correction. Good balance for most use cases — recommended as default.' },
-  { key: 'Q', label: 'Q', pct: '25%', width: 75,  desc: 'Quartile error correction. Recommended when adding a logo or for medium-range scanning.' },
+  { key: 'L', label: 'L', pct: '7%', width: 25, desc: 'Low error correction. Best for simple QR codes with clean printing and close-range scanning.' },
+  { key: 'M', label: 'M', pct: '15%', width: 50, desc: 'Medium error correction. Good balance for most use cases — recommended as default.' },
+  { key: 'Q', label: 'Q', pct: '25%', width: 75, desc: 'Quartile error correction. Recommended when adding a logo or for medium-range scanning.' },
   { key: 'H', label: 'H', pct: '30%', width: 100, desc: 'High error correction. Best for complex logos, small print sizes, or harsh environments.' },
 ];
 
@@ -186,10 +186,10 @@ class ErrorBoundary extends Component {
   componentDidCatch(err) { console.error('QR Engine error:', err); }
   render() {
     if (this.state.hasError) return (
-      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', gap:16, color:'var(--text-secondary)', padding:40 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 16, color: 'var(--text-secondary)', padding: 40 }}>
         <QrCode size={48} strokeWidth={1} color="var(--text-muted)" />
-        <p style={{ fontSize:15, fontWeight:600, color:'var(--text-primary)' }}>Something went wrong generating your QR.</p>
-        <p style={{ fontSize:13 }}>Please check your input and try again.</p>
+        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>Something went wrong generating your QR.</p>
+        <p style={{ fontSize: 13 }}>Please check your input and try again.</p>
         <button className="btn btn-primary btn-sm" onClick={() => this.setState({ hasError: false })}>Try Again</button>
       </div>
     );
@@ -233,7 +233,7 @@ export default function App() {
   const [eyeOuterColor, setEyeOuterColor] = useState('');
   const [syncEyes, setSyncEyes] = useState(true);
   const [activePreset, setActivePreset] = useState(null);
-  
+
   // ── Gradient ──
   const [gradientEnabled, setGradientEnabled] = useState(false);
   const [gradientColor1, setGradientColor1] = useState('#6c5ce7');
@@ -517,11 +517,11 @@ export default function App() {
   // ── Tab definitions ──
   const TABS = [
     { id: 'content', label: 'Content', icon: Pencil },
-    { id: 'color',   label: 'Color',   icon: Palette },
-    { id: 'shapes',  label: 'Shapes',  icon: Hexagon },
-    { id: 'logo',    label: 'Logo',    icon: ImageIcon },
+    { id: 'color', label: 'Color', icon: Palette },
+    { id: 'shapes', label: 'Shapes', icon: Hexagon },
+    { id: 'logo', label: 'Logo', icon: ImageIcon },
     // { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
-    { id: 'scan',    label: 'Scan',    icon: ShieldCheck },
+    { id: 'scan', label: 'Scan', icon: ShieldCheck },
   ];
 
   // ── Get the frame CSS class for the preview wrapper ──
@@ -573,7 +573,7 @@ export default function App() {
           </button>
 
 
-          
+
           <div className="header-save-container" ref={downloadBtnRef} style={{ position: 'relative' }}>
             <button
               className={`btn-header-action btn-header-save ${!qrMatrixInfo ? 'disabled' : ''} ${formatDropdownOpen ? 'active' : ''}`}
@@ -599,8 +599,8 @@ export default function App() {
                       <button
                         key={label}
                         className={`format-option ${selectedFormat === label ? 'active' : ''}`}
-                        onClick={() => { 
-                          setSelectedFormat(label); 
+                        onClick={() => {
+                          setSelectedFormat(label);
                           setFormatDropdownOpen(false);
                           handleDownload(label, FORMAT_MAP[label]);
                         }}
@@ -627,33 +627,33 @@ export default function App() {
                 </div>
                 <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0' }} />
 
-                  
-                  <div className="dropdown-section" style={{ padding: '8px 12px 12px' }}>
-                    <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Quick Actions</div>
-                    <div className="actions-column" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+
+                <div className="dropdown-section" style={{ padding: '8px 12px 12px' }}>
+                  <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Quick Actions</div>
+                  <div className="actions-column" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <button
+                      className="menu-link-btn"
+                      onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}
+                      style={{ padding: '10px 12px', borderRadius: '10px' }}
+                    >
+                      <Copy size={16} /> <span>Copy Image</span>
+                    </button>
+                    <button
+                      className="menu-link-btn"
+                      onClick={() => { handleSave(); setFormatDropdownOpen(false); }}
+                      style={{ padding: '10px 12px', borderRadius: '10px' }}
+                    >
+                      <History size={16} /> <span>Save to History</span>
+                    </button>
+                    {typeof navigator !== 'undefined' && navigator.canShare && (
                       <button
                         className="menu-link-btn"
-                        onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}
+                        onClick={() => { handleShare(); setFormatDropdownOpen(false); }}
                         style={{ padding: '10px 12px', borderRadius: '10px' }}
                       >
-                        <Copy size={16} /> <span>Copy Image</span>
+                        <Share2 size={16} /> <span>Share QR Code</span>
                       </button>
-                      <button
-                        className="menu-link-btn"
-                        onClick={() => { handleSave(); setFormatDropdownOpen(false); }}
-                        style={{ padding: '10px 12px', borderRadius: '10px' }}
-                      >
-                        <History size={16} /> <span>Save to History</span>
-                      </button>
-                      {typeof navigator !== 'undefined' && navigator.canShare && (
-                        <button
-                          className="menu-link-btn"
-                          onClick={() => { handleShare(); setFormatDropdownOpen(false); }}
-                          style={{ padding: '10px 12px', borderRadius: '10px' }}
-                        >
-                          <Share2 size={16} /> <span>Share QR Code</span>
-                        </button>
-                      )}
+                    )}
                   </div>
                 </div>
               </div>
@@ -687,7 +687,7 @@ export default function App() {
                       if (theme === 'dark') next = 'light';
                       else if (theme === 'light') next = 'auto';
                       else next = 'dark';
-                      
+
                       setTheme(next);
                       savePreferences({ ...getPreferences(), theme: next });
                     }}
@@ -703,8 +703,8 @@ export default function App() {
                         <circle cx="12" cy="12" r="10" />
                       </svg>
                     )}
-                    Theme <span style={{ 
-                      textTransform: 'capitalize', 
+                    Theme <span style={{
+                      textTransform: 'capitalize',
                       marginLeft: 4,
                       color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF007F' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF007F'),
                       fontWeight: 'bold'
@@ -762,12 +762,12 @@ export default function App() {
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <QRTypeSelector 
-                      activeType={qrType} 
-                      onTypeChange={(type) => { 
-                        setQrType(type); 
-                        setIsDataModalOpen(true); 
-                      }} 
+                    <QRTypeSelector
+                      activeType={qrType}
+                      onTypeChange={(type) => {
+                        setQrType(type);
+                        setIsDataModalOpen(true);
+                      }}
                     />
                   </div>
                 </div>
@@ -783,16 +783,16 @@ export default function App() {
                         <label className="panel-label">Background Color</label>
                       </div>
                       <div className="swatch-grid-mini">
-                        <ColorPicker 
+                        <ColorPicker
                           isSwatch={true}
                           icon={Pipette}
-                          value={bgColor} 
-                          onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} 
-                          onOpenAdvanced={handleOpenAdv} 
+                          value={bgColor}
+                          onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }}
+                          onOpenAdvanced={handleOpenAdv}
                         />
-                        {[ '#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2) ].map(color => (
-                          <div 
-                            key={color} 
+                        {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
+                          <div
+                            key={color}
                             className={`swatch-item${bgColor === color ? ' active' : ''}`}
                             style={{ backgroundColor: color }}
                             onClick={() => { setBgColor(color); setLogoBgColor(color); setBgTransparent(false); }}
@@ -807,16 +807,16 @@ export default function App() {
                         <label className="panel-label">Dots Color</label>
                       </div>
                       <div className="swatch-grid-mini">
-                        <ColorPicker 
+                        <ColorPicker
                           isSwatch={true}
                           icon={Pipette}
-                          value={qrColor} 
-                          onChange={(c) => { setQrColor(c); setLogoOutlineColor(c); }} 
-                          onOpenAdvanced={handleOpenAdv} 
+                          value={qrColor}
+                          onChange={(c) => { setQrColor(c); setLogoOutlineColor(c); }}
+                          onOpenAdvanced={handleOpenAdv}
                         />
                         {SWATCH_PRESETS.map(color => (
-                          <div 
-                            key={color} 
+                          <div
+                            key={color}
                             className={`swatch-item${qrColor === color ? ' active' : ''}`}
                             style={{ backgroundColor: color }}
                             onClick={() => { setQrColor(color); setLogoOutlineColor(color); }}
@@ -825,9 +825,10 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="toggle-row" style={{ margin: '4px 0', background: 'var(--bg-hover)', padding: '10px 14px', borderRadius: '14px' }}>
+                    <div className="toggle-row" style={{ margin: '12px 0 16px' }}>
                       <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
                     </div>
+
 
                     {/* Inner Eyes Color Row */}
                     <div className={`color-row-item${syncEyes ? ' disabled' : ''}`}>
@@ -835,17 +836,17 @@ export default function App() {
                         <label className="panel-label">Inner Eyes Color</label>
                       </div>
                       <div className="swatch-grid-mini">
-                        <ColorPicker 
+                        <ColorPicker
                           isSwatch={true}
                           icon={Pipette}
-                          value={syncEyes ? qrColor : (eyeColor || qrColor)} 
-                          onChange={setEyeColor} 
+                          value={syncEyes ? qrColor : (eyeColor || qrColor)}
+                          onChange={setEyeColor}
                           onOpenAdvanced={handleOpenAdv}
                           disabled={syncEyes}
                         />
                         {SWATCH_PRESETS.map(color => (
-                          <div 
-                            key={color} 
+                          <div
+                            key={color}
                             className={`swatch-item${(syncEyes ? qrColor : eyeColor) === color ? ' active' : ''}`}
                             style={{ backgroundColor: color }}
                             onClick={() => !syncEyes && setEyeColor(color)}
@@ -860,17 +861,17 @@ export default function App() {
                         <label className="panel-label">Outer Eyes Color</label>
                       </div>
                       <div className="swatch-grid-mini">
-                        <ColorPicker 
+                        <ColorPicker
                           isSwatch={true}
                           icon={Pipette}
-                          value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} 
-                          onChange={setEyeOuterColor} 
+                          value={syncEyes ? qrColor : (eyeOuterColor || qrColor)}
+                          onChange={setEyeOuterColor}
                           onOpenAdvanced={handleOpenAdv}
                           disabled={syncEyes}
                         />
                         {SWATCH_PRESETS.map(color => (
-                          <div 
-                            key={color} 
+                          <div
+                            key={color}
                             className={`swatch-item${(syncEyes ? qrColor : eyeOuterColor) === color ? ' active' : ''}`}
                             style={{ backgroundColor: color }}
                             onClick={() => !syncEyes && setEyeOuterColor(color)}
@@ -1001,10 +1002,10 @@ export default function App() {
                   </div>
 
                   <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
-                    <LogoPresets 
-                      logo={logo} 
-                      onLogoChange={setLogo} 
-                      onLogoRemove={() => setLogo(null)} 
+                    <LogoPresets
+                      logo={logo}
+                      onLogoChange={setLogo}
+                      onLogoRemove={() => setLogo(null)}
                     />
                   </div>
                 </div>
@@ -1120,12 +1121,12 @@ export default function App() {
             <CheckCircle2 color="var(--success)" size={18} />
           ) : (
             <XCircle color="var(--error)" size={18} />
-          )} 
+          )}
           {toast.message}
         </div>
       )}
       {/* Advanced Color Picker Modal */}
-      <AdvancedColorPicker 
+      <AdvancedColorPicker
         isOpen={advPicker.open}
         initialColor={advPicker.color}
         onChange={(newColor) => {
