@@ -94,12 +94,21 @@ export default function LogoPresets({ logo, onLogoChange, onLogoRemove }) {
           <button
             key={p.slug}
             className={`logo-preset-btn ${loading === p.slug ? 'loading' : ''} ${logo?.src === p.url ? 'active' : ''}`}
-            onClick={() => handleSelect(p.slug, p.name, p.url)}
+            onClick={() => logo?.src === p.url ? onLogoRemove() : handleSelect(p.slug, p.name, p.url)}
             title={p.name}
             style={{ '--brand-color': p.color }}
           >
-            <div className="logo-preset-icon">
-              <img src={p.url} alt={p.name} loading="lazy" crossOrigin="anonymous" />
+            <div className="logo-preset-icon" style={{ position: 'relative' }}>
+              <img 
+                src={p.url} 
+                alt={p.name} 
+                loading="lazy" 
+                crossOrigin="anonymous" 
+                style={{ opacity: logo?.src === p.url ? 0.3 : 1, transition: 'opacity 0.2s' }} 
+              />
+              {logo?.src === p.url && (
+                <X size={18} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              )}
             </div>
           </button>
         ))}
