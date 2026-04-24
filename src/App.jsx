@@ -1034,11 +1034,6 @@ export default function App() {
 
               {activeTab === 'scan' && (
                 <div className="tab-panel fade-in" id="panel-scan">
-                  <div>
-                    <p className="ec-description">
-                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
-                    </p>
-                  </div>
                   <div style={{ marginTop: 'auto' }}>
                     <label className="panel-label">Scan Reliability</label>
                     <div className="ec-buttons-row">
@@ -1059,6 +1054,9 @@ export default function App() {
                         style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
                       />
                     </div>
+                    <p className="ec-description">
+                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
+                    </p>
                   </div>
                 </div>
               )}
