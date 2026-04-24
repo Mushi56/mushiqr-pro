@@ -52,24 +52,80 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
         {/* Hero Card */}
         <div style={{ padding: '0 24px', marginTop: '10px' }}>
           <div style={{ 
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border-color)',
+            background: 'linear-gradient(135deg, #8B0020 0%, #D60036 45%, #FF2D5E 100%)',
             borderRadius: '24px',
-            padding: '24px',
-            color: 'var(--text-primary)',
+            padding: '28px 24px',
+            color: '#fff',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             position: 'relative',
             overflow: 'hidden',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
+            boxShadow: '0 16px 48px rgba(214, 0, 54, 0.45)'
           }}>
+            {/* Decorative circles for depth */}
+            <div style={{
+              position: 'absolute', top: '-24px', right: '90px',
+              width: '120px', height: '120px', borderRadius: '50%',
+              background: 'rgba(255,255,255,0.07)', pointerEvents: 'none'
+            }} />
+            <div style={{
+              position: 'absolute', bottom: '-30px', right: '20px',
+              width: '160px', height: '160px', borderRadius: '50%',
+              background: 'rgba(255,255,255,0.06)', pointerEvents: 'none'
+            }} />
+            <div style={{
+              position: 'absolute', top: '10px', left: '-30px',
+              width: '80px', height: '80px', borderRadius: '50%',
+              background: 'rgba(255,255,255,0.05)', pointerEvents: 'none'
+            }} />
+
             <div style={{ zIndex: 1, flex: 1 }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>Create QR Code</h2>
-              <p style={{ fontSize: '13px', margin: '0', color: 'var(--text-secondary)' }}>Fast, Simple & Beautiful</p>
+              <h2 style={{ 
+                fontSize: '24px', fontWeight: 800, 
+                margin: '0 0 6px 0', color: '#fff',
+                lineHeight: 1.2
+              }}>Create QR Code</h2>
+              <p style={{ 
+                fontSize: '13px', margin: '0 0 16px 0', 
+                color: 'rgba(255,255,255,0.75)',
+                fontWeight: 500
+              }}>Fast, Simple &amp; Beautiful</p>
+              
+              <button 
+                onClick={() => onNavigate('generator')}
+                style={{
+                  backgroundColor: '#fff',
+                  color: '#D60036',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  transition: 'transform 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Plus size={18} /> Create New
+              </button>
             </div>
-            <div style={{ zIndex: 1, background: 'var(--bg-primary)', padding: '16px', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
-              <QrCode size={64} color="var(--accent-primary)" />
+
+            <div style={{ 
+              zIndex: 1,
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(8px)',
+              padding: '16px',
+              borderRadius: '20px',
+              border: '1px solid rgba(255,255,255,0.25)',
+              flexShrink: 0
+            }}>
+              <QrCode size={60} color="#fff" />
             </div>
           </div>
         </div>
