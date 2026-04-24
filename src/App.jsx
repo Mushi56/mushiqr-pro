@@ -558,32 +558,112 @@ export default function App() {
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
 
-        <div className="app-header-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          {/* Main App Navigation */}
-          <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '20px', marginRight: '8px' }}>
+        <div className="app-header-actions">
+          {/* Single Mode Toggle Button */}
+          <button
+            className="btn-header-action mode-toggle-btn"
+            onClick={() => setActivePage(activePage === 'generator' ? 'scanner' : 'generator')}
+            title={activePage === 'generator' ? 'Switch to Scanner' : 'Switch to Generator'}
+          >
+            {activePage === 'generator' ? (
+              <MdOutlineQrCode2 size={22} />
+            ) : (
+              <MdQrCodeScanner size={22} />
+            )}
+          </button>
+
+
+          
+          <div className="header-save-container" ref={downloadBtnRef} style={{ position: 'relative' }}>
             <button
-              className={`btn-theme-toggle`}
-              onClick={() => setActivePage('generator')}
-              title="QR Generator"
-              style={{
-                background: activePage === 'generator' ? 'var(--accent-primary)' : 'transparent',
-                color: activePage === 'generator' ? '#000' : 'var(--text-primary)'
-              }}
+              className={`btn-header-action btn-header-save ${!qrMatrixInfo ? 'disabled' : ''} ${formatDropdownOpen ? 'active' : ''}`}
+              onClick={() => setFormatDropdownOpen(!formatDropdownOpen)}
+              disabled={!qrMatrixInfo}
+              title="Save As..."
             >
-              <MdOutlineQrCode2 size={20} />
+              <Save size={20} />
+              <ChevronDown size={14} style={{ marginLeft: 2, opacity: 0.8 }} />
             </button>
-            <button
-              className={`btn-theme-toggle`}
-              onClick={() => setActivePage('scanner')}
-              title="QR Scanner"
-              style={{
-                background: activePage === 'scanner' ? 'var(--accent-primary)' : 'transparent',
-                color: activePage === 'scanner' ? '#000' : 'var(--text-primary)'
-              }}
-            >
-              <MdQrCodeScanner size={20} />
-            </button>
+
+            {formatDropdownOpen && (
+              <div className="app-dropdown-menu save-as-dropdown fade-in" style={{ top: 'calc(100% + 12px)', right: 0, width: '220px' }}>
+                <div className="dropdown-section" style={{ padding: '12px' }}>
+                  <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Export Format</div>
+                  <div className="format-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                    {[
+                      { label: 'PNG', Icon: FileImage },
+                      { label: 'SVG', Icon: FileCode },
+                      { label: 'PDF', Icon: FileText },
+                      { label: 'JPG', Icon: FileImage },
+                    ].map(({ label, Icon }) => (
+                      <button
+                        key={label}
+                        className={`format-option ${selectedFormat === label ? 'active' : ''}`}
+                        onClick={() => { 
+                          setSelectedFormat(label); 
+                          setFormatDropdownOpen(false);
+                          handleDownload(label, FORMAT_MAP[label]);
+                        }}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '10px',
+                          background: selectedFormat === label ? 'var(--accent-soft)' : 'var(--bg-hover)',
+                          border: '1px solid',
+                          borderColor: selectedFormat === label ? 'var(--accent-primary)' : 'transparent',
+                          borderRadius: '12px',
+                          color: selectedFormat === label ? 'var(--accent-primary)' : 'var(--text-primary)',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <Icon size={18} />
+                        <span style={{ fontSize: '11px', fontWeight: 700 }}>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0' }} />
+
+                  
+                  <div className="dropdown-section" style={{ padding: '8px 12px 12px' }}>
+                    <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Quick Actions</div>
+                    <div className="actions-column" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <button
+                        className="menu-link-btn"
+                        onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}
+                        style={{ padding: '10px 12px', borderRadius: '10px' }}
+                      >
+                        <Copy size={16} /> <span>Copy Image</span>
+                      </button>
+                      <button
+                        className="menu-link-btn"
+                        onClick={() => { handleSave(); setFormatDropdownOpen(false); }}
+                        style={{ padding: '10px 12px', borderRadius: '10px' }}
+                      >
+                        <History size={16} /> <span>Save to History</span>
+                      </button>
+                      {typeof navigator !== 'undefined' && navigator.canShare && (
+                        <button
+                          className="menu-link-btn"
+                          onClick={() => { handleShare(); setFormatDropdownOpen(false); }}
+                          style={{ padding: '10px 12px', borderRadius: '10px' }}
+                        >
+                          <Share2 size={16} /> <span>Share QR Code</span>
+                        </button>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+
+
+
+
+
 
           <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
             <button
@@ -671,75 +751,8 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Unified Save & Actions Button */}
-                <div className="save-split-wrapper" ref={downloadBtnRef}>
-                  <div className={`save-split-btn${!qrMatrixInfo ? ' disabled' : ''}`}>
-                    <button
-                      className="save-split-main"
-                      disabled={!qrMatrixInfo}
-                      onClick={() => handleDownload(selectedFormat, FORMAT_MAP[selectedFormat])}
-                    >
-                      {downloadingFormat === selectedFormat
-                        ? <Loader2 size={17} className="spinning" />
-                        : <Download size={17} />
-                      }
-                      Save {selectedFormat}
-                    </button>
-                    <span className="save-split-divider" />
-                    <button
-                      className={`save-split-chevron${formatDropdownOpen ? ' open' : ''}`}
-                      disabled={!qrMatrixInfo}
-                      onClick={() => setFormatDropdownOpen(v => !v)}
-                      aria-label="Action menu"
-                    >
-                      <ChevronDown size={15} />
-                    </button>
-                  </div>
 
-                  {formatDropdownOpen && (
-                    <div className="save-action-dropdown">
-                      <div className="dropdown-section">
-                        <div className="dropdown-label">Export Format</div>
-                        <div className="format-grid">
-                          {[
-                            { label: 'PNG', Icon: FileImage, color: '#00F0FF' },
-                            { label: 'SVG', Icon: FileCode, color: '#7000FF' },
-                            { label: 'PDF', Icon: FileText, color: '#FF007F' },
-                            { label: 'JPG', Icon: FileImage, color: '#FFD54F' },
-                          ].map(({ label, Icon, color }) => (
-                            <button
-                              key={label}
-                              className={`format-option${selectedFormat === label ? ' active' : ''}`}
-                              onClick={() => { setSelectedFormat(label); setFormatDropdownOpen(false); }}
-                            >
-                              <Icon size={18} color={selectedFormat === label ? 'var(--accent-primary)' : 'var(--text-secondary)'} />
-                              <span>{label}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
 
-                      <div className="dropdown-divider" />
-
-                      <div className="dropdown-section">
-                        <div className="dropdown-label">Actions</div>
-                        <div className="dropdown-actions-row">
-                          <button className="dropdown-action-btn primary" onClick={() => { handleSave(); setFormatDropdownOpen(false); }}>
-                            <History size={18} /> <span>Save to History</span>
-                          </button>
-                          <button className="dropdown-action-btn" onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }} title="Copy Image">
-                            <Copy size={18} />
-                          </button>
-                          {typeof navigator !== 'undefined' && navigator.canShare && (
-                            <button className="dropdown-action-btn" onClick={() => { handleShare(); setFormatDropdownOpen(false); }} title="Share QR Code">
-                              <Share2 size={18} />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
               </section>
             </ErrorBoundary>
 

@@ -70,38 +70,90 @@
 
 /* Light Theme Ã¢â‚¬â€ High-end clean aesthetic */
 [data-theme="light"] {
-  --bg-primary: #FDFDFF;
-  --bg-secondary: #FFFFFF;
-  --bg-tertiary: #F8FAFF;
-  --bg-card: rgba(255, 255, 255, 0.75);
+  --bg-primary: #FAFAFA;
+  --bg-secondary: #212427; /* Dark headers/secondary surfaces */
+  --bg-tertiary: #F5F5F5;
+  --bg-card: rgba(255, 255, 255, 0.95);
   --bg-elevated: #FFFFFF;
-  --bg-input: #F9FAFB;
-  --bg-hover: rgba(0, 0, 0, 0.02);
-  --bg-glass: rgba(255, 255, 255, 0.65);
+  --bg-input: #FFFFFF;
+  --bg-hover: rgba(33, 36, 39, 0.05);
+  --bg-glass: rgba(33, 36, 39, 0.98);
 
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-tertiary: #94A3B8;
-  --text-muted: #CBD5E1;
+  --text-primary: #212427;
+  --text-secondary: #4A4D50;
+  --text-tertiary: #707376;
+  --text-muted: #A0A3A6;
 
-  /* Premium Pink Palette for Light Mode */
-  --accent-primary: #D81B60; /* Slightly darker pink */
-  --accent-secondary: #AD1457;
-  --accent-gradient: linear-gradient(135deg, #FF4081 0%, #D81B60 100%);
-  --accent-glow: rgba(216, 27, 96, 0.3);
-  --accent-soft: rgba(216, 27, 96, 0.08); /* Transparent shades */
+  /* Custom variable for light text on dark secondary surfaces (like header) */
+  --text-inverse: #FAFAFA;
 
-  --border-color: rgba(0, 0, 0, 0.04);
-  --border-light: rgba(0, 0, 0, 0.06);
-  --border-accent: rgba(216, 27, 96, 0.15);
+  --accent-primary: #D60036;
+  --accent-secondary: #B5002D;
+  --accent-gradient: linear-gradient(135deg, #D60036 0%, #B5002D 100%);
+  --accent-glow: rgba(214, 0, 54, 0.3);
+  --accent-soft: rgba(214, 0, 54, 0.08);
+
+  --border-color: rgba(33, 36, 39, 0.1);
+  --border-light: rgba(33, 36, 39, 0.06);
+  --border-accent: rgba(214, 0, 54, 0.25);
   
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
-  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.01);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
+  --shadow-sm: 0 2px 4px rgba(33, 36, 39, 0.04);
+  --shadow-md: 0 6px 16px rgba(33, 36, 39, 0.08);
+  --shadow-lg: 0 16px 32px rgba(33, 36, 39, 0.12);
 
-  --bg-dropdown: rgba(255, 255, 255, 0.98);
+  --accent-gradient-animated: linear-gradient(270deg, #D60036, #B5002D, #FF4D7D, #D60036);
+
+  --bg-dropdown: #FFFFFF;
   --bg-dropdown-solid: #FFFFFF;
 }
+
+/* Light Mode Overrides for Dark Surfaces (Headers/Sidebars) */
+[data-theme="light"] .app-header,
+[data-theme="light"] .sidebar,
+[data-theme="light"] .scanner-nav-header,
+[data-theme="light"] .scanner-controls-bar,
+[data-theme="light"] .scanner-footer-info {
+  color: var(--text-inverse);
+}
+
+[data-theme="light"] .app-header .app-logo-text,
+[data-theme="light"] .app-header .btn-header-action:not(.active),
+[data-theme="light"] .scanner-nav-header .scanner-back-btn,
+[data-theme="light"] .scanner-nav-header .scanner-nav-title,
+[data-theme="light"] .scanner-controls-bar .scanner-bar-title {
+  color: var(--text-inverse);
+}
+
+[data-theme="light"] .app-header .btn-menu-toggle,
+[data-theme="light"] .app-header .btn-header-action:not(.active) {
+  background: #FAFAFA;
+  color: #212427;
+  border-color: transparent;
+}
+
+[data-theme="light"] .app-header .btn-menu-toggle:hover,
+[data-theme="light"] .app-header .btn-header-action:not(.active):hover {
+  background: #FFFFFF;
+  color: var(--accent-primary);
+}
+
+
+
+
+[data-theme="light"] .sidebar .section-title,
+[data-theme="light"] .sidebar .section-icon,
+[data-theme="light"] .sidebar .form-label,
+[data-theme="light"] .sidebar .slider-label,
+[data-theme="light"] .sidebar .panel-label {
+  color: var(--text-inverse);
+}
+
+[data-theme="light"] .scanner-result-card {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+
 
 /* ========================================
    RESET & BASE
@@ -3892,29 +3944,84 @@ input[type="range"]::-moz-range-thumb {
 .app-header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px; /* Consistent spacing between all buttons */
 }
 
-.btn-menu-toggle {
+.mode-toggle-btn {
+  background: var(--accent-primary) !important;
+  color: #000 !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+
+[data-theme="light"] .mode-toggle-btn {
+  color: #FFFFFF !important;
+}
+
+.mode-toggle-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 18px var(--accent-glow);
+}
+
+
+.btn-menu-toggle,
+.btn-header-action {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   background: var(--bg-elevated);
-  border: none;
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
   cursor: pointer;
-  transition: var(--transition-base);
+  transition: all var(--transition-base);
 }
 
 .btn-menu-toggle:hover,
-.btn-menu-toggle.active {
+.btn-header-action:hover {
   background: var(--bg-hover);
-  border-color: var(--border-light);
+  border-color: var(--border-accent);
   color: var(--accent-primary);
+  transform: translateY(-2px);
 }
+
+
+
+.btn-header-save {
+  background: #FAFAFA !important;
+  color: #212427 !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 64px;
+  border-radius: 14px !important;
+  transition: all var(--transition-base);
+}
+
+.btn-header-save.active {
+  background: var(--accent-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+
+
+
+
+
+.btn-header-save:hover:not(.active) {
+  background: #FFFFFF !important;
+  color: var(--accent-primary) !important;
+  transform: translateY(-2px);
+}
+
+.btn-header-save:active {
+  transform: scale(0.95) !important;
+}
+
+
 
 .app-dropdown-menu {
   position: absolute;
