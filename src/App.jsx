@@ -44,6 +44,7 @@ import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/expo
 import { saveToHistory, getPreferences, savePreferences } from './utils/storage';
 import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
+import HomePage from './components/HomePage';
 import AdvancedColorPicker from './components/AdvancedColorPicker';
 import { ScanLine, History } from 'lucide-react';
 import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
@@ -201,7 +202,7 @@ class ErrorBoundary extends Component {
 export default function App() {
   // ── Tab & Theme ──
   const [activeTab, setActiveTab] = useState('content');
-  const [activePage, setActivePage] = useState('generator'); // 'generator', 'scanner', 'history'
+  const [activePage, setActivePage] = useState('home'); // 'home', 'generator', 'scanner', 'history'
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
 
@@ -539,6 +540,7 @@ export default function App() {
   return (
     <div className="app redesigned">
       {/* ── Header ── */}
+      {activePage !== 'home' && (
       <header className="app-header">
         <div className="app-logo">
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
@@ -677,6 +679,9 @@ export default function App() {
             {isMenuOpen && (
               <div className="app-dropdown-menu fade-in">
                 <div className="menu-links">
+                  <button className={`menu-link-btn ${activePage === 'home' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('home'); }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Home
+                  </button>
                   <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('history'); }}>
                     <History size={16} /> History
                   </button>
@@ -730,6 +735,7 @@ export default function App() {
           </div>
         </div>
       </header>
+      )}
 
       {/* ── Main Content Area ── */}
       <main className="app-main-redesigned">
@@ -1065,6 +1071,22 @@ export default function App() {
           </>
         ) : activePage === 'scanner' ? (
           <QRScanner onBack={() => setActivePage('generator')} />
+        ) : activePage === 'home' ? (
+          <HomePage 
+            onNavigate={setActivePage}
+            onQuickCreate={(type) => {
+              setQrType(type);
+              setActivePage('generator');
+              setIsDataModalOpen(true);
+            }}
+            theme={theme}
+            setTheme={(next) => {
+              setTheme(next);
+              savePreferences({ ...getPreferences(), theme: next });
+            }}
+            effectiveTheme={effectiveTheme}
+            activePage={activePage}
+          />
         ) : (
           <HistoryPage />
         )}
