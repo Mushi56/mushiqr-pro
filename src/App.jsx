@@ -560,21 +560,7 @@ export default function App() {
         </div>
 
         <div className="app-header-actions">
-          {/* Single Mode Toggle Button */}
-          <button
-            className="btn-header-action mode-toggle-btn"
-            onClick={() => setActivePage(activePage === 'generator' ? 'scanner' : 'generator')}
-            title={activePage === 'generator' ? 'Switch to Scanner' : 'Switch to Generator'}
-          >
-            {activePage === 'generator' ? (
-              <MdOutlineQrCode2 size={22} />
-            ) : (
-              <MdQrCodeScanner size={22} />
-            )}
-          </button>
-
-
-
+          {activePage !== 'home' && (
           <div className="header-save-container" ref={downloadBtnRef} style={{ position: 'relative' }}>
             <button
               className={`btn-header-action btn-header-save ${!qrMatrixInfo ? 'disabled' : ''} ${formatDropdownOpen ? 'active' : ''}`}
@@ -660,11 +646,7 @@ export default function App() {
               </div>
             )}
           </div>
-
-
-
-
-
+          )}
 
           <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
             <button

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, MoreVertical, ChevronRight } from 'lucide-react';
+import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, MoreVertical, ChevronRight, ScanLine } from 'lucide-react';
 import { QR_TYPES } from '../utils/qrEngine';
 import { getHistory } from '../utils/storage';
 
@@ -66,26 +66,7 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
           }}>
             <div style={{ zIndex: 1, flex: 1 }}>
               <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>Create QR Code</h2>
-              <p style={{ fontSize: '13px', margin: '0 0 20px 0', color: 'var(--text-secondary)' }}>Fast, Simple & Beautiful</p>
-              <button 
-                onClick={() => onNavigate('generator')}
-                style={{
-                  background: 'var(--text-primary)',
-                  color: 'var(--bg-primary)',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '10px 16px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Plus size={16} />
-                Create New
-              </button>
+              <p style={{ fontSize: '13px', margin: '0', color: 'var(--text-secondary)' }}>Fast, Simple & Beautiful</p>
             </div>
             <div style={{ zIndex: 1, background: 'var(--bg-primary)', padding: '16px', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
               <QrCode size={64} color="var(--accent-primary)" />
@@ -221,7 +202,7 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
 
         <div style={{ position: 'relative', width: '60px', height: '60px' }}>
           <button 
-            onClick={() => onNavigate('generator')}
+            onClick={() => onNavigate('scanner')}
             style={{ 
               position: 'absolute',
               top: '-20px',
@@ -240,7 +221,7 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
               color: 'white'
             }}
           >
-            <QrCode size={24} />
+            <ScanLine size={24} />
           </button>
         </div>
 
