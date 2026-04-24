@@ -110,18 +110,12 @@
 
 /* Light Mode Overrides for Dark Surfaces (Headers/Sidebars) */
 [data-theme="light"] .app-header,
-[data-theme="light"] .sidebar,
-[data-theme="light"] .scanner-nav-header,
-[data-theme="light"] .scanner-controls-bar,
-[data-theme="light"] .scanner-footer-info {
+[data-theme="light"] .sidebar {
   color: var(--text-inverse);
 }
 
 [data-theme="light"] .app-header .app-logo-text,
-[data-theme="light"] .app-header .btn-header-action:not(.active),
-[data-theme="light"] .scanner-nav-header .scanner-back-btn,
-[data-theme="light"] .scanner-nav-header .scanner-nav-title,
-[data-theme="light"] .scanner-controls-bar .scanner-bar-title {
+[data-theme="light"] .app-header .btn-header-action:not(.active) {
   color: var(--text-inverse);
 }
 
@@ -4846,6 +4840,22 @@ input[type="range"]::-moz-range-thumb {
 /* â”€â”€ QR Scanner Redesign â”€â”€ */
 /* â”€â”€ QR Scanner Theme-Aware Redesign â”€â”€ */
 .scanner-page {
+  /* Force dark theme for premium camera aesthetic */
+  --bg-primary: #030305;
+  --bg-secondary: #0A0A0F;
+  --bg-tertiary: #12121A;
+  --bg-card: rgba(20, 20, 30, 0.4);
+  --bg-elevated: rgba(30, 30, 45, 0.6);
+  --bg-input: rgba(10, 10, 15, 0.8);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-glass: rgba(5, 5, 8, 0.7);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #71717A;
+  --text-muted: #52525B;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.1);
+
   position: fixed;
   top: 0;
   left: 0;
@@ -4916,7 +4926,6 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  background: var(--bg-primary);
 }
 
 .scanner-viewport-wrapper {
