@@ -453,16 +453,22 @@ export default function QRScanner({ onBack }) {
             </div>
           )}
 
-          {/* CONTROLS BAR — Premium floating design */}
+          {/* CONTROLS BAR — Square separate buttons */}
           {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
-            <div className="scanner-controls-bar glass-panel" style={{ borderRadius: '24px', padding: '8px', gap: '8px', marginBottom: '20px' }}>
-              <button className="scanner-ctrl-btn" onClick={() => fileInputRef.current?.click()}>
-                <ImagePlus size={22} strokeWidth={1.5} />
+            <div className="scanner-controls-bar">
+              <button className="type-tab" onClick={() => fileInputRef.current?.click()}>
+                <span className="type-tab-icon">
+                  <ImagePlus size={20} strokeWidth={1.5} />
+                </span>
                 Gallery
               </button>
+              
+              <div className="scanner-bar-title">Scan</div>
 
-              <button className="scanner-ctrl-btn primary" onClick={closeScanner}>
-                <X size={22} strokeWidth={1.5} />
+              <button className="type-tab active" onClick={closeScanner} style={{ background: 'var(--accent-soft)', color: 'var(--accent-primary)' }}>
+                <span className="type-tab-icon">
+                  <X size={20} strokeWidth={1.5} />
+                </span>
                 Close
               </button>
 
