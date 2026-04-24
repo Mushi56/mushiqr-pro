@@ -398,43 +398,6 @@ export default function QRScanner({ onBack }) {
                 </div>
               )}
 
-              {/* RESULT CARD - Matches app modal style */}
-              {status === 'RESULT' && (
-                <div className="modal-overlay">
-                  <div className="modal-container glass-panel" style={{ margin: 'auto' }}>
-                    <div className="modal-header">
-                      <div className="modal-header-title">
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <ShieldCheck size={22} color="var(--accent-primary)" />
-                          <h3>QR Code Detected</h3>
-                        </div>
-                        <p>Decoded successfully</p>
-                      </div>
-                      <button className="modal-close" onClick={() => startScanner()}>
-                        <X size={20} />
-                      </button>
-                    </div>
-
-                    <div className="modal-content">
-                      <div className="res-data-box" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', borderRadius: '16px', padding: '16px', wordBreak: 'break-all', fontFamily: 'var(--font-mono)', fontSize: '15px' }}>
-                        <p style={{ margin: 0 }}>{result}</p>
-                      </div>
-                    </div>
-
-                    <div style={{ padding: '0 20px 20px', display: 'flex', gap: '12px' }}>
-                      <button className="modal-done-btn" onClick={handleCopy} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                        {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
-                        {copied ? 'Copied!' : 'Copy Text'}
-                      </button>
-                      <button className="modal-done-btn" onClick={() => startScanner()} style={{ flex: 1, background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                        <RefreshCw size={18} />
-                        Scan Another
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* ERROR overlay */}
               {status === 'ERROR' && (
                 <div className="scanner-state-overlay">
@@ -447,6 +410,43 @@ export default function QRScanner({ onBack }) {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* RESULT CARD - Matches app modal style */}
+          {status === 'RESULT' && (
+            <div className="modal-overlay">
+              <div className="modal-container glass-panel" style={{ margin: 'auto' }}>
+                <div className="modal-header">
+                  <div className="modal-header-title">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ShieldCheck size={22} color="var(--accent-primary)" />
+                      <h3>QR Code Detected</h3>
+                    </div>
+                    <p>Decoded successfully</p>
+                  </div>
+                  <button className="modal-close" onClick={() => startScanner()}>
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="modal-content">
+                  <div className="res-data-box" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', borderRadius: '16px', padding: '16px', wordBreak: 'break-all', fontFamily: 'var(--font-mono)', fontSize: '15px' }}>
+                    <p style={{ margin: 0 }}>{result}</p>
+                  </div>
+                </div>
+
+                <div style={{ padding: '0 20px 20px', display: 'flex', gap: '12px' }}>
+                  <button className="modal-done-btn" onClick={handleCopy} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
+                    {copied ? 'Copied!' : 'Copy Text'}
+                  </button>
+                  <button className="modal-done-btn" onClick={() => startScanner()} style={{ flex: 1, background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <RefreshCw size={18} />
+                    Scan Another
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
