@@ -3336,8 +3336,9 @@ input[type="range"]::-moz-range-thumb {
 .qr-preview-wrapper {
   position: relative;
   width: 100%;
-  max-width: 260px;
+  max-width: 320px; /* Increased from 260px */
   aspect-ratio: 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3905,9 +3906,10 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .qr-preview-wrapper {
-    max-width: 340px;
-    padding: 28px;
+    max-width: 420px; /* Increased from 340px */
+    padding: 32px;
   }
+
 
   .tab-panel-area {
     width: 50%;
@@ -3935,9 +3937,10 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .qr-preview-wrapper {
-    max-width: 400px;
-    padding: 36px;
+    max-width: 500px; /* Increased from 400px */
+    padding: 40px;
   }
+
 }
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Header Menu Ã¢â€â‚¬Ã¢â€â‚¬ */
