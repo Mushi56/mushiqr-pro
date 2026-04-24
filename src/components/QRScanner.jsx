@@ -358,11 +358,8 @@ export default function QRScanner({ onBack }) {
           {status === 'LOADING' && (
             <div className="scanner-loading-overlay">
               <div className="scanner-loading-inner">
-                <div className="scanner-loading-pulse">
-                  <div className="scanner-loading-ring" />
-                  <div className="scanner-loading-icon">
-                    <Camera size={36} strokeWidth={1.5} color="var(--accent-primary)" />
-                  </div>
+                <div className="scanner-loading-icon-wrap">
+                  <Camera size={40} strokeWidth={1.5} color="var(--accent-primary)" />
                 </div>
                 <p className="scanner-loading-title">Starting Camera</p>
                 <p className="scanner-loading-sub">Please allow camera access when prompted</p>
