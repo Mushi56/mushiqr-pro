@@ -3913,6 +3913,7 @@ input[type="range"]::-moz-range-thumb {
   padding: 8px 4px;
   margin: 0;
   scrollbar-width: none;
+  align-content: start;
 }
 
 .logo-presets-grid::-webkit-scrollbar {
