@@ -316,7 +316,7 @@ export default function QRScanner({ onBack }) {
   const showViewport = status !== 'RESULT';
 
   return (
-    <div className="scanner-page fade-in">
+    <div className="scanner-page scanner-page-enter">
         {/* Header */}
         {/* Header — Aligned with camera sides */}
         <header className="scanner-nav-header">
@@ -350,6 +350,22 @@ export default function QRScanner({ onBack }) {
                                  display: 'flex', alignItems: 'center', gap: 4 }}>
                   <RefreshCw size={14} /> Scan Another
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* LOADING STATE — Rich premium camera init screen */}
+          {status === 'LOADING' && (
+            <div className="scanner-loading-overlay">
+              <div className="scanner-loading-inner">
+                <div className="scanner-loading-pulse">
+                  <div className="scanner-loading-ring" />
+                  <div className="scanner-loading-icon">
+                    <Camera size={36} strokeWidth={1.5} color="var(--accent-primary)" />
+                  </div>
+                </div>
+                <p className="scanner-loading-title">Starting Camera</p>
+                <p className="scanner-loading-sub">Please allow camera access when prompted</p>
               </div>
             </div>
           )}
