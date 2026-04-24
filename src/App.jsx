@@ -41,7 +41,7 @@ import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
 import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
-import { saveToHistory, getPreferences, savePreferences } from './utils/storage';
+import { saveToHistory, getDrafts, saveToDrafts, getPreferences, savePreferences } from './utils/storage';
 import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
 import HomePage from './components/HomePage';
@@ -369,6 +369,28 @@ export default function App() {
   useEffect(() => {
     if (qrMatrixInfo) setQrAnimKey(k => k + 1);
   }, [qrMatrixInfo]);
+
+  // ── Save to Drafts when leaving the generator page ──
+  const prevPageRef = useRef(activePage);
+  useEffect(() => {
+    const prevPage = prevPageRef.current;
+    prevPageRef.current = activePage;
+
+    // Save a draft only when navigating AWAY from the generator
+    if (prevPage === 'generator' && activePage !== 'generator') {
+      const dataString = formatQRData(qrType, qrData);
+      if (dataString) {
+        saveToDrafts({
+          qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
+          qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
+          dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
+          logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+          logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+          thumbnail: canvasRef.current?.toDataURL('image/jpeg', 0.2) || null
+        });
+      }
+    }
+  }, [activePage]);
 
   // ── Auto-upgrade error correction when logo is present ──
   useEffect(() => {

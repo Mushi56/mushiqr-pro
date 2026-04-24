@@ -1,23 +1,48 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, MoreVertical, ChevronRight, ScanLine } from 'lucide-react';
+import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, MoreVertical, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2 } from 'lucide-react';
 import { QR_TYPES } from '../utils/qrEngine';
-import { getHistory } from '../utils/storage';
+import { getDrafts, deleteFromDrafts, clearDrafts } from '../utils/storage';
 
 export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, effectiveTheme, activePage, onMenuClick }) {
   const [recentItems, setRecentItems] = useState([]);
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const menuRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    if (openMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [openMenuId]);
 
   useEffect(() => {
-    const history = getHistory();
-    setRecentItems(history.slice(0, 3));
-  }, []);
+    if (activePage === 'home') {
+      const drafts = getDrafts();
+      setRecentItems(drafts.slice(0, 10));
+    }
+  }, [activePage]);
 
   const quickOptions = [
-    { id: QR_TYPES.URL, label: 'Website', icon: <Link2 size={24} /> },
-    { id: QR_TYPES.TEXT, label: 'Text', icon: <Type size={24} /> },
-    { id: QR_TYPES.WIFI, label: 'WiFi', icon: <Wifi size={24} /> },
-    { id: QR_TYPES.VCARD, label: 'Contact', icon: <User size={24} /> },
-    { id: QR_TYPES.EMAIL, label: 'Email', icon: <Mail size={24} /> },
-    { id: QR_TYPES.LOCATION, label: 'Location', icon: <MapPin size={24} /> },
+    { id: QR_TYPES.URL, label: 'Website', icon: <Link2 size={20} /> },
+    { id: QR_TYPES.TEXT, label: 'Text', icon: <Type size={20} /> },
+    { id: QR_TYPES.WIFI, label: 'WiFi', icon: <Wifi size={20} /> },
+    { id: QR_TYPES.EMAIL, label: 'Email', icon: <Mail size={20} /> },
+    { id: QR_TYPES.PHONE, label: 'Phone', icon: <Phone size={20} /> },
+    { id: QR_TYPES.SMS, label: 'SMS', icon: <MessageSquare size={20} /> },
+    { id: QR_TYPES.VCARD, label: 'Contact', icon: <User size={20} /> },
+    { id: QR_TYPES.LOCATION, label: 'Location', icon: <MapPin size={20} /> },
+    { id: QR_TYPES.PDF, label: 'PDF', icon: <FileCode size={20} /> },
+    { id: QR_TYPES.IMAGE, label: 'Image', icon: <Image size={20} /> },
   ];
 
   const formatDate = (isoString) => {
@@ -28,14 +53,23 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
   };
 
   const getQRTitle = (item) => {
-    if (item.type === QR_TYPES.URL) return 'Website Link';
-    if (item.type === QR_TYPES.WIFI) return 'WiFi Network';
-    if (item.type === QR_TYPES.VCARD) return 'Contact Card';
-    return item.type.split('_').join(' ');
+    const type = item.qrType || item.type || '';
+    if (type === QR_TYPES.URL) return 'Website Link';
+    if (type === QR_TYPES.WIFI) return 'WiFi Network';
+    if (type === QR_TYPES.VCARD) return 'Contact Card';
+    if (type === QR_TYPES.EMAIL) return 'Email';
+    if (type === QR_TYPES.PHONE) return 'Phone Call';
+    if (type === QR_TYPES.SMS) return 'SMS Message';
+    if (type === QR_TYPES.LOCATION) return 'Location';
+    if (type === QR_TYPES.TEXT) return 'Plain Text';
+    if (type === QR_TYPES.PDF) return 'PDF File';
+    if (type === QR_TYPES.IMAGE) return 'Image';
+    return type ? type.split('_').join(' ') : 'QR Code';
   };
 
   const getQRSubtitle = (item) => {
-    return item.data.url || item.data.ssid || item.data.text || item.data.email || 'QR Code Data';
+    const data = item.qrData || item.data || {};
+    return data.url || data.ssid || data.text || data.email || data.phone || item.displayText || 'QR Code Data';
   };
 
   return (
@@ -135,8 +169,8 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
           <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 16px 0', color: 'var(--text-primary)' }}>Quick Create</h3>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', 
-            gap: '16px' 
+            gridTemplateColumns: 'repeat(5, 1fr)', 
+            gap: '10px' 
           }}>
             {quickOptions.map(option => (
               <button
@@ -145,31 +179,32 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
                 style={{
                   backgroundColor: 'var(--bg-elevated)',
                   border: '1px solid var(--border-color)',
-                  borderRadius: '20px',
-                  padding: '20px 12px',
+                  borderRadius: '16px',
+                  padding: '12px 4px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '12px',
+                  gap: '8px',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.04)',
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   color: 'var(--text-primary)'
                 }}
               >
                 <div style={{ 
-                  width: '48px', 
-                  height: '48px', 
-                  borderRadius: '16px', 
+                  width: '36px', 
+                  height: '36px', 
+                  borderRadius: '10px', 
                   backgroundColor: 'rgba(214, 0, 54, 0.1)', 
                   color: 'var(--accent-primary)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  flexShrink: 0
                 }}>
                   {option.icon}
                 </div>
-                <span style={{ fontSize: '13px', fontWeight: 600 }}>
+                <span style={{ fontSize: '10px', fontWeight: 600, textAlign: 'center' }}>
                   {option.label}
                 </span>
               </button>
@@ -177,13 +212,25 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
           </div>
         </div>
 
-        {/* Recent QR Codes */}
         <div style={{ padding: '0 24px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent QR Codes</h3>
-            <button onClick={() => onNavigate('history')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-              See All <ChevronRight size={14} />
-            </button>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent Projects</h3>
+            {recentItems.length > 0 && (
+              <button 
+                onClick={() => {
+                  clearDrafts();
+                  setRecentItems([]);
+                }} 
+                style={{ 
+                  background: 'rgba(214, 0, 54, 0.1)', border: 'none', 
+                  color: '#D60036', fontSize: '13px', fontWeight: 600,
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  cursor: 'pointer', borderRadius: '8px', padding: '6px 12px'
+                }}
+              >
+                <Trash2 size={14} /> Delete All
+              </button>
+            )}
           </div>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -196,7 +243,8 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
                 display: 'flex',
                 alignItems: 'center',
                 gap: '16px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                position: 'relative'
               }}>
                 <div style={{ width: '48px', height: '48px', background: 'rgba(214, 0, 54, 0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <QrCode size={24} color="var(--accent-primary)" />
@@ -212,13 +260,54 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
                     {formatDate(item.timestamp)}
                   </p>
                 </div>
-                <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '8px' }}>
-                  <MoreVertical size={20} />
-                </button>
+                <div style={{ position: 'relative' }} ref={openMenuId === item.id ? menuRef : null}>
+                  <button 
+                    onClick={() => setOpenMenuId(openMenuId === item.id ? null : item.id)}
+                    style={{ background: 'var(--bg-hover)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <MoreVertical size={20} />
+                  </button>
+                  {openMenuId === item.id && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '12px',
+                      padding: '4px',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                      zIndex: 100,
+                      minWidth: '140px',
+                      animation: 'fadeIn 0.15s ease'
+                    }}>
+                      <button
+                        onClick={() => {
+                          const updated = deleteFromDrafts(item.id);
+                          setRecentItems(updated.slice(0, 10));
+                          setOpenMenuId(null);
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '10px',
+                          width: '100%', padding: '10px 12px',
+                          background: 'none', border: 'none',
+                          borderRadius: '8px',
+                          color: '#D60036', fontSize: '13px', fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'background 0.15s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(214,0,54,0.15)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(214,0,54,0.06)'}
+                      >
+                        <Trash2 size={16} /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )) : (
               <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
-                No recent QR codes found.
+                No recent unsaved projects found.
               </div>
             )}
           </div>
@@ -232,58 +321,58 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
         left: 0,
         right: 0,
         height: '70px',
-        backgroundColor: 'var(--bg-elevated)',
-        borderTop: '1px solid var(--border-color)',
+        backgroundColor: 'var(--bg-primary)',
+        borderTop: '2px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
         padding: '0 10px',
         zIndex: 50,
-        boxShadow: '0 -10px 20px rgba(0,0,0,0.05)'
+        boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
       }}>
         <button 
           onClick={() => onNavigate('home')}
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)' }}
+          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
         >
           <Home size={24} color={activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
         </button>
         
         <button 
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)' }}
+          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
         >
           <Bookmark size={24} color="var(--text-muted)" />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
         </button>
 
-        <div style={{ position: 'relative', width: '60px', height: '60px' }}>
+        <div style={{ position: 'relative', width: '70px', height: '70px' }}>
           <button 
             onClick={() => onNavigate('scanner')}
             style={{ 
               position: 'absolute',
-              top: '-20px',
+              top: '-26px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '56px',
-              height: '56px',
-              borderRadius: '28px',
+              width: '66px',
+              height: '66px',
+              borderRadius: '33px',
               background: 'var(--accent-primary)',
-              border: '4px solid var(--bg-elevated)',
+              border: '4px solid var(--bg-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: '0 8px 16px rgba(214, 0, 54, 0.3)',
+              boxShadow: '0 8px 20px rgba(214, 0, 54, 0.4)',
               color: 'white'
             }}
           >
-            <ScanLine size={24} />
+            <ScanLine size={28} />
           </button>
         </div>
 
         <button 
           onClick={() => onNavigate('history')}
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)' }}
+          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
         >
           <History size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
@@ -291,7 +380,7 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
         
         <button 
           onClick={onMenuClick}
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)' }}
+          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
         >
           <Settings size={24} color="var(--text-muted)" />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
