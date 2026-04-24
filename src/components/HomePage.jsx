@@ -22,12 +22,12 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
   }, []);
 
   const quickOptions = [
-    { id: QR_TYPES.URL, label: 'URL / Link', icon: <Link2 size={24} />, color: '#6C5CE7', bg: '#F3F0FF' },
-    { id: QR_TYPES.TEXT, label: 'Text', icon: <Type size={24} />, color: '#10B981', bg: '#ECFDF5' },
-    { id: QR_TYPES.WIFI, label: 'WiFi', icon: <Wifi size={24} />, color: '#3B82F6', bg: '#EFF6FF' },
-    { id: QR_TYPES.VCARD, label: 'Contact', icon: <User size={24} />, color: '#F59E0B', bg: '#FFFBEB' },
-    { id: QR_TYPES.EMAIL, label: 'Email', icon: <Mail size={24} />, color: '#EF4444', bg: '#FEF2F2' },
-    { id: QR_TYPES.LOCATION, label: 'Location', icon: <MapPin size={24} />, color: '#8B5CF6', bg: '#F5F3FF' },
+    { id: QR_TYPES.URL, label: 'Website', icon: <Link2 size={24} /> },
+    { id: QR_TYPES.TEXT, label: 'Text', icon: <Type size={24} /> },
+    { id: QR_TYPES.WIFI, label: 'WiFi', icon: <Wifi size={24} /> },
+    { id: QR_TYPES.VCARD, label: 'Contact', icon: <User size={24} /> },
+    { id: QR_TYPES.EMAIL, label: 'Email', icon: <Mail size={24} /> },
+    { id: QR_TYPES.LOCATION, label: 'Location', icon: <MapPin size={24} /> },
   ];
 
   const formatDate = (isoString) => {
@@ -52,8 +52,8 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
     <div style={{
       width: '100%',
       height: '100%',
-      backgroundColor: '#FAFAFA',
-      color: '#212427',
+      backgroundColor: 'var(--bg-primary)',
+      color: 'var(--text-primary)',
       display: 'flex',
       flexDirection: 'column',
       position: 'relative'
@@ -65,7 +65,7 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '20px 24px',
-          backgroundColor: '#FAFAFA',
+          backgroundColor: 'var(--bg-primary)',
           position: 'sticky',
           top: 0,
           zIndex: 10
@@ -73,7 +73,7 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
           <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              style={{ background: 'transparent', border: 'none', color: '#212427', cursor: 'pointer', padding: 0 }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 0 }}
             >
               <Menu size={28} />
             </button>
@@ -132,110 +132,112 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <h1 style={{ fontSize: '20px', fontWeight: 800, margin: 0, letterSpacing: '0.5px', color: '#6C5CE7' }}>MUSHI</h1>
-            <span style={{ fontSize: '10px', fontWeight: 600, color: '#666', letterSpacing: '0.5px' }}>QR Code Pro</span>
-          </div>
+          <h1 style={{ fontSize: '20px', fontWeight: 800, margin: 0, letterSpacing: '-0.5px', color: 'var(--text-primary)' }}>Mushi QR Pro</h1>
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center', 
-            background: 'rgba(245, 158, 11, 0.15)', 
+            background: 'rgba(214, 0, 54, 0.1)', 
             padding: '8px', 
             borderRadius: '12px',
-            color: '#F59E0B' 
+            color: 'var(--accent-primary)' 
           }}>
             <Crown size={20} />
           </div>
         </header>
 
-        {/* Hero Card */}
-        <div style={{ padding: '0 24px', marginTop: '10px' }}>
+        {/* Hero Section */}
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginTop: '10px' }}>
           <div style={{ 
-            background: 'linear-gradient(135deg, #6C5CE7 0%, #8B5CF6 100%)',
-            borderRadius: '24px',
-            padding: '24px',
-            color: 'white',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 20px 40px rgba(108, 92, 231, 0.25)'
+            width: '80px', 
+            height: '80px', 
+            backgroundColor: 'var(--bg-elevated)', 
+            borderRadius: '24px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            marginBottom: '24px',
+            boxShadow: '0 12px 24px rgba(0, 0, 0, 0.15)',
+            border: '1px solid var(--border-color)'
           }}>
-            <div style={{ zIndex: 1, flex: 1 }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 700, margin: '0 0 4px 0' }}>Create QR Code</h2>
-              <p style={{ fontSize: '13px', margin: '0 0 20px 0', opacity: 0.9 }}>Fast, Simple & Beautiful</p>
-              <button 
-                onClick={() => onNavigate('generator')}
-                style={{
-                  background: '#1A1A2E',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '10px 16px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Plus size={16} />
-                Create New
-              </button>
-            </div>
-            <div style={{ zIndex: 1, background: 'rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.2)' }}>
-              <QrCode size={64} color="white" />
-            </div>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <rect x="7" y="7" width="3" height="3"></rect>
+              <rect x="14" y="7" width="3" height="3"></rect>
+              <rect x="7" y="14" width="3" height="3"></rect>
+              <rect x="14" y="14" width="3" height="3"></rect>
+            </svg>
           </div>
+          <h2 style={{ fontSize: '28px', fontWeight: 800, margin: '0 0 12px 0', lineHeight: 1.2, color: 'var(--text-primary)' }}>Create Your Next<br/>QR Code</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '15px', margin: '0 0 32px 0', maxWidth: '280px' }}>
+            Design beautiful, custom QR codes for your business or personal use.
+          </p>
+          <button 
+            onClick={() => onNavigate('generator')}
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '16px',
+              padding: '16px 32px',
+              fontSize: '16px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: 'pointer',
+              boxShadow: '0 12px 24px rgba(214, 0, 54, 0.25)',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              width: '100%',
+              maxWidth: '300px',
+              justifyContent: 'center'
+            }}
+          >
+            <Plus size={20} />
+            Create New QR Code
+          </button>
         </div>
 
         {/* Quick Create Grid */}
         <div style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Quick Create</h3>
-            <button style={{ background: 'none', border: 'none', color: '#666', fontSize: '12px', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-              See All <ChevronRight size={14} />
-            </button>
-          </div>
+          <h3 style={{ fontSize: '18px', fontWeight: 700, margin: '0 0 16px 0', color: 'var(--text-primary)' }}>Quick Create</h3>
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '12px' 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', 
+            gap: '16px' 
           }}>
             {quickOptions.map(option => (
               <button
                 key={option.id}
                 onClick={() => onQuickCreate(option.id)}
                 style={{
-                  backgroundColor: 'white',
-                  border: 'none',
+                  backgroundColor: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '20px',
-                  padding: '16px 8px',
+                  padding: '20px 12px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '12px',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
-                  transition: 'transform 0.2s'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  color: 'var(--text-primary)'
                 }}
               >
                 <div style={{ 
                   width: '48px', 
                   height: '48px', 
                   borderRadius: '16px', 
-                  backgroundColor: option.bg, 
-                  color: option.color,
+                  backgroundColor: 'rgba(214, 0, 54, 0.1)', 
+                  color: 'var(--accent-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
                   {option.icon}
                 </div>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: '#212427' }}>
+                <span style={{ fontSize: '13px', fontWeight: 600 }}>
                   {option.label}
                 </span>
               </button>
@@ -246,8 +248,8 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
         {/* Recent QR Codes */}
         <div style={{ padding: '0 24px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Recent QR Codes</h3>
-            <button onClick={() => onNavigate('history')} style={{ background: 'none', border: 'none', color: '#666', fontSize: '12px', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent QR Codes</h3>
+            <button onClick={() => onNavigate('history')} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
               See All <ChevronRight size={14} />
             </button>
           </div>
@@ -255,34 +257,35 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {recentItems.length > 0 ? recentItems.map(item => (
               <div key={item.id} style={{
-                background: 'white',
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-color)',
                 borderRadius: '16px',
                 padding: '16px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '16px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
               }}>
-                <div style={{ width: '48px', height: '48px', background: '#F5F5F5', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <QrCode size={24} color="#212427" />
+                <div style={{ width: '48px', height: '48px', background: 'rgba(214, 0, 54, 0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <QrCode size={24} color="var(--accent-primary)" />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 700, color: '#212427', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {getQRTitle(item)}
                   </h4>
-                  <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {getQRSubtitle(item)}
                   </p>
-                  <p style={{ margin: 0, fontSize: '11px', color: '#999' }}>
+                  <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-muted)' }}>
                     {formatDate(item.timestamp)}
                   </p>
                 </div>
-                <button style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer', padding: '8px' }}>
+                <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '8px' }}>
                   <MoreVertical size={20} />
                 </button>
               </div>
             )) : (
-              <div style={{ textAlign: 'center', padding: '30px 0', color: '#999', fontSize: '13px' }}>
+              <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
                 No recent QR codes found.
               </div>
             )}
@@ -297,27 +300,27 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
         left: 0,
         right: 0,
         height: '70px',
-        background: 'white',
-        borderTop: '1px solid rgba(0,0,0,0.05)',
+        backgroundColor: 'var(--bg-elevated)',
+        borderTop: '1px solid var(--border-color)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
         padding: '0 10px',
         zIndex: 50,
-        boxShadow: '0 -10px 20px rgba(0,0,0,0.03)'
+        boxShadow: '0 -10px 20px rgba(0,0,0,0.05)'
       }}>
         <button 
           onClick={() => onNavigate('home')}
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? '#6C5CE7' : '#999' }}
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)' }}
         >
-          <Home size={24} color={activePage === 'home' ? '#6C5CE7' : '#999'} />
+          <Home size={24} color={activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
         </button>
         
         <button 
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: '#999' }}
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)' }}
         >
-          <Bookmark size={24} color="#999" />
+          <Bookmark size={24} color="var(--text-muted)" />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
         </button>
 
@@ -332,13 +335,13 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
               width: '56px',
               height: '56px',
               borderRadius: '28px',
-              background: 'linear-gradient(135deg, #6C5CE7 0%, #8B5CF6 100%)',
-              border: '4px solid #FAFAFA',
+              background: 'var(--accent-primary)',
+              border: '4px solid var(--bg-elevated)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: '0 8px 16px rgba(108, 92, 231, 0.3)',
+              boxShadow: '0 8px 16px rgba(214, 0, 54, 0.3)',
               color: 'white'
             }}
           >
@@ -348,17 +351,17 @@ export default function HomePage({ onNavigate, onQuickCreate, theme, setTheme, e
 
         <button 
           onClick={() => onNavigate('history')}
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? '#6C5CE7' : '#999' }}
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)' }}
         >
-          <History size={24} color={activePage === 'history' ? '#6C5CE7' : '#999'} />
+          <History size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
         </button>
         
         <button 
           onClick={() => setIsMenuOpen(true)}
-          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: '#999' }}
+          style={{ background: 'none', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)' }}
         >
-          <Settings size={24} color="#999" />
+          <Settings size={24} color="var(--text-muted)" />
           <span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
         </button>
       </div>
