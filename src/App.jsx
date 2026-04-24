@@ -540,7 +540,6 @@ export default function App() {
   return (
     <div className="app redesigned">
       {/* ── Header ── */}
-      {activePage !== 'home' && (
       <header className="app-header">
         <div className="app-logo">
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
@@ -735,7 +734,6 @@ export default function App() {
           </div>
         </div>
       </header>
-      )}
 
       {/* ── Main Content Area ── */}
       <main className="app-main-redesigned">
@@ -1086,6 +1084,7 @@ export default function App() {
             }}
             effectiveTheme={effectiveTheme}
             activePage={activePage}
+            onMenuClick={() => setIsMenuOpen(true)}
           />
         ) : (
           <HistoryPage />
