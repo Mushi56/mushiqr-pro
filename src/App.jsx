@@ -264,14 +264,8 @@ export default function App() {
         return;
       }
 
-      // If no tab history, handle exit to home with double-press warning
-      const now = Date.now();
-      if (now - lastBackPress.current < 2000) {
-        setActivePage(previousPage || 'home');
-      } else {
-        lastBackPress.current = now;
-        showToast('Press back again to exit editor', 'info');
-      }
+      // If no tab history, exit to home immediately
+      setActivePage(previousPage || 'home');
     } else if (activePage === 'history') {
       // From History/Recent/Menu to previous tab
       setActivePage(previousPage || 'home');
