@@ -434,7 +434,7 @@ export default function QRScanner({ onBack }) {
                 </div>
 
                 <div className="modal-content">
-                  <div className="res-data-box" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-light)', borderRadius: '16px', padding: '16px', wordBreak: 'break-all', fontFamily: 'var(--font-mono)', fontSize: '15px' }}>
+                  <div className="res-data-box" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '16px', wordBreak: 'break-all', fontFamily: 'var(--font-mono)', fontSize: '15px' }}>
                     <p style={{ margin: 0 }}>{result}</p>
                   </div>
                 </div>
@@ -443,7 +443,7 @@ export default function QRScanner({ onBack }) {
                   <button className="modal-done-btn" onClick={handleCopy} style={{ margin: 0, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {copied ? <CheckCircle2 size={22} /> : <Copy size={22} />}
                   </button>
-                  <button className="modal-done-btn" onClick={() => startScanner()} style={{ margin: 0, flex: 1, background: 'var(--bg-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <button className="modal-done-btn" onClick={() => startScanner()} style={{ margin: 0, flex: 1, background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <RefreshCw size={22} />
                   </button>
                 </div>
