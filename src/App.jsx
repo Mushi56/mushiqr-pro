@@ -308,33 +308,6 @@ export default function App() {
     updateStatusBar();
   }, [effectiveTheme]);
 
-  useEffect(() => {
-    // Handle Android Back Button
-    const backListener = CapApp.addListener('backButton', ({ canGoBack }) => {
-      if (advPicker.open) {
-        setAdvPicker(prev => ({ ...prev, open: false }));
-        return;
-      }
-      if (formatDropdownOpen) {
-        setFormatDropdownOpen(false);
-        return;
-      }
-      if (isMenuOpen) {
-        setIsMenuOpen(false);
-        return;
-      }
-
-      if (activePage !== 'generator') {
-        setActivePage('generator');
-      } else {
-        CapApp.exitApp();
-      }
-    });
-
-    return () => {
-      backListener.then(l => l.remove());
-    };
-  }, [activePage, advPicker.open, formatDropdownOpen, isMenuOpen]);
 
   // ── Sync Eyes color with dots color when syncEyes is ON ──
   useEffect(() => {
@@ -406,6 +379,39 @@ export default function App() {
       setErrorLevel(prev => prev === 'H' ? 'M' : prev);
     }
   }, [logo]);
+
+  // ── Android Back Button Logic ──
+  const lastBackPress = useRef(0);
+  useEffect(() => {
+    const handleBackButton = async () => {
+      if (advPicker.open) {
+        setAdvPicker(prev => ({ ...prev, open: false }));
+      } else if (formatDropdownOpen) {
+        setFormatDropdownOpen(false);
+      } else if (isMenuOpen) {
+        setIsMenuOpen(false);
+      } else if (isDataModalOpen) {
+        setIsDataModalOpen(false);
+      } else if (activePage === 'scanner') {
+        setActivePage(lastPageBeforeScanner);
+      } else if (activePage !== 'home') {
+        setActivePage('home');
+      } else {
+        const now = Date.now();
+        if (now - lastBackPress.current < 2000) {
+          CapApp.exitApp();
+        } else {
+          lastBackPress.current = now;
+          showToast('Press back again to exit', 'info');
+        }
+      }
+    };
+
+    const backListener = CapApp.addListener('backButton', handleBackButton);
+    return () => {
+      backListener.then(l => l.remove());
+    };
+  }, [activePage, lastPageBeforeScanner, isMenuOpen, isDataModalOpen, advPicker.open, formatDropdownOpen]);
 
   // ── Update body theme ──
   useEffect(() => {
@@ -633,7 +639,7 @@ export default function App() {
   return (
     <div className="app redesigned">
       {/* ── Header ── */}
-      <header className="app-header">
+      <header className={`app-header ${activePage === 'home' ? 'header-home' : ''}`}>
         <div className="app-logo">
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
             {logoImgError ? (

@@ -16,6 +16,7 @@
   --bg-input: rgba(10, 10, 15, 0.8);
   --bg-hover: rgba(255, 255, 255, 0.04);
   --bg-glass: rgba(5, 5, 8, 0.7);
+  --bg-glass-light: rgba(5, 5, 8, 0.7);
 
   --text-primary: #FFFFFF;
   --text-secondary: #A1A1AA;
@@ -81,7 +82,8 @@
   --bg-elevated: #FFFFFF;
   --bg-input: #FFFFFF;
   --bg-hover: rgba(33, 36, 39, 0.05);
-  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass: rgba(33, 36, 39, 0.98);
+  --bg-glass-light: rgba(255, 255, 255, 0.85);
   --bg-dropdown: rgba(255, 255, 255, 0.95);
   --bg-dropdown-solid: #FFFFFF;
 
@@ -111,7 +113,24 @@
 
 }
 
-/* Light Mode Icon Overrides if needed */
+/* Light Mode Header Scoping */
+[data-theme="light"] .app-header:not(.header-home) {
+  background: var(--bg-glass);
+  color: var(--text-inverse);
+}
+
+[data-theme="light"] .app-header:not(.header-home) .app-logo-text {
+  color: var(--text-inverse);
+}
+
+[data-theme="light"] .app-header:not(.header-home) .btn-header-action:not(.active) {
+  color: var(--text-inverse);
+}
+
+[data-theme="light"] .app-header.header-home {
+  background: var(--bg-glass-light);
+  color: var(--text-primary);
+}
 
 
 
