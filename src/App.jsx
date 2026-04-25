@@ -386,6 +386,8 @@ export default function App() {
           dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
           logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
           logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+          logoSrc: logo?.src || null,
+          logoName: logo?.name || null,
           thumbnail: canvasRef.current?.toDataURL('image/jpeg', 0.2) || null
         });
       }
@@ -483,9 +485,74 @@ export default function App() {
       dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
       logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
       logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
+      logoSrc: logo?.src || null,
+      logoName: logo?.name || null,
       thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
     });
     showToast('Saved to history');
+  };
+
+  // ── Load QR ──
+  const handleLoadQR = (item) => {
+    if (!item) return;
+    
+    // Core data
+    if (item.qrType) setQrType(item.qrType);
+    if (item.qrData) setQrData(item.qrData);
+    if (item.errorLevel) setErrorLevel(item.errorLevel);
+
+    // Appearance
+    if (item.qrColor) setQrColor(item.qrColor);
+    if (item.bgColor) setBgColor(item.bgColor);
+    if (item.bgTransparent !== undefined) setBgTransparent(item.bgTransparent);
+    if (item.gradientEnabled !== undefined) setGradientEnabled(item.gradientEnabled);
+    if (item.gradientColor1) setGradientColor1(item.gradientColor1);
+    if (item.gradientColor2) setGradientColor2(item.gradientColor2);
+    if (item.gradientType) setGradientType(item.gradientType);
+
+    // Shapes
+    if (item.dotStyle) setDotStyle(item.dotStyle);
+    if (item.eyeStyle) setEyeStyle(item.eyeStyle);
+    if (item.dotPadding !== undefined) setDotPadding(item.dotPadding);
+    if (item.eyePadding !== undefined) setEyePadding(item.eyePadding);
+
+    // Logo (Note: logo.image is not serializable, so we only have metadata in storage usually)
+    // If the storage includes a logo placeholder or source, we'd handle it here.
+    // For now, we clear the logo or keep it if it's not provided in the template.
+    if (item.logo === null) setLogo(null);
+    if (item.logoSize) setLogoSize(item.logoSize);
+    if (item.logoPadding !== undefined) setLogoPadding(item.logoPadding);
+    if (item.logoBackground !== undefined) setLogoBackground(item.logoBackground);
+    if (item.logoBgColor) setLogoBgColor(item.logoBgColor);
+    if (item.logoBgShape) setLogoBgShape(item.logoBgShape);
+    if (item.logoOutline !== undefined) setLogoOutline(item.logoOutline);
+    if (item.logoOutlineColor) setLogoOutlineColor(item.logoOutlineColor);
+    if (item.logoOutlineWidth !== undefined) setLogoOutlineWidth(item.logoOutlineWidth);
+    if (item.logoOutlineOpacity !== undefined) setLogoOutlineOpacity(item.logoOutlineOpacity);
+
+    // Reconstruct logo image if src exists
+    if (item.logoSrc) {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        setLogo({
+          image: img,
+          name: item.logoName || 'Logo',
+          src: item.logoSrc
+        });
+      };
+      img.src = item.logoSrc;
+    } else {
+      setLogo(null);
+    }
+
+    // Frame
+    if (item.frameStyle) setFrameStyle(item.frameStyle);
+    if (item.frameText) setFrameText(item.frameText);
+    if (item.frameColor) setFrameColor(item.frameColor);
+
+    setActivePage('generator');
+    showToast('Template loaded');
   };
 
   // ── Generate QR Matrix ──
@@ -1081,6 +1148,7 @@ export default function App() {
               setActivePage('generator');
               setIsDataModalOpen(true);
             }}
+            onLoadQR={handleLoadQR}
             theme={theme}
             setTheme={(next) => {
               setTheme(next);
@@ -1091,7 +1159,7 @@ export default function App() {
             onMenuClick={() => setIsMenuOpen(true)}
           />
         ) : (
-          <HistoryPage />
+          <HistoryPage onLoadQR={handleLoadQR} />
         )}
       </main>
 

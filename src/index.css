@@ -66,6 +66,9 @@
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
+  
+  /* Horizontal Padding System */
+  --main-padding-x: 24px;
 }
 
 /* Light Theme Ã¢â‚¬â€ High-end clean aesthetic */
@@ -2187,6 +2190,7 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 640px) {
   :root {
     --header-height: 64px;
+    --main-padding-x: 16px;
   }
 
   .app-header {
@@ -3466,7 +3470,7 @@ input[type="range"]::-moz-range-thumb {
 
 .app.redesigned .app-header {
   height: 56px;
-  padding: 0 16px;
+  padding: 0 var(--main-padding-x);
   flex-shrink: 0;
   z-index: 2000;
 }
@@ -4062,7 +4066,7 @@ input[type="range"]::-moz-range-thumb {
 @media (min-width: 768px) {
   .app.redesigned .app-header {
     height: 64px;
-    padding: 0 24px;
+    padding: 0 var(--main-padding-x);
   }
 
   .app-main-redesigned {
@@ -4104,6 +4108,9 @@ input[type="range"]::-moz-range-thumb {
 }
 
 @media (min-width: 1200px) {
+  :root {
+    --main-padding-x: 32px;
+  }
   .qr-preview-card {
     width: 55%;
   }
