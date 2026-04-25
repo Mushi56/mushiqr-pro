@@ -641,6 +641,28 @@ export default function App() {
       {/* ── Header ── */}
       <header className={`app-header ${activePage === 'home' ? 'header-home' : ''}`}>
         <div className="app-logo">
+          {activePage !== 'home' && (
+            <button 
+              onClick={() => setActivePage('home')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                padding: '8px',
+                marginRight: '8px',
+                marginLeft: '-8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+          )}
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
             {logoImgError ? (
               <div className="app-logo-fallback">
@@ -1149,7 +1171,7 @@ export default function App() {
             </section>
           </>
         ) : activePage === 'scanner' ? (
-          <QRScanner onBack={() => setActivePage(lastPageBeforeScanner)} />
+          <QRScanner onBack={() => setActivePage('home')} />
         ) : activePage === 'home' ? (
           <HomePage 
             onNavigate={setActivePage}
