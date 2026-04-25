@@ -205,16 +205,29 @@ class ErrorBoundary extends Component {
 export default function App() {
   // ── Tab & Theme ──
   const [activeTab, setActiveTab] = useState('content');
+  const [tabHistory, setTabHistory] = useState([]);
   const [activePage, setActivePage] = useState('home'); // 'home', 'generator', 'scanner', 'history'
   const [previousPage, setPreviousPage] = useState('home');
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
+
+  const handleTabChange = (tabId) => {
+    if (tabId !== activeTab) {
+      setTabHistory(prev => [...prev, activeTab]);
+      setActiveTab(tabId);
+    }
+  };
 
   // Custom navigation wrapper to track history
   const navigateTo = (page) => {
     if (page !== activePage) {
       setPreviousPage(activePage);
       setActivePage(page);
+      // Clear tab history when starting a new session or returning home
+      if (page === 'generator' || page === 'home') {
+        setTabHistory([]);
+        if (page === 'generator') setActiveTab('content');
+      }
     }
   };
 
@@ -242,8 +255,23 @@ export default function App() {
       // From Scan to Home
       setActivePage('home');
     } else if (activePage === 'generator') {
-      // From Creation/Recent to previous
-      setActivePage(previousPage || 'home');
+      // ── IMPROVED CREATOR NAVIGATION ──
+      // If we have tab history, go back to previous tab
+      if (tabHistory.length > 0) {
+        const lastTab = tabHistory[tabHistory.length - 1];
+        setTabHistory(prev => prev.slice(0, -1));
+        setActiveTab(lastTab);
+        return;
+      }
+
+      // If no tab history, handle exit to home with double-press warning
+      const now = Date.now();
+      if (now - lastBackPress.current < 2000) {
+        setActivePage(previousPage || 'home');
+      } else {
+        lastBackPress.current = now;
+        showToast('Press back again to exit editor', 'info');
+      }
     } else if (activePage === 'history') {
       // From History/Recent/Menu to previous tab
       setActivePage(previousPage || 'home');
@@ -603,9 +631,10 @@ export default function App() {
       setLogo(null);
     }
 
-    // Frame
     setFrameColor(item.frameColor);
 
+    // Reset tab history when loading a template
+    setTabHistory([]);
     navigateTo('generator');
     showToast('Template loaded');
   };
@@ -1247,7 +1276,7 @@ export default function App() {
             <button
               key={tab.id}
               className={`bottom-nav-tab${activeTab === tab.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
             >
               <div className="bottom-nav-highlight" />
               <span className="bottom-nav-icon">
