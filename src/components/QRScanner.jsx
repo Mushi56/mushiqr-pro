@@ -42,10 +42,13 @@ export default function QRScanner({ onBack }) {
     return () => { mountedRef.current = false; };
   }, []);
 
+  // Back button handled centrally in App.jsx
+  /*
   useEffect(() => {
     const lp = App.addListener('backButton', () => safeBack());
     return () => { lp.then(l => l.remove()).catch(() => {}); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  */
 
   useEffect(() => {
     return () => {

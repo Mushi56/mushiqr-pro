@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getHistory, deleteFromHistory, clearHistory } from '../utils/storage';
 import { SearchX, Trash2, ArrowDownToLine, ChevronLeft, QrCode, Clock, ExternalLink } from 'lucide-react';
 
-export default function HistoryPage({ onLoadQR }) {
+export default function HistoryPage({ onLoadQR, onNavigate }) {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {

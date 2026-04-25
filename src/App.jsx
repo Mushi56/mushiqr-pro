@@ -206,9 +206,51 @@ export default function App() {
   // ── Tab & Theme ──
   const [activeTab, setActiveTab] = useState('content');
   const [activePage, setActivePage] = useState('home'); // 'home', 'generator', 'scanner', 'history'
-  const [lastPageBeforeScanner, setLastPageBeforeScanner] = useState('home');
+  const [previousPage, setPreviousPage] = useState('home');
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
+
+  // Custom navigation wrapper to track history
+  const navigateTo = (page) => {
+    if (page !== activePage) {
+      setPreviousPage(activePage);
+      setActivePage(page);
+    }
+  };
+
+  const goBack = () => {
+    // 1. Close overlays first
+    if (advPicker.open) {
+      setAdvPicker(prev => ({ ...prev, open: false }));
+      return;
+    }
+    if (formatDropdownOpen) {
+      setFormatDropdownOpen(false);
+      return;
+    }
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+      return;
+    }
+    if (isDataModalOpen) {
+      setIsDataModalOpen(false);
+      return;
+    }
+
+    // 2. Navigation logic
+    if (activePage === 'scanner') {
+      // From Scan to Home
+      setActivePage('home');
+    } else if (activePage === 'generator') {
+      // From Creation/Recent to previous
+      setActivePage(previousPage || 'home');
+    } else if (activePage === 'history') {
+      // From History/Recent/Menu to previous tab
+      setActivePage(previousPage || 'home');
+    } else if (activePage !== 'home') {
+      setActivePage('home');
+    }
+  };
 
   // Resolve Auto Theme
   useEffect(() => {
@@ -381,37 +423,42 @@ export default function App() {
   }, [logo]);
 
   // ── Android Back Button Logic ──
+  // ── Back Button Handling (Centralized) ──
   const lastBackPress = useRef(0);
-  useEffect(() => {
-    const handleBackButton = async () => {
-      if (advPicker.open) {
-        setAdvPicker(prev => ({ ...prev, open: false }));
-      } else if (formatDropdownOpen) {
-        setFormatDropdownOpen(false);
-      } else if (isMenuOpen) {
-        setIsMenuOpen(false);
-      } else if (isDataModalOpen) {
-        setIsDataModalOpen(false);
-      } else if (activePage === 'scanner') {
-        setActivePage(lastPageBeforeScanner);
-      } else if (activePage !== 'home') {
-        setActivePage('home');
+  const backHandlerRef = useRef();
+
+  // Update the ref whenever dependencies change
+  backHandlerRef.current = () => {
+    if (activePage === 'home' && !advPicker.open && !formatDropdownOpen && !isMenuOpen && !isDataModalOpen) {
+      const now = Date.now();
+      if (now - lastBackPress.current < 2000) {
+        CapApp.exitApp();
       } else {
-        const now = Date.now();
-        if (now - lastBackPress.current < 2000) {
-          CapApp.exitApp();
-        } else {
-          lastBackPress.current = now;
-          showToast('Press back again to exit', 'info');
-        }
+        lastBackPress.current = now;
+        showToast('Press back again to exit', 'info');
       }
+    } else {
+      goBack();
+    }
+  };
+
+  useEffect(() => {
+    const setupListener = async () => {
+      const backListener = await CapApp.addListener('backButton', (data) => {
+        // data.canGoBack is available but we handle navigation internally
+        if (backHandlerRef.current) {
+          backHandlerRef.current();
+        }
+      });
+      return backListener;
     };
 
-    const backListener = CapApp.addListener('backButton', handleBackButton);
+    const listenerPromise = setupListener();
+    
     return () => {
-      backListener.then(l => l.remove());
+      listenerPromise.then(l => l.remove());
     };
-  }, [activePage, lastPageBeforeScanner, isMenuOpen, isDataModalOpen, advPicker.open, formatDropdownOpen]);
+  }, []); // Run once on mount
 
   // ── Update body theme ──
   useEffect(() => {
@@ -557,11 +604,9 @@ export default function App() {
     }
 
     // Frame
-    if (item.frameStyle) setFrameStyle(item.frameStyle);
-    if (item.frameText) setFrameText(item.frameText);
-    if (item.frameColor) setFrameColor(item.frameColor);
+    setFrameColor(item.frameColor);
 
-    setActivePage('generator');
+    navigateTo('generator');
     showToast('Template loaded');
   };
 
@@ -643,7 +688,7 @@ export default function App() {
         <div className="app-logo">
           {activePage !== 'home' && (
             <button 
-              onClick={() => setActivePage('home')}
+              onClick={goBack}
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -781,10 +826,10 @@ export default function App() {
             {isMenuOpen && (
               <div className="app-dropdown-menu fade-in">
                 <div className="menu-links">
-                  <button className={`menu-link-btn ${activePage === 'home' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('home'); }}>
+                  <button className={`menu-link-btn ${activePage === 'home' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); navigateTo('home'); }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Home
                   </button>
-                  <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); setActivePage('history'); }}>
+                  <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); navigateTo('history'); }}>
                     <History size={16} /> History
                   </button>
                   <button
@@ -1177,7 +1222,7 @@ export default function App() {
             onNavigate={setActivePage}
             onQuickCreate={(type) => {
               setQrType(type);
-              setActivePage('generator');
+              navigateTo('generator');
               setIsDataModalOpen(true);
             }}
             onLoadQR={handleLoadQR}
@@ -1186,12 +1231,12 @@ export default function App() {
               setTheme(next);
               savePreferences({ ...getPreferences(), theme: next });
             }}
-            effectiveTheme={effectiveTheme}
             activePage={activePage}
             onMenuClick={() => setIsMenuOpen(true)}
+            onNavigate={navigateTo}
           />
         ) : (
-          <HistoryPage onLoadQR={handleLoadQR} />
+          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
         )}
       </main>
 
@@ -1232,7 +1277,7 @@ export default function App() {
           boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
         }}>
           <button 
-            onClick={() => setActivePage('home')}
+            onClick={() => navigateTo('home')}
             style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
           >
             <Home size={24} color={activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
@@ -1240,7 +1285,7 @@ export default function App() {
           </button>
           
           <button 
-            onClick={() => setActivePage('history')}
+            onClick={() => navigateTo('history')}
             style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
           >
             <Bookmark size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
@@ -1250,8 +1295,7 @@ export default function App() {
           <div style={{ position: 'relative', width: '70px', height: '70px' }}>
             <button 
               onClick={() => {
-                setLastPageBeforeScanner(activePage);
-                setActivePage('scanner');
+                navigateTo('scanner');
               }}
               style={{ 
                 position: 'absolute',
@@ -1276,7 +1320,7 @@ export default function App() {
           </div>
 
           <button 
-            onClick={() => setActivePage('history')}
+            onClick={() => navigateTo('history')}
             style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
           >
             <History size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
