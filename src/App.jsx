@@ -29,7 +29,10 @@ import {
   Info,
   Shield,
   FileText as FileIcon,
-  ExternalLink
+  ExternalLink,
+  Home,
+  Bookmark,
+  Settings
 } from 'lucide-react';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -203,6 +206,7 @@ export default function App() {
   // ── Tab & Theme ──
   const [activeTab, setActiveTab] = useState('content');
   const [activePage, setActivePage] = useState('home'); // 'home', 'generator', 'scanner', 'history'
+  const [lastPageBeforeScanner, setLastPageBeforeScanner] = useState('home');
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
 
@@ -1139,7 +1143,7 @@ export default function App() {
             </section>
           </>
         ) : activePage === 'scanner' ? (
-          <QRScanner onBack={() => setActivePage('generator')} />
+          <QRScanner onBack={() => setActivePage(lastPageBeforeScanner)} />
         ) : activePage === 'home' ? (
           <HomePage 
             onNavigate={setActivePage}
@@ -1180,6 +1184,85 @@ export default function App() {
             </button>
           ))}
         </nav>
+      )}
+
+      {/* ── Main App Navigation (Home & History) ── */}
+      {(activePage === 'home' || activePage === 'history') && (
+        <div style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '70px',
+          backgroundColor: 'var(--bg-primary)',
+          borderTop: '1px solid var(--border-color)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 var(--main-padding-x)',
+          zIndex: 50,
+          boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
+        }}>
+          <button 
+            onClick={() => setActivePage('home')}
+            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
+          >
+            <Home size={24} color={activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
+            <span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
+          </button>
+          
+          <button 
+            onClick={() => setActivePage('history')}
+            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
+          >
+            <Bookmark size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
+            <span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
+          </button>
+
+          <div style={{ position: 'relative', width: '70px', height: '70px' }}>
+            <button 
+              onClick={() => {
+                setLastPageBeforeScanner(activePage);
+                setActivePage('scanner');
+              }}
+              style={{ 
+                position: 'absolute',
+                top: '-26px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '66px',
+                height: '66px',
+                borderRadius: '33px',
+                background: 'var(--accent-primary)',
+                border: '4px solid var(--bg-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 8px 20px rgba(214, 0, 54, 0.4)',
+                color: 'white'
+              }}
+            >
+              <ScanLine size={28} />
+            </button>
+          </div>
+
+          <button 
+            onClick={() => setActivePage('history')}
+            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
+          >
+            <History size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
+            <span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
+          </button>
+          
+          <button 
+            onClick={() => setIsMenuOpen(true)}
+            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
+          >
+            <Settings size={24} color="var(--text-muted)" />
+            <span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
+          </button>
+        </div>
       )}
 
       {/* ── QR Data Modal ── */}

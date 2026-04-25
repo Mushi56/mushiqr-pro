@@ -84,11 +84,11 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
     }}>
       <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '90px' }}>
         {/* Hero Card */}
-        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '10px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '24px' }}>
           <div style={{ 
             background: 'linear-gradient(135deg, #8B0020 0%, #D60036 45%, #FF2D5E 100%)',
-            borderRadius: '18px',
-            padding: '16px 18px',
+            borderRadius: '12px',
+            padding: '20px 18px',
             color: '#fff',
             display: 'flex',
             justifyContent: 'space-between',
@@ -110,59 +110,60 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
               background: 'rgba(255,255,255,0.06)', pointerEvents: 'none'
             }} />
 
-            <div style={{ zIndex: 1, flex: 1, display: 'flex', alignItems: 'center', gap: '14px', minWidth: 0 }}>
-              <div style={{ 
-                background: 'rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(8px)',
-                padding: '10px',
-                borderRadius: '14px',
-                border: '1px solid rgba(255,255,255,0.2)',
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <QrCode size={28} color="#fff" />
-              </div>
-              <div style={{ minWidth: 0 }}>
+            <div style={{ zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0, justifyContent: 'center' }}>
                 <h2 style={{ 
-                  fontSize: '16px', fontWeight: 800, 
+                  fontSize: '24px', fontWeight: 800, 
                   margin: 0, color: '#fff',
-                  lineHeight: 1.2, whiteSpace: 'nowrap'
+                  lineHeight: 1.1, whiteSpace: 'nowrap'
                 }}>Create QR Code</h2>
                 <p style={{ 
-                  fontSize: '11px', margin: '2px 0 0 0', 
-                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: '13px', margin: 0, 
+                  color: 'rgba(255,255,255,0.75)',
                   fontWeight: 500, whiteSpace: 'nowrap'
                 }}>Fast, Simple & Beautiful</p>
-              </div>
+
+              <button 
+                onClick={() => onNavigate('generator')}
+                style={{
+                  backgroundColor: '#fff',
+                  color: '#D60036',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '10px 18px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  transition: 'transform 0.2s',
+                  alignSelf: 'flex-start',
+                  whiteSpace: 'nowrap',
+                  zIndex: 1,
+                  marginTop: '2px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Plus size={16} /> Create New
+              </button>
             </div>
 
-            <button 
-              onClick={() => onNavigate('generator')}
-              style={{
-                backgroundColor: '#fff',
-                color: '#D60036',
-                border: 'none',
-                borderRadius: '10px',
-                padding: '8px 14px',
-                fontSize: '12px',
-                fontWeight: 700,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                transition: 'transform 0.2s',
-                flexShrink: 0,
-                whiteSpace: 'nowrap',
-                zIndex: 1
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Plus size={14} /> Create New
-            </button>
+            <div style={{ 
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(8px)',
+              padding: '16px',
+              borderRadius: '16px',
+              border: '1px solid rgba(255,255,255,0.2)',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1
+            }}>
+              <QrCode size={60} color="#fff" />
+            </div>
           </div>
         </div>
 
@@ -343,79 +344,7 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
         </div>
       </div>
 
-      {/* Bottom Navigation */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: '70px',
-        backgroundColor: 'var(--bg-primary)',
-        borderTop: '2px solid var(--border-color)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 var(--main-padding-x)',
-        zIndex: 50,
-        boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
-      }}>
-        <button 
-          onClick={() => onNavigate('home')}
-          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-        >
-          <Home size={24} color={activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-          <span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
-        </button>
-        
-        <button 
-          onClick={() => onNavigate('history')}
-          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-        >
-          <Bookmark size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-          <span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
-        </button>
-
-        <div style={{ position: 'relative', width: '70px', height: '70px' }}>
-          <button 
-            onClick={() => onNavigate('scanner')}
-            style={{ 
-              position: 'absolute',
-              top: '-26px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '66px',
-              height: '66px',
-              borderRadius: '33px',
-              background: 'var(--accent-primary)',
-              border: '4px solid var(--bg-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              boxShadow: '0 8px 20px rgba(214, 0, 54, 0.4)',
-              color: 'white'
-            }}
-          >
-            <ScanLine size={28} />
-          </button>
-        </div>
-
-        <button 
-          onClick={() => onNavigate('history')}
-          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-        >
-          <History size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-          <span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
-        </button>
-        
-        <button 
-          onClick={onMenuClick}
-          style={{ background: 'var(--bg-elevated)', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-        >
-          <Settings size={24} color="var(--text-muted)" />
-          <span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
-        </button>
-      </div>
     </div>
+
   );
 }

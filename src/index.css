@@ -75,13 +75,15 @@
 [data-theme="light"] {
   --bg-primary: #FAFAFA;
   --bg-secondary: #212427;
-  /* Dark headers/secondary surfaces */
+  /* Clean light secondary surfaces */
   --bg-tertiary: #F5F5F5;
   --bg-card: rgba(255, 255, 255, 0.95);
   --bg-elevated: #FFFFFF;
   --bg-input: #FFFFFF;
   --bg-hover: rgba(33, 36, 39, 0.05);
-  --bg-glass: rgba(33, 36, 39, 0.98);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-dropdown: rgba(255, 255, 255, 0.95);
+  --bg-dropdown-solid: #FFFFFF;
 
   --text-primary: #212427;
   --text-secondary: #4A4D50;
@@ -107,33 +109,11 @@
 
   --accent-gradient-animated: linear-gradient(270deg, #D60036, #B5002D, #FF4D7D, #D60036);
 
-  --bg-dropdown: #FFFFFF;
-  --bg-dropdown-solid: #FFFFFF;
 }
 
-/* Light Mode Overrides for Dark Surfaces (Headers/Sidebars) */
-[data-theme="light"] .app-header,
-[data-theme="light"] .sidebar {
-  color: var(--text-inverse);
-}
+/* Light Mode Icon Overrides if needed */
 
-[data-theme="light"] .app-header .app-logo-text,
-[data-theme="light"] .app-header .btn-header-action:not(.active) {
-  color: var(--text-inverse);
-}
 
-[data-theme="light"] .app-header .btn-menu-toggle,
-[data-theme="light"] .app-header .btn-header-action:not(.active) {
-  background: #FAFAFA;
-  color: #212427;
-  border-color: transparent;
-}
-
-[data-theme="light"] .app-header .btn-menu-toggle:hover,
-[data-theme="light"] .app-header .btn-header-action:not(.active):hover {
-  background: #FFFFFF;
-  color: var(--accent-primary);
-}
 
 
 
@@ -143,7 +123,7 @@
 [data-theme="light"] .sidebar .form-label,
 [data-theme="light"] .sidebar .slider-label,
 [data-theme="light"] .sidebar .panel-label {
-  color: var(--text-inverse);
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .scanner-result-card {
@@ -196,24 +176,16 @@ body {
 /* ========================================
    SCROLLBAR
    ======================================== */
-
 ::-webkit-scrollbar {
-  width: 6px;
+  display: none;
+  width: 0;
+  height: 0;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
-
-::-webkit-scrollbar-thumb {
-  background: var(--bg-hover);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
-}
-
 /* ========================================
    APP LAYOUT
    ======================================== */
@@ -231,7 +203,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 0 var(--main-padding-x);
   background: var(--bg-glass);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
@@ -239,7 +211,7 @@ body {
   z-index: 2000;
   backdrop-filter: blur(30px) saturate(150%);
   -webkit-backdrop-filter: blur(30px) saturate(150%);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .app-logo {
@@ -2193,9 +2165,6 @@ input[type="range"]::-moz-range-thumb {
     --main-padding-x: 16px;
   }
 
-  .app-header {
-    padding: 0 16px;
-  }
 
   .app-logo-text {
     font-size: 18px;
@@ -3470,7 +3439,6 @@ input[type="range"]::-moz-range-thumb {
 
 .app.redesigned .app-header {
   height: 56px;
-  padding: 0 var(--main-padding-x);
   flex-shrink: 0;
   z-index: 2000;
 }
@@ -4066,7 +4034,6 @@ input[type="range"]::-moz-range-thumb {
 @media (min-width: 768px) {
   .app.redesigned .app-header {
     height: 64px;
-    padding: 0 var(--main-padding-x);
   }
 
   .app-main-redesigned {
