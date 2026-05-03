@@ -5,6 +5,29 @@ import { Share } from '@capacitor/share';
 import { Media } from '@capacitor-community/media';
 
 /**
+ * Convert an ArrayBuffer to a base64 string (binary-safe, no btoa size limits).
+ */
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode.apply(null, chunk);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Convert a plain string to base64 in chunks (avoids call stack overflow on large SVGs).
+ */
+function stringToBase64(str) {
+  const encoder = new TextEncoder();
+  const bytes = encoder.encode(str);
+  return arrayBufferToBase64(bytes.buffer);
+}
+
+/**
  * Save an image to the device gallery on Android.
  * Handles permissions for Android 10-14+.
  */
@@ -75,20 +98,26 @@ async function saveToGallery(base64Data, filename) {
 }
 
 /**
- * Save non-image files (PDF, SVG) via share sheet.
+ * Save non-image files (PDF, SVG) to cache and open the native share sheet.
+ * Uses proper base64 encoding that Capacitor's Filesystem expects.
  */
 async function saveFileViaShare(base64Data, filename) {
   try { await Filesystem.requestPermissions(); } catch {}
 
+  // Write file to cache directory
   const savedFile = await Filesystem.writeFile({
     path: filename,
     data: base64Data,
     directory: Directory.Cache,
   });
 
+  // Get the full file URI that Android can resolve
+  const fileUri = savedFile.uri;
+
+  // Open share sheet so user can save / send the file
   await Share.share({
     title: 'MushiQR Pro',
-    url: savedFile.uri,
+    url: fileUri,
     dialogTitle: 'Save or Share your QR Code',
   });
 }
@@ -140,16 +169,19 @@ export async function downloadJPG(canvas, filename = 'qrcode') {
 }
 
 export async function downloadSVG(canvas, filename = 'qrcode') {
-  const dataUrl = canvas.toDataURL('image/png');
+  // Get the PNG base64 (without the data:image/png;base64, prefix)
+  const pngBase64 = canvas.toDataURL('image/png').split(',')[1];
+
   const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      width="${canvas.width}" height="${canvas.height}"
      viewBox="0 0 ${canvas.width} ${canvas.height}">
-  <image width="${canvas.width}" height="${canvas.height}" xlink:href="${dataUrl}"/>
+  <image width="${canvas.width}" height="${canvas.height}" xlink:href="data:image/png;base64,${pngBase64}"/>
 </svg>`;
-  
+
   if (Capacitor.isNativePlatform()) {
-    const base64Data = btoa(unescape(encodeURIComponent(svgContent)));
+    // Use chunked base64 conversion to avoid call-stack overflow on large SVGs
+    const base64Data = stringToBase64(svgContent);
     await saveFileNative(base64Data, `${filename}.svg`);
   } else {
     const blob = new Blob([svgContent], { type: 'image/svg+xml' });
@@ -174,7 +206,9 @@ export async function downloadPDF(canvas, filename = 'qrcode') {
   pdf.addImage(imgData, 'PNG', margin, margin, qrSize, qrSize);
   
   if (Capacitor.isNativePlatform()) {
-    const base64Data = pdf.output('datauristring').split(',')[1];
+    // Use arraybuffer output → binary-safe base64 (avoids datauristring issues)
+    const pdfArrayBuffer = pdf.output('arraybuffer');
+    const base64Data = arrayBufferToBase64(pdfArrayBuffer);
     await saveFileNative(base64Data, `${filename}.pdf`);
   } else {
     pdf.save(`${filename}.pdf`);

@@ -5516,3 +5516,37 @@ input[type="range"]::-moz-range-thumb {
   color: var(--text-tertiary);
   line-height: 1.4;
 }
+
+/* Hide native video controls in Android WebView/Scanner */
+video::-webkit-media-controls {
+  display: none !important;
+}
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+video::-webkit-media-controls-panel {
+  display: none !important;
+}
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+video {
+  pointer-events: none; /* Prevents user interaction with the video element */
+}
+
+/* Floating Scan Button */
+.floating-scan-btn {
+  animation: scanPulse 2.5s ease-in-out infinite;
+}
+
+.floating-scan-btn:active {
+  transform: translateX(-50%) scale(0.92) !important;
+  box-shadow: 0 4px 12px rgba(214, 0, 54, 0.3) !important;
+}
+
+@keyframes scanPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(214, 0, 54, 0.45), 0 0 0 0 rgba(214, 0, 54, 0.3); }
+  50% { box-shadow: 0 8px 24px rgba(214, 0, 54, 0.45), 0 0 0 10px rgba(214, 0, 54, 0); }
+}
+

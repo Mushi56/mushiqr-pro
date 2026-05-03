@@ -13,6 +13,7 @@ import {
   Loader2,
   Share2,
   ChevronDown,
+  ChevronUp,
   FileImage,
   FileCode,
   FileText,
@@ -241,6 +242,10 @@ export default function App() {
       setFormatDropdownOpen(false);
       return;
     }
+    if (isNavExpanded) {
+      setIsNavExpanded(false);
+      return;
+    }
     if (isMenuOpen) {
       setIsMenuOpen(false);
       return;
@@ -346,12 +351,14 @@ export default function App() {
   const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
-  const [qrAnimKey, setQrAnimKey] = useState(0);
   const [logoImgError, setLogoImgError] = useState(false);
 
   // ── Menu ──
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // ── Bottom Nav Toggle ──
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
 
   // ── Mobile App Fixes (Capacitor) ──
   useEffect(() => {
@@ -406,10 +413,6 @@ export default function App() {
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // ── Bump canvas animation key ──
-  useEffect(() => {
-    if (qrMatrixInfo) setQrAnimKey(k => k + 1);
-  }, [qrMatrixInfo]);
 
   // ── Save to Drafts when leaving the generator page ──
   const prevPageRef = useRef(activePage);
@@ -633,6 +636,55 @@ export default function App() {
     showToast('Template loaded');
   };
 
+  const resetGenerator = () => {
+    // Content
+    setQrType(QR_TYPES.URL);
+    setQrData({ url: 'https://example.com' });
+    setErrorLevel('M');
+
+    // Appearance
+    setQrColor('#000000');
+    setBgColor('#ffffff');
+    setBgTransparent(false);
+    setSyncEyes(true);
+    setEyeColor('');
+    setEyeOuterColor('');
+    setActivePreset(null);
+
+    // Gradient
+    setGradientEnabled(false);
+    setGradientColor1('#6c5ce7');
+    setGradientColor2('#a78bfa');
+    setGradientType('linear');
+
+    // Shapes
+    setDotStyle(DOT_STYLES.SQUARE);
+    setEyeStyle(EYE_STYLES.SQUARE);
+    setDotPadding(0);
+    setEyePadding(0);
+
+    // Logo
+    setLogo(null);
+    setLogoSize(0.18);
+    setLogoPadding(10);
+    setLogoBackground(false);
+    setLogoBgColor('#ffffff');
+    setLogoBgShape('circle');
+    setLogoOutline(false);
+    setLogoOutlineColor('#ffffff');
+    setLogoOutlineWidth(3);
+    setLogoOutlineOpacity(1);
+
+    // Frame
+    setFrameStyle('none');
+    setFrameText('SCAN ME');
+    setFrameColor('');
+
+    // Tabs
+    setActiveTab('content');
+    setTabHistory([]);
+  };
+
   // ── Generate QR Matrix ──
   const regenerateMatrix = useCallback(() => {
     const dataString = formatQRData(qrType, qrData);
@@ -647,11 +699,17 @@ export default function App() {
 
   useEffect(() => { regenerateMatrix(); }, [regenerateMatrix]);
 
+  // ── Device Capability Detection ──
+  const isLowEndDevice = typeof navigator !== 'undefined' && 
+    ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || 
+     (navigator.deviceMemory && navigator.deviceMemory <= 4));
+  const RENDER_DELAY = isLowEndDevice ? 60 : 0; // Throttle low-end to ~16fps, High-end uses native requestAnimationFrame (60-120fps)
+
   // ── Render Canvas ──
   const renderCanvas = useCallback(() => {
     if (!qrMatrixInfo || !canvasRef.current) return;
-    if (renderTimeoutRef.current) clearTimeout(renderTimeoutRef.current);
-    renderTimeoutRef.current = setTimeout(() => {
+    
+    const executeRender = () => {
       if (!canvasRef.current) return;
       renderQR(canvasRef.current, {
         ...qrMatrixInfo, size: 512,
@@ -665,7 +723,15 @@ export default function App() {
         logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
         quietZone: 2, frameStyle, frameText, frameColor,
       });
-    }, 40);
+    };
+
+    if (isLowEndDevice) {
+      if (renderTimeoutRef.current) clearTimeout(renderTimeoutRef.current);
+      renderTimeoutRef.current = setTimeout(executeRender, RENDER_DELAY);
+    } else {
+      if (renderTimeoutRef.current) cancelAnimationFrame(renderTimeoutRef.current);
+      renderTimeoutRef.current = requestAnimationFrame(executeRender);
+    }
   }, [
     qrMatrixInfo, qrColor, bgColor, bgTransparent, dotStyle, eyeStyle, eyeColor,
     eyeOuterColor, syncEyes, gradientEnabled, gradientColor1, gradientColor2, gradientType,
@@ -732,18 +798,12 @@ export default function App() {
             </button>
           )}
           <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
-            {logoImgError ? (
-              <div className="app-logo-fallback">
-                <QrCode size={24} color="white" />
-              </div>
-            ) : (
               <img
                 src="/logo.png"
                 alt="Mushi QR Pro"
                 style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', display: 'block' }}
-                onError={() => setLogoImgError(true)}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
-            )}
           </div>
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
@@ -922,7 +982,7 @@ export default function App() {
                       <span className="preview-placeholder-text">Your QR code will appear here</span>
                     </div>
                   ) : (
-                    <canvas key={qrAnimKey} ref={canvasRef} className="preview-canvas" />
+                    <canvas ref={canvasRef} className="preview-canvas" style={{ willChange: 'transform' }} />
                   )}
                 </div>
 
@@ -1124,7 +1184,28 @@ export default function App() {
                         </div>
                         {logoOutline && (
                           <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ColorPicker label="Stroke Color" value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
+                            <div className="color-row-item">
+                              <div className="color-row-header">
+                                <label className="panel-label-sub">Stroke Color</label>
+                              </div>
+                              <div className="swatch-grid-mini">
+                                <ColorPicker
+                                  isSwatch={true}
+                                  icon={Pipette}
+                                  value={logoOutlineColor}
+                                  onChange={setLogoOutlineColor}
+                                  onOpenAdvanced={handleOpenAdv}
+                                />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div
+                                    key={color}
+                                    className={`swatch-item${logoOutlineColor === color ? ' active' : ''}`}
+                                    style={{ backgroundColor: color }}
+                                    onClick={() => setLogoOutlineColor(color)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
                             <Slider
                               label="Stroke Width"
                               value={logoOutlineWidth}
@@ -1143,7 +1224,28 @@ export default function App() {
                         </div>
                         {logoBackground && (
                           <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <ColorPicker label="Background Color" value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
+                            <div className="color-row-item">
+                              <div className="color-row-header">
+                                <label className="panel-label-sub">Background Color</label>
+                              </div>
+                              <div className="swatch-grid-mini">
+                                <ColorPicker
+                                  isSwatch={true}
+                                  icon={Pipette}
+                                  value={logoBgColor}
+                                  onChange={setLogoBgColor}
+                                  onOpenAdvanced={handleOpenAdv}
+                                />
+                                {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
+                                  <div
+                                    key={color}
+                                    className={`swatch-item${logoBgColor === color ? ' active' : ''}`}
+                                    style={{ backgroundColor: color }}
+                                    onClick={() => setLogoBgColor(color)}
+                                  />
+                                ))}
+                              </div>
+                            </div>
                             <div className="selector-group">
                               <label className="panel-label-sub">Shape</label>
                               <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>
@@ -1242,8 +1344,12 @@ export default function App() {
           <QRScanner onBack={() => setActivePage('home')} />
         ) : activePage === 'home' ? (
           <HomePage 
-            onNavigate={setActivePage}
+            onNavigate={(page) => {
+              if (page === 'generator') resetGenerator();
+              navigateTo(page);
+            }}
             onQuickCreate={(type) => {
+              resetGenerator();
               setQrType(type);
               navigateTo('generator');
               setIsDataModalOpen(true);
@@ -1256,7 +1362,6 @@ export default function App() {
             }}
             activePage={activePage}
             onMenuClick={() => setIsMenuOpen(true)}
-            onNavigate={navigateTo}
           />
         ) : (
           <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
@@ -1282,83 +1387,91 @@ export default function App() {
         </nav>
       )}
 
-      {/* ── Main App Navigation (Home & History) ── */}
+      {/* ── Floating Scan Button (Always visible) ── */}
       {(activePage === 'home' || activePage === 'history') && (
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '70px',
-          backgroundColor: 'var(--bg-primary)',
-          borderTop: '1px solid var(--border-color)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 var(--main-padding-x)',
-          zIndex: 50,
-          boxShadow: '0 -8px 24px rgba(0,0,0,0.12)'
-        }}>
-          <button 
-            onClick={() => navigateTo('home')}
-            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
+        <button 
+          onClick={() => navigateTo('scanner')}
+          className="floating-scan-btn"
+          style={{ 
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '64px',
+            height: '64px',
+            borderRadius: '32px',
+            background: 'var(--accent-primary)',
+            border: '4px solid var(--bg-primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 8px 24px rgba(214, 0, 54, 0.45), 0 0 0 0 rgba(214, 0, 54, 0.2)',
+            color: 'white',
+            zIndex: 60,
+          }}
+        >
+          <ScanLine size={28} />
+        </button>
+      )}
+
+      {/* ── Nav Bar — DISABLED FOR NOW ──
+      {(activePage === 'home' || activePage === 'history') && (
+        <>
+          <button
+            onClick={() => setIsNavExpanded(prev => !prev)}
+            style={{
+              position: 'fixed',
+              bottom: isNavExpanded ? '70px' : '0px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '48px',
+              height: '20px',
+              borderRadius: '10px 10px 0 0',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-color)',
+              borderBottom: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 52,
+              color: 'var(--text-muted)',
+              transition: 'bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+              padding: 0,
+            }}
           >
-            <Home size={24} color={activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-            <span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
-          </button>
-          
-          <button 
-            onClick={() => navigateTo('history')}
-            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-          >
-            <Bookmark size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-            <span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
+            {isNavExpanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
           </button>
 
-          <div style={{ position: 'relative', width: '70px', height: '70px' }}>
-            <button 
-              onClick={() => {
-                navigateTo('scanner');
-              }}
-              style={{ 
-                position: 'absolute',
-                top: '-26px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '66px',
-                height: '66px',
-                borderRadius: '33px',
-                background: 'var(--accent-primary)',
-                border: '4px solid var(--bg-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                boxShadow: '0 8px 20px rgba(214, 0, 54, 0.4)',
-                color: 'white'
-              }}
-            >
-              <ScanLine size={28} />
+          <div style={{
+            position: 'fixed',
+            bottom: isNavExpanded ? '0px' : '-70px',
+            left: 0, right: 0, height: '70px',
+            backgroundColor: 'var(--bg-primary)',
+            borderTop: '1px solid var(--border-color)',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+            padding: '0 16px', zIndex: 51,
+            boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
+            transition: 'bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}>
+            <button onClick={() => { navigateTo('home'); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+              <Home size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
+            </button>
+            <button onClick={() => { navigateTo('history'); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+              <Bookmark size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
+            </button>
+            <div style={{ width: '64px' }} />
+            <button onClick={() => { navigateTo('history'); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+              <History size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
+            </button>
+            <button onClick={() => { setIsMenuOpen(true); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+              <Settings size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
             </button>
           </div>
-
-          <button 
-            onClick={() => navigateTo('history')}
-            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-          >
-            <History size={24} color={activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)'} />
-            <span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
-          </button>
-          
-          <button 
-            onClick={() => setIsMenuOpen(true)}
-            style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 12px', borderRadius: '12px' }}
-          >
-            <Settings size={24} color="var(--text-muted)" />
-            <span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
-          </button>
-        </div>
+        </>
       )}
+      */}
 
       {/* ── QR Data Modal ── */}
       {isDataModalOpen && (
