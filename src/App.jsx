@@ -1387,91 +1387,63 @@ export default function App() {
         </nav>
       )}
 
-      {/* ── Floating Scan Button (Always visible) ── */}
-      {(activePage === 'home' || activePage === 'history') && (
-        <button 
-          onClick={() => navigateTo('scanner')}
-          className="floating-scan-btn"
-          style={{ 
-            position: 'fixed',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '64px',
-            height: '64px',
-            borderRadius: '32px',
-            background: 'var(--accent-primary)',
-            border: '4px solid var(--bg-primary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 8px 24px rgba(214, 0, 54, 0.45), 0 0 0 0 rgba(214, 0, 54, 0.2)',
-            color: 'white',
-            zIndex: 60,
-          }}
-        >
-          <ScanLine size={28} />
-        </button>
-      )}
-
-      {/* ── Nav Bar — DISABLED FOR NOW ──
+      {/* ── Main App Navigation ── */}
       {(activePage === 'home' || activePage === 'history') && (
         <>
-          <button
-            onClick={() => setIsNavExpanded(prev => !prev)}
-            style={{
+          {/* Always-visible Floating Scan Button */}
+          <button 
+            onClick={() => navigateTo('scanner')}
+            className="floating-scan-btn"
+            style={{ 
               position: 'fixed',
-              bottom: isNavExpanded ? '70px' : '0px',
+              bottom: '82px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '48px',
-              height: '20px',
-              borderRadius: '10px 10px 0 0',
-              background: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderBottom: 'none',
+              width: '64px',
+              height: '64px',
+              borderRadius: '32px',
+              background: 'var(--accent-primary)',
+              border: '4px solid var(--bg-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              zIndex: 52,
-              color: 'var(--text-muted)',
-              transition: 'bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-              padding: 0,
+              boxShadow: '0 8px 24px rgba(214, 0, 54, 0.45), 0 0 0 0 rgba(214, 0, 54, 0.2)',
+              color: 'white',
+              zIndex: 60,
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
             }}
           >
-            {isNavExpanded ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+            <ScanLine size={28} />
           </button>
 
+          {/* Permanent Nav Bar */}
           <div style={{
             position: 'fixed',
-            bottom: isNavExpanded ? '0px' : '-70px',
+            bottom: '0px',
             left: 0, right: 0, height: '70px',
             backgroundColor: 'var(--bg-primary)',
             borderTop: '1px solid var(--border-color)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-around',
             padding: '0 16px', zIndex: 51,
             boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
-            transition: 'bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
           }}>
-            <button onClick={() => { navigateTo('home'); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <button onClick={() => navigateTo('home')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
               <Home size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
             </button>
-            <button onClick={() => { navigateTo('history'); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
               <Bookmark size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
             </button>
             <div style={{ width: '64px' }} />
-            <button onClick={() => { navigateTo('history'); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
               <History size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
             </button>
-            <button onClick={() => { setIsMenuOpen(true); setIsNavExpanded(false); }} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <button onClick={() => setIsMenuOpen(true)} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
               <Settings size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
             </button>
           </div>
         </>
       )}
-      */}
 
       {/* ── QR Data Modal ── */}
       {isDataModalOpen && (

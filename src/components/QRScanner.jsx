@@ -65,6 +65,7 @@ export default function QRScanner({ onBack }) {
     busyRef.current = false;
     const qr = html5QrRef.current;
     if (!qr) return;
+    try { if (qr._controlsObserver) qr._controlsObserver.disconnect(); } catch {}
     try { if (qr.isScanning) await qr.stop(); } catch {}
     try { qr.clear(); } catch {}
     html5QrRef.current = null;
@@ -216,6 +217,35 @@ export default function QRScanner({ onBack }) {
         }
       } catch (e) {
         console.warn('Zoom detection failed:', e);
+      }
+
+      // ── Force-strip native video controls (Android WebView fix) ──
+      try {
+        const viewport = document.getElementById('qr-scanner-viewport');
+        if (viewport) {
+          const stripControls = (container) => {
+            const videos = container.querySelectorAll('video');
+            videos.forEach(v => {
+              v.removeAttribute('controls');
+              v.controls = false;
+              v.setAttribute('playsinline', '');
+              v.setAttribute('disablepictureinpicture', '');
+              v.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback');
+              v.style.pointerEvents = 'none';
+              // Also hide any overlay buttons Android might inject
+              v.style.webkitMediaControls = 'none';
+            });
+          };
+          // Strip immediately
+          stripControls(viewport);
+          // Watch for new video elements (Android may re-inject controls)
+          const observer = new MutationObserver(() => stripControls(viewport));
+          observer.observe(viewport, { childList: true, subtree: true, attributes: true, attributeFilter: ['controls'] });
+          // Store observer ref so cleanup can disconnect it
+          html5Qr._controlsObserver = observer;
+        }
+      } catch (e) {
+        console.warn('Video controls strip failed:', e);
       }
 
       busyRef.current = false;
