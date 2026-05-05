@@ -5572,7 +5572,7 @@ video {
 }
 
 .floating-scan-btn:active {
-  transform: translateX(-50%) scale(0.92) !important;
+  transform: scale(0.92);
   box-shadow: 0 4px 12px rgba(214, 0, 54, 0.3) !important;
 }
 

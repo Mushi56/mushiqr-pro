@@ -39,6 +39,76 @@ export function clearHistory() {
   localStorage.removeItem(HISTORY_KEY);
 }
 
+export function clearHistoryByRange(hours) {
+  if (hours === -1) {
+    clearHistory();
+    return [];
+  }
+  const history = getHistory();
+  const cutoff = Date.now() - (hours * 60 * 60 * 1000);
+  const updated = history.filter(item => {
+    const time = new Date(item.timestamp).getTime();
+    return time < cutoff;
+  });
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+  return updated;
+}
+
+const SAVED_KEY = 'qrgen_saved';
+const MAX_SAVED = 100;
+
+export function saveToSaved(entry) {
+  const saved = getSaved();
+  
+  // Ensure the entry has an ID
+  const entryToSave = {
+    ...entry,
+    id: entry.id || ('saved_' + Date.now().toString(36) + Math.random().toString(36).substr(2)),
+    savedAt: new Date().toISOString()
+  };
+
+  // Check if already exists to avoid duplicates
+  if (saved.find(item => item.id === entryToSave.id)) return entryToSave;
+  
+  saved.unshift(entryToSave);
+  if (saved.length > MAX_SAVED) saved.pop();
+  localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+  return entryToSave;
+}
+
+export function getSaved() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+export function deleteFromSaved(id) {
+  const saved = getSaved().filter(item => item.id !== id);
+  localStorage.setItem(SAVED_KEY, JSON.stringify(saved));
+  return saved;
+}
+
+export function clearSaved() {
+  localStorage.removeItem(SAVED_KEY);
+}
+
+export function clearSavedByRange(hours) {
+  if (hours === -1) {
+    clearSaved();
+    return [];
+  }
+  const saved = getSaved();
+  const cutoff = Date.now() - (hours * 60 * 60 * 1000);
+  const updated = saved.filter(item => {
+    const time = new Date(item.savedAt || item.timestamp).getTime();
+    return time < cutoff;
+  });
+  localStorage.setItem(SAVED_KEY, JSON.stringify(updated));
+  return updated;
+}
+
 export function saveToDrafts(entry) {
   const drafts = getDrafts();
   

@@ -45,10 +45,12 @@ import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
 import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
-import { saveToHistory, getDrafts, saveToDrafts, getPreferences, savePreferences } from './utils/storage';
+import { saveToHistory, getSaved, saveToSaved, getPreferences, savePreferences } from './utils/storage';
 import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
 import HomePage from './components/HomePage';
+import SavedPage from './components/SavedPage';
+import SettingsPage from './components/SettingsPage';
 import AdvancedColorPicker from './components/AdvancedColorPicker';
 import { ScanLine, History } from 'lucide-react';
 import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
@@ -414,17 +416,18 @@ export default function App() {
   }, []);
 
 
-  // ── Save to Drafts when leaving the generator page ──
+  // ── Save to History when leaving the generator page ──
   const prevPageRef = useRef(activePage);
   useEffect(() => {
     const prevPage = prevPageRef.current;
     prevPageRef.current = activePage;
 
-    // Save a draft only when navigating AWAY from the generator
+    // Save generated code to history when navigating AWAY from the generator
     if (prevPage === 'generator' && activePage !== 'generator') {
       const dataString = formatQRData(qrType, qrData);
       if (dataString) {
-        saveToDrafts({
+        saveToHistory({
+          source: 'create',
           qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
           qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
           dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
@@ -556,12 +559,15 @@ export default function App() {
     }
   };
 
-  // ── Save ──
+  // ── Save to Saved ──
   const handleSave = () => {
     if (!canvasRef.current) return;
     const dataString = formatQRData(qrType, qrData);
     if (!dataString) { showToast('Please enter QR data first', 'error'); return; }
-    saveToHistory({
+    
+    // We already save to history automatically, but user clicked "Add to Saved"
+    saveToSaved({
+      source: 'create',
       qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
       qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
       dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
@@ -571,7 +577,7 @@ export default function App() {
       logoName: logo?.name || null,
       thumbnail: canvasRef.current.toDataURL('image/jpeg', 0.5)
     });
-    showToast('Saved to history');
+    showToast('Added to Saved QRs', 'success');
   };
 
   // ── Load QR ──
@@ -773,9 +779,9 @@ export default function App() {
   return (
     <div className="app redesigned">
       {/* ── Header ── */}
-      <header className={`app-header ${activePage === 'home' ? 'header-home' : ''}`}>
+      <header className={`app-header ${['home', 'saved', 'history', 'settings'].includes(activePage) ? 'header-home' : ''}`}>
         <div className="app-logo">
-          {activePage !== 'home' && (
+          {activePage === 'scanner' && (
             <button 
               onClick={goBack}
               style={{
@@ -809,160 +815,158 @@ export default function App() {
         </div>
 
         <div className="app-header-actions">
-          {activePage !== 'home' && (
-          <div className="header-save-container" ref={downloadBtnRef} style={{ position: 'relative' }}>
-            <button
-              className={`btn-header-action btn-header-save ${!qrMatrixInfo ? 'disabled' : ''} ${formatDropdownOpen ? 'active' : ''}`}
-              onClick={() => setFormatDropdownOpen(!formatDropdownOpen)}
-              disabled={!qrMatrixInfo}
-              title="Save As..."
-            >
-              <Save size={20} />
-              <ChevronDown size={14} style={{ marginLeft: 2, opacity: 0.8 }} />
-            </button>
+          {activePage === 'generator' && (
+            <>
+              <div className="header-save-container" ref={downloadBtnRef} style={{ position: 'relative' }}>
+                <button
+                  className={`btn-header-action btn-header-save ${!qrMatrixInfo ? 'disabled' : ''} ${formatDropdownOpen ? 'active' : ''}`}
+                  onClick={() => setFormatDropdownOpen(!formatDropdownOpen)}
+                  disabled={!qrMatrixInfo}
+                  title="Save As..."
+                >
+                  <Save size={20} />
+                  <ChevronDown size={14} style={{ marginLeft: 2, opacity: 0.8 }} />
+                </button>
 
-            {formatDropdownOpen && (
-              <div className="app-dropdown-menu save-as-dropdown fade-in" style={{ top: 'calc(100% + 12px)', right: 0, width: '220px' }}>
-                <div className="dropdown-section" style={{ padding: '12px' }}>
-                  <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Export Format</div>
-                  <div className="format-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                    {[
-                      { label: 'PNG', Icon: FileImage },
-                      { label: 'SVG', Icon: FileCode },
-                      { label: 'PDF', Icon: FileText },
-                      { label: 'JPG', Icon: FileImage },
-                    ].map(({ label, Icon }) => (
-                      <button
-                        key={label}
-                        className={`format-option ${selectedFormat === label ? 'active' : ''}`}
-                        onClick={() => {
-                          setSelectedFormat(label);
-                          setFormatDropdownOpen(false);
-                          handleDownload(label, FORMAT_MAP[label]);
-                        }}
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '10px',
-                          background: selectedFormat === label ? 'var(--accent-soft)' : 'var(--bg-hover)',
-                          border: '1px solid',
-                          borderColor: selectedFormat === label ? 'var(--accent-primary)' : 'transparent',
-                          borderRadius: '12px',
-                          color: selectedFormat === label ? 'var(--accent-primary)' : 'var(--text-primary)',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        <Icon size={18} />
-                        <span style={{ fontSize: '11px', fontWeight: 700 }}>{label}</span>
-                      </button>
-                    ))}
+                {formatDropdownOpen && (
+                  <div className="app-dropdown-menu save-as-dropdown fade-in" style={{ top: 'calc(100% + 12px)', right: 0, width: '220px' }}>
+                    <div className="dropdown-section" style={{ padding: '12px' }}>
+                      <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Export Format</div>
+                      <div className="format-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                        {[
+                          { label: 'PNG', Icon: FileImage },
+                          { label: 'SVG', Icon: FileCode },
+                          { label: 'PDF', Icon: FileText },
+                          { label: 'JPG', Icon: FileImage },
+                        ].map(({ label, Icon }) => (
+                          <button
+                            key={label}
+                            className={`format-option ${selectedFormat === label ? 'active' : ''}`}
+                            onClick={() => {
+                              setSelectedFormat(label);
+                              setFormatDropdownOpen(false);
+                              handleDownload(label, FORMAT_MAP[label]);
+                            }}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              padding: '10px',
+                              background: selectedFormat === label ? 'var(--accent-soft)' : 'var(--bg-hover)',
+                              border: '1px solid',
+                              borderColor: selectedFormat === label ? 'var(--accent-primary)' : 'transparent',
+                              borderRadius: '12px',
+                              color: selectedFormat === label ? 'var(--accent-primary)' : 'var(--text-primary)',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
+                            }}
+                          >
+                            <Icon size={18} />
+                            <span style={{ fontSize: '11px', fontWeight: 700 }}>{label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0' }} />
+
+
+                    <div className="dropdown-section" style={{ padding: '8px 12px 12px' }}>
+                      <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Quick Actions</div>
+                      <div className="actions-column" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <button
+                          className="menu-link-btn"
+                          onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}
+                          style={{ padding: '10px 12px', borderRadius: '10px' }}
+                        >
+                          <Copy size={16} /> <span>Copy Image</span>
+                        </button>
+                        <button
+                          className="menu-link-btn"
+                          onClick={() => { handleSave(); setFormatDropdownOpen(false); }}
+                          style={{ padding: '10px 12px', borderRadius: '10px' }}
+                        >
+                          <Bookmark size={16} /> <span>Add to Saved</span>
+                        </button>
+                        {typeof navigator !== 'undefined' && navigator.canShare && (
+                          <button
+                            className="menu-link-btn"
+                            onClick={() => { handleShare(); setFormatDropdownOpen(false); }}
+                            style={{ padding: '10px 12px', borderRadius: '10px' }}
+                          >
+                            <Share2 size={16} /> <span>Share QR Code</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0' }} />
+                )}
+              </div>
 
+              <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
+                <button
+                  className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="Toggle menu"
+                >
+                  <Menu size={20} />
+                </button>
 
-                <div className="dropdown-section" style={{ padding: '8px 12px 12px' }}>
-                  <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Quick Actions</div>
-                  <div className="actions-column" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <button
-                      className="menu-link-btn"
-                      onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}
-                      style={{ padding: '10px 12px', borderRadius: '10px' }}
-                    >
-                      <Copy size={16} /> <span>Copy Image</span>
-                    </button>
-                    <button
-                      className="menu-link-btn"
-                      onClick={() => { handleSave(); setFormatDropdownOpen(false); }}
-                      style={{ padding: '10px 12px', borderRadius: '10px' }}
-                    >
-                      <History size={16} /> <span>Save to History</span>
-                    </button>
-                    {typeof navigator !== 'undefined' && navigator.canShare && (
+                {isMenuOpen && (
+                  <div className="app-dropdown-menu fade-in" style={{ top: 'calc(100% + 12px)', right: 0 }}>
+                    <div className="menu-links">
+                      <button className={`menu-link-btn ${activePage === 'home' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); navigateTo('home'); }}>
+                        <Home size={16} /> Home
+                      </button>
+                      <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); navigateTo('history'); }}>
+                        <History size={16} /> History
+                      </button>
                       <button
                         className="menu-link-btn"
-                        onClick={() => { handleShare(); setFormatDropdownOpen(false); }}
-                        style={{ padding: '10px 12px', borderRadius: '10px' }}
+                        onClick={() => {
+                          let next;
+                          if (theme === 'dark') next = 'light';
+                          else if (theme === 'light') next = 'auto';
+                          else next = 'dark';
+
+                          setTheme(next);
+                          savePreferences({ ...getPreferences(), theme: next });
+                        }}
                       >
-                        <Share2 size={16} /> <span>Share QR Code</span>
+                        {theme === 'dark' ? (
+                          <Moon size={16} />
+                        ) : theme === 'light' ? (
+                          <Sun size={16} />
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2v20" />
+                            <path d="M12 2a10 10 0 0 0 0 20V2z" fill="currentColor" />
+                            <circle cx="12" cy="12" r="10" />
+                          </svg>
+                        )}
+                        Theme <span style={{
+                          textTransform: 'capitalize',
+                          marginLeft: 4,
+                          color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF007F' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF007F'),
+                          fontWeight: 'bold'
+                        }}>{theme}</span>
                       </button>
-                    )}
+                      <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
+                      <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
+                        <Info size={16} /> About
+                      </button>
+                      <button className="menu-link-btn" onClick={() => window.location.hash = '#/privacy-policy'}>
+                        <Shield size={16} /> Privacy Policy
+                      </button>
+                      <button className="menu-link-btn" onClick={() => window.location.hash = '#/terms'}>
+                        <FileIcon size={16} /> Terms of Service
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
           )}
-
-          <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
-            <button
-              className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              <Menu size={20} />
-            </button>
-
-            {isMenuOpen && (
-              <div className="app-dropdown-menu fade-in">
-                <div className="menu-links">
-                  <button className={`menu-link-btn ${activePage === 'home' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); navigateTo('home'); }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Home
-                  </button>
-                  <button className={`menu-link-btn ${activePage === 'history' ? 'active' : ''}`} onClick={() => { setIsMenuOpen(false); navigateTo('history'); }}>
-                    <History size={16} /> History
-                  </button>
-                  <button
-                    className="menu-link-btn"
-                    onClick={() => {
-                      let next;
-                      if (theme === 'dark') next = 'light';
-                      else if (theme === 'light') next = 'auto';
-                      else next = 'dark';
-
-                      setTheme(next);
-                      savePreferences({ ...getPreferences(), theme: next });
-                    }}
-                  >
-                    {theme === 'dark' ? (
-                      <Moon size={16} />
-                    ) : theme === 'light' ? (
-                      <Sun size={16} />
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2v20" />
-                        <path d="M12 2a10 10 0 0 0 0 20V2z" fill="currentColor" />
-                        <circle cx="12" cy="12" r="10" />
-                      </svg>
-                    )}
-                    Theme <span style={{
-                      textTransform: 'capitalize',
-                      marginLeft: 4,
-                      color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF007F' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF007F'),
-                      fontWeight: 'bold'
-                    }}>{theme}</span>
-                  </button>
-                  <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
-                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/about'}>
-                    <Info size={16} /> About
-                  </button>
-                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/privacy-policy'}>
-                    <Shield size={16} /> Privacy Policy
-                  </button>
-                  <button className="menu-link-btn" onClick={() => window.location.hash = '#/terms'}>
-                    <FileIcon size={16} /> Terms of Service
-                  </button>
-                </div>
-                <div className="menu-footer">
-                  <p>© 2026 MushiQR Pro</p>
-                  <p>All rights reserved</p>
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </header>
 
@@ -1361,8 +1365,12 @@ export default function App() {
               savePreferences({ ...getPreferences(), theme: next });
             }}
             activePage={activePage}
-            onMenuClick={() => setIsMenuOpen(true)}
+            onMenuClick={() => navigateTo('settings')}
           />
+        ) : activePage === 'saved' ? (
+          <SavedPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
+        ) : activePage === 'settings' ? (
+          <SettingsPage theme={theme} setTheme={setTheme} effectiveTheme={effectiveTheme} />
         ) : (
           <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
         )}
@@ -1388,61 +1396,69 @@ export default function App() {
       )}
 
       {/* ── Main App Navigation ── */}
-      {(activePage === 'home' || activePage === 'history') && (
-        <>
-          {/* Always-visible Floating Scan Button */}
-          <button 
+      {(['home', 'saved', 'history', 'settings'].includes(activePage)) && (
+        <div style={{
+          position: 'fixed',
+          bottom: '0px',
+          left: 0, right: 0, height: '70px',
+          backgroundColor: 'var(--bg-primary)',
+          borderTop: '1px solid var(--border-color)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+          padding: '0 16px', zIndex: 100,
+          boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
+        }}>
+          <button onClick={() => navigateTo('home')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <Home size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
+          </button>
+          <button onClick={() => navigateTo('saved')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'saved' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <Bookmark size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
+          </button>
+          
+          {/* Integrated Scan Button */}
+          <div 
             onClick={() => navigateTo('scanner')}
-            className="floating-scan-btn"
             style={{ 
-              position: 'fixed',
-              bottom: '82px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '64px',
-              height: '64px',
-              borderRadius: '32px',
-              background: 'var(--accent-primary)',
-              border: '4px solid var(--bg-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(214, 0, 54, 0.45), 0 0 0 0 rgba(214, 0, 54, 0.2)',
-              color: 'white',
-              zIndex: 60,
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              gap: '2px',
+              marginTop: '-35px',
+              cursor: 'pointer'
             }}
           >
-            <ScanLine size={28} />
-          </button>
-
-          {/* Permanent Nav Bar */}
-          <div style={{
-            position: 'fixed',
-            bottom: '0px',
-            left: 0, right: 0, height: '70px',
-            backgroundColor: 'var(--bg-primary)',
-            borderTop: '1px solid var(--border-color)',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-            padding: '0 16px', zIndex: 51,
-            boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
-          }}>
-            <button onClick={() => navigateTo('home')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-              <Home size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
+            <button 
+              className="floating-scan-btn"
+              style={{ 
+                width: '56px',
+                height: '56px',
+                borderRadius: '28px',
+                background: 'var(--accent-primary)',
+                border: '4px solid var(--bg-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(214, 0, 54, 0.3)',
+                color: 'white',
+                zIndex: 101
+              }}
+            >
+              <ScanLine size={24} />
             </button>
-            <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-              <Bookmark size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
-            </button>
-            <div style={{ width: '64px' }} />
-            <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-              <History size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
-            </button>
-            <button onClick={() => setIsMenuOpen(true)} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-              <Settings size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
-            </button>
+            <span style={{ 
+              fontSize: '10px', 
+              fontWeight: 700, 
+              color: activePage === 'scanner' ? 'var(--accent-primary)' : 'var(--text-muted)',
+              marginTop: '2px'
+            }}>Scan</span>
           </div>
-        </>
+
+          <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <History size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
+          </button>
+          <button onClick={() => navigateTo('settings')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'settings' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <Settings size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
+          </button>
+        </div>
       )}
 
       {/* ── QR Data Modal ── */}

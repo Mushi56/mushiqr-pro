@@ -138,6 +138,17 @@ export default function QRScanner({ onBack }) {
 
   const handleScanResult = useCallback((decodedText) => {
     if (!mountedRef.current) return;
+    
+    // Save to history
+    import('../utils/storage').then(({ saveToHistory }) => {
+      saveToHistory({
+        source: 'scan',
+        qrData: { text: decodedText },
+        type: isURL(decodedText) ? 'URL' : 'TEXT',
+        displayText: decodedText
+      });
+    });
+
     if (isURL(decodedText)) {
       // URL detected → stop scanner, open in external browser, go back
       stopScanner();

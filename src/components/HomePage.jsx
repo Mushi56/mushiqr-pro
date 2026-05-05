@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, MoreVertical, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2 } from 'lucide-react';
 import { QR_TYPES } from '../utils/qrEngine';
-import { getDrafts, deleteFromDrafts, clearDrafts } from '../utils/storage';
+import { getHistory, deleteFromHistory, clearHistory } from '../utils/storage';
 
 export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, setTheme, effectiveTheme, activePage, onMenuClick }) {
   const [recentItems, setRecentItems] = useState([]);
@@ -27,8 +27,8 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
 
   useEffect(() => {
     if (activePage === 'home') {
-      const drafts = getDrafts();
-      setRecentItems(drafts.slice(0, 10));
+      const history = getHistory();
+      setRecentItems(history.slice(0, 10));
     }
   }, [activePage]);
 
@@ -232,7 +232,7 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
             {recentItems.length > 0 && (
               <button 
                 onClick={() => {
-                  clearDrafts();
+                  clearHistory();
                   setRecentItems([]);
                 }} 
                 style={{ 
@@ -313,7 +313,7 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          const updated = deleteFromDrafts(item.id);
+                          const updated = deleteFromHistory(item.id);
                           setRecentItems(updated.slice(0, 10));
                           setOpenMenuId(null);
                         }}
@@ -337,7 +337,7 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
               </div>
             )) : (
               <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)', fontSize: '13px' }}>
-                No recent unsaved projects found.
+                No recent projects found.
               </div>
             )}
           </div>
