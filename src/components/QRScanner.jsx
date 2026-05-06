@@ -153,12 +153,13 @@ export default function QRScanner({ onBack, navigateTo }) {
           // Scan the entire viewport — no restrictive box
           return { width: Math.floor(vw * 0.9), height: Math.floor(vh * 0.9) };
         },
-        aspectRatio: 4 / 3,
+        aspectRatio: 0.75, // Professional 3:4 vertical ratio
         disableFlip: false,
         videoConstraints: {
           facingMode: facingBack ? 'environment' : 'user',
-          width: { min: 1280, ideal: 3840, max: 4096 },
-          height: { min: 720, ideal: 2160, max: 2160 },
+          width: { ideal: 2160 },
+          height: { ideal: 3840 },
+          aspectRatio: { ideal: 0.75 },
           advanced: [{ focusMode: 'continuous' }]
         }
       };

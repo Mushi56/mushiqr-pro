@@ -5857,12 +5857,15 @@ video {
 
 /* ── Scanner Frame ── */
 .qrs-frame {
-  position: absolute;
-  inset: 0;
+  position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 3 / 4;
   background: #000;
   z-index: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .qrs-frame.detected { background: rgba(0,0,0,0.4); }
 
@@ -5878,6 +5881,7 @@ video {
   height: 100% !important;
   object-fit: cover !important;
   border-radius: 0 !important;
+  display: block;
 }
 .qrs-viewport.blur { filter: blur(3px) brightness(0.7); transition: all 0.4s; }
 
