@@ -5941,25 +5941,25 @@ video {
 /* ── Laser Line ── */
 .qrs-laser {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  height: 2.5px;
-  background: linear-gradient(90deg, transparent, #D60036 20%, #D60036 80%, transparent);
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #D60036 10%, #ff1a52 40%, #ff1a52 60%, #D60036 90%, transparent);
   border-radius: 2px;
   z-index: 18;
-  box-shadow: 0 0 12px rgba(214, 0, 54, 0.6), 0 0 30px rgba(214, 0, 54, 0.3);
-  animation: qrsLaserSweep 2.2s ease-in-out infinite;
+  box-shadow: 0 0 16px rgba(214, 0, 54, 0.7), 0 0 40px rgba(214, 0, 54, 0.35), 0 -2px 8px rgba(214, 0, 54, 0.4);
+  animation: qrsLaserSweep 2.4s ease-in-out infinite;
 }
 .qrs-laser.frozen {
   animation: none;
   top: 50%;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #B5002D 15%, #B5002D 85%, transparent);
-  box-shadow: 0 0 20px rgba(214, 0, 54, 0.8), 0 0 40px rgba(214, 0, 54, 0.4);
+  background: linear-gradient(90deg, transparent, #B5002D 10%, #B5002D 90%, transparent);
+  box-shadow: 0 0 24px rgba(214, 0, 54, 0.9), 0 0 50px rgba(214, 0, 54, 0.5);
 }
 @keyframes qrsLaserSweep {
-  0%, 100% { top: 15%; opacity: 0.4; }
-  50% { top: 80%; opacity: 1; }
+  0%, 100% { top: 10%; opacity: 0.3; }
+  50% { top: 85%; opacity: 1; }
 }
 
 /* ── Info Line ── */

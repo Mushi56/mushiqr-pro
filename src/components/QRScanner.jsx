@@ -149,16 +149,17 @@ export default function QRScanner({ onBack, navigateTo }) {
       html5QrRef.current = html5Qr;
       const config = {
         fps: 30,
-        qrbox: (vw, vh) => { 
-          const s = Math.floor(Math.min(vw, vh) * 0.72);
-          return { width: s, height: s }; 
+        qrbox: (vw, vh) => {
+          // Scan the entire viewport — no restrictive box
+          return { width: Math.floor(vw * 0.9), height: Math.floor(vh * 0.9) };
         },
-        aspectRatio: 0.75, // 3:4 ratio
+        aspectRatio: 4 / 3,
         disableFlip: false,
         videoConstraints: {
           facingMode: facingBack ? 'environment' : 'user',
-          width: { min: 640, ideal: 1080, max: 1920 },
-          aspectRatio: { ideal: 0.75 }
+          width: { min: 1280, ideal: 3840, max: 4096 },
+          height: { min: 720, ideal: 2160, max: 2160 },
+          advanced: [{ focusMode: 'continuous' }]
         }
       };
       await html5Qr.start({ facingMode: facingBack ? 'environment' : 'user' }, config, (t) => handleScanResult(t), () => {});
@@ -169,6 +170,15 @@ export default function QRScanner({ onBack, navigateTo }) {
           const caps = track.getCapabilities();
           if (caps.zoom) { setZoomCapabilities({ min: caps.zoom.min || 1, max: Math.min(caps.zoom.max || 10, 10), step: caps.zoom.step || 0.1 }); setZoom(caps.zoom.min || 1); }
           if (caps.torch) setFlashSupported(true);
+          // Apply pro-grade camera constraints
+          const advanced = {};
+          if (caps.focusMode && caps.focusMode.includes('continuous')) advanced.focusMode = 'continuous';
+          if (caps.exposureMode && caps.exposureMode.includes('continuous')) advanced.exposureMode = 'continuous';
+          if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes('continuous')) advanced.whiteBalanceMode = 'continuous';
+          if (caps.resizeMode && caps.resizeMode.includes('none')) advanced.resizeMode = 'none';
+          if (Object.keys(advanced).length > 0) {
+            try { await track.applyConstraints({ advanced: [advanced] }); } catch {}
+          }
         }
       } catch {}
       try {
@@ -303,11 +313,7 @@ export default function QRScanner({ onBack, navigateTo }) {
             {/* 3:4 Ratio Frame */}
             <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} />
             
-            {/* Corner Brackets */}
-            <div className="qrs-corners">
-              <div className="qrs-corner tl" /><div className="qrs-corner tr" />
-              <div className="qrs-corner bl" /><div className="qrs-corner br" />
-            </div>
+            {/* Laser scan line only — no corner brackets */}
 
             {/* Laser */}
             {status === 'SCANNING' && <div className="qrs-laser" />}
