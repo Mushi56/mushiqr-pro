@@ -58,7 +58,8 @@ export default function SettingsPage({ theme, setTheme, effectiveTheme }) {
       flexDirection: 'column',
       backgroundColor: 'var(--bg-primary)',
       color: 'var(--text-primary)',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      paddingTop: 'env(safe-area-inset-top)'
     }}>
       {/* Header */}
       <div style={{

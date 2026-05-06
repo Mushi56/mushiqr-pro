@@ -221,16 +221,21 @@ export default function App() {
     }
   };
 
+  const [pageParams, setPageParams] = useState({});
+
   // Custom navigation wrapper to track history
-  const navigateTo = (page) => {
+  const navigateTo = (page, params = {}) => {
     if (page !== activePage) {
       setPreviousPage(activePage);
       setActivePage(page);
+      setPageParams(params);
       // Clear tab history when starting a new session or returning home
       if (page === 'generator' || page === 'home') {
         setTabHistory([]);
         if (page === 'generator') setActiveTab('content');
       }
+    } else if (Object.keys(params).length > 0) {
+      setPageParams(params);
     }
   };
 
@@ -369,10 +374,10 @@ export default function App() {
         await StatusBar.show();
         if (effectiveTheme === 'dark') {
           await StatusBar.setStyle({ style: 'DARK' });
-          await StatusBar.setBackgroundColor({ color: '#030305' });
+          await StatusBar.setBackgroundColor({ color: '#00000000' });
         } else {
           await StatusBar.setStyle({ style: 'LIGHT' });
-          await StatusBar.setBackgroundColor({ color: '#FDFDFF' });
+          await StatusBar.setBackgroundColor({ color: '#00000000' });
         }
       } catch (e) {
         console.warn('StatusBar plugin failed to update:', e);
@@ -1345,7 +1350,7 @@ export default function App() {
             </section>
           </>
         ) : activePage === 'scanner' ? (
-          <QRScanner onBack={() => setActivePage('home')} />
+          <QRScanner onBack={() => setActivePage('home')} navigateTo={navigateTo} />
         ) : activePage === 'home' ? (
           <HomePage 
             onNavigate={(page) => {
@@ -1372,7 +1377,7 @@ export default function App() {
         ) : activePage === 'settings' ? (
           <SettingsPage theme={theme} setTheme={setTheme} effectiveTheme={effectiveTheme} />
         ) : (
-          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
+          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} initialFilter={pageParams.filter} />
         )}
       </main>
 
@@ -1400,11 +1405,12 @@ export default function App() {
         <div style={{
           position: 'fixed',
           bottom: '0px',
-          left: 0, right: 0, height: '70px',
+          left: 0, right: 0, 
+          height: 'calc(70px + env(safe-area-inset-bottom))',
           backgroundColor: 'var(--bg-primary)',
           borderTop: '1px solid var(--border-color)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-around',
-          padding: '0 16px', zIndex: 100,
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'space-around',
+          padding: '10px 16px env(safe-area-inset-bottom) 16px', zIndex: 100,
           boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
         }}>
           <button onClick={() => navigateTo('home')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>

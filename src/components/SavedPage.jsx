@@ -94,7 +94,8 @@ export default function SavedPage({ onLoadQR }) {
       flexDirection: 'column',
       backgroundColor: 'var(--bg-primary)',
       color: 'var(--text-primary)',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      paddingTop: 'env(safe-area-inset-top)'
     }}>
       {/* Header */}
       <div style={{ padding: '24px var(--main-padding-x) 16px', background: 'var(--bg-primary)', zIndex: 10 }}>

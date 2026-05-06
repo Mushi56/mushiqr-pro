@@ -16,9 +16,9 @@ const TYPE_ICONS = {
   [QR_TYPES.TEXT]: <FileCode size={14} />
 };
 
-export default function HistoryPage({ onLoadQR, onNavigate }) {
+export default function HistoryPage({ onLoadQR, onNavigate, initialFilter }) {
   const [history, setHistory] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState(initialFilter || 'All');
    const [swipedItemId, setSwipedItemId] = useState(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [showRangeMenu, setShowRangeMenu] = useState(false);
@@ -164,7 +164,8 @@ export default function HistoryPage({ onLoadQR, onNavigate }) {
       flexDirection: 'column',
       backgroundColor: 'var(--bg-primary)',
       color: 'var(--text-primary)',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      paddingTop: 'env(safe-area-inset-top)'
     }}>
       {/* Header */}
       <div style={{ padding: '24px var(--main-padding-x) 16px', background: 'var(--bg-primary)', zIndex: 10 }}>

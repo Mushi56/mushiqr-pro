@@ -8,7 +8,8 @@ import {
   ArrowLeft, Zap, ZapOff, Image, X, CheckCircle2,
   Copy, ExternalLink, Share2, Star, Wifi, Mail,
   Phone, User, Globe, FileText, Link2, ScanLine,
-  ShieldCheck, Minus, Plus, AlertCircle, RefreshCcw, Bookmark
+  ShieldCheck, Minus, Plus, AlertCircle, RefreshCcw, Bookmark,
+  History
 } from 'lucide-react';
 
 const parseQRData = (text) => {
@@ -23,7 +24,7 @@ const parseQRData = (text) => {
   return { type: 'Text', icon: FileText, title: 'Text Content', action: 'Copy Text', actionIcon: Copy };
 };
 
-export default function QRScanner({ onBack }) {
+export default function QRScanner({ onBack, navigateTo }) {
   const [status, setStatus] = useState('LOADING');
   const [result, setResult] = useState(null);
   const [qrTypeData, setQrTypeData] = useState(null);
@@ -84,17 +85,34 @@ export default function QRScanner({ onBack }) {
   const toggleFlash = useCallback(async () => {
     const qr = html5QrRef.current;
     if (!qr || !qr.isScanning) return;
+    
+    const next = !flashOn;
+    
     try {
+      // 1. Try Capacitor Native Flash (More reliable for Android/iOS)
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const { Camera: CapCamera } = await import('@capacitor/camera');
+          await CapCamera.setFlashMode({ flashMode: next ? 'on' : 'off' });
+          setFlashOn(next);
+          return;
+        } catch (e) {
+          console.warn('Capacitor Flash failed, falling back to Web API', e);
+        }
+      }
+
+      // 2. Fallback to Web API (Html5Qrcode track)
       const track = qr.getRunningTrack();
       if (track) {
         const caps = track.getCapabilities();
         if (caps.torch) {
-          const next = !flashOn;
           await track.applyConstraints({ advanced: [{ torch: next }] });
           setFlashOn(next);
         }
       }
-    } catch {}
+    } catch (err) {
+      console.error('Flash toggle error:', err);
+    }
   }, [flashOn]);
 
   const handleScanResult = useCallback((decodedText) => {
@@ -131,14 +149,16 @@ export default function QRScanner({ onBack }) {
       html5QrRef.current = html5Qr;
       const config = {
         fps: 30,
-        qrbox: (vw, vh) => { const s = Math.floor(Math.min(vw, vh) * 0.82); return { width: s, height: s }; },
-        aspectRatio: 1.0,
+        qrbox: (vw, vh) => { 
+          const s = Math.floor(Math.min(vw, vh) * 0.72);
+          return { width: s, height: s }; 
+        },
+        aspectRatio: 0.75, // 3:4 ratio
         disableFlip: false,
         videoConstraints: {
           facingMode: facingBack ? 'environment' : 'user',
-          width: { min: 640, ideal: 1920, max: 3840 },
-          height: { min: 480, ideal: 1080, max: 2160 },
-          frameRate: { ideal: 30, max: 60 }
+          width: { min: 640, ideal: 1080, max: 1920 },
+          aspectRatio: { ideal: 0.75 }
         }
       };
       await html5Qr.start({ facingMode: facingBack ? 'environment' : 'user' }, config, (t) => handleScanResult(t), () => {});
@@ -245,16 +265,15 @@ export default function QRScanner({ onBack }) {
       <div className="qrs">
         {/* Header */}
         <header className="qrs-header">
-          <button className="qrs-icon-btn" onClick={safeBack} aria-label="Go back">
+          <button className="qrs-icon-btn circ" onClick={safeBack} aria-label="Go back">
             <ArrowLeft size={22} />
           </button>
           <div className="qrs-header-center">
             <h1 className="qrs-title">Scan QR Code</h1>
             <p className="qrs-subtitle">Align QR code within the frame</p>
           </div>
-          <button className={`qrs-icon-btn qrs-flash ${flashOn ? 'on' : ''}`} onClick={toggleFlash} aria-label="Toggle flash">
+          <button className={`qrs-icon-btn circ qrs-flash ${flashOn ? 'on' : ''}`} onClick={toggleFlash} aria-label="Toggle flash">
             {flashOn ? <Zap size={18} /> : <ZapOff size={18} />}
-            <span className="qrs-flash-lbl">Flash</span>
           </button>
         </header>
 
@@ -281,16 +300,9 @@ export default function QRScanner({ onBack }) {
           {/* Scanner Frame */}
           <div className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`}>
             {/* Status Pill */}
-            {status === 'SCANNING' && (
-              <div className="qrs-pill"><ScanLine size={14} /><span>Scanning...</span></div>
-            )}
-            {status === 'DETECTED' && (
-              <div className="qrs-pill detected"><CheckCircle2 size={14} /><span>Detected!</span></div>
-            )}
-
-            {/* Camera */}
+            {/* 3:4 Ratio Frame */}
             <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} />
-
+            
             {/* Corner Brackets */}
             <div className="qrs-corners">
               <div className="qrs-corner tl" /><div className="qrs-corner tr" />
@@ -324,9 +336,19 @@ export default function QRScanner({ onBack }) {
             <div className="qrs-ctrl-icon"><Image size={20} /></div>
             <span>Gallery</span>
           </button>
-          <button className="qrs-ctrl-btn" onClick={safeBack}>
-            <div className="qrs-ctrl-icon"><X size={20} /></div>
-            <span>Close</span>
+          
+          <div className="qrs-center-status">
+            {status === 'SCANNING' && (
+              <div className="qrs-pill-inline active"><ScanLine size={16} /><span>Scanning</span></div>
+            )}
+            {status === 'DETECTED' && (
+              <div className="qrs-pill-inline detected"><CheckCircle2 size={16} /><span>Detected</span></div>
+            )}
+          </div>
+
+          <button className="qrs-ctrl-btn" onClick={() => { stopScanner(); if (navigateTo) navigateTo('history', { filter: 'Scanned' }); else if (onBack) onBack(); }}>
+            <div className="qrs-ctrl-icon"><History size={20} /></div>
+            <span>History</span>
           </button>
         </div>
 
@@ -343,11 +365,9 @@ export default function QRScanner({ onBack }) {
                 <TypeIcon size={14} />
                 <span>{qrTypeData.title}</span>
               </div>
-              <div className="qrs-sheet-preview" onClick={handlePrimaryAction}>
-                <div className="qrs-sheet-link-icon"><Link2 size={20} /></div>
+              <div className="qrs-sheet-preview">
                 <div className="qrs-sheet-link-text">
                   <p className="qrs-sheet-url">{result}</p>
-                  <p className="qrs-sheet-tap">Tap to view</p>
                 </div>
               </div>
               <div className="qrs-sheet-actions">
@@ -368,6 +388,14 @@ export default function QRScanner({ onBack }) {
                   <span>Save</span>
                 </button>
               </div>
+              
+              <button 
+                className="qrs-retry-btn" 
+                style={{ width: '100%', marginTop: '24px', justifyContent: 'center', background: 'rgba(255,255,255,0.05)' }} 
+                onClick={resumeScanning}
+              >
+                <RefreshCcw size={16} /> Resume Scanning
+              </button>
             </div>
           </div>
         )}
