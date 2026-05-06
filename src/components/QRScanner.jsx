@@ -1,33 +1,37 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Share } from '@capacitor/share';
 import {
-  Camera,
-  Copy,
-  ExternalLink,
-  X,
-  ScanLine,
-  CheckCircle2,
-  RefreshCw,
-  ImagePlus,
-  RefreshCcw,
-  AlertCircle,
-  ArrowLeft,
-  Loader2,
-  ShieldCheck,
-  Search,
-  Minus,
-  Plus
+  ArrowLeft, Zap, ZapOff, Image, X, CheckCircle2,
+  Copy, ExternalLink, Share2, Star, Wifi, Mail,
+  Phone, User, Globe, FileText, Link2, ScanLine,
+  ShieldCheck, Minus, Plus, AlertCircle, RefreshCcw, Bookmark
 } from 'lucide-react';
+
+const parseQRData = (text) => {
+  if (!text) return { type: 'Text', icon: FileText, title: 'Text Content', action: 'Copy Text', actionIcon: Copy };
+  const t = text.trim();
+  if (/^WIFI:S:.*?;/i.test(t)) return { type: 'WiFi', icon: Wifi, title: 'WiFi Network', action: 'Copy Password', actionIcon: Copy };
+  if (/^mailto:/i.test(t)) return { type: 'Email', icon: Mail, title: 'Email Address', action: 'Send Email', actionIcon: Mail };
+  if (/^tel:/i.test(t) || /^sms:/i.test(t)) return { type: 'Phone', icon: Phone, title: 'Phone Number', action: 'Call / SMS', actionIcon: Phone };
+  if (/^BEGIN:VCARD/i.test(t)) return { type: 'Contact', icon: User, title: 'Contact Card', action: 'Save Contact', actionIcon: User };
+  if (/^https?:\/\//i.test(t) || /^www\./i.test(t) || /^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.[a-z]{2,}(\/.*)?$/i.test(t))
+    return { type: 'Website', icon: Globe, title: 'Website', action: 'Open Link', actionIcon: ExternalLink };
+  return { type: 'Text', icon: FileText, title: 'Text Content', action: 'Copy Text', actionIcon: Copy };
+};
 
 export default function QRScanner({ onBack }) {
   const [status, setStatus] = useState('LOADING');
   const [result, setResult] = useState(null);
+  const [qrTypeData, setQrTypeData] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [facingBack, setFacingBack] = useState(true);
+  const [flashOn, setFlashOn] = useState(false);
+  const [flashSupported, setFlashSupported] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [zoomCapabilities, setZoomCapabilities] = useState(null);
 
@@ -37,27 +41,12 @@ export default function QRScanner({ onBack }) {
   const busyRef = useRef(false);
   const touchStateRef = useRef({ distance: 0, initialZoom: 1 });
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => { mountedRef.current = false; };
-  }, []);
-
-  // Back button handled centrally in App.jsx
-  /*
-  useEffect(() => {
-    const lp = App.addListener('backButton', () => safeBack());
-    return () => { lp.then(l => l.remove()).catch(() => {}); };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  */
+  useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
 
   useEffect(() => {
     return () => {
       const qr = html5QrRef.current;
-      if (qr) {
-        try { if (qr.isScanning) qr.stop().catch(() => {}); } catch {}
-        try { qr.clear(); } catch {}
-        html5QrRef.current = null;
-      }
+      if (qr) { try { if (qr.isScanning) qr.stop().catch(() => {}); } catch {} try { qr.clear(); } catch {} html5QrRef.current = null; }
     };
   }, []);
 
@@ -70,129 +59,81 @@ export default function QRScanner({ onBack }) {
     try { qr.clear(); } catch {}
     html5QrRef.current = null;
     setZoomCapabilities(null);
+    setFlashOn(false);
+    setFlashSupported(false);
   }, []);
 
-  const safeBack = useCallback(() => {
-    stopScanner();
-    if (onBack) onBack();
-  }, [stopScanner, onBack]);
+  const safeBack = useCallback(() => { stopScanner(); if (onBack) onBack(); }, [stopScanner, onBack]);
 
-  // Apply zoom to the running video track
   const applyZoom = useCallback(async (value) => {
     const qr = html5QrRef.current;
     if (!qr || !qr.isScanning) return;
-    
     try {
       const track = qr.getRunningTrack();
-      if (track && typeof track.applyConstraints === 'function') {
-        const capabilities = track.getCapabilities();
-        if (capabilities.zoom) {
-          const val = Math.min(Math.max(value, capabilities.zoom.min), capabilities.zoom.max);
+      if (track) {
+        const caps = track.getCapabilities();
+        if (caps.zoom) {
+          const val = Math.min(Math.max(value, caps.zoom.min), caps.zoom.max);
           await track.applyConstraints({ advanced: [{ zoom: val }] });
           setZoom(val);
         }
       }
-    } catch (err) {
-      console.warn('Failed to apply zoom:', err);
-    }
+    } catch {}
   }, []);
 
-  // Broader URL detection — catches http://, https://, and www. prefixed strings
-  const isURL = useCallback((text) => {
-    if (!text || typeof text !== 'string') return false;
-    const trimmed = text.trim();
-    // Direct protocol check
+  const toggleFlash = useCallback(async () => {
+    const qr = html5QrRef.current;
+    if (!qr || !qr.isScanning) return;
     try {
-      const u = new URL(trimmed);
-      if (u.protocol === 'http:' || u.protocol === 'https:') return true;
-    } catch { /* not a full URL, try other patterns */ }
-    // Check for www. prefix (without protocol)
-    if (/^www\./i.test(trimmed)) return true;
-    // Check for common domain patterns like example.com, sub.example.org etc.
-    if (/^[a-z0-9]([a-z0-9-]*[a-z0-9])?\.[a-z]{2,}(\/.*)?$/i.test(trimmed)) return true;
-    return false;
-  }, []);
-
-  // Normalize URL — ensure it has a protocol prefix
-  const normalizeURL = useCallback((text) => {
-    const trimmed = text.trim();
-    if (/^https?:\/\//i.test(trimmed)) return trimmed;
-    return 'https://' + trimmed;
-  }, []);
-
-  // Open URL in the device's default external browser (Chrome, etc.)
-  const openInBrowser = useCallback(async (url) => {
-    const fullUrl = normalizeURL(url);
-    if (Capacitor.isNativePlatform()) {
-      try {
-        // Browser.open launches the system default browser (Chrome, etc.)
-        await Browser.open({ url: fullUrl, windowName: '_system' });
-      } catch {
-        // Fallback if Browser plugin fails
-        window.open(fullUrl, '_system');
+      const track = qr.getRunningTrack();
+      if (track) {
+        const caps = track.getCapabilities();
+        if (caps.torch) {
+          const next = !flashOn;
+          await track.applyConstraints({ advanced: [{ torch: next }] });
+          setFlashOn(next);
+        }
       }
-    } else {
-      window.open(fullUrl, '_blank');
-    }
-  }, [normalizeURL]);
+    } catch {}
+  }, [flashOn]);
 
   const handleScanResult = useCallback((decodedText) => {
-    if (!mountedRef.current) return;
-    
-    // Save to history
-    import('../utils/storage').then(({ saveToHistory }) => {
-      saveToHistory({
-        source: 'scan',
-        qrData: { text: decodedText },
-        type: isURL(decodedText) ? 'URL' : 'TEXT',
-        displayText: decodedText
+    if (!mountedRef.current || busyRef.current) return;
+    setStatus(prev => {
+      if (prev === 'DETECTED') return prev;
+      if (Capacitor.isNativePlatform()) { Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => {}); }
+      else if (navigator.vibrate) { navigator.vibrate(200); }
+      const qr = html5QrRef.current;
+      if (qr && qr.isScanning) { try { qr.pause(true); } catch {} }
+      const parsed = parseQRData(decodedText);
+      setQrTypeData(parsed);
+      setResult(decodedText);
+      import('../utils/storage').then(({ saveToHistory }) => {
+        saveToHistory({ source: 'scan', qrData: { text: decodedText }, type: parsed.type.toUpperCase(), displayText: decodedText });
       });
+      return 'DETECTED';
     });
-
-    if (isURL(decodedText)) {
-      // URL detected → stop scanner, open in external browser, go back
-      stopScanner();
-      openInBrowser(decodedText);
-      if (onBack) onBack();
-      return;
-    }
-    // Non-URL content → show result card
-    setResult(decodedText);
-    setStatus('RESULT');
-    stopScanner();
-  }, [isURL, stopScanner, openInBrowser, onBack]);
+  }, []);
 
   const startScanner = useCallback(async () => {
     if (busyRef.current) return;
     busyRef.current = true;
-
     if (!mountedRef.current) return;
-    setResult(null);
-    setError(null);
-    setStatus('LOADING');
-    setZoom(1);
-
+    setResult(null); setQrTypeData(null); setError(null); setStatus('LOADING'); setZoom(1);
     try {
       await stopScanner();
       await new Promise(r => setTimeout(r, 300));
       if (!mountedRef.current) { busyRef.current = false; return; }
-
       const el = document.getElementById('qr-scanner-viewport');
-      if (!el) throw new Error('Scanner viewport element not found.');
+      if (!el) throw new Error('Scanner viewport not found.');
       el.innerHTML = '';
-
       const html5Qr = new Html5Qrcode('qr-scanner-viewport');
       html5QrRef.current = html5Qr;
-
       const config = {
-        fps: 30, // Max standard FPS for smooth video
-        qrbox: (vw, vh) => {
-          const s = Math.floor(Math.min(vw, vh) * 0.8);
-          return { width: s, height: s };
-        },
-        aspectRatio: 0.75, 
+        fps: 30,
+        qrbox: (vw, vh) => { const s = Math.floor(Math.min(vw, vh) * 0.82); return { width: s, height: s }; },
+        aspectRatio: 1.0,
         disableFlip: false,
-        // Request maximum possible resolution and high frame rate
         videoConstraints: {
           facingMode: facingBack ? 'environment' : 'user',
           width: { min: 640, ideal: 1920, max: 3840 },
@@ -200,329 +141,240 @@ export default function QRScanner({ onBack }) {
           frameRate: { ideal: 30, max: 60 }
         }
       };
-
-      const cameraId = { facingMode: facingBack ? 'environment' : 'user' };
-
-      await html5Qr.start(
-        cameraId,
-        config,
-        (decodedText) => handleScanResult(decodedText),
-        () => {}
-      );
-
+      await html5Qr.start({ facingMode: facingBack ? 'environment' : 'user' }, config, (t) => handleScanResult(t), () => {});
       if (!mountedRef.current) { busyRef.current = false; return; }
-      
-      // Detect zoom capabilities after start
       try {
         const track = html5Qr.getRunningTrack();
         if (track) {
-          const capabilities = track.getCapabilities();
-          if (capabilities.zoom) {
-            setZoomCapabilities({
-              min: capabilities.zoom.min || 1,
-              max: Math.min(capabilities.zoom.max || 10, 10), // Limit to 10x as requested
-              step: capabilities.zoom.step || 0.1
-            });
-            setZoom(capabilities.zoom.min || 1);
-          }
+          const caps = track.getCapabilities();
+          if (caps.zoom) { setZoomCapabilities({ min: caps.zoom.min || 1, max: Math.min(caps.zoom.max || 10, 10), step: caps.zoom.step || 0.1 }); setZoom(caps.zoom.min || 1); }
+          if (caps.torch) setFlashSupported(true);
         }
-      } catch (e) {
-        console.warn('Zoom detection failed:', e);
-      }
-
-      // ── Force-strip native video controls (Android WebView fix) ──
+      } catch {}
       try {
-        const viewport = document.getElementById('qr-scanner-viewport');
-        if (viewport) {
-          const stripControls = (container) => {
-            const videos = container.querySelectorAll('video');
-            videos.forEach(v => {
-              v.removeAttribute('controls');
-              v.controls = false;
-              v.setAttribute('playsinline', '');
-              v.setAttribute('disablepictureinpicture', '');
-              v.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback');
-              v.style.pointerEvents = 'none';
-              // Also hide any overlay buttons Android might inject
-              v.style.webkitMediaControls = 'none';
-            });
-          };
-          // Strip immediately
-          stripControls(viewport);
-          // Watch for new video elements (Android may re-inject controls)
-          const observer = new MutationObserver(() => stripControls(viewport));
-          observer.observe(viewport, { childList: true, subtree: true, attributes: true, attributeFilter: ['controls'] });
-          // Store observer ref so cleanup can disconnect it
-          html5Qr._controlsObserver = observer;
+        const vp = document.getElementById('qr-scanner-viewport');
+        if (vp) {
+          const strip = (c) => { c.querySelectorAll('video').forEach(v => { v.removeAttribute('controls'); v.controls = false; v.setAttribute('playsinline', ''); v.setAttribute('disablepictureinpicture', ''); v.style.pointerEvents = 'none'; }); };
+          strip(vp);
+          const obs = new MutationObserver(() => strip(vp));
+          obs.observe(vp, { childList: true, subtree: true, attributes: true, attributeFilter: ['controls'] });
+          html5Qr._controlsObserver = obs;
         }
-      } catch (e) {
-        console.warn('Video controls strip failed:', e);
-      }
-
+      } catch {}
       busyRef.current = false;
       setStatus('SCANNING');
-
     } catch (err) {
       busyRef.current = false;
       if (!mountedRef.current) return;
-      console.error('Scanner error:', err);
-
       let msg = 'Failed to start camera.';
       const m = typeof err?.message === 'string' ? err.message : '';
-      if (m.includes('NotAllowed') || m.includes('Permission'))
-        msg = 'Camera permission denied. Please allow camera access in Settings → Apps → MushiQR Pro → Permissions.';
-      else if (m.includes('NotReadable') || m.includes('Could not start') || m.includes('in use'))
-        msg = 'Camera is in use by another app. Close all camera apps, then try again.';
-      else if (m.includes('NotFound') || m.includes('Requested device not found'))
-        msg = 'No camera found on this device.';
-      else if (m.includes('AbortError'))
-        msg = 'Camera was interrupted. Please try again.';
+      if (m.includes('NotAllowed') || m.includes('Permission')) msg = 'Camera permission denied. Please allow camera access in Settings.';
+      else if (m.includes('NotReadable') || m.includes('in use')) msg = 'Camera is in use by another app.';
+      else if (m.includes('NotFound')) msg = 'No camera found on this device.';
       else if (m) msg = m;
-
-      setError(msg);
-      setStatus('ERROR');
-      await stopScanner();
+      setError(msg); setStatus('ERROR'); await stopScanner();
     }
   }, [facingBack, stopScanner, handleScanResult]);
 
-  // Auto-start camera on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (mountedRef.current) startScanner();
-    }, 200);
-    return () => clearTimeout(timer);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const switchCamera = useCallback(async () => {
-    await stopScanner();
-    setFacingBack(p => !p);
-    setTimeout(() => { if (mountedRef.current) startScanner(); }, 400);
-  }, [stopScanner, startScanner]);
-
-  const closeScanner = useCallback(async () => {
-    await stopScanner();
-    if (mountedRef.current) safeBack();
-  }, [stopScanner, safeBack]);
+  useEffect(() => { const t = setTimeout(() => { if (mountedRef.current) startScanner(); }, 200); return () => clearTimeout(t); }, []); // eslint-disable-line
 
   const handleFileUpload = async (file) => {
     if (!file) return;
-    await stopScanner();
-    setStatus('LOADING');
-    setResult(null);
-    setError(null);
-    try {
-      const qr = new Html5Qrcode('qr-scanner-file-temp');
-      const text = await qr.scanFile(file, true);
-      if (mountedRef.current) handleScanResult(text);
-    } catch {
-      if (mountedRef.current) {
-        setError('No QR code found in this image. Try a clearer photo.');
-        setStatus('ERROR');
-      }
-    }
+    await stopScanner(); setStatus('LOADING'); setResult(null); setQrTypeData(null); setError(null);
+    try { const qr = new Html5Qrcode('qr-scanner-file-temp'); const text = await qr.scanFile(file, true); if (mountedRef.current) handleScanResult(text); }
+    catch { if (mountedRef.current) { setError('No QR code found in this image.'); setStatus('ERROR'); } }
   };
 
   const handleCopy = async () => {
     if (!result) return;
-    try { await navigator.clipboard.writeText(result); } catch {
-      const t = document.createElement('textarea');
-      t.value = result; t.style.cssText = 'position:fixed;opacity:0';
-      document.body.appendChild(t); t.select();
-      document.execCommand('copy'); document.body.removeChild(t);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try { await navigator.clipboard.writeText(result); } catch { const t = document.createElement('textarea'); t.value = result; t.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); }
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
   };
 
-  // Pinch to Zoom Logic
+  const handleShare = async () => {
+    if (!result) return;
+    try { await Share.share({ title: 'Scanned QR Code', text: result, dialogTitle: 'Share QR Content' }); }
+    catch { if (navigator.share) navigator.share({ title: 'Scanned QR Code', text: result }).catch(() => {}); }
+  };
+
+  const handleSave = async () => {
+    if (!result || !qrTypeData) return;
+    import('../utils/storage').then(({ saveToSaved }) => { saveToSaved({ qrData: { text: result }, type: qrTypeData.type.toUpperCase(), displayText: result }); });
+    alert('Saved to favorites!');
+  };
+
+  const handlePrimaryAction = async () => {
+    if (!result || !qrTypeData) return;
+    const t = result.trim();
+    try {
+      if (qrTypeData.type === 'Website') {
+        const url = /^https?:\/\//i.test(t) ? t : 'https://' + t;
+        if (Capacitor.isNativePlatform()) { await Browser.open({ url, windowName: '_system' }); } else { window.open(url, '_blank'); }
+      } else if (qrTypeData.type === 'WiFi') {
+        const p = t.match(/P:(.*?);/); await navigator.clipboard.writeText(p ? p[1] : t); alert(p ? 'WiFi Password Copied!' : 'WiFi details copied.');
+      } else if (qrTypeData.type === 'Email' || qrTypeData.type === 'Phone') { window.location.href = t; }
+      else if (qrTypeData.type === 'Contact') { const b = new Blob([t], { type: 'text/vcard' }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = 'contact.vcf'; a.click(); }
+      else { await handleCopy(); }
+    } catch (err) { console.error('Action failed:', err); }
+  };
+
+  const resumeScanning = () => {
+    const qr = html5QrRef.current;
+    if (qr && qr.isPaused) { try { qr.resume(); } catch {} } else { startScanner(); }
+    setResult(null); setQrTypeData(null); setStatus('SCANNING');
+  };
+
   const handleTouchStart = (e) => {
     if (e.touches.length === 2 && zoomCapabilities) {
-      const dist = Math.hypot(
-        e.touches[0].pageX - e.touches[1].pageX,
-        e.touches[0].pageY - e.touches[1].pageY
-      );
-      touchStateRef.current = { distance: dist, initialZoom: zoom };
+      const d = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+      touchStateRef.current = { distance: d, initialZoom: zoom };
     }
   };
-
   const handleTouchMove = (e) => {
     if (e.touches.length === 2 && zoomCapabilities) {
-      const dist = Math.hypot(
-        e.touches[0].pageX - e.touches[1].pageX,
-        e.touches[0].pageY - e.touches[1].pageY
-      );
-      const scale = dist / touchStateRef.current.distance;
-      const newZoom = touchStateRef.current.initialZoom * scale;
-      applyZoom(newZoom);
+      const d = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+      applyZoom(touchStateRef.current.initialZoom * (d / touchStateRef.current.distance));
     }
   };
 
-  const showViewport = status !== 'RESULT';
+  const ActionIcon = qrTypeData?.actionIcon || ExternalLink;
+  const TypeIcon = qrTypeData?.icon || FileText;
 
   return (
     <div className="scanner-page scanner-page-enter">
+      <div className="qrs">
         {/* Header */}
-        {/* Header — Aligned with camera sides */}
-        <header className="scanner-nav-header">
-          <div className="scanner-header-inner">
-            <button className="scanner-back-btn" onClick={safeBack} aria-label="Go back">
-              <ArrowLeft size={22} />
-            </button>
-            <div className="scanner-nav-title"></div>
-            <div style={{ width: 44 }} />
+        <header className="qrs-header">
+          <button className="qrs-icon-btn" onClick={safeBack} aria-label="Go back">
+            <ArrowLeft size={22} />
+          </button>
+          <div className="qrs-header-center">
+            <h1 className="qrs-title">Scan QR Code</h1>
+            <p className="qrs-subtitle">Align QR code within the frame</p>
           </div>
+          <button className={`qrs-icon-btn qrs-flash ${flashOn ? 'on' : ''}`} onClick={toggleFlash} aria-label="Toggle flash">
+            {flashOn ? <Zap size={18} /> : <ZapOff size={18} />}
+            <span className="qrs-flash-lbl">Flash</span>
+          </button>
         </header>
 
-        <div className="scanner-main-content">
-
-
-          {/* LOADING STATE — Rich premium camera init screen */}
+        {/* Body */}
+        <div className="qrs-body" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove}>
+          {/* Loading */}
           {status === 'LOADING' && (
-            <div className="scanner-loading-overlay">
-              <div className="scanner-loading-inner">
-                <div className="scanner-loading-icon-wrap">
-                  <Camera size={40} strokeWidth={1.5} color="var(--accent-primary)" />
-                </div>
-                <p className="scanner-loading-title">Starting Camera</p>
-                <p className="scanner-loading-sub">Please allow camera access when prompted</p>
-              </div>
+            <div className="qrs-center-msg">
+              <div className="qrs-spinner" />
+              <p>Starting Camera...</p>
+              <p className="qrs-hint">Allow camera access when prompted</p>
             </div>
           )}
 
-          {/* SCANNER AREA */}
-          {showViewport && (
-            <div 
-              className="scanner-viewport-wrapper"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-            >
-
-              {/* Camera viewport — html5-qrcode owns this */}
-              <div
-                id="qr-scanner-viewport"
-                className="scanner-view-box"
-                style={{
-                  visibility: status === 'SCANNING' ? 'visible' : 'hidden',
-                  position: status === 'SCANNING' ? 'relative' : 'absolute',
-                }}
-              />
-
-              {/* Animated scan line only */}
-              {status === 'SCANNING' && (
-                <div className="scanner-overlay-guide">
-                  <div className="scanner-laser-line" />
-                </div>
-              )}
-
-              {/* ZOOM SLIDER - Premium Camera Style */}
-              {status === 'SCANNING' && zoomCapabilities && (
-                <div className="scanner-zoom-container fade-in">
-                  <div className="zoom-slider-wrapper glass-panel">
-                    <button className="zoom-btn" onClick={() => applyZoom(zoom - 0.5)}>
-                      <Minus size={16} />
-                    </button>
-                    <div className="slider-track-container">
-                      <input
-                        type="range"
-                        min={zoomCapabilities.min}
-                        max={zoomCapabilities.max}
-                        step={zoomCapabilities.step}
-                        value={zoom}
-                        onChange={(e) => applyZoom(parseFloat(e.target.value))}
-                        className="premium-zoom-slider"
-                      />
-                    </div>
-                    <button className="zoom-btn" onClick={() => applyZoom(zoom + 0.5)}>
-                      <Plus size={16} />
-                    </button>
-                    <div className="zoom-indicator">
-                      {zoom.toFixed(1)}x
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* ERROR overlay */}
-              {status === 'ERROR' && (
-                <div className="scanner-state-overlay">
-                  <div className="scanner-error-state">
-                    <AlertCircle size={48} color="var(--error)" />
-                    <p className="err-msg">{error}</p>
-                    <button className="error-retry-btn" onClick={startScanner}>
-                      <RefreshCcw size={16} /> Try Again
-                    </button>
-                  </div>
-                </div>
-              )}
+          {/* Error */}
+          {status === 'ERROR' && (
+            <div className="qrs-center-msg">
+              <AlertCircle size={44} color="#ef4444" />
+              <p>{error}</p>
+              <button className="qrs-retry-btn" onClick={startScanner}><RefreshCcw size={16} /> Try Again</button>
             </div>
           )}
 
-          {/* RESULT CARD - Matches app modal style */}
-          {status === 'RESULT' && (
-            <div className="modal-overlay">
-              <div className="modal-container glass-panel" style={{ margin: 'auto' }}>
-                <div className="modal-header">
-                  <div className="modal-header-title">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <ShieldCheck size={22} color="var(--accent-primary)" />
-                      <h3>QR Code Detected</h3>
-                    </div>
-                    <p>Decoded successfully</p>
-                  </div>
-                  <button className="modal-close" onClick={() => startScanner()}>
-                    <X size={20} />
-                  </button>
-                </div>
+          {/* Scanner Frame */}
+          <div className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`}>
+            {/* Status Pill */}
+            {status === 'SCANNING' && (
+              <div className="qrs-pill"><ScanLine size={14} /><span>Scanning...</span></div>
+            )}
+            {status === 'DETECTED' && (
+              <div className="qrs-pill detected"><CheckCircle2 size={14} /><span>Detected!</span></div>
+            )}
 
-                <div className="modal-content">
-                  <div className="res-data-box" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '16px', wordBreak: 'break-all', fontFamily: 'var(--font-mono)', fontSize: '15px' }}>
-                    <p style={{ margin: 0 }}>{result}</p>
-                  </div>
-                </div>
+            {/* Camera */}
+            <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} />
 
-                <div style={{ padding: '0 24px 24px', display: 'flex', gap: '12px' }}>
-                  <button className="modal-done-btn" onClick={handleCopy} style={{ margin: 0, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {copied ? <CheckCircle2 size={22} /> : <Copy size={22} />}
-                  </button>
-                  <button className="modal-done-btn" onClick={() => startScanner()} style={{ margin: 0, flex: 1, background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <RefreshCw size={22} />
-                  </button>
-                </div>
-              </div>
+            {/* Corner Brackets */}
+            <div className="qrs-corners">
+              <div className="qrs-corner tl" /><div className="qrs-corner tr" />
+              <div className="qrs-corner bl" /><div className="qrs-corner br" />
             </div>
-          )}
 
-          {/* CONTROLS BAR — Square separate buttons */}
-          {(status === 'SCANNING' || status === 'LOADING' || status === 'ERROR') && (
-            <div className="scanner-controls-bar">
-              <button className="type-tab" onClick={() => fileInputRef.current?.click()}>
-                <span className="type-tab-icon">
-                  <ImagePlus size={20} strokeWidth={1.5} />
-                </span>
-                Gallery
-              </button>
-              
-              <div className="scanner-bar-title">Scan</div>
+            {/* Laser */}
+            {status === 'SCANNING' && <div className="qrs-laser" />}
+            {status === 'DETECTED' && <div className="qrs-laser frozen" />}
+          </div>
 
-              <button className="type-tab active" onClick={closeScanner} style={{ background: 'var(--accent-soft)', color: 'var(--accent-primary)' }}>
-                <span className="type-tab-icon">
-                  <X size={20} strokeWidth={1.5} />
-                </span>
-                Close
-              </button>
+          {/* Info */}
+          <div className="qrs-info-line">
+            <ShieldCheck size={14} /><span>Scanning happens automatically</span>
+          </div>
 
-              <input type="file" ref={fileInputRef} accept="image/*"
-                     onChange={e => handleFileUpload(e.target.files?.[0])}
-                     style={{ display: 'none' }} />
+          {/* Zoom */}
+          {status === 'SCANNING' && zoomCapabilities && (
+            <div className="qrs-zoom">
+              <button onClick={() => applyZoom(zoom - 0.5)}><Minus size={14} /></button>
+              <input type="range" min={zoomCapabilities.min} max={zoomCapabilities.max} step={zoomCapabilities.step} value={zoom} onChange={e => applyZoom(parseFloat(e.target.value))} />
+              <button onClick={() => applyZoom(zoom + 0.5)}><Plus size={14} /></button>
+              <span>{zoom.toFixed(1)}x</span>
             </div>
           )}
         </div>
 
-        <footer className="scanner-footer-info">
-          <ShieldCheck size={14} /><span>Secure Local Processing</span>
-        </footer>
+        {/* Bottom Controls */}
+        <div className="qrs-controls">
+          <button className="qrs-ctrl-btn" onClick={() => fileInputRef.current?.click()}>
+            <div className="qrs-ctrl-icon"><Image size={20} /></div>
+            <span>Gallery</span>
+          </button>
+          <button className="qrs-ctrl-btn" onClick={safeBack}>
+            <div className="qrs-ctrl-icon"><X size={20} /></div>
+            <span>Close</span>
+          </button>
+        </div>
 
-      <div id="qr-scanner-file-temp" style={{ display: 'none' }} />
+        {/* Detection Bottom Sheet */}
+        {status === 'DETECTED' && qrTypeData && (
+          <div className="qrs-sheet-bg" onClick={resumeScanning}>
+            <div className="qrs-sheet" onClick={e => e.stopPropagation()}>
+              <div className="qrs-sheet-handle" />
+              <div className="qrs-sheet-head">
+                <CheckCircle2 size={22} color="#4ade80" />
+                <h3>QR Detected</h3>
+              </div>
+              <div className="qrs-sheet-type">
+                <TypeIcon size={14} />
+                <span>{qrTypeData.title}</span>
+              </div>
+              <div className="qrs-sheet-preview" onClick={handlePrimaryAction}>
+                <div className="qrs-sheet-link-icon"><Link2 size={20} /></div>
+                <div className="qrs-sheet-link-text">
+                  <p className="qrs-sheet-url">{result}</p>
+                  <p className="qrs-sheet-tap">Tap to view</p>
+                </div>
+              </div>
+              <div className="qrs-sheet-actions">
+                <button className="qrs-sheet-act primary" onClick={handlePrimaryAction}>
+                  <ActionIcon size={20} />
+                  <span>{qrTypeData.action}</span>
+                </button>
+                <button className="qrs-sheet-act" onClick={handleCopy}>
+                  {copied ? <CheckCircle2 size={20} color="#4ade80" /> : <Copy size={20} />}
+                  <span>{copied ? 'Copied!' : 'Copy'}</span>
+                </button>
+                <button className="qrs-sheet-act" onClick={handleShare}>
+                  <Share2 size={20} />
+                  <span>Share</span>
+                </button>
+                <button className="qrs-sheet-act" onClick={handleSave}>
+                  <Star size={20} />
+                  <span>Save</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <input type="file" ref={fileInputRef} accept="image/*" onChange={e => handleFileUpload(e.target.files?.[0])} style={{ display: 'none' }} />
+        <div id="qr-scanner-file-temp" style={{ display: 'none' }} />
+      </div>
     </div>
   );
 }
