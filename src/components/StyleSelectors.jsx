@@ -125,51 +125,51 @@ const EYE_PREVIEWS = {
   ),
   [EYE_STYLES.DIAMOND]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <polygon points="14,1 27,14 14,27 1,14" fill="none" stroke="currentColor" strokeWidth="3" />
-      <rect x="10" y="10" width="8" height="8" transform="rotate(45 14 14)" fill="currentColor" />
+      <rect x="1" y="1" width="26" height="26" rx="2" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <polygon points="14,8 20,14 14,20 8,14" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.HEXAGON]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <polygon points="14,1 26,7 26,21 14,27 2,21 2,7" fill="none" stroke="currentColor" strokeWidth="3" />
-      <circle cx="14" cy="14" r="5" fill="currentColor" />
+      <rect x="1" y="1" width="26" height="26" rx="6" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <polygon points="14,8 20,11 20,17 14,20 8,17 8,11" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.STAR]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M14 1 L18 10 L27 10 L20 16 L23 25 L14 20 L5 25 L8 16 L1 10 L10 10 Z" fill="none" stroke="currentColor" strokeWidth="2.5" />
-      <circle cx="14" cy="14" r="4" fill="currentColor" />
+      <rect x="0" y="0" width="28" height="28" rx="4" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <polygon points="14,6 16,12 22,12 17,15 19,21 14,18 9,21 11,15 6,12 12,12" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.HEART]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M14 26s-12-7.5-12-14.5a6.5 6.5 0 0 1 12-3.5 6.5 6.5 0 0 1 12 3.5c0 7-12 14.5-12 14.5z" fill="none" stroke="currentColor" strokeWidth="2.5" />
-      <circle cx="14" cy="14" r="4" fill="currentColor" />
+      <rect x="1" y="1" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <circle cx="14" cy="14" r="5" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.TRIANGLE]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <polygon points="14,2 26,25 2,25" fill="none" stroke="currentColor" strokeWidth="3" />
-      <circle cx="14" cy="17" r="4" fill="currentColor" />
+      <rect x="1" y="1" width="26" height="26" rx="12" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="8" y="8" width="12" height="12" rx="5" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.GEOMETRIC]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
       <path d="M2 2 L26 2 L26 10 L18 10 L18 18 L10 18 L10 26 L2 26 Z" fill="none" stroke="currentColor" strokeWidth="3" />
-      <rect x="8" y="8" width="6" height="6" fill="currentColor" />
+      <rect x="12" y="8" width="4" height="12" fill="currentColor" />
+      <rect x="8" y="12" width="12" height="4" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.MODERN]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <rect x="2" y="2" width="24" height="24" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
-      <rect x="6" y="6" width="16" height="16" rx="1" fill="none" stroke="currentColor" strokeWidth="2" />
-      <rect x="10" y="10" width="8" height="8" rx="0.5" fill="currentColor" />
+      <rect x="1" y="1" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="7" y="7" width="14" height="14" rx="2" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.LCD]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M4 2h20M26 4v20M24 26H4M2 24V4" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeDasharray="5 3" />
-      <rect x="9" y="9" width="10" height="10" rx="2" fill="currentColor" />
+      <rect x="1" y="1" width="26" height="26" rx="5" fill="none" stroke="currentColor" strokeWidth="3.5" />
+      <rect x="8" y="8" width="12" height="12" fill="currentColor" />
     </svg>
   ),
 };

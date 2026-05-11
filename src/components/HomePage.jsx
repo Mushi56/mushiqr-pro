@@ -155,8 +155,8 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
             <div style={{ 
               background: 'rgba(255,255,255,0.15)',
               backdropFilter: 'blur(8px)',
-              padding: '12px',
-              borderRadius: '20px',
+              padding: '16px',
+              borderRadius: '16px',
               border: '1px solid rgba(255,255,255,0.2)',
               flexShrink: 0,
               display: 'flex',
@@ -164,7 +164,7 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
               justifyContent: 'center',
               zIndex: 1
             }}>
-              <AppIcon size={68} shadow />
+              <QrCode size={60} color="#fff" />
             </div>
           </div>
         </div>
