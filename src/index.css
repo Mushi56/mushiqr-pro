@@ -225,14 +225,12 @@ body {
   justify-content: space-between;
   padding-left: var(--main-padding-x);
   padding-right: var(--main-padding-x);
-  background: var(--bg-glass);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-primary); /* Seamless edge-to-edge */
+  border-bottom: none; /* No separation border */
   position: sticky;
   top: 0;
   z-index: 2000;
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
 }
 
 .app-logo-icon {
@@ -3623,20 +3621,20 @@ input[type="range"]::-moz-range-thumb {
 .bottom-nav {
   display: flex;
   align-items: stretch;
-  height: 64px;
+  height: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
   flex-shrink: 0;
-  background: var(--bg-glass);
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary); /* Seamless edge-to-edge */
+  border-top: none; /* No separation border */
   z-index: 2000;
-  padding: 0 4px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  padding-left: 4px;
+  padding-right: 4px;
+  box-shadow: none;
 }
 
 [data-theme="light"] .bottom-nav {
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+  background: var(--bg-primary);
+  box-shadow: none;
 }
 
 .bottom-nav-tab {
