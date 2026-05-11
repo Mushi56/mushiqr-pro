@@ -87,23 +87,7 @@ export default function QRScanner({ onBack, navigateTo }) {
     const next = !flashOn;
     
     try {
-      // 1. Try Native BarcodeScanner (Best for Android/iOS torch control)
-      if (Capacitor.isNativePlatform()) {
-        try {
-          const { BarcodeScanner } = await import('@capacitor-community/barcode-scanner');
-          if (next) {
-            await BarcodeScanner.enableTorch();
-          } else {
-            await BarcodeScanner.disableTorch();
-          }
-          setFlashOn(next);
-          return;
-        } catch (e) {
-          console.warn('Native Torch failed, trying fallback', e);
-        }
-      }
-
-      // 2. Fallback to Html5Qrcode Web API
+      // Use Html5Qrcode Web API for torch control
       if (!qr || !qr.isScanning) return;
       const track = qr.getRunningTrack();
       if (track) {
