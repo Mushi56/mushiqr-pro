@@ -369,11 +369,11 @@ export default function App() {
       try {
         await StatusBar.show();
         if (effectiveTheme === 'dark') {
-          await StatusBar.setStyle({ style: 'LIGHT' }); // Light text/icons for dark background
-          await StatusBar.setBackgroundColor({ color: '#030305' }); // Exact dark core color
+          await StatusBar.setStyle({ style: 'DARK' }); // Light text/icons for dark background
+          await StatusBar.setBackgroundColor({ color: '#13131D' });
         } else {
-          await StatusBar.setStyle({ style: 'DARK' }); // Dark text/icons for light background
-          await StatusBar.setBackgroundColor({ color: '#FAFAFA' }); // Exact light core color
+          await StatusBar.setStyle({ style: 'LIGHT' }); // Dark text/icons for light background
+          await StatusBar.setBackgroundColor({ color: '#FFFFFF' });
         }
       } catch (e) {
         console.warn('StatusBar plugin failed to update:', e);

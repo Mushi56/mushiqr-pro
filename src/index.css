@@ -17,6 +17,7 @@
   --bg-hover: rgba(255, 255, 255, 0.04);
   --bg-glass: rgba(5, 5, 8, 0.7);
   --bg-glass-light: rgba(5, 5, 8, 0.7);
+  --nav-bg: #13131D; /* Gray color matching elevated cards in dark mode */
 
   --text-primary: #FFFFFF;
   --text-secondary: #A1A1AA;
@@ -84,6 +85,7 @@
   --bg-hover: rgba(33, 36, 39, 0.05);
   --bg-glass: rgba(33, 36, 39, 0.98);
   --bg-glass-light: rgba(255, 255, 255, 0.85);
+  --nav-bg: #FFFFFF; /* Clean white navbar in light mode */
   --bg-dropdown: rgba(255, 255, 255, 0.95);
   --bg-dropdown-solid: #FFFFFF;
 
@@ -115,20 +117,20 @@
 
 /* Light Mode Header Scoping */
 [data-theme="light"] .app-header:not(.header-home) {
-  background: var(--bg-glass);
-  color: var(--text-inverse);
+  background: var(--nav-bg);
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .app-header:not(.header-home) .app-logo-text {
-  color: var(--text-inverse);
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .app-header:not(.header-home) .btn-header-action:not(.active) {
-  color: var(--text-inverse);
+  color: var(--text-primary);
 }
 
 [data-theme="light"] .app-header.header-home {
-  background: var(--bg-glass-light);
+  background: var(--nav-bg);
   color: var(--text-primary);
 }
 
@@ -225,14 +227,12 @@ body {
   justify-content: space-between;
   padding-left: var(--main-padding-x);
   padding-right: var(--main-padding-x);
-  background: var(--bg-glass);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--nav-bg);
+  border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 2000;
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
 }
 
 .app-logo-icon {
@@ -3623,20 +3623,19 @@ input[type="range"]::-moz-range-thumb {
 .bottom-nav {
   display: flex;
   align-items: stretch;
-  height: 64px;
+  height: calc(64px + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
   flex-shrink: 0;
-  background: var(--bg-glass);
-  backdrop-filter: blur(30px) saturate(150%);
-  -webkit-backdrop-filter: blur(30px) saturate(150%);
-  border-top: 1px solid var(--border-color);
+  background: var(--nav-bg);
+  border-top: none;
   z-index: 2000;
   padding: 0 4px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: none;
 }
 
 [data-theme="light"] .bottom-nav {
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+  background: var(--nav-bg);
+  box-shadow: none;
 }
 
 .bottom-nav-tab {
