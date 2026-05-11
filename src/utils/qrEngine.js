@@ -128,12 +128,12 @@ export const EYE_STYLES = {
   OCTAGON: 'octagon',
   HEXAGON: 'hexagon',
   STAR: 'star',
-  HEART: 'heart',
-  TRIANGLE: 'triangle',
+  HEART: 'spotlight',
+  TRIANGLE: 'pillow',
   DIAMOND: 'diamond',
   GEOMETRIC: 'geometric',
   MODERN: 'modern',
-  LCD: 'lcd',
+  LCD: 'notch',
 };
 
 // Frame styles

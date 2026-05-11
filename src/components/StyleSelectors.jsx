@@ -107,7 +107,7 @@ const EYE_PREVIEWS = {
   ),
   [EYE_STYLES.FLOWER]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M14 2 a3 3 0 0 1 3 3 v4 a3 3 0 0 1 -6 0 v-4 a3 3 0 0 1 3 -3 M26 14 a3 3 0 0 1 -3 3 h-4 a3 3 0 0 1 0 -6 h4 a3 3 0 0 1 3 3 M14 26 a3 3 0 0 1 -3 -3 v-4 a3 3 0 0 1 6 0 v4 a3 3 0 0 1 -3 3 M2 14 a3 3 0 0 1 3 -3 h4 a3 3 0 0 1 0 6 h-4 a3 3 0 0 1 -3 -3" fill="none" stroke="currentColor" strokeWidth="4" />
+      <polygon points="28,14 25.8,19 24,23 19,25.8 14,28 9,25.8 4,23 2.2,19 0,14 2.2,9 4,5 9,2.2 14,0 19,2.2 24,5 25.8,9" fill="none" stroke="currentColor" strokeWidth="2.5" />
       <circle cx="14" cy="14" r="5" fill="currentColor" />
     </svg>
   ),
@@ -138,7 +138,7 @@ const EYE_PREVIEWS = {
   [EYE_STYLES.STAR]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
       <rect x="0" y="0" width="28" height="28" rx="4" fill="none" stroke="currentColor" strokeWidth="3.5" />
-      <polygon points="14,6 16,12 22,12 17,15 19,21 14,18 9,21 11,15 6,12 12,12" fill="currentColor" />
+      <circle cx="14" cy="14" r="5" fill="currentColor" />
     </svg>
   ),
   [EYE_STYLES.HEART]: (
@@ -155,7 +155,7 @@ const EYE_PREVIEWS = {
   ),
   [EYE_STYLES.GEOMETRIC]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M2 2 L26 2 L26 10 L18 10 L18 18 L10 18 L10 26 L2 26 Z" fill="none" stroke="currentColor" strokeWidth="3" />
+      <rect x="1" y="1" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="3.5" />
       <rect x="12" y="8" width="4" height="12" fill="currentColor" />
       <rect x="8" y="12" width="12" height="4" fill="currentColor" />
     </svg>
