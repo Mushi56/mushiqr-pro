@@ -84,29 +84,40 @@ export default function QRScanner({ onBack, navigateTo }) {
 
   const toggleFlash = useCallback(async () => {
     const qr = html5QrRef.current;
-    if (!qr || !qr.isScanning) return;
-    
     const next = !flashOn;
     
     try {
-      // 1. Try Capacitor Native Flash (More reliable for Android/iOS)
+      // 1. Try Native BarcodeScanner (Best for Android/iOS torch control)
       if (Capacitor.isNativePlatform()) {
         try {
-          const { Camera: CapCamera } = await import('@capacitor/camera');
-          await CapCamera.setFlashMode({ flashMode: next ? 'on' : 'off' });
+          const { BarcodeScanner } = await import('@capacitor-community/barcode-scanner');
+          if (next) {
+            await BarcodeScanner.enableTorch();
+          } else {
+            await BarcodeScanner.disableTorch();
+          }
           setFlashOn(next);
           return;
         } catch (e) {
-          console.warn('Capacitor Flash failed, falling back to Web API', e);
+          console.warn('Native Torch failed, trying fallback', e);
         }
       }
 
-      // 2. Fallback to Web API (Html5Qrcode track)
+      // 2. Fallback to Html5Qrcode Web API
+      if (!qr || !qr.isScanning) return;
       const track = qr.getRunningTrack();
       if (track) {
         const caps = track.getCapabilities();
-        if (caps.torch) {
-          await track.applyConstraints({ advanced: [{ torch: next }] });
+        if (caps.torch !== undefined) {
+          await track.applyConstraints({
+            advanced: [{ torch: next }]
+          });
+          setFlashOn(next);
+        } else {
+          // Some browsers might use 'fillLightMode'
+          await track.applyConstraints({
+            advanced: [{ fillLightMode: next ? 'torch' : 'off' }]
+          });
           setFlashOn(next);
         }
       }
@@ -149,18 +160,17 @@ export default function QRScanner({ onBack, navigateTo }) {
       html5QrRef.current = html5Qr;
       const config = {
         fps: 30,
-        qrbox: (vw, vh) => {
-          // Scan the entire viewport — no restrictive box
-          return { width: Math.floor(vw * 0.9), height: Math.floor(vh * 0.9) };
+        qrbox: (vw, vh) => { 
+          const w = Math.floor(vw * 0.8);
+          const h = Math.floor(vh * 0.8);
+          return { width: w, height: h }; 
         },
-        aspectRatio: 0.75, // Professional 3:4 vertical ratio
+        aspectRatio: 0.75, // 3:4 ratio
         disableFlip: false,
         videoConstraints: {
           facingMode: facingBack ? 'environment' : 'user',
-          width: { ideal: 2160 },
-          height: { ideal: 3840 },
-          aspectRatio: { ideal: 0.75 },
-          advanced: [{ focusMode: 'continuous' }]
+          width: { min: 640, ideal: 1080, max: 1920 },
+          aspectRatio: { ideal: 0.75 }
         }
       };
       await html5Qr.start({ facingMode: facingBack ? 'environment' : 'user' }, config, (t) => handleScanResult(t), () => {});
@@ -171,15 +181,6 @@ export default function QRScanner({ onBack, navigateTo }) {
           const caps = track.getCapabilities();
           if (caps.zoom) { setZoomCapabilities({ min: caps.zoom.min || 1, max: Math.min(caps.zoom.max || 10, 10), step: caps.zoom.step || 0.1 }); setZoom(caps.zoom.min || 1); }
           if (caps.torch) setFlashSupported(true);
-          // Apply pro-grade camera constraints
-          const advanced = {};
-          if (caps.focusMode && caps.focusMode.includes('continuous')) advanced.focusMode = 'continuous';
-          if (caps.exposureMode && caps.exposureMode.includes('continuous')) advanced.exposureMode = 'continuous';
-          if (caps.whiteBalanceMode && caps.whiteBalanceMode.includes('continuous')) advanced.whiteBalanceMode = 'continuous';
-          if (caps.resizeMode && caps.resizeMode.includes('none')) advanced.resizeMode = 'none';
-          if (Object.keys(advanced).length > 0) {
-            try { await track.applyConstraints({ advanced: [advanced] }); } catch {}
-          }
         }
       } catch {}
       try {
@@ -276,15 +277,16 @@ export default function QRScanner({ onBack, navigateTo }) {
       <div className="qrs">
         {/* Header */}
         <header className="qrs-header">
-          <button className="qrs-icon-btn circ" onClick={safeBack} aria-label="Go back">
+          <button className="qrs-icon-btn" onClick={safeBack} aria-label="Go back">
             <ArrowLeft size={22} />
           </button>
           <div className="qrs-header-center">
             <h1 className="qrs-title">Scan QR Code</h1>
             <p className="qrs-subtitle">Align QR code within the frame</p>
           </div>
-          <button className={`qrs-icon-btn circ qrs-flash ${flashOn ? 'on' : ''}`} onClick={toggleFlash} aria-label="Toggle flash">
+          <button className={`qrs-icon-btn qrs-flash ${flashOn ? 'on' : ''}`} onClick={toggleFlash} aria-label="Toggle flash">
             {flashOn ? <Zap size={18} /> : <ZapOff size={18} />}
+            <span className="qrs-flash-lbl">Flash</span>
           </button>
         </header>
 
@@ -314,7 +316,11 @@ export default function QRScanner({ onBack, navigateTo }) {
             {/* 3:4 Ratio Frame */}
             <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} />
             
-            {/* Laser scan line only — no corner brackets */}
+            {/* Corner Brackets */}
+            <div className="qrs-corners">
+              <div className="qrs-corner tl" /><div className="qrs-corner tr" />
+              <div className="qrs-corner bl" /><div className="qrs-corner br" />
+            </div>
 
             {/* Laser */}
             {status === 'SCANNING' && <div className="qrs-laser" />}
@@ -353,7 +359,7 @@ export default function QRScanner({ onBack, navigateTo }) {
             )}
           </div>
 
-          <button className="qrs-ctrl-btn" onClick={() => { stopScanner(); if (navigateTo) navigateTo('history', { filter: 'Scanned' }); else if (onBack) onBack(); }}>
+          <button className="qrs-ctrl-btn" onClick={() => { stopScanner(); if (navigateTo) navigateTo('history'); else if (onBack) onBack(); }}>
             <div className="qrs-ctrl-icon"><History size={20} /></div>
             <span>History</span>
           </button>

@@ -1,5 +1,6 @@
 import { Moon, Sun, Info, Shield, FileText, ChevronRight } from 'lucide-react';
 import { getPreferences, savePreferences } from '../utils/storage';
+import AppIcon from './AppIcon';
 
 export default function SettingsPage({ theme, setTheme, effectiveTheme }) {
   const handleThemeChange = () => {
@@ -122,9 +123,10 @@ export default function SettingsPage({ theme, setTheme, effectiveTheme }) {
           ))}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: '32px', color: 'var(--text-muted)' }}>
-          <p style={{ margin: 0, fontSize: '13px', fontWeight: 600 }}>MushiQR Pro</p>
-          <p style={{ margin: '4px 0 0 0', fontSize: '12px' }}>Version 1.1.0</p>
+        <div style={{ textAlign: 'center', marginTop: '32px', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <AppIcon size={56} shadow />
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: 700 }}>MushiQR Pro</p>
+          <p style={{ margin: 0, fontSize: '12px', opacity: 0.6 }}>Version 1.1.0</p>
         </div>
       </div>
     </div>

@@ -52,6 +52,7 @@ import HomePage from './components/HomePage';
 import SavedPage from './components/SavedPage';
 import SettingsPage from './components/SettingsPage';
 import AdvancedColorPicker from './components/AdvancedColorPicker';
+import AppIcon from './components/AppIcon';
 import { ScanLine, History } from 'lucide-react';
 import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
 
@@ -221,21 +222,16 @@ export default function App() {
     }
   };
 
-  const [pageParams, setPageParams] = useState({});
-
   // Custom navigation wrapper to track history
-  const navigateTo = (page, params = {}) => {
+  const navigateTo = (page) => {
     if (page !== activePage) {
       setPreviousPage(activePage);
       setActivePage(page);
-      setPageParams(params);
       // Clear tab history when starting a new session or returning home
       if (page === 'generator' || page === 'home') {
         setTabHistory([]);
         if (page === 'generator') setActiveTab('content');
       }
-    } else if (Object.keys(params).length > 0) {
-      setPageParams(params);
     }
   };
 
@@ -808,14 +804,7 @@ export default function App() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
           )}
-          <div className="app-logo-image" style={{ width: 42, height: 42, marginRight: 10, flexShrink: 0 }}>
-              <img
-                src="/logo.png"
-                alt="Mushi QR Pro"
-                style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', display: 'block' }}
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-          </div>
+          <AppIcon size={38} shadow />
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
 
@@ -1377,7 +1366,7 @@ export default function App() {
         ) : activePage === 'settings' ? (
           <SettingsPage theme={theme} setTheme={setTheme} effectiveTheme={effectiveTheme} />
         ) : (
-          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} initialFilter={pageParams.filter} />
+          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
         )}
       </main>
 

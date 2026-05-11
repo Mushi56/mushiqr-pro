@@ -16,9 +16,9 @@ const TYPE_ICONS = {
   [QR_TYPES.TEXT]: <FileCode size={14} />
 };
 
-export default function HistoryPage({ onLoadQR, onNavigate, initialFilter }) {
+export default function HistoryPage({ onLoadQR, onNavigate }) {
   const [history, setHistory] = useState([]);
-  const [activeFilter, setActiveFilter] = useState(initialFilter || 'All');
+  const [activeFilter, setActiveFilter] = useState('All');
    const [swipedItemId, setSwipedItemId] = useState(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [showRangeMenu, setShowRangeMenu] = useState(false);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, MoreVertical, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2 } from 'lucide-react';
 import { QR_TYPES } from '../utils/qrEngine';
 import { getHistory, deleteFromHistory, clearHistory } from '../utils/storage';
+import AppIcon from './AppIcon';
 
 export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, setTheme, effectiveTheme, activePage, onMenuClick }) {
   const [recentItems, setRecentItems] = useState([]);
@@ -154,8 +155,8 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
             <div style={{ 
               background: 'rgba(255,255,255,0.15)',
               backdropFilter: 'blur(8px)',
-              padding: '16px',
-              borderRadius: '16px',
+              padding: '12px',
+              borderRadius: '20px',
               border: '1px solid rgba(255,255,255,0.2)',
               flexShrink: 0,
               display: 'flex',
@@ -163,7 +164,7 @@ export default function HomePage({ onNavigate, onQuickCreate, onLoadQR, theme, s
               justifyContent: 'center',
               zIndex: 1
             }}>
-              <QrCode size={60} color="#fff" />
+              <AppIcon size={68} shadow />
             </div>
           </div>
         </div>
