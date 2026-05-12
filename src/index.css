@@ -2191,7 +2191,6 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 640px) {
   :root {
-    --header-height: 64px;
     --main-padding-x: 16px;
   }
 
