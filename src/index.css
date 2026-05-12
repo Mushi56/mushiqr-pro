@@ -65,7 +65,7 @@
 
   /* Widened from 340px — gives controls room to breathe */
   --sidebar-width: 400px;
-  --header-height: 176px; /* 152px M3 Large + 24px system status bar */
+  --header-height: 152px; /* Material 3 Large App Bar */
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
@@ -225,9 +225,11 @@ body {
 }
 
 .app-header {
-  height: var(--header-height);
-  padding-top: 24px; /* Space for status bar */
-  padding-bottom: 24px; /* Explicit bottom padding for consistency */
+  /* Dynamic height: M3 152px content area + actual device status bar height */
+  height: calc(var(--header-height) + env(safe-area-inset-top, 24px));
+  /* Push content below the status bar using the real device inset */
+  padding-top: env(safe-area-inset-top, 24px);
+  padding-bottom: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
