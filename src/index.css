@@ -1,6 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;700&family=Oswald:wght@400;500&family=Pacifico&family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Bebas+Neue&family=Lobster&family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&family=Poppins:wght@400;600&family=Raleway:wght@400;700&family=Merriweather:wght@400;700&family=Noto+Sans:wght@400;700&family=Ubuntu:wght@400;700&family=Anton&family=Permanent+Marker&family=Righteous&family=Cinzel:wght@400;700&family=Courgette&family=Fredoka+One&family=Great+Vibes&family=Kanit:wght@400;600&family=Luckiest+Guy&family=Orbitron:wght@400;700&family=Quicksand:wght@400;700&family=Satisfy&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+
 
 /* ========================================
    DESIGN SYSTEM Ã¢â‚¬â€ QR Code Generator Pro
@@ -6430,3 +6430,15 @@ video {
 .qrs-sheet-act.primary:active {
   background: rgba(214, 0, 54, 0.2);
 }
+/* Font Scroll Container Custom Styles */
+.font-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+.font-scroll-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.font-scroll-btn:active {
+  transform: scale(0.95);
+}
+

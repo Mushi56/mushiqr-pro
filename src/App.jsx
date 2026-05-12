@@ -33,7 +33,9 @@ import {
   ExternalLink,
   Home,
   Bookmark,
-  Settings
+  Settings,
+  Type,
+  Plus
 } from 'lucide-react';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -185,6 +187,39 @@ const EC_LEVELS = [
   { key: 'M', label: 'M', pct: '15%', width: 50, desc: 'Medium error correction. Good balance for most use cases — recommended as default.' },
   { key: 'Q', label: 'Q', pct: '25%', width: 75, desc: 'Quartile error correction. Recommended when adding a logo or for medium-range scanning.' },
   { key: 'H', label: 'H', pct: '30%', width: 100, desc: 'High error correction. Best for complex logos, small print sizes, or harsh environments.' },
+];
+
+const FONT_OPTIONS = [
+  { id: 'Inter', label: 'Inter' },
+  { id: 'Outfit', label: 'Outfit' },
+  { id: 'Montserrat', label: 'Montserrat' },
+  { id: 'Playfair Display', label: 'Playfair Display' },
+  { id: 'Oswald', label: 'Oswald' },
+  { id: 'Pacifico', label: 'Pacifico' },
+  { id: 'Caveat', label: 'Caveat' },
+  { id: 'Dancing Script', label: 'Dancing Script' },
+  { id: 'Bebas Neue', label: 'Bebas Neue' },
+  { id: 'Lobster', label: 'Lobster' },
+  { id: 'Roboto', label: 'Roboto' },
+  { id: 'Open Sans', label: 'Open Sans' },
+  { id: 'Lato', label: 'Lato' },
+  { id: 'Poppins', label: 'Poppins' },
+  { id: 'Raleway', label: 'Raleway' },
+  { id: 'Merriweather', label: 'Merriweather' },
+  { id: 'Noto Sans', label: 'Noto Sans' },
+  { id: 'Ubuntu', label: 'Ubuntu' },
+  { id: 'Anton', label: 'Anton' },
+  { id: 'Permanent Marker', label: 'Permanent Marker' },
+  { id: 'Righteous', label: 'Righteous' },
+  { id: 'Cinzel', label: 'Cinzel' },
+  { id: 'Courgette', label: 'Courgette' },
+  { id: 'Fredoka One', label: 'Fredoka One' },
+  { id: 'Great Vibes', label: 'Great Vibes' },
+  { id: 'Kanit', label: 'Kanit' },
+  { id: 'Luckiest Guy', label: 'Luckiest Guy' },
+  { id: 'Orbitron', label: 'Orbitron' },
+  { id: 'Quicksand', label: 'Quicksand' },
+  { id: 'Satisfy', label: 'Satisfy' },
 ];
 
 /* ── Error Boundary ── */
@@ -339,6 +374,18 @@ export default function App() {
   const [frameStyle, setFrameStyle] = useState('none');
   const [frameText, setFrameText] = useState('SCAN ME');
   const [frameColor, setFrameColor] = useState('');
+  const [frameFont, setFrameFont] = useState('Inter');
+  const [textCenterEnabled, setTextCenterEnabled] = useState(false);
+  const [textCenterText, setTextCenterText] = useState('');
+  const [textCenterSize, setTextCenterSize] = useState(0.18);
+  const [textCenterColor, setTextCenterColor] = useState('#000000');
+  const [textCenterFont, setTextCenterFont] = useState('Inter');
+  const [textCenterStrokeEnabled, setTextCenterStrokeEnabled] = useState(false);
+  const [textCenterStrokeWidth, setTextCenterStrokeWidth] = useState(5);
+  const [textCenterStrokeColor, setTextCenterStrokeColor] = useState('#ffffff');
+  const [textCenterShadowEnabled, setTextCenterShadowEnabled] = useState(false);
+  const [textCenterShadowBlur, setTextCenterShadowBlur] = useState(10);
+  const [textCenterShadowColor, setTextCenterShadowColor] = useState('rgba(0,0,0,0.5)');
 
   // ── References ──
   const canvasRef = useRef(null);
@@ -355,6 +402,37 @@ export default function App() {
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
   const [logoImgError, setLogoImgError] = useState(false);
+  const [customFonts, setCustomFonts] = useState([]);
+  const fontInputRef = useRef(null);
+
+  const handleFontUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const fontName = file.name.split('.')[0].replace(/[^a-zA-Z0-9]/g, '_');
+    const reader = new FileReader();
+
+    reader.onload = async (event) => {
+      try {
+        const fontData = event.target.result;
+        const fontFace = new FontFace(fontName, fontData);
+        const loadedFace = await fontFace.load();
+        document.fonts.add(loadedFace);
+        
+        const newFont = { id: fontName, label: file.name.split('.')[0], isCustom: true };
+        setCustomFonts(prev => [...prev, newFont]);
+        setTextCenterFont(fontName);
+        showToast(`Font "${file.name}" installed successfully!`, 'success');
+      } catch (err) {
+        console.error('Font load error:', err);
+        showToast('Failed to load font file. Use TTF, OTF or WOFF.', 'error');
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+    // Reset input so same file can be uploaded again if needed
+    e.target.value = '';
+  };
 
   // ── Menu ──
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -719,8 +797,11 @@ export default function App() {
   const renderCanvas = useCallback(() => {
     if (!qrMatrixInfo || !canvasRef.current) return;
     
-    const executeRender = () => {
+    const executeRender = async () => {
+      // Fix: Wait for fonts to be ready so canvas renders correctly
+      if (document.fonts) await document.fonts.ready;
       if (!canvasRef.current) return;
+      
       renderQR(canvasRef.current, {
         ...qrMatrixInfo, size: 512,
         qrColor, bgColor, bgTransparent, dotStyle, eyeStyle,
@@ -731,7 +812,11 @@ export default function App() {
         logo: logo?.image, logoSize, logoPadding,
         logoBackground, logoBgColor, logoBgShape,
         logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-        quietZone: 2, frameStyle, frameText, frameColor,
+        quietZone: 2, frameStyle, frameText, frameColor, frameFont,
+        textCenter: textCenterEnabled ? textCenterText : null, 
+        textCenterSize, textCenterColor, textCenterFont,
+        textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
+        textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
       });
     };
 
@@ -747,7 +832,10 @@ export default function App() {
     eyeOuterColor, syncEyes, gradientEnabled, gradientColor1, gradientColor2, gradientType,
     logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-    dotPadding, eyePadding, frameStyle, frameText, frameColor
+    dotPadding, eyePadding, frameStyle, frameText, frameColor, frameFont,
+    textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont,
+    textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
+    textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor
   ]);
 
   useEffect(() => {
@@ -765,7 +853,7 @@ export default function App() {
     { id: 'shapes', label: 'Shapes', icon: Hexagon },
     { id: 'logo', label: 'Logo', icon: ImageIcon },
     // { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
-    { id: 'scan', label: 'Scan', icon: ShieldCheck },
+    { id: 'text', label: 'Text', icon: Type },
   ];
 
   // ── Get the frame CSS class for the preview wrapper ──
@@ -1347,31 +1435,437 @@ export default function App() {
                 </div>
               ) */}
 
-              {activeTab === 'scan' && (
-                <div className="tab-panel fade-in" id="panel-scan">
-                  <div style={{ marginTop: 'auto' }}>
-                    <label className="panel-label">Scan Reliability</label>
-                    <div className="ec-buttons-row">
-                      {EC_LEVELS.map(lv => (
-                        <button
-                          key={lv.key}
-                          className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
-                          onClick={() => setErrorLevel(lv.key)}
-                        >
-                          <span className="ec-btn-letter">{lv.label}</span>
-                          <span className="ec-btn-pct">{lv.pct}</span>
-                        </button>
-                      ))}
-                    </div>
-                    <div className="reliability-bar-track" style={{ marginTop: '8px' }}>
-                      <div
-                        className="reliability-bar-fill"
-                        style={{ width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%` }}
+              {activeTab === 'text' && (
+                <div className="tab-panel fade-in" id="panel-text">
+                  <div className="panel-section">
+                    
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Text Content</label>
+                      <input 
+                        type="text" 
+                        value={frameText} 
+                        onChange={(e) => {
+                          setFrameText(e.target.value);
+                          if (frameStyle === 'none' && e.target.value.trim() !== '') {
+                            setFrameStyle('text-bottom'); // Auto-enable text style if they type
+                          }
+                        }}
+                        placeholder="e.g. Scan Me, Your Name, Company..."
+                        className="custom-input"
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-primary)', fontSize: '15px' }}
                       />
                     </div>
-                    <p className="ec-description">
-                      {EC_LEVELS.find(l => l.key === errorLevel)?.desc}
-                    </p>
+
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Font Style</label>
+                      <div 
+                        className="font-scroll-container" 
+                        style={{ 
+                          display: 'flex', 
+                          gap: '10px', 
+                          overflowX: 'auto', 
+                          padding: '4px 0 12px 0',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none',
+                          WebkitOverflowScrolling: 'touch'
+                        }}
+                      >
+                        {/* Custom Font Upload Button */}
+                        <button
+                          onClick={() => fontInputRef.current?.click()}
+                          className="font-scroll-btn"
+                          style={{
+                            flex: '0 0 auto',
+                            padding: '10px 20px',
+                            borderRadius: '12px',
+                            background: 'var(--bg-hover)',
+                            color: 'var(--accent-primary)',
+                            border: '2px dashed var(--accent-primary)',
+                            fontSize: '15px',
+                            fontWeight: 600,
+                            whiteSpace: 'nowrap',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}
+                        >
+                          <Plus size={16} /> Add Font
+                        </button>
+
+                        {/* Custom Fonts First */}
+                        {customFonts.map(font => (
+                          <button
+                            key={font.id}
+                            onClick={() => {
+                              setFrameFont(font.id);
+                              if (frameStyle === 'none') setFrameStyle('text-bottom');
+                            }}
+                            className={`font-scroll-btn ${frameFont === font.id ? 'active' : ''}`}
+                            style={{
+                              flex: '0 0 auto',
+                              padding: '10px 20px',
+                              borderRadius: '12px',
+                              background: frameFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                              color: frameFont === font.id ? '#ffffff' : 'var(--text-primary)',
+                              border: '1px solid',
+                              borderColor: frameFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
+                              fontFamily: font.id,
+                              fontSize: '15px',
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              boxShadow: frameFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            {font.label} (Custom)
+                          </button>
+                        ))}
+
+                        {/* Standard Fonts */}
+                        {FONT_OPTIONS.map(font => (
+                          <button
+                            key={font.id}
+                            onClick={() => {
+                              setFrameFont(font.id);
+                              if (frameStyle === 'none') setFrameStyle('text-bottom');
+                            }}
+                            className={`font-scroll-btn ${frameFont === font.id ? 'active' : ''}`}
+                            style={{
+                              flex: '0 0 auto',
+                              padding: '10px 20px',
+                              borderRadius: '12px',
+                              background: frameFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                              color: frameFont === font.id ? '#ffffff' : 'var(--text-primary)',
+                              border: '1px solid',
+                              borderColor: frameFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
+                              fontFamily: font.id,
+                              fontSize: '15px',
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              boxShadow: frameFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            {font.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Text Layout</label>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          onClick={() => setFrameStyle('none')}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${frameStyle === 'none' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: frameStyle === 'none' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: frameStyle === 'none' ? 'var(--accent-primary)' : 'var(--text-primary)', cursor: 'pointer' }}
+                        >
+                          Hidden
+                        </button>
+                        <button
+                          onClick={() => setFrameStyle('text-bottom')}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${frameStyle === 'text-bottom' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: frameStyle === 'text-bottom' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: frameStyle === 'text-bottom' ? 'var(--accent-primary)' : 'var(--text-primary)', cursor: 'pointer' }}
+                        >
+                          Classic
+                        </button>
+                        <button
+                          onClick={() => setFrameStyle('scan-me')}
+                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${frameStyle === 'scan-me' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: frameStyle === 'scan-me' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: frameStyle === 'scan-me' ? 'var(--accent-primary)' : 'var(--text-primary)', cursor: 'pointer' }}
+                        >
+                          Pill Box
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* New: Text in Center Section */}
+                    <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
+                      <label style={{ display: 'block', fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>Center Text (Overlay)</label>
+                      <Toggle
+                        label="Draw Text in Center"
+                        enabled={textCenterEnabled}
+                        onChange={(val) => {
+                          setTextCenterEnabled(val);
+                          if (val) setLogo(null); // Clear logo if enabling center text
+                        }}
+                      />
+                      
+                      {textCenterEnabled && (
+                        <div className="fade-in" style={{ marginTop: '16px' }}>
+                          
+                          {/* 1. Content & Font */}
+                          <div className="panel-sub-section" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', marginBottom: '16px' }}>
+                            <div style={{ marginBottom: '16px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Content (Max 18 chars)</label>
+                              <div style={{ position: 'relative' }}>
+                                <input 
+                                  type="text" 
+                                  maxLength={18}
+                                  value={textCenterText} 
+                                  onChange={(e) => setTextCenterText(e.target.value)}
+                                  placeholder="e.g. YOUR BRAND"
+                                  className="custom-input"
+                                  style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-primary)', fontSize: '15px' }}
+                                />
+                                <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                                  {textCenterText.length}/18
+                                </span>
+                              </div>
+                            </div>
+
+                            <div style={{ marginBottom: '16px' }}>
+                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Font Family</label>
+                              <div 
+                                className="font-scroll-container" 
+                                style={{ 
+                                  display: 'flex', 
+                                  gap: '10px', 
+                                  overflowX: 'auto', 
+                                  padding: '4px 0 12px 0',
+                                  scrollbarWidth: 'none',
+                                  msOverflowStyle: 'none',
+                                  WebkitOverflowScrolling: 'touch'
+                                }}
+                              >
+                                  {/* Custom Font Upload Button */}
+                                  <button
+                                    onClick={() => fontInputRef.current?.click()}
+                                    className="font-scroll-btn"
+                                    style={{
+                                      flex: '0 0 auto',
+                                      padding: '10px 20px',
+                                      borderRadius: '12px',
+                                      background: 'var(--bg-hover)',
+                                      color: 'var(--accent-primary)',
+                                      border: '2px dashed var(--accent-primary)',
+                                      fontSize: '15px',
+                                      fontWeight: 600,
+                                      whiteSpace: 'nowrap',
+                                      cursor: 'pointer',
+                                      transition: 'all 0.2s ease',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px'
+                                    }}
+                                  >
+                                    <Plus size={16} /> Add Font
+                                  </button>
+                                  <input 
+                                    type="file" 
+                                    ref={fontInputRef} 
+                                    style={{ display: 'none' }} 
+                                    accept=".ttf,.otf,.woff,.woff2" 
+                                    onChange={handleFontUpload} 
+                                  />
+
+                                  {/* Custom Fonts First */}
+                                  {customFonts.map(font => (
+                                    <button
+                                      key={font.id}
+                                      onClick={() => setTextCenterFont(font.id)}
+                                      className={`font-scroll-btn ${textCenterFont === font.id ? 'active' : ''}`}
+                                      style={{
+                                        flex: '0 0 auto',
+                                        padding: '10px 20px',
+                                        borderRadius: '12px',
+                                        background: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                                        color: textCenterFont === font.id ? '#ffffff' : 'var(--text-primary)',
+                                        border: '1px solid',
+                                        borderColor: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
+                                        fontFamily: font.id,
+                                        fontSize: '15px',
+                                        whiteSpace: 'nowrap',
+                                        cursor: 'pointer',
+                                        boxShadow: textCenterFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
+                                        transition: 'all 0.2s ease'
+                                      }}
+                                    >
+                                      {font.label} (Custom)
+                                    </button>
+                                  ))}
+
+                                  {/* Standard Fonts */}
+                                  {FONT_OPTIONS.map(font => (
+                                    <button
+                                      key={font.id}
+                                      onClick={() => setTextCenterFont(font.id)}
+                                      className={`font-scroll-btn ${textCenterFont === font.id ? 'active' : ''}`}
+                                      style={{
+                                        flex: '0 0 auto',
+                                        padding: '10px 20px',
+                                        borderRadius: '12px',
+                                        background: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                                        color: textCenterFont === font.id ? '#ffffff' : 'var(--text-primary)',
+                                        border: '1px solid',
+                                        borderColor: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
+                                        fontFamily: font.id,
+                                        fontSize: '15px',
+                                        whiteSpace: 'nowrap',
+                                        cursor: 'pointer',
+                                        boxShadow: textCenterFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
+                                        transition: 'all 0.2s ease'
+                                      }}
+                                    >
+                                      {font.label}
+                                    </button>
+                                  ))}
+                              </div>
+                            </div>
+                            
+                            <div style={{ marginBottom: '20px' }}>
+                               <label className="panel-label">Text Color & Size</label>
+                               <div className="swatch-grid-mini" style={{ marginBottom: '16px' }}>
+                                 <ColorPicker
+                                   isSwatch={true}
+                                   icon={Pipette}
+                                   value={textCenterColor}
+                                   onChange={setTextCenterColor}
+                                   onOpenAdvanced={handleOpenAdv}
+                                 />
+                                 {SWATCH_PRESETS.map(color => (
+                                   <div
+                                     key={color}
+                                     className={`swatch-item${textCenterColor === color ? ' active' : ''}`}
+                                     style={{ backgroundColor: color }}
+                                     onClick={() => setTextCenterColor(color)}
+                                   />
+                                 ))}
+                               </div>
+                               <Slider
+                                 label="Text Size"
+                                 min={0.02}
+                                 max={0.18}
+                                 step={0.01}
+                                 value={textCenterSize}
+                                 onChange={setTextCenterSize}
+                               />
+                            </div>
+                          </div>
+
+                          {/* 2. Stroke & Shadow (Pixel Lab Style) */}
+                          <div className="panel-sub-section" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', marginBottom: '16px' }}>
+                             <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                               <div style={{ flex: 1 }}>
+                                  <Toggle
+                                    label="Stroke"
+                                    enabled={textCenterStrokeEnabled}
+                                    onChange={setTextCenterStrokeEnabled}
+                                  />
+                               </div>
+                               <div style={{ flex: 1 }}>
+                                  <Toggle
+                                    label="Shadow"
+                                    enabled={textCenterShadowEnabled}
+                                    onChange={setTextCenterShadowEnabled}
+                                  />
+                               </div>
+                             </div>
+
+                             {textCenterStrokeEnabled && (
+                               <div className="fade-in" style={{ padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', marginBottom: '12px' }}>
+                                  <label className="panel-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Stroke Color</label>
+                                  <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
+                                    <ColorPicker
+                                      isSwatch={true}
+                                      icon={Pipette}
+                                      value={textCenterStrokeColor}
+                                      onChange={setTextCenterStrokeColor}
+                                      onOpenAdvanced={handleOpenAdv}
+                                    />
+                                    {SWATCH_PRESETS.map(color => (
+                                      <div
+                                        key={color}
+                                        className={`swatch-item${textCenterStrokeColor === color ? ' active' : ''}`}
+                                        style={{ backgroundColor: color }}
+                                        onClick={() => setTextCenterStrokeColor(color)}
+                                      />
+                                    ))}
+                                  </div>
+                                  <Slider
+                                    label="Stroke Width"
+                                    min={1}
+                                    max={20}
+                                    value={textCenterStrokeWidth}
+                                    onChange={setTextCenterStrokeWidth}
+                                  />
+                               </div>
+                             )}
+
+                             {textCenterShadowEnabled && (
+                               <div className="fade-in" style={{ padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
+                                  <label className="panel-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Shadow Color</label>
+                                  <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
+                                    <ColorPicker
+                                      isSwatch={true}
+                                      icon={Pipette}
+                                      iconSize={14}
+                                      value={textCenterShadowColor}
+                                      onChange={setTextCenterShadowColor}
+                                      onOpenAdvanced={handleOpenAdv}
+                                    />
+                                    {SWATCH_PRESETS.map(color => (
+                                      <div
+                                        key={color}
+                                        className={`swatch-item${textCenterShadowColor === color ? ' active' : ''}`}
+                                        style={{ backgroundColor: color }}
+                                        onClick={() => setTextCenterShadowColor(color)}
+                                      />
+                                    ))}
+                                  </div>
+                                  <Slider
+                                    label="Shadow Blur"
+                                    min={0}
+                                    max={30}
+                                    value={textCenterShadowBlur}
+                                    onChange={setTextCenterShadowBlur}
+                                  />
+                               </div>
+                             )}
+                          </div>
+
+                          {/* 3. Background Shape (Default: Disabled) */}
+                          <div className="panel-sub-section" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px' }}>
+                            <Toggle
+                              label="Clear Area (Background Shape)"
+                              enabled={logoBackground}
+                              onChange={setLogoBackground}
+                            />
+                            {logoBackground && (
+                             <div className="fade-in" style={{ marginTop: '12px' }}>
+                                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                  <button
+                                    onClick={() => setLogoBgShape('circle')}
+                                    style={{ flex: 1, padding: '8px', borderRadius: '8px', border: `1px solid ${logoBgShape === 'circle' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: logoBgShape === 'circle' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: logoBgShape === 'circle' ? 'var(--accent-primary)' : 'var(--text-primary)' }}
+                                  >Circle</button>
+                                  <button
+                                    onClick={() => setLogoBgShape('rounded')}
+                                    style={{ flex: 1, padding: '8px', borderRadius: '8px', border: `1px solid ${logoBgShape === 'rounded' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: logoBgShape === 'rounded' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: logoBgShape === 'rounded' ? 'var(--accent-primary)' : 'var(--text-primary)' }}
+                                  >Square</button>
+                                </div>
+                                <label className="panel-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Shape Color</label>
+                                <div className="swatch-grid-mini">
+                                  <ColorPicker
+                                    isSwatch={true}
+                                    icon={Pipette}
+                                    value={logoBgColor}
+                                    onChange={setLogoBgColor}
+                                    onOpenAdvanced={handleOpenAdv}
+                                  />
+                                  {SWATCH_PRESETS.map(color => (
+                                    <div
+                                      key={color}
+                                      className={`swatch-item${logoBgColor === color ? ' active' : ''}`}
+                                      style={{ backgroundColor: color }}
+                                      onClick={() => setLogoBgColor(color)}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

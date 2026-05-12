@@ -224,6 +224,16 @@ export function renderQR(canvas, options) {
     frameStyle = FRAME_STYLES.NONE,
     frameText = 'SCAN ME',
     frameColor = '',
+    textCenter = null,
+    textCenterSize = 0.1,
+    textCenterFont = 'Inter',
+    textCenterColor = '#000000',
+    textCenterStrokeEnabled = false,
+    textCenterStrokeWidth = 2,
+    textCenterStrokeColor = '#ffffff',
+    textCenterShadowEnabled = false,
+    textCenterShadowBlur = 5,
+    textCenterShadowColor = 'rgba(0,0,0,0.5)',
   } = options;
 
   if (!matrix || !canvas) return;
@@ -333,7 +343,7 @@ export function renderQR(canvas, options) {
       }
     }
 
-  // Draw logo
+  // Draw logo or Text
   if (logo) {
     // Adjust logo drawing to be centered in content area
     drawLogo(ctx, logo, size, {
@@ -346,6 +356,25 @@ export function renderQR(canvas, options) {
       logoOutlineColor,
       logoOutlineWidth,
       logoOutlineOpacity,
+      contentX,
+      contentY,
+      contentSize
+    });
+  } else if (textCenter) {
+    drawCenterText(ctx, textCenter, size, {
+      textCenterSize,
+      textCenterFont,
+      textCenterColor,
+      textCenterStrokeEnabled,
+      textCenterStrokeWidth,
+      textCenterStrokeColor,
+      textCenterShadowEnabled,
+      textCenterShadowBlur,
+      textCenterShadowColor,
+      logoPadding,
+      logoBackground,
+      logoBgColor,
+      logoBgShape,
       contentX,
       contentY,
       contentSize
@@ -758,6 +787,94 @@ function drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, 
     // Draw the silhouette offset by (dx, dy)
     ctx.drawImage(silhouetteCanvas, logoX + dx, logoY + dy, logoW, logoH);
   }
+}
+
+/**
+ * Draw text in the center of the QR code
+ */
+function drawCenterText(ctx, text, canvasSize, options) {
+  const {
+    textCenterSize,
+    textCenterFont,
+    textCenterColor,
+    textCenterStrokeEnabled = false,
+    textCenterStrokeWidth = 2,
+    textCenterStrokeColor = '#ffffff',
+    textCenterShadowEnabled = false,
+    textCenterShadowBlur = 5,
+    textCenterShadowColor = 'rgba(0,0,0,0.5)',
+    logoPadding,
+    logoBackground,
+    logoBgColor,
+    logoBgShape,
+    contentX = 0,
+    contentY = 0,
+    contentSize = canvasSize
+  } = options;
+
+  const fontSize = contentSize * textCenterSize;
+  ctx.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+  const metrics = ctx.measureText(text);
+  const textWidth = metrics.width;
+  const textHeight = fontSize * 0.8; 
+
+  const centerX = contentX + contentSize / 2;
+  const centerY = contentY + contentSize / 2;
+
+  const paddedW = textWidth + (logoPadding || 10) * 2;
+  const paddedH = textHeight + (logoPadding || 10) * 2;
+
+  // 1. Clear area if background is enabled
+  if (logoBackground) {
+    ctx.save();
+    if (logoBgColor === 'transparent') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      const radius = Math.max(paddedW, paddedH) / 2;
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = logoBgColor;
+      ctx.beginPath();
+      if (logoBgShape === 'circle') {
+        const radius = Math.max(paddedW, paddedH) / 2;
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      } else {
+        drawRoundedRectPath(ctx, centerX - paddedW / 2, centerY - paddedH / 2, paddedW, paddedH, logoPadding || 10);
+      }
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // 2. Setup Text Properties
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+
+  // 4. Draw Stroke (behind fill, no shadow)
+  if (textCenterStrokeEnabled) {
+    ctx.strokeStyle = textCenterStrokeColor || '#ffffff';
+    ctx.lineWidth = fontSize * (textCenterStrokeWidth / 100);
+    ctx.lineJoin = 'round';
+    ctx.miterLimit = 2;
+    ctx.strokeText(text, centerX, centerY);
+  }
+
+  // 5. Apply Shadow (to fill only)
+  if (textCenterShadowEnabled) {
+    ctx.shadowColor = textCenterShadowColor;
+    ctx.shadowBlur = textCenterShadowBlur;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+  }
+
+  // 6. Draw Fill (on top of stroke)
+  ctx.fillStyle = textCenterColor || '#000000';
+  ctx.fillText(text, centerX, centerY);
+
+  ctx.restore();
 }
 
 /**
