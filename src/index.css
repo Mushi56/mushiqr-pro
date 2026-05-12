@@ -64,7 +64,7 @@
 
   /* Widened from 340px Ã¢â‚¬â€ gives controls room to breathe */
   --sidebar-width: 400px;
-  --header-height: 88px;
+  --header-height: 112px;
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
@@ -221,7 +221,8 @@ body {
 
 .app-header {
   height: var(--header-height);
-  padding-top: 24px; /* Dedicated space for 24dp status bar */
+  padding-top: 32px; /* Increased top space for status bar */
+  padding-bottom: 12px; /* Added bottom breathing room */
   display: flex;
   align-items: center;
   justify-content: space-between;
