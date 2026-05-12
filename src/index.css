@@ -65,7 +65,7 @@
 
   /* Widened from 340px — gives controls room to breathe */
   --sidebar-width: 400px;
-  --header-height: 92px; /* 24px status bar + 16px pad + 36px logo + 16px pad */
+  --header-height: 108px; /* 24px status bar + 24px pad + 36px logo + 24px pad */
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
