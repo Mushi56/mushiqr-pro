@@ -826,33 +826,11 @@ export default function App() {
                 </button>
 
                 {formatDropdownOpen && (
-                  <div className="app-dropdown-menu save-as-dropdown fade-in" style={{ top: 'calc(100% + 12px)', right: 0, width: '220px' }}>
-                    <div className="dropdown-section" style={{ padding: '12px 12px 0 12px' }}>
-                      <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Scan Reliability</div>
-                      <div style={{ background: 'var(--bg-hover)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Level {errorLevel}</span>
-                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>{EC_LEVELS.find(l => l.key === errorLevel)?.pct}</span>
-                        </div>
-                        <div className="reliability-bar-track" style={{ height: '4px', background: 'rgba(214, 0, 54, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div
-                            className="reliability-bar-fill"
-                            style={{ 
-                              width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%`,
-                              height: '100%',
-                              background: 'var(--accent-primary)',
-                              borderRadius: '2px',
-                              transition: 'width 0.3s ease'
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '12px 0 0 0' }} />
-
+                  <div className="app-dropdown-menu save-as-dropdown fade-in" style={{ top: 'calc(100% + 12px)', right: 0, width: '280px' }}>
+                    
                     <div className="dropdown-section" style={{ padding: '12px' }}>
                       <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Export Format</div>
-                      <div className="format-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                      <div className="format-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                         {[
                           { label: 'PNG', Icon: FileImage },
                           { label: 'SVG', Icon: FileCode },
@@ -862,7 +840,8 @@ export default function App() {
                           <button
                             key={label}
                             className={`format-option ${selectedFormat === label ? 'active' : ''}`}
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedFormat(label);
                               setFormatDropdownOpen(false);
                               handleDownload(label, FORMAT_MAP[label]);
@@ -871,8 +850,10 @@ export default function App() {
                               display: 'flex',
                               flexDirection: 'column',
                               alignItems: 'center',
+                              justifyContent: 'center',
                               gap: '6px',
-                              padding: '10px',
+                              aspectRatio: '1 / 1',
+                              padding: '0',
                               background: selectedFormat === label ? 'var(--accent-soft)' : 'var(--bg-hover)',
                               border: '1px solid',
                               borderColor: selectedFormat === label ? 'var(--accent-primary)' : 'transparent',
@@ -883,38 +864,71 @@ export default function App() {
                             }}
                           >
                             <Icon size={18} />
-                            <span style={{ fontSize: '11px', fontWeight: 700 }}>{label}</span>
+                            <span style={{ fontSize: '10px', fontWeight: 700 }}>{label}</span>
                           </button>
                         ))}
                       </div>
                     </div>
-                    <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0' }} />
 
+                    <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '0' }} />
 
-                    <div className="dropdown-section" style={{ padding: '8px 12px 12px' }}>
+                    <div className="dropdown-section" style={{ padding: '12px' }}>
+                      <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Scan Reliability</div>
+                      <div className="ec-buttons-row" style={{ marginBottom: '10px', gap: '8px' }}>
+                        {EC_LEVELS.map(lv => (
+                          <button
+                            key={lv.key}
+                            className={`ec-btn${errorLevel === lv.key ? ' active' : ''}`}
+                            onClick={(e) => { e.stopPropagation(); setErrorLevel(lv.key); }}
+                          >
+                            <span className="ec-btn-letter">{lv.label}</span>
+                            <span className="ec-btn-pct">{lv.pct}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="reliability-bar-track" style={{ height: '4px', background: 'rgba(214, 0, 54, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div
+                          className="reliability-bar-fill"
+                          style={{ 
+                            width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%`,
+                            height: '100%',
+                            background: 'var(--accent-primary)',
+                            borderRadius: '2px',
+                            transition: 'width 0.3s ease'
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '0' }} />
+
+                    <div className="dropdown-section" style={{ padding: '12px' }}>
                       <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Quick Actions</div>
-                      <div className="actions-column" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                           className="menu-link-btn"
-                          onClick={() => { handleCopyToClipboard(); setFormatDropdownOpen(false); }}
-                          style={{ padding: '10px 12px', borderRadius: '10px' }}
+                          onClick={(e) => { e.stopPropagation(); handleCopyToClipboard(); setFormatDropdownOpen(false); }}
+                          style={{ flex: 1, height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', padding: 0 }}
+                          title="Copy Image"
                         >
-                          <Copy size={16} /> <span>Copy Image</span>
+                          <Copy size={20} />
                         </button>
                         <button
                           className="menu-link-btn"
-                          onClick={() => { handleSave(); setFormatDropdownOpen(false); }}
-                          style={{ padding: '10px 12px', borderRadius: '10px' }}
+                          onClick={(e) => { e.stopPropagation(); handleSave(); setFormatDropdownOpen(false); }}
+                          style={{ flex: 1, height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', padding: 0 }}
+                          title="Add to Saved"
                         >
-                          <Bookmark size={16} /> <span>Add to Saved</span>
+                          <Bookmark size={20} />
                         </button>
                         {typeof navigator !== 'undefined' && navigator.canShare && (
                           <button
                             className="menu-link-btn"
-                            onClick={() => { handleShare(); setFormatDropdownOpen(false); }}
-                            style={{ padding: '10px 12px', borderRadius: '10px' }}
+                            onClick={(e) => { e.stopPropagation(); handleShare(); setFormatDropdownOpen(false); }}
+                            style={{ flex: 1, height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', padding: 0 }}
+                            title="Share QR Code"
                           >
-                            <Share2 size={16} /> <span>Share QR Code</span>
+                            <Share2 size={20} />
                           </button>
                         )}
                       </div>
