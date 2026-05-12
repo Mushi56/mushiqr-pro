@@ -65,7 +65,7 @@
 
   /* Widened from 340px — gives controls room to breathe */
   --sidebar-width: 400px;
-  --header-height: 108px; /* 24px status bar + 24px pad + 36px logo + 24px pad */
+  --header-height: 92px; /* 24px status + 16px pad + 36px logo + 16px pad */
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
@@ -226,10 +226,10 @@ body {
 
 .app-header {
   height: var(--header-height);
-  padding-top: 24px;    /* Reserved box for system status bar */
-  padding-bottom: 0;
+  padding-top: 40px;   /* 24px status bar + 16px top logo padding */
+  padding-bottom: 16px; /* 16px bottom logo padding */
   display: flex;
-  align-items: center;  /* Centers logo in remaining 68px giving 16px top/bottom */
+  align-items: center;
   justify-content: space-between;
   padding-left: var(--main-padding-x);
   padding-right: var(--main-padding-x);
