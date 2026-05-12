@@ -807,7 +807,7 @@ export default function App() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
           )}
-          <AppIcon size={38} shadow />
+          <AppIcon size={36} shadow />
           <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
 
