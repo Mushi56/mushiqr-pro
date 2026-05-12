@@ -827,6 +827,29 @@ export default function App() {
 
                 {formatDropdownOpen && (
                   <div className="app-dropdown-menu save-as-dropdown fade-in" style={{ top: 'calc(100% + 12px)', right: 0, width: '220px' }}>
+                    <div className="dropdown-section" style={{ padding: '12px 12px 0 12px' }}>
+                      <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Scan Reliability</div>
+                      <div style={{ background: 'var(--bg-hover)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>Level {errorLevel}</span>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)' }}>{EC_LEVELS.find(l => l.key === errorLevel)?.pct}</span>
+                        </div>
+                        <div className="reliability-bar-track" style={{ height: '4px', background: 'rgba(214, 0, 54, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div
+                            className="reliability-bar-fill"
+                            style={{ 
+                              width: `${EC_LEVELS.find(l => l.key === errorLevel)?.width || 50}%`,
+                              height: '100%',
+                              background: 'var(--accent-primary)',
+                              borderRadius: '2px',
+                              transition: 'width 0.3s ease'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="dropdown-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '12px 0 0 0' }} />
+
                     <div className="dropdown-section" style={{ padding: '12px' }}>
                       <div className="dropdown-label" style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Export Format</div>
                       <div className="format-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
