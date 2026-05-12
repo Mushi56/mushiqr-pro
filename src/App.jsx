@@ -368,8 +368,8 @@ export default function App() {
     const updateStatusBar = async () => {
       try {
         await StatusBar.show();
-        // Set overlaysWebView to FALSE so header starts below status bar
-        await StatusBar.setOverlaysWebView({ overlay: false });
+        // Set overlaysWebView to TRUE and add padding in CSS for the 24dp status bar
+        await StatusBar.setOverlaysWebView({ overlay: true });
         
         if (effectiveTheme === 'dark') {
           await StatusBar.setStyle({ style: 'DARK' }); // Light text/icons for dark background

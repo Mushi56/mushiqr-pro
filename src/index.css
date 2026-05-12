@@ -221,7 +221,7 @@ body {
 
 .app-header {
   height: var(--header-height);
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: 24px; /* Dedicated space for 24dp status bar */
   display: flex;
   align-items: center;
   justify-content: space-between;
