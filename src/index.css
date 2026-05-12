@@ -65,7 +65,7 @@
 
   /* Widened from 340px — gives controls room to breathe */
   --sidebar-width: 400px;
-  --header-height: 152px;
+  --header-height: 176px; /* 152px M3 Large + 24px system status bar */
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
