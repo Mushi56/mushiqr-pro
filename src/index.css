@@ -220,8 +220,8 @@ body {
 }
 
 .app-header {
-  height: calc(var(--header-height) + env(safe-area-inset-top));
-  padding-top: env(safe-area-inset-top);
+  height: var(--header-height);
+  padding-top: env(safe-area-inset-top, 0px);
   display: flex;
   align-items: center;
   justify-content: space-between;
