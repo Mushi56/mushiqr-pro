@@ -7,7 +7,7 @@
       "style": "DARK",
       "backgroundColor": "#13131D",
       "overlaysWebView": true,
-      "androidStatusBarPadding": true
+      "androidStatusBarPadding": false
     },
     "Camera": {
       "presentationStyle": "fullscreen"
