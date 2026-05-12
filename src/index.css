@@ -3468,7 +3468,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .app.redesigned .app-header {
-  height: 56px;
+  height: var(--header-height);
   flex-shrink: 0;
   z-index: 2000;
 }
