@@ -65,7 +65,7 @@
 
   /* Widened from 340px — gives controls room to breathe */
   --sidebar-width: 400px;
-  --header-height: 108px; /* 24px status bar + 24px pad + 36px logo + 24px pad */
+  --header-height: 92px; /* 24px status bar + 16px pad + 36px logo + 16px pad */
 
   --bg-dropdown: rgba(10, 10, 15, 0.85);
   --bg-dropdown-solid: #0D0D12;
@@ -229,7 +229,7 @@ body {
   padding-top: 24px;    /* Reserved box for system status bar */
   padding-bottom: 0;
   display: flex;
-  align-items: center;  /* Centers logo in remaining 84px giving 24px top/bottom */
+  align-items: center;  /* Centers logo in remaining 68px giving 16px top/bottom */
   justify-content: space-between;
   padding-left: var(--main-padding-x);
   padding-right: var(--main-padding-x);
