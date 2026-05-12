@@ -4062,7 +4062,7 @@ input[type="range"]::-moz-range-thumb {
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Desktop / Tablet: Wider Layout Ã¢â€â‚¬Ã¢â€â‚¬ */
 @media (min-width: 768px) {
   .app.redesigned .app-header {
-    height: 64px;
+    height: var(--header-height);
   }
 
   .app-main-redesigned {
@@ -4077,7 +4077,7 @@ input[type="range"]::-moz-range-thumb {
     border-right: 1px solid var(--border-color);
     padding: 32px 24px;
     overflow-y: auto;
-    height: calc(100dvh - 64px - 64px);
+    height: calc(100dvh - var(--header-height) - 64px);
   }
 
   .qr-preview-wrapper {
