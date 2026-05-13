@@ -141,11 +141,17 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     }
   };
 
+  const [isPicking, setIsPicking] = useState(false);
+
   const openEyeDropper = async () => {
     if (!window.EyeDropper) {
       alert("Your browser does not support the EyeDropper API. Please use a modern browser like Chrome or Edge.");
       return;
     }
+    
+    // Hide the UI so the user can see what's behind
+    setIsPicking(true);
+    
     const eyeDropper = new window.EyeDropper();
     try {
       const result = await eyeDropper.open();
@@ -156,13 +162,25 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
       if (onChange) onChange(hex);
     } catch (e) {
       console.log("EyeDropper canceled or failed", e);
+    } finally {
+      // Re-show the UI
+      setIsPicking(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="advanced-picker-overlay" onClick={onCancel}>
+    <div 
+      className="advanced-picker-overlay" 
+      onClick={onCancel}
+      style={{
+        visibility: isPicking ? 'hidden' : 'visible',
+        opacity: isPicking ? 0 : 1,
+        pointerEvents: isPicking ? 'none' : 'all',
+        transition: 'opacity 0.2s ease'
+      }}
+    >
       <div className="advanced-picker-container" onClick={e => e.stopPropagation()}>
         <header className="picker-header">
           <button className="picker-close" onClick={onCancel}><X size={20} /></button>

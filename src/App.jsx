@@ -37,7 +37,10 @@ import {
   Type,
   Plus,
   Maximize,
-  Shapes
+  Shapes,
+  ScanLine,
+  History,
+  PlusCircle
 } from 'lucide-react';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -56,7 +59,6 @@ import SavedPage from './components/SavedPage';
 import SettingsPage from './components/SettingsPage';
 import AdvancedColorPicker from './components/AdvancedColorPicker';
 import AppIcon from './components/AppIcon';
-import { ScanLine, History } from 'lucide-react';
 import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
 
 const TEXT_SHAPES = [
@@ -1338,49 +1340,10 @@ export default function App() {
               {activeTab === 'text' && (
                 <div className="tab-panel fade-in" id="panel-text">
                   <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px 100px 20px' }}>
-                    {/* ─── Unified Text Card ─── */}
-                    <div className="text-card">
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div className="text-card-icon purple"><Type size={18} /></div>
-                          <div className="text-card-title">Add Text</div>
-                        </div>
-                        <Toggle
-                          checked={textEditMode === 'center' ? textCenterEnabled : frameStyle !== 'none'}
-                          onChange={(val) => {
-                            if (textEditMode === 'center') {
-                              setTextCenterEnabled(val);
-                              if (val) setLogo(null);
-                            } else {
-                              setFrameStyle(val ? 'text-bottom' : 'none');
-                            }
-                          }}
-                        />
-                      </div>
-
-                      {/* Mode Switcher: Center / Bottom */}
-                      <div className="seg-control" style={{ marginBottom: '14px' }}>
-                        <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>Center Text</button>
-                        <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom Text</button>
-                      </div>
-
-                      {/* Center Text Input */}
-                      {textEditMode === 'center' && (
-                        <div className="fade-in">
-                          <div style={{ position: 'relative', marginBottom: '14px', opacity: textCenterEnabled ? 1 : 0.5, pointerEvents: textCenterEnabled ? 'all' : 'none' }}>
-                            <input type="text" maxLength={18} value={textCenterText} onChange={(e) => setTextCenterText(e.target.value)} placeholder="Type here..." className="text-input-premium" />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Bottom Text Input */}
-                      {textEditMode === 'bottom' && (
-                        <div className="fade-in">
-                          <div style={{ position: 'relative', marginBottom: '14px', opacity: frameStyle !== 'none' ? 1 : 0.5, pointerEvents: frameStyle !== 'none' ? 'all' : 'none' }}>
-                            <input type="text" value={frameText} onChange={(e) => { setFrameText(e.target.value); if (frameStyle === 'none' && e.target.value.trim() !== '') { setFrameStyle('solid'); } }} placeholder="Type here..." className="text-input-premium" />
-                          </div>
-                        </div>
-                      )}
+                    {/* The text input and mode switcher are now in the Expandable Toolbar below */}
+                    <div className="panel-empty-state" style={{ opacity: 0.5, textAlign: 'center', marginTop: '40px' }}>
+                      <Type size={32} style={{ marginBottom: '12px' }} />
+                      <p>Customize your text using the toolbar below</p>
                     </div>
                   </div>
 
@@ -1392,7 +1355,7 @@ export default function App() {
             </section>
 
             {/* ─── Shared Unified Expandable Toolbar (Centralized Bottom Layer) ─── */}
-            {((activeTab === 'logo' && logo) || (activeTab === 'text' && (textCenterEnabled || frameStyle === 'text-bottom'))) && (
+            {((activeTab === 'logo' && logo) || activeTab === 'text') && (
               <div className="logo-toolbar-container">
                 <div className="unified-toolbar-card">
                   {/* LOGO PROPERTIES */}
@@ -1460,6 +1423,42 @@ export default function App() {
                   {/* TEXT PROPERTIES */}
                   {activeTab === 'text' && textPopup && (
                     <div className="toolbar-properties-panel">
+                      {textPopup === 'input' && (
+                        <div className="fade-in">
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Enable Text</div>
+                            <Toggle
+                              checked={textEditMode === 'center' ? textCenterEnabled : frameStyle !== 'none'}
+                              onChange={(val) => {
+                                if (textEditMode === 'center') {
+                                  setTextCenterEnabled(val);
+                                  if (val) setLogo(null);
+                                } else {
+                                  setFrameStyle(val ? 'text-bottom' : 'none');
+                                }
+                              }}
+                            />
+                          </div>
+
+                          <div className="seg-control" style={{ marginBottom: '16px' }}>
+                            <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>Center</button>
+                            <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom</button>
+                          </div>
+
+                          {textEditMode === 'center' && (
+                            <div style={{ opacity: textCenterEnabled ? 1 : 0.5, pointerEvents: textCenterEnabled ? 'all' : 'none' }}>
+                              <input type="text" maxLength={18} value={textCenterText} onChange={(e) => setTextCenterText(e.target.value)} placeholder="Type center text..." className="text-input-premium" style={{ width: '100%', marginBottom: '4px' }} />
+                            </div>
+                          )}
+
+                          {textEditMode === 'bottom' && (
+                            <div style={{ opacity: frameStyle !== 'none' ? 1 : 0.5, pointerEvents: frameStyle !== 'none' ? 'all' : 'none' }}>
+                              <input type="text" value={frameText} onChange={(e) => { setFrameText(e.target.value); if (frameStyle === 'none' && e.target.value.trim() !== '') { setFrameStyle('solid'); } }} placeholder="Type bottom text..." className="text-input-premium" style={{ width: '100%', marginBottom: '4px' }} />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
                       {textPopup === 'fonts' && (
                         <div className="fade-in">
                           <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
@@ -1573,6 +1572,7 @@ export default function App() {
                     )}
                     {activeTab === 'text' && (
                       <>
+                        <button className={`text-toolbar-btn ${textPopup === 'input' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'input' ? null : 'input')}><PlusCircle size={18} /><span>Content</span></button>
                         <button className={`text-toolbar-btn ${textPopup === 'fonts' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'fonts' ? null : 'fonts')}><Type size={18} /><span>Fonts</span></button>
                         <button className={`text-toolbar-btn ${textPopup === 'size' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'size' ? null : 'size')}><ChevronUp size={18} /><span>Size</span></button>
                         <button className={`text-toolbar-btn ${textPopup === 'color' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'color' ? null : 'color')}><Palette size={18} /><span>Color</span></button>
