@@ -6714,33 +6714,52 @@ video {
 }
 
 /* ── Text Popup (Slide-up Sheet) ── */
-.text-popup-overlay {
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  backdrop-filter: none;
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 92px; /* Increased to add space between toolbar and popup */
-  pointer-events: none;
-}
-.text-popup-overlay > * { pointer-events: all; }
-
-.text-popup {
-  width: calc(100% - 32px); /* Matched to toolbar container padding */
+/* ── Unified Expandable Toolbar (New System) ── */
+.unified-toolbar-card {
+  width: calc(100% - 32px);
   max-width: 440px;
-  max-height: 55vh;
   background: var(--bg-dropdown-solid);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
   overflow: hidden;
-  animation: logoSheetUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
 }
+
+.toolbar-properties-panel {
+  padding: 20px 18px 12px 18px;
+  max-height: 50vh;
+  overflow-y: auto;
+  animation: panelSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toolbar-tabs-row {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@keyframes panelSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+[data-theme="light"] .unified-toolbar-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .toolbar-tabs-row {
+  background: rgba(0, 0, 0, 0.01);
+  border-top-color: rgba(0, 0, 0, 0.05);
+}
+
 @keyframes slideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
@@ -6867,76 +6886,12 @@ video {
 
 
 
-/* ── Logo Property Sheet (Popup Style) ── */
-.logo-property-sheet {
-  position: absolute;
-  bottom: 92px; /* Increased to add consistent space above toolbar */
-  left: 50%;
-  width: calc(100% - 32px);
-  max-width: 440px;
-  background: var(--bg-dropdown-solid);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 28px;
-  padding: 20px 18px; /* Decreased internal padding */
-  box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  z-index: 100;
-  transform-origin: bottom;
-  animation: logoSheetUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes logoSheetUp {
-  from { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.96); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-}
-
-@keyframes logoSheetDown {
-  from { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-  to { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.96); }
-}
 
 .logo-property-sheet-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
-}
-
-.logo-property-sheet-title {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.3px;
-}
-
-.logo-property-sheet-close {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.logo-property-sheet-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-}
-
-.logo-property-sheet-close:active {
-  transform: scale(0.9);
-}
-
-[data-theme="light"] .logo-property-sheet {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* Ensure Logo Toolbar stays responsive and centered */
@@ -6947,9 +6902,21 @@ video {
   left: 0;
   right: 0;
   background: transparent;
-  z-index: 110;
+  z-index: 2100; /* Extremely high to stay above bottom nav and preview */
   display: flex;
   justify-content: center;
+  pointer-events: none; /* Allow clicks through container */
+}
+.logo-toolbar-container > * { pointer-events: all; }
+
+@media (max-width: 768px) {
+  .logo-toolbar-container {
+    position: fixed;
+    bottom: 80px; /* Float above the bottom navigation (64px) */
+    left: 0;
+    right: 0;
+    padding: 0 16px;
+  }
 }
 
 .logo-toolbar-wrapper {
