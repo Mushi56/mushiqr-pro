@@ -696,6 +696,201 @@ function drawRoundedRect(ctx, x, y, w, h, r) {
   ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
   ctx.lineTo(x + r, y + h);
   ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    }
+    case DOT_STYLES.LEAF: {
+      const r = s * 0.8;
+      ctx.beginPath();
+      ctx.moveTo(x + padding + r, y + padding);
+      ctx.lineTo(x + padding + s, y + padding);
+      ctx.lineTo(x + padding + s, y + padding + s - r);
+      ctx.quadraticCurveTo(x + padding + s, y + padding + s, x + padding + s - r, y + padding + s);
+      ctx.lineTo(x + padding, y + padding + s);
+      ctx.lineTo(x + padding, y + padding + r);
+      ctx.quadraticCurveTo(x + padding, y + padding, x + padding + r, y + padding);
+      ctx.fill();
+      break;
+    }
+    default: // SQUARE
+      // Use 0.5px overfill to eliminate sub-pixel anti-aliasing gaps between adjacent modules
+      ctx.fillRect(x + padding, y + padding, s + 0.5, s + 0.5);
+      break;
+  }
+}
+
+/**
+ * Draw eye module
+ */
+/**
+ * Draw the full 7x7 eye (finder pattern) as a single unit
+ */
+function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
+  const s = size / 28; // Scale factor from 28x28 coordinate space
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
+  
+  // 1. Draw Outer Ring (using even-odd fill for the hole)
+  ctx.fillStyle = outerColor;
+  ctx.beginPath();
+  switch (style) {
+    case EYE_STYLES.CIRCLE:
+      ctx.arc(14, 14, 14, 0, Math.PI * 2);
+      ctx.moveTo(24, 14);
+      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
+      break;
+    case EYE_STYLES.ROUNDED:
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 8);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, 4);
+      break;
+    case EYE_STYLES.LEAF:
+      // Outer
+      ctx.moveTo(0, 0); ctx.lineTo(20, 0); ctx.quadraticCurveTo(28, 0, 28, 8); ctx.lineTo(28, 28); ctx.lineTo(8, 28); ctx.quadraticCurveTo(0, 28, 0, 20); ctx.closePath();
+      // Inner Hole
+      ctx.moveTo(4, 4); ctx.lineTo(20, 4); ctx.quadraticCurveTo(24, 4, 24, 8); ctx.lineTo(24, 24); ctx.lineTo(8, 24); ctx.quadraticCurveTo(4, 24, 4, 20); ctx.closePath();
+      break;
+    case EYE_STYLES.FLOWER:
+      // Outer Flower (more solid for scanning)
+      for (let i = 0; i < 24; i++) {
+        const a = i * Math.PI / 12;
+        const r = i % 2 === 0 ? 14 : 12.5;
+        ctx.lineTo(14 + r * Math.cos(a), 14 + r * Math.sin(a));
+      }
+      ctx.closePath();
+      // Hole
+      ctx.moveTo(14 + 10, 14);
+      ctx.arc(14, 14, 9, 0, Math.PI * 2, true);
+      break;
+    case EYE_STYLES.SHIELD:
+      // Outer
+      ctx.moveTo(0, 2); ctx.lineTo(28, 2); ctx.lineTo(28, 14); ctx.quadraticCurveTo(28, 24, 14, 28); ctx.quadraticCurveTo(0, 24, 0, 14); ctx.closePath();
+      // Hole
+      ctx.moveTo(4, 6); ctx.lineTo(24, 6); ctx.lineTo(24, 14); ctx.quadraticCurveTo(24, 20, 14, 24); ctx.quadraticCurveTo(4, 20, 4, 14); ctx.closePath();
+      break;
+    case EYE_STYLES.OCTAGON:
+      // Outer
+      ctx.moveTo(9, 0); ctx.lineTo(19, 0); ctx.lineTo(28, 9); ctx.lineTo(28, 19); ctx.lineTo(19, 28); ctx.lineTo(9, 28); ctx.lineTo(0, 19); ctx.lineTo(0, 9); ctx.closePath();
+      // Hole
+      ctx.moveTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24); ctx.lineTo(4, 18); ctx.lineTo(4, 10); ctx.closePath();
+      break;
+    case EYE_STYLES.HEXAGON:
+      // Scan-safe: Rounded-square outer, standard hole, hexagonal inner dot
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 6);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, 3);
+      break;
+    case EYE_STYLES.STAR:
+      // Scan-safe: Rounded-square outer, standard hole, star inner dot
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 4);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, 2);
+      break;
+    case EYE_STYLES.HEART:
+      // "Spotlight" — Sharp square outer + circle hole (unique combo)
+      ctx.rect(0, 0, 28, 28);
+      ctx.moveTo(24, 14);
+      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
+      break;
+    case EYE_STYLES.TRIANGLE:
+      // "Pillow" — Super-rounded outer (almost circle, softer than ROUNDED)
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 12);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, 8);
+      break;
+    case EYE_STYLES.GEOMETRIC:
+      // Original working cross-shaped cutout
+      ctx.rect(0, 0, 28, 28);
+      ctx.moveTo(4, 10); ctx.lineTo(10, 10); ctx.lineTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(18, 10);
+      ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24);
+      ctx.lineTo(10, 18); ctx.lineTo(4, 18); ctx.closePath();
+      break;
+    case EYE_STYLES.MODERN:
+      // Scan-safe: Square outer with rounded inner gap, double-ring aesthetic via inner dot
+      ctx.rect(0, 0, 28, 28);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, 3);
+      break;
+    case EYE_STYLES.DIAMOND:
+      // Scan-safe: Solid square outer, diamond-shaped hole, diamond inner
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 2);
+      ctx.moveTo(14, 5); ctx.lineTo(23, 14); ctx.lineTo(14, 23); ctx.lineTo(5, 14); ctx.closePath();
+      break;
+    case EYE_STYLES.LCD:
+      // "Notch" — Semi-rounded outer + sharp square hole
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, 5);
+      ctx.rect(4, 4, 20, 20);
+      break;
+    default: // SQUARE
+      ctx.rect(0, 0, 28, 28);
+      ctx.rect(4, 4, 20, 20);
+      break;
+  }
+  ctx.fill('evenodd');
+
+  // 2. Draw Inner Dot
+  ctx.fillStyle = innerColor;
+  ctx.beginPath();
+  switch (style) {
+    case EYE_STYLES.CIRCLE:
+    case EYE_STYLES.FLOWER:
+    case EYE_STYLES.SHIELD:
+    case EYE_STYLES.OCTAGON:
+    case EYE_STYLES.STAR:
+    case EYE_STYLES.HEART:
+      ctx.arc(14, 14, 6, 0, Math.PI * 2);
+      break;
+    case EYE_STYLES.HEXAGON: {
+      // Hexagonal inner dot
+      const hr = 6;
+      ctx.moveTo(14 + hr, 14);
+      for (let i = 1; i <= 6; i++) {
+        const a = i * Math.PI / 3;
+        ctx.lineTo(14 + hr * Math.cos(a), 14 + hr * Math.sin(a));
+      }
+      ctx.closePath();
+      break;
+    }
+    case EYE_STYLES.DIAMOND:
+      ctx.moveTo(14, 8); ctx.lineTo(20, 14); ctx.lineTo(14, 20); ctx.lineTo(8, 14); ctx.closePath();
+      break;
+    case EYE_STYLES.TRIANGLE:
+      // Pillow: super-rounded inner dot
+      drawRoundedRectPath(ctx, 8, 8, 12, 12, 5);
+      break;
+    case EYE_STYLES.GEOMETRIC:
+      // Plus-shaped inner dot (original working)
+      ctx.rect(12, 8, 4, 12);
+      ctx.rect(8, 12, 12, 4);
+      break;
+    case EYE_STYLES.LCD:
+      // Notch: sharp square inner dot
+      ctx.rect(8, 8, 12, 12);
+      break;
+    case EYE_STYLES.MODERN:
+      // Double ring inner: outer ring + center dot
+      drawRoundedRectPath(ctx, 7, 7, 14, 14, 2);
+      break;
+    case EYE_STYLES.ROUNDED:
+    case EYE_STYLES.LEAF:
+      drawRoundedRectPath(ctx, 8, 8, 12, 12, 4);
+      break;
+    default: // SQUARE
+      ctx.rect(8, 8, 12, 12);
+      break;
+  }
+  ctx.fill();
+  
+  ctx.restore();
+}
+
+/**
+ * Draw rounded rectangle
+ */
+function drawRoundedRect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
@@ -746,17 +941,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
 
   // Draw background behind logo
   if (logoBackground) {
-    ctx.fillStyle = logoBgColor;
-    if (logoBgShape === 'circle') {
-      const radius = Math.max(paddedW, paddedH) / 2;
-      ctx.beginPath();
-      ctx.arc(logoX + logoW/2, logoY + logoH/2, radius, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (logoBgShape === 'rounded') {
-      drawRoundedRect(ctx, paddedX, paddedY, paddedW, paddedH, 12);
-    } else {
-      ctx.fillRect(paddedX, paddedY, paddedW, paddedH);
-    }
+    drawBackgroundShape(ctx, logoBgShape, paddedX, paddedY, paddedW, paddedH, logoBgColor, contentSize * 0.005);
   }
 
   // Draw the logo image preserving transparency
@@ -831,28 +1016,12 @@ function drawCenterText(ctx, text, canvasSize, options) {
 
   const paddedW = textWidth + (logoPadding || 10) * 2;
   const paddedH = textHeight + (logoPadding || 10) * 2;
+  const paddedX = centerX - paddedW / 2;
+  const paddedY = centerY - paddedH / 2;
 
   // 1. Clear area if background is enabled
   if (logoBackground) {
-    ctx.save();
-    if (logoBgColor === 'transparent') {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      const radius = Math.max(paddedW, paddedH) / 2;
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.fill();
-    } else {
-      ctx.fillStyle = logoBgColor;
-      ctx.beginPath();
-      if (logoBgShape === 'circle') {
-        const radius = Math.max(paddedW, paddedH) / 2;
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      } else {
-        drawRoundedRectPath(ctx, centerX - paddedW / 2, centerY - paddedH / 2, paddedW, paddedH, logoPadding || 10);
-      }
-      ctx.fill();
-    }
-    ctx.restore();
+    drawBackgroundShape(ctx, logoBgShape, paddedX, paddedY, paddedW, paddedH, logoBgColor, contentSize * 0.005);
   }
 
   // 2. Setup Text Properties
@@ -881,22 +1050,29 @@ function drawCenterText(ctx, text, canvasSize, options) {
   // 6. Draw Fill (on top of stroke)
   ctx.fillStyle = textCenterColor || '#000000';
   ctx.fillText(text, centerX, centerY);
-
   ctx.restore();
 }
 
 /**
  * Draw decorative frame around the QR code
  */
-function drawFrame(ctx, size, options) {
-  const { 
-    frameStyle, frameText, frameColor, 
-    frameFont, frameSize, 
-    frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
-    frameShadowEnabled, frameShadowBlur, frameShadowColor,
-    bgColor, bgTransparent 
+function drawFrame(ctx, size, padding, options) {
+  const {
+    frameStyle,
+    frameText,
+    frameColor,
+    frameFont,
+    frameSize,
+    frameStrokeEnabled,
+    frameStrokeWidth,
+    frameStrokeColor,
+    frameShadowEnabled,
+    frameShadowBlur,
+    frameShadowColor,
+    bgColor,
+    bgTransparent
   } = options;
-  const padding = size * 0.03; // Moved closer to edge (3%) to give QR more room
+
   const innerSize = size - padding * 2;
   
   ctx.save();
@@ -910,76 +1086,7 @@ function drawFrame(ctx, size, options) {
   const labelW = innerSize - size * 0.1;
   const labelX = padding + size * 0.05;
 
-  ctx.beginPath();
-  switch (frameStyle) {
-    case FRAME_STYLES.SOLID:
-      ctx.fillRect(labelX, labelY, labelW, labelHeight);
-      break;
-    case FRAME_STYLES.ROUNDED:
-      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight * 0.2);
-      ctx.fill();
-      break;
-    case FRAME_STYLES.PILL:
-      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight / 2);
-      ctx.fill();
-      break;
-    case FRAME_STYLES.OUTLINE:
-      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight * 0.2);
-      ctx.lineWidth = size * 0.01;
-      ctx.stroke();
-      break;
-    case FRAME_STYLES.UNDERLINE:
-      ctx.lineWidth = size * 0.015;
-      ctx.moveTo(labelX + labelW * 0.1, labelY + labelHeight * 0.85);
-      ctx.lineTo(labelX + labelW * 0.9, labelY + labelHeight * 0.85);
-      ctx.stroke();
-      break;
-    case FRAME_STYLES.RIBBON:
-      ctx.moveTo(labelX, labelY);
-      ctx.lineTo(labelX + labelW, labelY);
-      ctx.lineTo(labelX + labelW - labelHeight * 0.4, labelY + labelHeight / 2);
-      ctx.lineTo(labelX + labelW, labelY + labelHeight);
-      ctx.lineTo(labelX, labelY + labelHeight);
-      ctx.lineTo(labelX + labelHeight * 0.4, labelY + labelHeight / 2);
-      ctx.fill();
-      break;
-    case FRAME_STYLES.GLOW:
-      ctx.shadowColor = frameColor;
-      ctx.shadowBlur = size * 0.04;
-      drawRoundedRectPath(ctx, labelX + size * 0.02, labelY + size * 0.02, labelW - size * 0.04, labelHeight - size * 0.04, labelHeight * 0.2);
-      ctx.fill();
-      ctx.shadowBlur = 0; // reset
-      break;
-    case FRAME_STYLES.BRACKETS:
-      ctx.lineWidth = size * 0.015;
-      ctx.moveTo(labelX + labelW * 0.1, labelY + labelHeight * 0.15);
-      ctx.lineTo(labelX, labelY + labelHeight * 0.15);
-      ctx.lineTo(labelX, labelY + labelHeight * 0.85);
-      ctx.lineTo(labelX + labelW * 0.1, labelY + labelHeight * 0.85);
-      
-      ctx.moveTo(labelX + labelW * 0.9, labelY + labelHeight * 0.15);
-      ctx.lineTo(labelX + labelW, labelY + labelHeight * 0.15);
-      ctx.lineTo(labelX + labelW, labelY + labelHeight * 0.85);
-      ctx.lineTo(labelX + labelW * 0.9, labelY + labelHeight * 0.85);
-      ctx.stroke();
-      break;
-    case FRAME_STYLES.HEXAGON:
-      ctx.moveTo(labelX + labelHeight * 0.4, labelY);
-      ctx.lineTo(labelX + labelW - labelHeight * 0.4, labelY);
-      ctx.lineTo(labelX + labelW, labelY + labelHeight / 2);
-      ctx.lineTo(labelX + labelW - labelHeight * 0.4, labelY + labelHeight);
-      ctx.lineTo(labelX + labelHeight * 0.4, labelY + labelHeight);
-      ctx.lineTo(labelX, labelY + labelHeight / 2);
-      ctx.fill();
-      break;
-    case FRAME_STYLES.DOTS:
-      ctx.lineWidth = size * 0.01;
-      ctx.setLineDash([size * 0.02, size * 0.02]);
-      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight * 0.2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      break;
-  }
+  drawBackgroundShape(ctx, frameStyle, labelX, labelY, labelW, labelHeight, frameColor, size * 0.005);
 
   // Text
   ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
@@ -1010,6 +1117,92 @@ function drawFrame(ctx, size, options) {
 }
 
 /**
+ * Unified helper to draw background shapes for text or logo
+ */
+function drawBackgroundShape(ctx, shape, x, y, w, h, color, sizeMultiplier = 1) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.fillStyle = color;
+  ctx.strokeStyle = color;
+  
+  switch (shape) {
+    case 'solid':
+    case 'rect':
+      ctx.fillRect(x, y, w, h);
+      break;
+    case 'rounded':
+      drawRoundedRectPath(ctx, x, y, w, h, h * 0.2);
+      ctx.fill();
+      break;
+    case 'pill':
+      drawRoundedRectPath(ctx, x, y, w, h, h / 2);
+      ctx.fill();
+      break;
+    case 'circle':
+      const radius = Math.max(w, h) / 2;
+      ctx.arc(x + w / 2, y + h / 2, radius, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    case 'outline':
+      drawRoundedRectPath(ctx, x, y, w, h, h * 0.2);
+      ctx.lineWidth = sizeMultiplier * 2;
+      ctx.stroke();
+      break;
+    case 'underline':
+      ctx.lineWidth = sizeMultiplier * 4;
+      ctx.moveTo(x + w * 0.1, y + h * 0.85);
+      ctx.lineTo(x + w * 0.9, y + h * 0.85);
+      ctx.stroke();
+      break;
+    case 'ribbon':
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + w, y);
+      ctx.lineTo(x + w - h * 0.4, y + h / 2);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x, y + h);
+      ctx.lineTo(x + h * 0.4, y + h / 2);
+      ctx.fill();
+      break;
+    case 'glow':
+      ctx.shadowColor = color;
+      ctx.shadowBlur = sizeMultiplier * 10;
+      drawRoundedRectPath(ctx, x + sizeMultiplier * 4, y + sizeMultiplier * 4, w - sizeMultiplier * 8, h - sizeMultiplier * 8, h * 0.2);
+      ctx.fill();
+      break;
+    case 'brackets':
+      ctx.lineWidth = sizeMultiplier * 3;
+      ctx.moveTo(x + w * 0.1, y + h * 0.15);
+      ctx.lineTo(x, y + h * 0.15);
+      ctx.lineTo(x, y + h * 0.85);
+      ctx.lineTo(x + w * 0.1, y + h * 0.85);
+      
+      ctx.moveTo(x + w * 0.9, y + h * 0.15);
+      ctx.lineTo(x + w, y + h * 0.15);
+      ctx.lineTo(x + w, y + h * 0.85);
+      ctx.lineTo(x + w * 0.9, y + h * 0.85);
+      ctx.stroke();
+      break;
+    case 'hexagon':
+      ctx.moveTo(x + h * 0.4, y);
+      ctx.lineTo(x + w - h * 0.4, y);
+      ctx.lineTo(x + w, y + h / 2);
+      ctx.lineTo(x + w - h * 0.4, y + h);
+      ctx.lineTo(x + h * 0.4, y + h);
+      ctx.lineTo(x, y + h / 2);
+      ctx.fill();
+      break;
+    case 'dots':
+      ctx.lineWidth = sizeMultiplier * 2;
+      ctx.setLineDash([sizeMultiplier * 4, sizeMultiplier * 4]);
+      drawRoundedRectPath(ctx, x, y, w, h, h * 0.2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      break;
+  }
+  ctx.restore();
+}
+
+/**
  * Path helper for rounded rect (doesn't call fill/stroke)
  */
 function drawRoundedRectPath(ctx, x, y, w, h, r) {
@@ -1023,5 +1216,5 @@ function drawRoundedRectPath(ctx, x, y, w, h, r) {
   ctx.quadraticCurveTo(x, y + h, x, y + h - r);
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
-

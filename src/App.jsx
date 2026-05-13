@@ -35,7 +35,9 @@ import {
   Bookmark,
   Settings,
   Type,
-  Plus
+  Plus,
+  Maximize,
+  Shapes
 } from 'lucide-react';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -397,6 +399,7 @@ export default function App() {
   const [frameShadowColor, setFrameShadowColor] = useState('rgba(0,0,0,0.5)');
   const [textCenterEnabled, setTextCenterEnabled] = useState(false);
   const [textPopup, setTextPopup] = useState(null);
+  const [logoPopup, setLogoPopup] = useState(null);
   const [textEditMode, setTextEditMode] = useState('center');
 
   const [textCenterText, setTextCenterText] = useState('');
@@ -1321,157 +1324,108 @@ export default function App() {
               {/* Logo Tab */}
               {activeTab === 'logo' && (
                 <div className="tab-panel fade-in" id="panel-logo" style={{ overflowY: 'auto' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    
+                    {/* 1. Upload Section */}
+                    <div className="text-card">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                        <div className="text-card-icon blue"><ImageIcon size={18} /></div>
+                        <div className="text-card-title">Add Logo</div>
+                      </div>
+                      <LogoUpload onLogoChange={setLogo} />
+                    </div>
+
+                    {/* 2. Presets Section */}
+                    <div className="text-card">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                        <div className="text-card-icon purple"><LayoutGrid size={18} /></div>
+                        <div className="text-card-title">Popular Logos</div>
+                      </div>
+                      <LogoPresets logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
+                    </div>
+
+                    {/* 3. Customization Section (Only visible if logo selected) */}
                     {logo && (
-                      <>
-                        <Slider
-                          label="Logo Size"
-                          value={logoSize}
-                          min={0.1}
-                          max={0.4}
-                          step={0.01}
-                          onChange={setLogoSize}
-                        />
-                        <Slider
-                          label="Logo Padding"
-                          value={logoPadding}
-                          min={0}
-                          max={20}
-                          step={1}
-                          onChange={setLogoPadding}
-                          unit="px"
-                        />
-
-                        <div className="toggle-row">
-                          <Toggle label="Smart Stroke" checked={logoOutline} onChange={setLogoOutline} />
-                          <span className="toggle-hint">Outline logo for better visibility</span>
+                      <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        
+                        {/* Size & Padding */}
+                        <div className="text-card">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+                            <div className="text-card-icon orange"><Maximize size={18} /></div>
+                            <div className="text-card-title">Size & Padding</div>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                            <Slider label="Logo Size" value={logoSize} min={0.1} max={0.4} step={0.01} onChange={setLogoSize} />
+                            <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
+                          </div>
                         </div>
-                        {logoOutline && (
-                          <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <div className="color-row-item">
-                              <div className="color-row-header">
-                                <label className="panel-label-sub">Stroke Color</label>
-                              </div>
-                              <div className="swatch-grid-mini">
-                                <ColorPicker
-                                  isSwatch={true}
-                                  icon={Pipette}
-                                  value={logoOutlineColor}
-                                  onChange={setLogoOutlineColor}
-                                  onOpenAdvanced={handleOpenAdv}
-                                />
+
+                        {/* Smart Stroke */}
+                        <div className="text-card">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div className="text-card-icon green"><ShieldCheck size={18} /></div>
+                              <div className="text-card-title">Smart Stroke</div>
+                            </div>
+                            <Toggle checked={logoOutline} onChange={setLogoOutline} />
+                          </div>
+                          {logoOutline && (
+                            <div className="fade-in">
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Stroke Color</div>
+                              <div className="swatch-grid-mini" style={{ marginBottom: '18px' }}>
+                                <ColorPicker isSwatch={true} icon={Pipette} value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
                                 {SWATCH_PRESETS.map(color => (
-                                  <div
-                                    key={color}
-                                    className={`swatch-item${logoOutlineColor === color ? ' active' : ''}`}
-                                    style={{ backgroundColor: color }}
-                                    onClick={() => setLogoOutlineColor(color)}
-                                  />
+                                  <div key={color} className={`swatch-item${logoOutlineColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoOutlineColor(color)} />
                                 ))}
                               </div>
+                              <Slider label="Stroke Width" value={logoOutlineWidth} min={1} max={10} step={1} onChange={setLogoOutlineWidth} />
                             </div>
-                            <Slider
-                              label="Stroke Width"
-                              value={logoOutlineWidth}
-                              min={1}
-                              max={10}
-                              step={1}
-                              onChange={setLogoOutlineWidth}
-                              unit="px"
-                            />
-                          </div>
-                        )}
-
-                        <div className="toggle-row">
-                          <Toggle label="Logo Background" checked={logoBackground} onChange={setLogoBackground} />
-                          <span className="toggle-hint">Add shape behind logo</span>
+                          )}
                         </div>
-                        {logoBackground && (
-                          <div className="nested-panel-section fade-in" style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <div className="color-row-item">
-                              <div className="color-row-header">
-                                <label className="panel-label-sub">Background Color</label>
-                              </div>
-                              <div className="swatch-grid-mini">
-                                <ColorPicker
-                                  isSwatch={true}
-                                  icon={Pipette}
-                                  value={logoBgColor}
-                                  onChange={setLogoBgColor}
-                                  onOpenAdvanced={handleOpenAdv}
-                                />
-                                {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
-                                  <div
-                                    key={color}
-                                    className={`swatch-item${logoBgColor === color ? ' active' : ''}`}
-                                    style={{ backgroundColor: color }}
-                                    onClick={() => setLogoBgColor(color)}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div className="selector-group">
-                              <label className="panel-label-sub">Shape</label>
-                              <div className="tabs-mini" style={{ display: 'flex', gap: '8px', background: 'var(--bg-elevated)', padding: '4px', borderRadius: '8px' }}>
-                                {['circle', 'square'].map(s => (
-                                  <button
-                                    key={s}
-                                    className={`tab-mini-btn ${logoBgShape === s ? 'active' : ''}`}
-                                    onClick={() => setLogoBgShape(s)}
-                                    style={{
-                                      flex: 1,
-                                      padding: '6px',
-                                      borderRadius: '6px',
-                                      border: 'none',
-                                      background: logoBgShape === s ? 'var(--accent-primary)' : 'transparent',
-                                      color: logoBgShape === s ? '#fff' : 'var(--text-secondary)',
-                                      fontSize: '12px',
-                                      fontWeight: '600',
-                                      textTransform: 'capitalize',
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    {s}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
 
-                  <div style={{ marginTop: 'auto', paddingTop: '12px' }}>
-                    <LogoPresets
-                      logo={logo}
-                      onLogoChange={setLogo}
-                      onLogoRemove={() => setLogo(null)}
-                    />
+                        {/* Logo Background */}
+                        <div className="text-card">
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div className="text-card-icon red"><Shapes size={18} /></div>
+                              <div className="text-card-title">Logo Background</div>
+                            </div>
+                            <Toggle checked={logoBackground} onChange={setLogoBackground} />
+                          </div>
+                          {logoBackground && (
+                            <div className="fade-in">
+                              <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '14px' }}>
+                                {TEXT_SHAPES.map(shape => {
+                                  const isActive = logoBgShape === shape.id;
+                                  return (
+                                    <button 
+                                      key={shape.id} 
+                                      onClick={() => setLogoBgShape(shape.id)}
+                                      className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
+                                      style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                    >
+                                      {shape.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Background Color</div>
+                              <div className="swatch-grid-mini">
+                                <ColorPicker isSwatch={true} icon={Pipette} value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div key={color} className={`swatch-item${logoBgColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoBgColor(color)} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    )}
+
                   </div>
                 </div>
               )}
-
-              {/* Frame Tab - Temporarily Hidden */}
-              {/* activeTab === 'frame' && (
-                <div className="tab-panel fade-in" id="panel-frame">
-                  <div style={{ marginTop: 'auto' }}>
-                    <label className="panel-label">Frame Style</label>
-                    <div className="frame-options-list">
-                      {FRAME_OPTIONS.map(opt => (
-                        <button
-                          key={opt.id}
-                          className={`frame-option-btn${frameStyle === opt.id ? ' active' : ''}`}
-                          onClick={() => setFrameStyle(opt.id)}
-                        >
-                          <span className="frame-option-icon">{opt.icon}</span>
-                          <span className="frame-option-label">{opt.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) */}
 
               {activeTab === 'text' && (
                 <div className="tab-panel fade-in" id="panel-text">
