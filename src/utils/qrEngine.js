@@ -280,7 +280,7 @@ export function renderQR(canvas, options) {
 
   // Draw frame if enabled
   if (frameStyle !== FRAME_STYLES.NONE) {
-    drawFrame(ctx, size, {
+    drawFrame(ctx, size, padding, {
       frameStyle,
       frameText,
       frameColor: frameColor || (gradientEnabled ? gradientColor1 : qrColor),
@@ -523,9 +523,6 @@ function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = {}) {
 }
 
 /**
- * Draw eye module
- */
-/**
  * Draw the full 7x7 eye (finder pattern) as a single unit
  */
 function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
@@ -684,202 +681,7 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
 }
 
 /**
- * Draw rounded rectangle
- */
-function drawRoundedRect(ctx, x, y, w, h, r) {
-  r = Math.min(r, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    }
-    case DOT_STYLES.LEAF: {
-      const r = s * 0.8;
-      ctx.beginPath();
-      ctx.moveTo(x + padding + r, y + padding);
-      ctx.lineTo(x + padding + s, y + padding);
-      ctx.lineTo(x + padding + s, y + padding + s - r);
-      ctx.quadraticCurveTo(x + padding + s, y + padding + s, x + padding + s - r, y + padding + s);
-      ctx.lineTo(x + padding, y + padding + s);
-      ctx.lineTo(x + padding, y + padding + r);
-      ctx.quadraticCurveTo(x + padding, y + padding, x + padding + r, y + padding);
-      ctx.fill();
-      break;
-    }
-    default: // SQUARE
-      // Use 0.5px overfill to eliminate sub-pixel anti-aliasing gaps between adjacent modules
-      ctx.fillRect(x + padding, y + padding, s + 0.5, s + 0.5);
-      break;
-  }
-}
-
-/**
- * Draw eye module
- */
-/**
- * Draw the full 7x7 eye (finder pattern) as a single unit
- */
-function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
-  const s = size / 28; // Scale factor from 28x28 coordinate space
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(s, s);
-  
-  // 1. Draw Outer Ring (using even-odd fill for the hole)
-  ctx.fillStyle = outerColor;
-  ctx.beginPath();
-  switch (style) {
-    case EYE_STYLES.CIRCLE:
-      ctx.arc(14, 14, 14, 0, Math.PI * 2);
-      ctx.moveTo(24, 14);
-      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
-      break;
-    case EYE_STYLES.ROUNDED:
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 8);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 4);
-      break;
-    case EYE_STYLES.LEAF:
-      // Outer
-      ctx.moveTo(0, 0); ctx.lineTo(20, 0); ctx.quadraticCurveTo(28, 0, 28, 8); ctx.lineTo(28, 28); ctx.lineTo(8, 28); ctx.quadraticCurveTo(0, 28, 0, 20); ctx.closePath();
-      // Inner Hole
-      ctx.moveTo(4, 4); ctx.lineTo(20, 4); ctx.quadraticCurveTo(24, 4, 24, 8); ctx.lineTo(24, 24); ctx.lineTo(8, 24); ctx.quadraticCurveTo(4, 24, 4, 20); ctx.closePath();
-      break;
-    case EYE_STYLES.FLOWER:
-      // Outer Flower (more solid for scanning)
-      for (let i = 0; i < 24; i++) {
-        const a = i * Math.PI / 12;
-        const r = i % 2 === 0 ? 14 : 12.5;
-        ctx.lineTo(14 + r * Math.cos(a), 14 + r * Math.sin(a));
-      }
-      ctx.closePath();
-      // Hole
-      ctx.moveTo(14 + 10, 14);
-      ctx.arc(14, 14, 9, 0, Math.PI * 2, true);
-      break;
-    case EYE_STYLES.SHIELD:
-      // Outer
-      ctx.moveTo(0, 2); ctx.lineTo(28, 2); ctx.lineTo(28, 14); ctx.quadraticCurveTo(28, 24, 14, 28); ctx.quadraticCurveTo(0, 24, 0, 14); ctx.closePath();
-      // Hole
-      ctx.moveTo(4, 6); ctx.lineTo(24, 6); ctx.lineTo(24, 14); ctx.quadraticCurveTo(24, 20, 14, 24); ctx.quadraticCurveTo(4, 20, 4, 14); ctx.closePath();
-      break;
-    case EYE_STYLES.OCTAGON:
-      // Outer
-      ctx.moveTo(9, 0); ctx.lineTo(19, 0); ctx.lineTo(28, 9); ctx.lineTo(28, 19); ctx.lineTo(19, 28); ctx.lineTo(9, 28); ctx.lineTo(0, 19); ctx.lineTo(0, 9); ctx.closePath();
-      // Hole
-      ctx.moveTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24); ctx.lineTo(4, 18); ctx.lineTo(4, 10); ctx.closePath();
-      break;
-    case EYE_STYLES.HEXAGON:
-      // Scan-safe: Rounded-square outer, standard hole, hexagonal inner dot
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 6);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 3);
-      break;
-    case EYE_STYLES.STAR:
-      // Scan-safe: Rounded-square outer, standard hole, star inner dot
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 4);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 2);
-      break;
-    case EYE_STYLES.HEART:
-      // "Spotlight" — Sharp square outer + circle hole (unique combo)
-      ctx.rect(0, 0, 28, 28);
-      ctx.moveTo(24, 14);
-      ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
-      break;
-    case EYE_STYLES.TRIANGLE:
-      // "Pillow" — Super-rounded outer (almost circle, softer than ROUNDED)
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 12);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 8);
-      break;
-    case EYE_STYLES.GEOMETRIC:
-      // Original working cross-shaped cutout
-      ctx.rect(0, 0, 28, 28);
-      ctx.moveTo(4, 10); ctx.lineTo(10, 10); ctx.lineTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(18, 10);
-      ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24);
-      ctx.lineTo(10, 18); ctx.lineTo(4, 18); ctx.closePath();
-      break;
-    case EYE_STYLES.MODERN:
-      // Scan-safe: Square outer with rounded inner gap, double-ring aesthetic via inner dot
-      ctx.rect(0, 0, 28, 28);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 3);
-      break;
-    case EYE_STYLES.DIAMOND:
-      // Scan-safe: Solid square outer, diamond-shaped hole, diamond inner
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 2);
-      ctx.moveTo(14, 5); ctx.lineTo(23, 14); ctx.lineTo(14, 23); ctx.lineTo(5, 14); ctx.closePath();
-      break;
-    case EYE_STYLES.LCD:
-      // "Notch" — Semi-rounded outer + sharp square hole
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 5);
-      ctx.rect(4, 4, 20, 20);
-      break;
-    default: // SQUARE
-      ctx.rect(0, 0, 28, 28);
-      ctx.rect(4, 4, 20, 20);
-      break;
-  }
-  ctx.fill('evenodd');
-
-  // 2. Draw Inner Dot
-  ctx.fillStyle = innerColor;
-  ctx.beginPath();
-  switch (style) {
-    case EYE_STYLES.CIRCLE:
-    case EYE_STYLES.FLOWER:
-    case EYE_STYLES.SHIELD:
-    case EYE_STYLES.OCTAGON:
-    case EYE_STYLES.STAR:
-    case EYE_STYLES.HEART:
-      ctx.arc(14, 14, 6, 0, Math.PI * 2);
-      break;
-    case EYE_STYLES.HEXAGON: {
-      // Hexagonal inner dot
-      const hr = 6;
-      ctx.moveTo(14 + hr, 14);
-      for (let i = 1; i <= 6; i++) {
-        const a = i * Math.PI / 3;
-        ctx.lineTo(14 + hr * Math.cos(a), 14 + hr * Math.sin(a));
-      }
-      ctx.closePath();
-      break;
-    }
-    case EYE_STYLES.DIAMOND:
-      ctx.moveTo(14, 8); ctx.lineTo(20, 14); ctx.lineTo(14, 20); ctx.lineTo(8, 14); ctx.closePath();
-      break;
-    case EYE_STYLES.TRIANGLE:
-      // Pillow: super-rounded inner dot
-      drawRoundedRectPath(ctx, 8, 8, 12, 12, 5);
-      break;
-    case EYE_STYLES.GEOMETRIC:
-      // Plus-shaped inner dot (original working)
-      ctx.rect(12, 8, 4, 12);
-      ctx.rect(8, 12, 12, 4);
-      break;
-    case EYE_STYLES.LCD:
-      // Notch: sharp square inner dot
-      ctx.rect(8, 8, 12, 12);
-      break;
-    case EYE_STYLES.MODERN:
-      // Double ring inner: outer ring + center dot
-      drawRoundedRectPath(ctx, 7, 7, 14, 14, 2);
-      break;
-    case EYE_STYLES.ROUNDED:
-    case EYE_STYLES.LEAF:
-      drawRoundedRectPath(ctx, 8, 8, 12, 12, 4);
-      break;
-    default: // SQUARE
-      ctx.rect(8, 8, 12, 12);
-      break;
-  }
-  ctx.fill();
-  
-  ctx.restore();
-}
-
-/**
- * Draw rounded rectangle
+ * Draw a filled rounded rectangle
  */
 function drawRoundedRect(ctx, x, y, w, h, r) {
   r = Math.min(r, w / 2, h / 2);
