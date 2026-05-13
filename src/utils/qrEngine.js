@@ -224,6 +224,8 @@ export function renderQR(canvas, options) {
     logoOutlineColor = '#000000',
     logoOutlineWidth = 3,
     logoOutlineOpacity = 1,
+    logoPosX = 0.5,
+    logoPosY = 0.5,
     quietZone = 2,
     frameStyle = FRAME_STYLES.NONE,
     frameText = 'SCAN ME',
@@ -238,6 +240,8 @@ export function renderQR(canvas, options) {
     textCenterShadowEnabled = false,
     textCenterShadowBlur = 5,
     textCenterShadowColor = 'rgba(0,0,0,0.5)',
+    textCenterPosX = 0.5,
+    textCenterPosY = 0.5,
     frameFont = 'Inter',
     frameSize = 0.12,
     frameStrokeEnabled = false,
@@ -353,7 +357,6 @@ export function renderQR(canvas, options) {
 
   // Draw logo or Text
   if (logo) {
-    // Adjust logo drawing to be centered in content area
     drawLogo(ctx, logo, size, {
       logoSize,
       logoPadding,
@@ -364,9 +367,13 @@ export function renderQR(canvas, options) {
       logoOutlineColor,
       logoOutlineWidth,
       logoOutlineOpacity,
+      logoPosX,
+      logoPosY,
       contentX,
       contentY,
-      contentSize
+      contentSize,
+      moduleCount,
+      quietZone
     });
   } else if (textCenter) {
     drawCenterText(ctx, textCenter, size, {
@@ -379,13 +386,17 @@ export function renderQR(canvas, options) {
       textCenterShadowEnabled,
       textCenterShadowBlur,
       textCenterShadowColor,
+      textCenterPosX,
+      textCenterPosY,
       logoPadding,
       logoBackground,
       logoBgColor,
       logoBgShape,
       contentX,
       contentY,
-      contentSize
+      contentSize,
+      moduleCount,
+      quietZone
     });
   }
 
@@ -713,15 +724,25 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
     logoOutlineColor,
     logoOutlineWidth,
     logoOutlineOpacity,
+    logoPosX = 0.5,
+    logoPosY = 0.5,
     contentX = 0,
     contentY = 0,
-    contentSize = canvasSize
+    contentSize = canvasSize,
+    moduleCount = 21,
+    quietZone = 2
   } = options;
 
   const logoW = contentSize * logoSize;
   const logoH = logoW * (logoImg.height / logoImg.width);
-  const logoX = contentX + (contentSize - logoW) / 2;
-  const logoY = contentY + (contentSize - logoH) / 2;
+  const rawX = contentX + (contentSize - logoW) * logoPosX;
+  const rawY = contentY + (contentSize - logoH) * logoPosY;
+  
+  // Apply Safety Zone Constraints (Avoid Eyes)
+  const safePos = constrainToSafeZone(rawX, rawY, logoW, logoH, contentX, contentY, contentSize, moduleCount, quietZone);
+  const logoX = safePos.x;
+  const logoY = safePos.y;
+
   const paddedW = logoW + logoPadding * 2;
   const paddedH = logoH + logoPadding * 2;
   const paddedX = logoX - logoPadding;
@@ -797,14 +818,17 @@ function drawCenterText(ctx, text, canvasSize, options) {
     textCenterStrokeColor = '#ffffff',
     textCenterShadowEnabled = false,
     textCenterShadowBlur = 5,
-    textCenterShadowColor = 'rgba(0,0,0,0.5)',
+    textCenterPosX = 0.5,
+    textCenterPosY = 0.5,
     logoPadding,
     logoBackground,
     logoBgColor,
     logoBgShape,
     contentX = 0,
     contentY = 0,
-    contentSize = canvasSize
+    contentSize = canvasSize,
+    moduleCount = 21,
+    quietZone = 2
   } = options;
 
   const fontSize = contentSize * textCenterSize;
@@ -813,13 +837,22 @@ function drawCenterText(ctx, text, canvasSize, options) {
   const textWidth = metrics.width;
   const textHeight = fontSize * 0.8; 
 
-  const centerX = contentX + contentSize / 2;
-  const centerY = contentY + contentSize / 2;
-
   const paddedW = textWidth + (logoPadding || 10) * 2;
   const paddedH = textHeight + (logoPadding || 10) * 2;
-  const paddedX = centerX - paddedW / 2;
-  const paddedY = centerY - paddedH / 2;
+
+  const rawX = contentX + (contentSize - paddedW) * textCenterPosX;
+  const rawY = contentY + (contentSize - paddedH) * textCenterPosY;
+
+  // Apply Safety Zone Constraints (Avoid Eyes)
+  const safePos = constrainToSafeZone(rawX, rawY, paddedW, paddedH, contentX, contentY, contentSize, moduleCount, quietZone);
+  const logoX = safePos.x;
+  const logoY = safePos.y;
+
+  const centerX = logoX + paddedW / 2;
+  const centerY = logoY + paddedH / 2;
+
+  const paddedX = logoX;
+  const paddedY = logoY;
 
   // 1. Clear area if background is enabled
   if (logoBackground) {
@@ -1019,4 +1052,55 @@ function drawRoundedRectPath(ctx, x, y, w, h, r) {
   ctx.lineTo(x, y + r);
   ctx.quadraticCurveTo(x, y, x + r, y);
   ctx.closePath();
+}
+/**
+ * Constrain an element to stay within the QR content area and avoid the 3 finder patterns (eyes)
+ */
+function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, moduleCount, quietZone) {
+  const totalModules = moduleCount + quietZone * 2;
+  const cellSize = contentSize / totalModules;
+  // Eye region is 7x7 modules. We add 1 module buffer for safe scanning.
+  const eyeSize = cellSize * 8; 
+  const qzOffset = quietZone * cellSize;
+
+  // Define eye rectangles relative to contentX/Y
+  const eyes = [
+    { x: qzOffset, y: qzOffset, w: eyeSize, h: eyeSize }, // Top-Left
+    { x: contentSize - qzOffset - eyeSize, y: qzOffset, w: eyeSize, h: eyeSize }, // Top-Right
+    { x: qzOffset, y: contentSize - qzOffset - eyeSize, w: eyeSize, h: eyeSize } // Bottom-Left
+  ];
+
+  let resX = x;
+  let resY = y;
+
+  // Safety Nudging: If the element's bounding box overlaps an eye, push it away
+  for (const eye of eyes) {
+    const eyeAbsX = contentX + eye.x;
+    const eyeAbsY = contentY + eye.y;
+    
+    // Check intersection
+    if (resX < eyeAbsX + eye.w && resX + w > eyeAbsX && resY < eyeAbsY + eye.h && resY + h > eyeAbsY) {
+       // Calculate vector from eye center to rect center
+       const eyeCX = eyeAbsX + eye.w / 2;
+       const eyeCY = eyeAbsY + eye.h / 2;
+       const rectCX = resX + w / 2;
+       const rectCY = resY + h / 2;
+       
+       const dx = rectCX - eyeCX;
+       const dy = rectCY - eyeCY;
+       
+       // Nudge towards center of QR (greatest escape)
+       if (Math.abs(dx) > Math.abs(dy)) {
+         resX = dx > 0 ? eyeAbsX + eye.w : eyeAbsX - w;
+       } else {
+         resY = dy > 0 ? eyeAbsY + eye.h : eyeAbsY - h;
+       }
+    }
+  }
+
+  // Final Clamp: Ensure it never goes outside the QR content area
+  resX = Math.max(contentX, Math.min(contentX + contentSize - w, resX));
+  resY = Math.max(contentY, Math.min(contentY + contentSize - h, resY));
+
+  return { x: resX, y: resY };
 }

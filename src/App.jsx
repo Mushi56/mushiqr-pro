@@ -385,6 +385,8 @@ export default function App() {
   const [logoOutlineColor, setLogoOutlineColor] = useState('#ffffff');
   const [logoOutlineWidth, setLogoOutlineWidth] = useState(3);
   const [logoOutlineOpacity, setLogoOutlineOpacity] = useState(1);
+  const [logoPosX, setLogoPosX] = useState(0.5);
+  const [logoPosY, setLogoPosY] = useState(0.5);
 
   // ── Frame ──
   const [frameStyle, setFrameStyle] = useState('none');
@@ -413,6 +415,8 @@ export default function App() {
   const [textCenterShadowEnabled, setTextCenterShadowEnabled] = useState(false);
   const [textCenterShadowBlur, setTextCenterShadowBlur] = useState(10);
   const [textCenterShadowColor, setTextCenterShadowColor] = useState('rgba(0,0,0,0.5)');
+  const [textCenterPosX, setTextCenterPosX] = useState(0.5);
+  const [textCenterPosY, setTextCenterPosY] = useState(0.5);
 
   // ── References ──
   const canvasRef = useRef(null);
@@ -789,6 +793,10 @@ export default function App() {
     setLogoOutlineColor('#ffffff');
     setLogoOutlineWidth(3);
     setLogoOutlineOpacity(1);
+    setLogoPosX(0.5);
+    setLogoPosY(0.5);
+    setTextCenterPosX(0.5);
+    setTextCenterPosY(0.5);
 
     // Frame
     setFrameStyle('none');
@@ -851,6 +859,8 @@ export default function App() {
         textCenterSize, textCenterColor, textCenterFont,
         textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
         textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
+        textCenterPosX, textCenterPosY,
+        logoPosX, logoPosY,
       });
     };
 
@@ -877,7 +887,8 @@ export default function App() {
     textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont,
 
     textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
-    textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor
+    textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
+    textCenterPosX, textCenterPosY, logoPosX, logoPosY
   ]);
 
   useEffect(() => {
@@ -1417,6 +1428,21 @@ export default function App() {
                           )}
                         </div>
                       )}
+                      {logoPopup === 'pos' && (
+                        <div className="fade-in">
+                          <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <div className="pos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'var(--bg-elevated)', borderRadius: '16px' }}>
+                                {[0, 0.5, 1].map(y => [0, 0.5, 1].map(x => (
+                                  <button key={`${x}-${y}`} onClick={() => { setLogoPosX(x); setLogoPosY(y); }} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)', background: logoPosX === x && logoPosY === y ? 'var(--accent-primary)' : 'var(--bg-primary)', cursor: 'pointer', transition: 'all 0.2s ease' }} />
+                                )))}
+                              </div>
+                            </div>
+                            <Slider label="Horizontal" value={logoPosX} min={0} max={1} step={0.01} onChange={setLogoPosX} />
+                            <Slider label="Vertical" value={logoPosY} min={0} max={1} step={0.01} onChange={setLogoPosY} />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1441,13 +1467,13 @@ export default function App() {
                           </div>
 
                           <div className="seg-control" style={{ marginBottom: '16px' }}>
-                            <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>Center</button>
-                            <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom</button>
+                            <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>QR Text</button>
+                            <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom Text</button>
                           </div>
 
                           {textEditMode === 'center' && (
                             <div style={{ opacity: textCenterEnabled ? 1 : 0.5, pointerEvents: textCenterEnabled ? 'all' : 'none' }}>
-                              <input type="text" maxLength={18} value={textCenterText} onChange={(e) => setTextCenterText(e.target.value)} placeholder="Type center text..." className="text-input-premium" style={{ width: '100%', marginBottom: '4px' }} />
+                              <input type="text" maxLength={18} value={textCenterText} onChange={(e) => setTextCenterText(e.target.value)} placeholder="Type QR text..." className="text-input-premium" style={{ width: '100%', marginBottom: '4px' }} />
                             </div>
                           )}
 
@@ -1558,6 +1584,21 @@ export default function App() {
                           )}
                         </div>
                       )}
+                      {textPopup === 'pos' && (
+                        <div className="fade-in">
+                          <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <div className="pos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'var(--bg-elevated)', borderRadius: '16px' }}>
+                                {[0, 0.5, 1].map(y => [0, 0.5, 1].map(x => (
+                                  <button key={`${x}-${y}`} onClick={() => { setTextCenterPosX(x); setTextCenterPosY(y); }} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)', background: textCenterPosX === x && textCenterPosY === y ? 'var(--accent-primary)' : 'var(--bg-primary)', cursor: 'pointer', transition: 'all 0.2s ease' }} />
+                                )))}
+                              </div>
+                            </div>
+                            <Slider label="Horizontal" value={textCenterPosX} min={0} max={1} step={0.01} onChange={setTextCenterPosX} />
+                            <Slider label="Vertical" value={textCenterPosY} min={0} max={1} step={0.01} onChange={setTextCenterPosY} />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1566,6 +1607,7 @@ export default function App() {
                     {activeTab === 'logo' && (
                       <>
                         <button className={`text-toolbar-btn ${logoPopup === 'size' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'size' ? null : 'size')}><ChevronUp size={18} /><span>Size</span></button>
+                        <button className={`text-toolbar-btn ${logoPopup === 'pos' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'pos' ? null : 'pos')}><Maximize size={18} /><span>Position</span></button>
                         <button className={`text-toolbar-btn ${logoPopup === 'stroke' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'stroke' ? null : 'stroke')}><Pencil size={18} /><span>Stroke</span></button>
                         <button className={`text-toolbar-btn ${logoPopup === 'bg' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'bg' ? null : 'bg')}><Hexagon size={18} /><span>Background</span></button>
                       </>
@@ -1573,6 +1615,7 @@ export default function App() {
                     {activeTab === 'text' && (
                       <>
                         <button className={`text-toolbar-btn ${textPopup === 'input' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'input' ? null : 'input')}><PlusCircle size={18} /><span>Content</span></button>
+                        <button className={`text-toolbar-btn ${textPopup === 'pos' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'pos' ? null : 'pos')}><Maximize size={18} /><span>Position</span></button>
                         <button className={`text-toolbar-btn ${textPopup === 'fonts' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'fonts' ? null : 'fonts')}><Type size={18} /><span>Fonts</span></button>
                         <button className={`text-toolbar-btn ${textPopup === 'size' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'size' ? null : 'size')}><ChevronUp size={18} /><span>Size</span></button>
                         <button className={`text-toolbar-btn ${textPopup === 'color' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'color' ? null : 'color')}><Palette size={18} /><span>Color</span></button>
