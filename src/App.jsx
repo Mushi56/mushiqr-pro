@@ -1327,7 +1327,7 @@ export default function App() {
               {/* Logo Tab */}
               {activeTab === 'logo' && (
                 <div className="tab-panel fade-in" id="panel-logo">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '0 20px 100px 20px' }}>
+                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px 100px 20px' }}>
                     {/* 1. Presets Section */}
                     <LogoPresets logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
                   </div>
