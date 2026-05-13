@@ -2166,7 +2166,7 @@ input[type="range"]::-moz-range-thumb {
     margin: 0 auto;
   }
 
-  /* Sidebar is normal flow Ã¢â‚¬â€ scrolls inside app-main */
+  /* Sidebar is normal flow — scrolls inside app-main */
   .sidebar {
     width: 100%;
     height: auto;
@@ -2175,6 +2175,8 @@ input[type="range"]::-moz-range-thumb {
     flex-shrink: 0;
     background: transparent;
     box-shadow: none;
+    position: relative;
+    z-index: 500;
   }
 }
 
