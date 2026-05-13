@@ -1594,7 +1594,7 @@ export default function App() {
                   )}
 
                   {/* ─── Action Toolbar (Responsive Container) ─── */}
-                  {(textCenterEnabled || (frameStyle !== 'none' && frameStyle !== 'simple-border' && frameStyle !== 'rounded-border')) && (
+                  {(textCenterEnabled || frameStyle === 'text-bottom') && (
                     <div className="logo-toolbar-container">
                       <div className="logo-toolbar-wrapper">
                         <div className="text-toolbar" style={{ margin: '0' }}>
@@ -1656,10 +1656,7 @@ export default function App() {
               onClick={() => handleTabChange(tab.id)}
             >
               <div className="bottom-nav-highlight" />
-              <span className="bottom-nav-icon">
-                <tab.icon size={20} strokeWidth={2} />
-              </span>
-              <span className="bottom-nav-label">{tab.label}</span>
+              <tab.icon size={22} strokeWidth={2.5} />
             </button>
           ))}
         </nav>
@@ -1678,11 +1675,10 @@ export default function App() {
           padding: '10px 16px env(safe-area-inset-bottom) 16px', zIndex: 100,
           boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
         }}>
-          <button onClick={() => navigateTo('home')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <Home size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
+            <Home size={24} strokeWidth={2.5} />
           </button>
           <button onClick={() => navigateTo('saved')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'saved' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <Bookmark size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
+            <Bookmark size={24} strokeWidth={2.5} />
           </button>
           
           {/* Integrated Scan Button */}
@@ -1692,42 +1688,35 @@ export default function App() {
               display: 'flex', 
               flexDirection: 'column', 
               alignItems: 'center', 
-              gap: '2px',
-              marginTop: '-35px',
+              marginTop: '-28px', /* Brought down from -35px */
               cursor: 'pointer'
             }}
           >
             <button 
               className="floating-scan-btn"
               style={{ 
-                width: '56px',
-                height: '56px',
-                borderRadius: '28px',
+                width: '64px', /* Increased from 56px */
+                height: '64px',
+                borderRadius: '32px',
                 background: 'var(--accent-primary)',
                 border: '4px solid var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 16px rgba(214, 0, 54, 0.3)',
+                boxShadow: '0 8px 24px rgba(214, 0, 54, 0.4)',
                 color: 'white',
                 zIndex: 101
               }}
             >
-              <ScanLine size={24} />
+              <ScanLine size={28} />
             </button>
-            <span style={{ 
-              fontSize: '10px', 
-              fontWeight: 700, 
-              color: activePage === 'scanner' ? 'var(--accent-primary)' : 'var(--text-muted)',
-              marginTop: '2px'
-            }}>Scan</span>
           </div>
 
           <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <History size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
+            <History size={24} strokeWidth={2.5} />
           </button>
           <button onClick={() => navigateTo('settings')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'settings' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <Settings size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
+            <Settings size={24} strokeWidth={2.5} />
           </button>
         </div>
       )}

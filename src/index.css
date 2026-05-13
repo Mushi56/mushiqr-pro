@@ -6715,7 +6715,7 @@ video {
 
 /* ── Text Popup (Slide-up Sheet) ── */
 .text-popup-overlay {
-  position: absolute; /* Changed from fixed to stay within tab panel */
+  position: absolute;
   inset: 0;
   background: transparent;
   backdrop-filter: none;
@@ -6723,15 +6723,15 @@ video {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 84px; /* Align with logo property sheet */
+  padding-bottom: 92px; /* Increased to add space between toolbar and popup */
   pointer-events: none;
 }
 .text-popup-overlay > * { pointer-events: all; }
 
 .text-popup {
-  width: calc(100% - 24px);
+  width: calc(100% - 32px); /* Matched to toolbar container padding */
   max-width: 440px;
-  max-height: 60vh;
+  max-height: 55vh;
   background: var(--bg-dropdown-solid);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
@@ -6774,9 +6774,9 @@ video {
 }
 .text-popup-close:active { transform: scale(0.9); }
 .text-popup-body {
-  padding: 20px;
+  padding: 18px 16px;
   overflow-y: auto;
-  max-height: calc(75vh - 70px);
+  max-height: calc(55vh - 64px);
 }
 
 /* ── Font Grid inside Popup ── */
@@ -6870,16 +6870,16 @@ video {
 /* ── Logo Property Sheet (Popup Style) ── */
 .logo-property-sheet {
   position: absolute;
-  bottom: 84px; /* Space for toolbar */
+  bottom: 92px; /* Increased to add consistent space above toolbar */
   left: 50%;
-  width: calc(100% - 24px);
+  width: calc(100% - 32px);
   max-width: 440px;
   background: var(--bg-dropdown-solid);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
-  padding: 24px 20px;
+  padding: 20px 18px; /* Decreased internal padding */
   box-shadow: 0 -15px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
   z-index: 100;
   transform-origin: bottom;
@@ -6941,7 +6941,7 @@ video {
 
 /* Ensure Logo Toolbar stays responsive and centered */
 .logo-toolbar-container {
-  padding: 0 16px 20px 16px;
+  padding: 0 16px 12px 16px; /* Decreased bottom padding */
   position: absolute;
   bottom: 0;
   left: 0;
