@@ -1074,27 +1074,43 @@ function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, module
   let resY = y;
 
   // Safety Nudging (Absolute Eye Avoidance)
-  for (const eye of eyes) {
+  for (let i = 0; i < eyes.length; i++) {
+    const eye = eyes[i];
     const eyeAbsX = contentX + eye.x;
     const eyeAbsY = contentY + eye.y;
     
     // Check intersection
     if (resX < eyeAbsX + eye.w && resX + w > eyeAbsX && resY < eyeAbsY + eye.h && resY + h > eyeAbsY) {
-       // We are in the Danger Zone!
-       // Calculate required distances to "escape" this eye rectangle in all 4 directions
+       // We are in the Danger Zone! 
+       // Escape options MUST stay within the QR module area [minX, maxX]
+       const canGoRight = (eyeAbsX + eye.w + w) <= (contentX + contentSize - qzOffset);
+       const canGoDown = (eyeAbsY + eye.h + h) <= (contentY + contentSize - qzOffset);
+       const canGoLeft = (eyeAbsX - w) >= (contentX + qzOffset);
+       const canGoUp = (eyeAbsY - h) >= (contentY + qzOffset);
+
        const distRight = (eyeAbsX + eye.w) - resX;
        const distLeft = (resX + w) - eyeAbsX;
        const distBottom = (eyeAbsY + eye.h) - resY;
        const distTop = (resY + h) - eyeAbsY;
 
-       // Find the minimum distance required to escape
-       const minDist = Math.min(distRight, distLeft, distBottom, distTop);
+       // Filter escape routes that stay in bounds
+       const options = [];
+       if (canGoRight) options.push({ dist: distRight, axis: 'x', val: eyeAbsX + eye.w });
+       if (canGoLeft) options.push({ dist: distLeft, axis: 'x', val: eyeAbsX - w });
+       if (canGoDown) options.push({ dist: distBottom, axis: 'y', val: eyeAbsY + eye.h });
+       if (canGoUp) options.push({ dist: distTop, axis: 'y', val: eyeAbsY - h });
 
-       // Snap to the closest escape boundary
-       if (minDist === distRight) resX = eyeAbsX + eye.w;
-       else if (minDist === distLeft) resX = eyeAbsX - w;
-       else if (minDist === distBottom) resY = eyeAbsY + eye.h;
-       else if (minDist === distTop) resY = eyeAbsY - h;
+       if (options.length > 0) {
+         // Sort by distance to find the closest valid escape
+         options.sort((a, b) => a.dist - b.dist);
+         const best = options[0];
+         if (best.axis === 'x') resX = best.val;
+         else resY = best.val;
+       } else {
+         // EMERGENCY: If it doesn't fit anywhere else (rare), force to center
+         resX = contentX + (contentSize - w) / 2;
+         resY = contentY + (contentSize - h) / 2;
+       }
     }
   }
 
