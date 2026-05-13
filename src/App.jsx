@@ -1656,7 +1656,10 @@ export default function App() {
               onClick={() => handleTabChange(tab.id)}
             >
               <div className="bottom-nav-highlight" />
-              <tab.icon size={22} strokeWidth={2.5} />
+              <span className="bottom-nav-icon">
+                <tab.icon size={20} strokeWidth={2} />
+              </span>
+              <span className="bottom-nav-label">{tab.label}</span>
             </button>
           ))}
         </nav>
@@ -1675,10 +1678,11 @@ export default function App() {
           padding: '10px 16px env(safe-area-inset-bottom) 16px', zIndex: 100,
           boxShadow: '0 -8px 24px rgba(0,0,0,0.12)',
         }}>
-            <Home size={24} strokeWidth={2.5} />
+          <button onClick={() => navigateTo('home')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'home' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
+            <Home size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Home</span>
           </button>
           <button onClick={() => navigateTo('saved')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'saved' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <Bookmark size={24} strokeWidth={2.5} />
+            <Bookmark size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Saved</span>
           </button>
           
           {/* Integrated Scan Button */}
@@ -1688,35 +1692,42 @@ export default function App() {
               display: 'flex', 
               flexDirection: 'column', 
               alignItems: 'center', 
-              marginTop: '-28px', /* Brought down from -35px */
+              gap: '2px',
+              marginTop: '-35px',
               cursor: 'pointer'
             }}
           >
             <button 
               className="floating-scan-btn"
               style={{ 
-                width: '64px', /* Increased from 56px */
-                height: '64px',
-                borderRadius: '32px',
+                width: '56px',
+                height: '56px',
+                borderRadius: '28px',
                 background: 'var(--accent-primary)',
                 border: '4px solid var(--bg-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 24px rgba(214, 0, 54, 0.4)',
+                boxShadow: '0 4px 16px rgba(214, 0, 54, 0.3)',
                 color: 'white',
                 zIndex: 101
               }}
             >
-              <ScanLine size={28} />
+              <ScanLine size={24} />
             </button>
+            <span style={{ 
+              fontSize: '10px', 
+              fontWeight: 700, 
+              color: activePage === 'scanner' ? 'var(--accent-primary)' : 'var(--text-muted)',
+              marginTop: '2px'
+            }}>Scan</span>
           </div>
 
           <button onClick={() => navigateTo('history')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'history' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <History size={24} strokeWidth={2.5} />
+            <History size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>History</span>
           </button>
           <button onClick={() => navigateTo('settings')} style={{ background: 'transparent', border: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer', color: activePage === 'settings' ? 'var(--accent-primary)' : 'var(--text-muted)', padding: '8px 16px', borderRadius: '12px' }}>
-            <Settings size={24} strokeWidth={2.5} />
+            <Settings size={22} /><span style={{ fontSize: '10px', fontWeight: 600 }}>Settings</span>
           </button>
         </div>
       )}
