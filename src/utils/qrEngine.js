@@ -1073,34 +1073,39 @@ function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, module
   let resX = x;
   let resY = y;
 
-  // Safety Nudging: If the element's bounding box overlaps an eye, push it away
+  // Safety Nudging (Absolute Eye Avoidance)
   for (const eye of eyes) {
     const eyeAbsX = contentX + eye.x;
     const eyeAbsY = contentY + eye.y;
     
     // Check intersection
     if (resX < eyeAbsX + eye.w && resX + w > eyeAbsX && resY < eyeAbsY + eye.h && resY + h > eyeAbsY) {
-       // Calculate vector from eye center to rect center
-       const eyeCX = eyeAbsX + eye.w / 2;
-       const eyeCY = eyeAbsY + eye.h / 2;
-       const rectCX = resX + w / 2;
-       const rectCY = resY + h / 2;
-       
-       const dx = rectCX - eyeCX;
-       const dy = rectCY - eyeCY;
-       
-       // Nudge towards center of QR (greatest escape)
-       if (Math.abs(dx) > Math.abs(dy)) {
-         resX = dx > 0 ? eyeAbsX + eye.w : eyeAbsX - w;
-       } else {
-         resY = dy > 0 ? eyeAbsY + eye.h : eyeAbsY - h;
-       }
+       // We are in the Danger Zone!
+       // Calculate required distances to "escape" this eye rectangle in all 4 directions
+       const distRight = (eyeAbsX + eye.w) - resX;
+       const distLeft = (resX + w) - eyeAbsX;
+       const distBottom = (eyeAbsY + eye.h) - resY;
+       const distTop = (resY + h) - eyeAbsY;
+
+       // Find the minimum distance required to escape
+       const minDist = Math.min(distRight, distLeft, distBottom, distTop);
+
+       // Snap to the closest escape boundary
+       if (minDist === distRight) resX = eyeAbsX + eye.w;
+       else if (minDist === distLeft) resX = eyeAbsX - w;
+       else if (minDist === distBottom) resY = eyeAbsY + eye.h;
+       else if (minDist === distTop) resY = eyeAbsY - h;
     }
   }
 
-  // Final Clamp: Ensure it never goes outside the QR content area
-  resX = Math.max(contentX, Math.min(contentX + contentSize - w, resX));
-  resY = Math.max(contentY, Math.min(contentY + contentSize - h, resY));
+  // Final Clamp: Ensure it never goes outside the QR MODULE area (excluding quiet zone)
+  const minX = contentX + qzOffset;
+  const minY = contentY + qzOffset;
+  const maxX = contentX + contentSize - qzOffset - w;
+  const maxY = contentY + contentSize - qzOffset - h;
+
+  resX = Math.max(minX, Math.min(maxX, resX));
+  resY = Math.max(minY, Math.min(maxY, resY));
 
   return { x: resX, y: resY };
 }
