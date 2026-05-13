@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Check, Plus, Minus, Hash } from 'lucide-react';
+import { X, Check, Plus, Minus, Hash, Pipette } from 'lucide-react';
 
 export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel, onChange }) {
   const [tempColor, setTempColor] = useState(initialColor || '#ff0000');
@@ -141,6 +141,24 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
     }
   };
 
+  const openEyeDropper = async () => {
+    if (!window.EyeDropper) {
+      alert("Your browser does not support the EyeDropper API. Please use a modern browser like Chrome or Edge.");
+      return;
+    }
+    const eyeDropper = new window.EyeDropper();
+    try {
+      const result = await eyeDropper.open();
+      const hex = result.sRGBHex;
+      setTempColor(hex);
+      const rgb = hexToRgb(hex);
+      stateRef.current = rgbToHsv(rgb.r, rgb.g, rgb.b);
+      if (onChange) onChange(hex);
+    } catch (e) {
+      console.log("EyeDropper canceled or failed", e);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -208,6 +226,27 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
               spellCheck={false}
             />
           </div>
+          <button 
+            className="pipette-btn" 
+            onClick={openEyeDropper}
+            title="Pick color from screen"
+            style={{
+              marginLeft: '10px',
+              width: '42px',
+              height: '42px',
+              borderRadius: '12px',
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--text-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Pipette size={18} />
+          </button>
         </div>
 
         <div className="picker-tabs">
