@@ -58,6 +58,19 @@ import AppIcon from './components/AppIcon';
 import { ScanLine, History } from 'lucide-react';
 import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
 
+const TEXT_SHAPES = [
+  { id: 'solid', label: 'Solid Box' },
+  { id: 'rounded', label: 'Rounded Box' },
+  { id: 'pill', label: 'Pill Box' },
+  { id: 'outline', label: 'Outline Box' },
+  { id: 'underline', label: 'Underline' },
+  { id: 'ribbon', label: 'Ribbon' },
+  { id: 'glow', label: 'Glow Effect' },
+  { id: 'brackets', label: 'Brackets' },
+  { id: 'hexagon', label: 'Hexagon' },
+  { id: 'dots', label: 'Dotted Box' }
+];
+
 /* ── Color Presets ── */
 const COLOR_PRESETS = [
   { name: 'Classic', qr: '#000000', bg: '#ffffff' },
@@ -375,7 +388,17 @@ export default function App() {
   const [frameText, setFrameText] = useState('SCAN ME');
   const [frameColor, setFrameColor] = useState('');
   const [frameFont, setFrameFont] = useState('Inter');
+  const [frameSize, setFrameSize] = useState(0.12);
+  const [frameStrokeEnabled, setFrameStrokeEnabled] = useState(false);
+  const [frameStrokeWidth, setFrameStrokeWidth] = useState(5);
+  const [frameStrokeColor, setFrameStrokeColor] = useState('#ffffff');
+  const [frameShadowEnabled, setFrameShadowEnabled] = useState(false);
+  const [frameShadowBlur, setFrameShadowBlur] = useState(10);
+  const [frameShadowColor, setFrameShadowColor] = useState('rgba(0,0,0,0.5)');
   const [textCenterEnabled, setTextCenterEnabled] = useState(false);
+  const [textPopup, setTextPopup] = useState(null);
+  const [textEditMode, setTextEditMode] = useState('center');
+
   const [textCenterText, setTextCenterText] = useState('');
   const [textCenterSize, setTextCenterSize] = useState(0.18);
   const [textCenterColor, setTextCenterColor] = useState('#000000');
@@ -813,6 +836,13 @@ export default function App() {
         logoBackground, logoBgColor, logoBgShape,
         logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
         quietZone: 2, frameStyle, frameText, frameColor, frameFont,
+        frameSize,
+        frameStrokeEnabled,
+        frameStrokeWidth,
+        frameStrokeColor,
+        frameShadowEnabled,
+        frameShadowBlur,
+        frameShadowColor,
         textCenter: textCenterEnabled ? textCenterText : null, 
         textCenterSize, textCenterColor, textCenterFont,
         textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
@@ -833,7 +863,15 @@ export default function App() {
     logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
     dotPadding, eyePadding, frameStyle, frameText, frameColor, frameFont,
+        frameSize,
+        frameStrokeEnabled,
+        frameStrokeWidth,
+        frameStrokeColor,
+        frameShadowEnabled,
+        frameShadowBlur,
+        frameShadowColor,
     textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont,
+
     textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
     textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor
   ]);
@@ -1437,440 +1475,191 @@ export default function App() {
 
               {activeTab === 'text' && (
                 <div className="tab-panel fade-in" id="panel-text">
-                  <div className="panel-section">
-                    
-                    <div style={{ marginBottom: '20px' }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Text Content</label>
-                      <input 
-                        type="text" 
-                        value={frameText} 
-                        onChange={(e) => {
-                          setFrameText(e.target.value);
-                          if (frameStyle === 'none' && e.target.value.trim() !== '') {
-                            setFrameStyle('text-bottom'); // Auto-enable text style if they type
-                          }
-                        }}
-                        placeholder="e.g. Scan Me, Your Name, Company..."
-                        className="custom-input"
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-primary)', fontSize: '15px' }}
-                      />
-                    </div>
+                  <div className="panel-section" style={{ paddingBottom: '80px' }}>
 
-                    <div style={{ marginBottom: '20px' }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Font Style</label>
-                      <div 
-                        className="font-scroll-container" 
-                        style={{ 
-                          display: 'flex', 
-                          gap: '10px', 
-                          overflowX: 'auto', 
-                          padding: '4px 0 12px 0',
-                          scrollbarWidth: 'none',
-                          msOverflowStyle: 'none',
-                          WebkitOverflowScrolling: 'touch'
-                        }}
-                      >
-                        {/* Custom Font Upload Button */}
-                        <button
-                          onClick={() => fontInputRef.current?.click()}
-                          className="font-scroll-btn"
-                          style={{
-                            flex: '0 0 auto',
-                            padding: '10px 20px',
-                            borderRadius: '12px',
-                            background: 'var(--bg-hover)',
-                            color: 'var(--accent-primary)',
-                            border: '2px dashed var(--accent-primary)',
-                            fontSize: '15px',
-                            fontWeight: 600,
-                            whiteSpace: 'nowrap',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
+                    {/* ─── Unified Text Card ─── */}
+                    <div className="text-card">
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div className="text-card-icon purple"><Type size={18} /></div>
+                          <div className="text-card-title">Add Text</div>
+                        </div>
+                        <Toggle
+                          checked={textEditMode === 'center' ? textCenterEnabled : frameStyle !== 'none'}
+                          onChange={(val) => {
+                            if (textEditMode === 'center') {
+                              setTextCenterEnabled(val);
+                              if (val) setLogo(null);
+                            } else {
+                              setFrameStyle(val ? 'text-bottom' : 'none');
+                            }
                           }}
-                        >
-                          <Plus size={16} /> Add Font
-                        </button>
-
-                        {/* Custom Fonts First */}
-                        {customFonts.map(font => (
-                          <button
-                            key={font.id}
-                            onClick={() => {
-                              setFrameFont(font.id);
-                              if (frameStyle === 'none') setFrameStyle('text-bottom');
-                            }}
-                            className={`font-scroll-btn ${frameFont === font.id ? 'active' : ''}`}
-                            style={{
-                              flex: '0 0 auto',
-                              padding: '10px 20px',
-                              borderRadius: '12px',
-                              background: frameFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                              color: frameFont === font.id ? '#ffffff' : 'var(--text-primary)',
-                              border: '1px solid',
-                              borderColor: frameFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
-                              fontFamily: font.id,
-                              fontSize: '15px',
-                              whiteSpace: 'nowrap',
-                              cursor: 'pointer',
-                              boxShadow: frameFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
-                              transition: 'all 0.2s ease'
-                            }}
-                          >
-                            {font.label} (Custom)
-                          </button>
-                        ))}
-
-                        {/* Standard Fonts */}
-                        {FONT_OPTIONS.map(font => (
-                          <button
-                            key={font.id}
-                            onClick={() => {
-                              setFrameFont(font.id);
-                              if (frameStyle === 'none') setFrameStyle('text-bottom');
-                            }}
-                            className={`font-scroll-btn ${frameFont === font.id ? 'active' : ''}`}
-                            style={{
-                              flex: '0 0 auto',
-                              padding: '10px 20px',
-                              borderRadius: '12px',
-                              background: frameFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                              color: frameFont === font.id ? '#ffffff' : 'var(--text-primary)',
-                              border: '1px solid',
-                              borderColor: frameFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
-                              fontFamily: font.id,
-                              fontSize: '15px',
-                              whiteSpace: 'nowrap',
-                              cursor: 'pointer',
-                              boxShadow: frameFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
-                              transition: 'all 0.2s ease'
-                            }}
-                          >
-                            {font.label}
-                          </button>
-                        ))}
+                        />
                       </div>
+
+                      {/* Mode Switcher: Center / Bottom */}
+                      <div className="seg-control" style={{ marginBottom: '14px' }}>
+                        <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>Center Text</button>
+                        <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom Text</button>
+                      </div>
+
+                      {/* Center Text Input */}
+                      {textEditMode === 'center' && (
+                        <div className="fade-in">
+                          <div style={{ position: 'relative', marginBottom: '14px', opacity: textCenterEnabled ? 1 : 0.5, pointerEvents: textCenterEnabled ? 'all' : 'none' }}>
+                            <input type="text" maxLength={18} value={textCenterText} onChange={(e) => setTextCenterText(e.target.value)} placeholder="" className="text-input-premium" />
+
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Bottom Text Input */}
+                      {textEditMode === 'bottom' && (
+                        <div className="fade-in">
+                          <div style={{ position: 'relative', marginBottom: '14px', opacity: frameStyle !== 'none' ? 1 : 0.5, pointerEvents: frameStyle !== 'none' ? 'all' : 'none' }}>
+                            <input type="text" value={frameText} onChange={(e) => { setFrameText(e.target.value); if (frameStyle === 'none' && e.target.value.trim() !== '') { setFrameStyle('solid'); } }} placeholder="" className="text-input-premium" />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div style={{ marginBottom: '16px' }}>
-                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Text Layout</label>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          onClick={() => setFrameStyle('none')}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${frameStyle === 'none' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: frameStyle === 'none' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: frameStyle === 'none' ? 'var(--accent-primary)' : 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          Hidden
-                        </button>
-                        <button
-                          onClick={() => setFrameStyle('text-bottom')}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${frameStyle === 'text-bottom' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: frameStyle === 'text-bottom' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: frameStyle === 'text-bottom' ? 'var(--accent-primary)' : 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          Classic
-                        </button>
-                        <button
-                          onClick={() => setFrameStyle('scan-me')}
-                          style={{ flex: 1, padding: '10px', borderRadius: '8px', border: `1px solid ${frameStyle === 'scan-me' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: frameStyle === 'scan-me' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: frameStyle === 'scan-me' ? 'var(--accent-primary)' : 'var(--text-primary)', cursor: 'pointer' }}
-                        >
-                          Pill Box
-                        </button>
-                      </div>
-                    </div>
 
-                    {/* New: Text in Center Section */}
-                    <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
-                      <label style={{ display: 'block', fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>Center Text (Overlay)</label>
-                      <Toggle
-                        label="Draw Text in Center"
-                        enabled={textCenterEnabled}
-                        onChange={(val) => {
-                          setTextCenterEnabled(val);
-                          if (val) setLogo(null); // Clear logo if enabling center text
-                        }}
-                      />
-                      
-                      {textCenterEnabled && (
-                        <div className="fade-in" style={{ marginTop: '16px' }}>
-                          
-                          {/* 1. Content & Font */}
-                          <div className="panel-sub-section" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', marginBottom: '16px' }}>
-                            <div style={{ marginBottom: '16px' }}>
-                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Content (Max 18 chars)</label>
-                              <div style={{ position: 'relative' }}>
-                                <input 
-                                  type="text" 
-                                  maxLength={18}
-                                  value={textCenterText} 
-                                  onChange={(e) => setTextCenterText(e.target.value)}
-                                  placeholder="e.g. YOUR BRAND"
-                                  className="custom-input"
-                                  style={{ width: '100%', padding: '12px 14px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'var(--bg-elevated)', color: 'var(--text-primary)', fontSize: '15px' }}
-                                />
-                                <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                                  {textCenterText.length}/18
-                                </span>
-                              </div>
-                            </div>
+                    {/* ─── Expanded Property Panel (shows above toolbar) ─── */}
+                    {((textEditMode === 'center' && textCenterEnabled) || (textEditMode === 'bottom' && frameStyle !== 'none')) && textPopup && (
+                      <div className="text-expand-panel fade-in">
 
-                            <div style={{ marginBottom: '16px' }}>
-                              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>Font Family</label>
-                              <div 
-                                className="font-scroll-container" 
-                                style={{ 
-                                  display: 'flex', 
-                                  gap: '10px', 
-                                  overflowX: 'auto', 
-                                  padding: '4px 0 12px 0',
-                                  scrollbarWidth: 'none',
-                                  msOverflowStyle: 'none',
-                                  WebkitOverflowScrolling: 'touch'
-                                }}
-                              >
-                                  {/* Custom Font Upload Button */}
-                                  <button
-                                    onClick={() => fontInputRef.current?.click()}
-                                    className="font-scroll-btn"
-                                    style={{
-                                      flex: '0 0 auto',
-                                      padding: '10px 20px',
-                                      borderRadius: '12px',
-                                      background: 'var(--bg-hover)',
-                                      color: 'var(--accent-primary)',
-                                      border: '2px dashed var(--accent-primary)',
-                                      fontSize: '15px',
-                                      fontWeight: 600,
-                                      whiteSpace: 'nowrap',
-                                      cursor: 'pointer',
-                                      transition: 'all 0.2s ease',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '8px'
-                                    }}
-                                  >
-                                    <Plus size={16} /> Add Font
-                                  </button>
-                                  <input 
-                                    type="file" 
-                                    ref={fontInputRef} 
-                                    style={{ display: 'none' }} 
-                                    accept=".ttf,.otf,.woff,.woff2" 
-                                    onChange={handleFontUpload} 
-                                  />
-
-                                  {/* Custom Fonts First */}
-                                  {customFonts.map(font => (
-                                    <button
-                                      key={font.id}
-                                      onClick={() => setTextCenterFont(font.id)}
-                                      className={`font-scroll-btn ${textCenterFont === font.id ? 'active' : ''}`}
-                                      style={{
-                                        flex: '0 0 auto',
-                                        padding: '10px 20px',
-                                        borderRadius: '12px',
-                                        background: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                                        color: textCenterFont === font.id ? '#ffffff' : 'var(--text-primary)',
-                                        border: '1px solid',
-                                        borderColor: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
-                                        fontFamily: font.id,
-                                        fontSize: '15px',
-                                        whiteSpace: 'nowrap',
-                                        cursor: 'pointer',
-                                        boxShadow: textCenterFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
-                                        transition: 'all 0.2s ease'
-                                      }}
-                                    >
-                                      {font.label} (Custom)
-                                    </button>
-                                  ))}
-
-                                  {/* Standard Fonts */}
-                                  {FONT_OPTIONS.map(font => (
-                                    <button
-                                      key={font.id}
-                                      onClick={() => setTextCenterFont(font.id)}
-                                      className={`font-scroll-btn ${textCenterFont === font.id ? 'active' : ''}`}
-                                      style={{
-                                        flex: '0 0 auto',
-                                        padding: '10px 20px',
-                                        borderRadius: '12px',
-                                        background: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                                        color: textCenterFont === font.id ? '#ffffff' : 'var(--text-primary)',
-                                        border: '1px solid',
-                                        borderColor: textCenterFont === font.id ? 'var(--accent-primary)' : 'var(--border-color)',
-                                        fontFamily: font.id,
-                                        fontSize: '15px',
-                                        whiteSpace: 'nowrap',
-                                        cursor: 'pointer',
-                                        boxShadow: textCenterFont === font.id ? '0 4px 12px rgba(255, 59, 48, 0.3)' : 'none',
-                                        transition: 'all 0.2s ease'
-                                      }}
-                                    >
-                                      {font.label}
-                                    </button>
-                                  ))}
-                              </div>
-                            </div>
-                            
-                            <div style={{ marginBottom: '20px' }}>
-                               <label className="panel-label">Text Color & Size</label>
-                               <div className="swatch-grid-mini" style={{ marginBottom: '16px' }}>
-                                 <ColorPicker
-                                   isSwatch={true}
-                                   icon={Pipette}
-                                   value={textCenterColor}
-                                   onChange={setTextCenterColor}
-                                   onOpenAdvanced={handleOpenAdv}
-                                 />
-                                 {SWATCH_PRESETS.map(color => (
-                                   <div
-                                     key={color}
-                                     className={`swatch-item${textCenterColor === color ? ' active' : ''}`}
-                                     style={{ backgroundColor: color }}
-                                     onClick={() => setTextCenterColor(color)}
-                                   />
-                                 ))}
-                               </div>
-                               <Slider
-                                 label="Text Size"
-                                 min={0.02}
-                                 max={0.18}
-                                 step={0.01}
-                                 value={textCenterSize}
-                                 onChange={setTextCenterSize}
-                               />
+                        {textPopup === 'fonts' && (
+                          <div>
+                            <div className="text-expand-title">Font Family</div>
+                            <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
+                              <button onClick={() => fontInputRef.current?.click()} className="font-scroll-btn" style={{ flex: '0 0 auto', padding: '10px 20px', borderRadius: '12px', background: 'var(--bg-hover)', color: 'var(--accent-primary)', border: '2px dashed var(--accent-primary)', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '8px' }}><Plus size={14} /> Add Font</button>
+                              <input type="file" ref={fontInputRef} style={{ display: 'none' }} accept=".ttf,.otf,.woff,.woff2" onChange={handleFontUpload} />
+                              {customFonts.map(font => (
+                                <button key={font.id} onClick={() => { if (textEditMode === 'center') setTextCenterFont(font.id); else { setFrameFont(font.id); if (frameStyle === 'none') setFrameStyle('text-bottom'); } }} className={`font-scroll-btn ${(textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'active' : ''}`} style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--border-color)', fontFamily: font.id, fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', boxShadow: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '0 4px 12px rgba(255,59,48,0.3)' : 'none', transition: 'all 0.2s ease' }}>{font.label} ★</button>
+                              ))}
+                              {FONT_OPTIONS.map(font => (
+                                <button key={font.id} onClick={() => { if (textEditMode === 'center') setTextCenterFont(font.id); else { setFrameFont(font.id); if (frameStyle === 'none') setFrameStyle('text-bottom'); } }} className={`font-scroll-btn ${(textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'active' : ''}`} style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--border-color)', fontFamily: font.id, fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', boxShadow: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '0 4px 12px rgba(255,59,48,0.3)' : 'none', transition: 'all 0.2s ease' }}>{font.label}</button>
+                              ))}
                             </div>
                           </div>
+                        )}
 
-                          {/* 2. Stroke & Shadow (Pixel Lab Style) */}
-                          <div className="panel-sub-section" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px', marginBottom: '16px' }}>
-                             <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                               <div style={{ flex: 1 }}>
-                                  <Toggle
-                                    label="Stroke"
-                                    enabled={textCenterStrokeEnabled}
-                                    onChange={setTextCenterStrokeEnabled}
-                                  />
-                               </div>
-                               <div style={{ flex: 1 }}>
-                                  <Toggle
-                                    label="Shadow"
-                                    enabled={textCenterShadowEnabled}
-                                    onChange={setTextCenterShadowEnabled}
-                                  />
-                               </div>
-                             </div>
-
-                             {textCenterStrokeEnabled && (
-                               <div className="fade-in" style={{ padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', marginBottom: '12px' }}>
-                                  <label className="panel-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Stroke Color</label>
-                                  <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
-                                    <ColorPicker
-                                      isSwatch={true}
-                                      icon={Pipette}
-                                      value={textCenterStrokeColor}
-                                      onChange={setTextCenterStrokeColor}
-                                      onOpenAdvanced={handleOpenAdv}
-                                    />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div
-                                        key={color}
-                                        className={`swatch-item${textCenterStrokeColor === color ? ' active' : ''}`}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => setTextCenterStrokeColor(color)}
-                                      />
-                                    ))}
-                                  </div>
-                                  <Slider
-                                    label="Stroke Width"
-                                    min={1}
-                                    max={20}
-                                    value={textCenterStrokeWidth}
-                                    onChange={setTextCenterStrokeWidth}
-                                  />
-                               </div>
-                             )}
-
-                             {textCenterShadowEnabled && (
-                               <div className="fade-in" style={{ padding: '12px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
-                                  <label className="panel-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Shadow Color</label>
-                                  <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
-                                    <ColorPicker
-                                      isSwatch={true}
-                                      icon={Pipette}
-                                      iconSize={14}
-                                      value={textCenterShadowColor}
-                                      onChange={setTextCenterShadowColor}
-                                      onOpenAdvanced={handleOpenAdv}
-                                    />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div
-                                        key={color}
-                                        className={`swatch-item${textCenterShadowColor === color ? ' active' : ''}`}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => setTextCenterShadowColor(color)}
-                                      />
-                                    ))}
-                                  </div>
-                                  <Slider
-                                    label="Shadow Blur"
-                                    min={0}
-                                    max={30}
-                                    value={textCenterShadowBlur}
-                                    onChange={setTextCenterShadowBlur}
-                                  />
-                               </div>
-                             )}
+                        {textPopup === 'size' && (
+                          <div>
+                            <div className="text-expand-title">Text Size</div>
+                            <Slider label="Size" min={0.02} max={0.18} step={0.01} value={textEditMode === 'center' ? textCenterSize : frameSize} onChange={textEditMode === 'center' ? setTextCenterSize : setFrameSize} />
                           </div>
+                        )}
 
-                          {/* 3. Background Shape (Default: Disabled) */}
-                          <div className="panel-sub-section" style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '16px' }}>
-                            <Toggle
-                              label="Clear Area (Background Shape)"
-                              enabled={logoBackground}
-                              onChange={setLogoBackground}
-                            />
-                            {logoBackground && (
-                             <div className="fade-in" style={{ marginTop: '12px' }}>
-                                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                                  <button
-                                    onClick={() => setLogoBgShape('circle')}
-                                    style={{ flex: 1, padding: '8px', borderRadius: '8px', border: `1px solid ${logoBgShape === 'circle' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: logoBgShape === 'circle' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: logoBgShape === 'circle' ? 'var(--accent-primary)' : 'var(--text-primary)' }}
-                                  >Circle</button>
-                                  <button
-                                    onClick={() => setLogoBgShape('rounded')}
-                                    style={{ flex: 1, padding: '8px', borderRadius: '8px', border: `1px solid ${logoBgShape === 'rounded' ? 'var(--accent-primary)' : 'var(--border-color)'}`, background: logoBgShape === 'rounded' ? 'var(--accent-soft)' : 'var(--bg-elevated)', color: logoBgShape === 'rounded' ? 'var(--accent-primary)' : 'var(--text-primary)' }}
-                                  >Square</button>
-                                </div>
-                                <label className="panel-label" style={{ fontSize: '11px', marginBottom: '8px' }}>Shape Color</label>
-                                <div className="swatch-grid-mini">
-                                  <ColorPicker
-                                    isSwatch={true}
-                                    icon={Pipette}
-                                    value={logoBgColor}
-                                    onChange={setLogoBgColor}
-                                    onOpenAdvanced={handleOpenAdv}
-                                  />
+                        {textPopup === 'color' && (
+                          <div>
+                            <div className="text-expand-title">Text Color</div>
+                            <div className="swatch-grid-mini">
+                              <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? textCenterColor : frameColor} onChange={textEditMode === 'center' ? setTextCenterColor : setFrameColor} onOpenAdvanced={handleOpenAdv} />
+                              {SWATCH_PRESETS.map(color => (
+                                <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterColor : frameColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterColor(color) : setFrameColor(color)} />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {textPopup === 'stroke' && (
+                          <div>
+                            <div className="text-expand-title">Stroke</div>
+                            <Toggle label="Enable Stroke" enabled={textEditMode === 'center' ? textCenterStrokeEnabled : frameStrokeEnabled} onChange={textEditMode === 'center' ? setTextCenterStrokeEnabled : setFrameStrokeEnabled} />
+                            {(textEditMode === 'center' ? textCenterStrokeEnabled : frameStrokeEnabled) && (
+                              <div className="fade-in" style={{ marginTop: '14px' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Stroke Color</div>
+                                <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
+                                  <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor} onChange={textEditMode === 'center' ? setTextCenterStrokeColor : setFrameStrokeColor} onOpenAdvanced={handleOpenAdv} />
                                   {SWATCH_PRESETS.map(color => (
-                                    <div
-                                      key={color}
-                                      className={`swatch-item${logoBgColor === color ? ' active' : ''}`}
-                                      style={{ backgroundColor: color }}
-                                      onClick={() => setLogoBgColor(color)}
-                                    />
+                                    <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterStrokeColor(color) : setFrameStrokeColor(color)} />
+                                  ))}
+                                </div>
+                                <Slider label="Stroke Width" min={1} max={20} value={textEditMode === 'center' ? textCenterStrokeWidth : frameStrokeWidth} onChange={textEditMode === 'center' ? setTextCenterStrokeWidth : setFrameStrokeWidth} />
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {textPopup === 'shadow' && (
+                          <div>
+                            <div className="text-expand-title">Shadow</div>
+                            <Toggle label="Enable Shadow" enabled={textEditMode === 'center' ? textCenterShadowEnabled : frameShadowEnabled} onChange={textEditMode === 'center' ? setTextCenterShadowEnabled : setFrameShadowEnabled} />
+                            {(textEditMode === 'center' ? textCenterShadowEnabled : frameShadowEnabled) && (
+                              <div className="fade-in" style={{ marginTop: '14px' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Shadow Color</div>
+                                <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
+                                  <ColorPicker isSwatch={true} icon={Pipette} iconSize={14} value={textEditMode === 'center' ? textCenterShadowColor : frameShadowColor} onChange={textEditMode === 'center' ? setTextCenterShadowColor : setFrameShadowColor} onOpenAdvanced={handleOpenAdv} />
+                                  {SWATCH_PRESETS.map(color => (
+                                    <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterShadowColor : frameShadowColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterShadowColor(color) : setFrameShadowColor(color)} />
+                                  ))}
+                                </div>
+                                <Slider label="Shadow Blur" min={0} max={30} value={textEditMode === 'center' ? textCenterShadowBlur : frameShadowBlur} onChange={textEditMode === 'center' ? setTextCenterShadowBlur : setFrameShadowBlur} />
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {textPopup === 'bg' && (
+                          <div>
+                            <div className="text-expand-title">Background Shape</div>
+                            {textEditMode === 'center' && (
+                              <Toggle label="Enable Background" checked={logoBackground} onChange={setLogoBackground} />
+                            )}
+                            {(textEditMode === 'bottom' || logoBackground) && (
+                              <div className="fade-in" style={{ marginTop: textEditMode === 'center' ? '14px' : '0' }}>
+                                <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '14px' }}>
+                                  {TEXT_SHAPES.map(shape => {
+                                    const isActive = textEditMode === 'center' ? logoBgShape === shape.id : frameStyle === shape.id;
+                                    return (
+                                      <button 
+                                        key={shape.id} 
+                                        onClick={() => {
+                                          if (textEditMode === 'center') setLogoBgShape(shape.id);
+                                          else setFrameStyle(shape.id);
+                                        }}
+                                        className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
+                                        style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: isActive ? '0 4px 12px rgba(255,59,48,0.3)' : 'none' }}
+                                      >
+                                        {shape.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Shape Color</div>
+                                <div className="swatch-grid-mini">
+                                  <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? logoBgColor : frameColor} onChange={textEditMode === 'center' ? setLogoBgColor : setFrameColor} onOpenAdvanced={handleOpenAdv} />
+                                  {SWATCH_PRESETS.map(color => (
+                                    <div key={color} className={`swatch-item${(textEditMode === 'center' ? logoBgColor : frameColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setLogoBgColor(color) : setFrameColor(color)} />
                                   ))}
                                 </div>
                               </div>
                             )}
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+
+                      </div>
+                    )}
+
+                    {/* ─── Action Toolbar (fixed above lower nav) ─── */}
+                    {((textEditMode === 'center' && textCenterEnabled) || (textEditMode === 'bottom' && frameStyle !== 'none')) && (
+                      <div className="text-toolbar">
+                        <button className={`text-toolbar-btn ${textPopup === 'fonts' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'fonts' ? null : 'fonts')}><Type size={18} /><span>Fonts</span></button>
+                        <button className={`text-toolbar-btn ${textPopup === 'size' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'size' ? null : 'size')}><ChevronUp size={18} /><span>Size</span></button>
+                        <button className={`text-toolbar-btn ${textPopup === 'color' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'color' ? null : 'color')}><Palette size={18} /><span>Color</span></button>
+                        <button className={`text-toolbar-btn ${textPopup === 'stroke' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'stroke' ? null : 'stroke')}><Pencil size={18} /><span>Stroke</span></button>
+                        <button className={`text-toolbar-btn ${textPopup === 'shadow' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'shadow' ? null : 'shadow')}><Moon size={18} /><span>Shadow</span></button>
+                        <button className={`text-toolbar-btn ${textPopup === 'bg' ? 'active' : ''}`} onClick={() => setTextPopup(textPopup === 'bg' ? null : 'bg')}><Hexagon size={18} /><span>Shape</span></button>
+                      </div>
+                    )}
+
                   </div>
                 </div>
               )}
 
             </section>
+
           </>
         ) : activePage === 'scanner' ? (
           <QRScanner onBack={() => setActivePage('home')} navigateTo={navigateTo} />

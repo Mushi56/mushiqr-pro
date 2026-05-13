@@ -139,12 +139,16 @@ export const EYE_STYLES = {
 // Frame styles
 export const FRAME_STYLES = {
   NONE: 'none',
-  SCAN_ME: 'scan-me',
-  TEXT_BOTTOM: 'text-bottom',
-  TEXT_TOP: 'text-top',
-  BOX: 'box',
+  SOLID: 'solid',
   ROUNDED: 'rounded',
-  MODERN: 'modern',
+  PILL: 'pill',
+  OUTLINE: 'outline',
+  UNDERLINE: 'underline',
+  RIBBON: 'ribbon',
+  GLOW: 'glow',
+  BRACKETS: 'brackets',
+  HEXAGON: 'hexagon',
+  DOTS: 'dots',
 };
 
 /**
@@ -234,6 +238,14 @@ export function renderQR(canvas, options) {
     textCenterShadowEnabled = false,
     textCenterShadowBlur = 5,
     textCenterShadowColor = 'rgba(0,0,0,0.5)',
+    frameFont = 'Inter',
+    frameSize = 0.12,
+    frameStrokeEnabled = false,
+    frameStrokeWidth = 2,
+    frameStrokeColor = '#ffffff',
+    frameShadowEnabled = false,
+    frameShadowBlur = 5,
+    frameShadowColor = 'rgba(0,0,0,0.5)',
   } = options;
 
   if (!matrix || !canvas) return;
@@ -252,30 +264,18 @@ export function renderQR(canvas, options) {
   }
 
   // Define Content Area for the QR based on Frame Style
-  const padding = size * 0.03; 
+  const padding = size * 0.03;
   let contentX = 0;
   let contentY = 0;
   let contentSize = size;
 
   // Adjust content area for frames to give proper breathing space
   if (frameStyle !== FRAME_STYLES.NONE) {
-    if (frameStyle === FRAME_STYLES.SCAN_ME) {
-      const labelHeight = size * 0.16;
-      // Shrink and shift UP to give more breathing space
-      contentSize = size - (padding * 2) - labelHeight - (size * 0.12); 
-      contentX = (size - contentSize) / 2;
-      contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
-    } else if (frameStyle === FRAME_STYLES.TEXT_BOTTOM) {
-      const labelHeight = size * 0.1;
-      contentSize = size - (padding * 2) - labelHeight;
-      contentX = (size - contentSize) / 2;
-      contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
-    } else {
-      // Basic frame padding
-      contentX = padding + size * 0.08;
-      contentY = padding + size * 0.08;
-      contentSize = size - (contentX * 2);
-    }
+    const labelHeight = size * 0.14; // Unify label height
+    // Shrink and shift UP to give more breathing space
+    contentSize = size - (padding * 2) - labelHeight - (size * 0.06); 
+    contentX = (size - contentSize) / 2;
+    contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
   }
 
   // Draw frame if enabled
@@ -284,6 +284,14 @@ export function renderQR(canvas, options) {
       frameStyle,
       frameText,
       frameColor: frameColor || (gradientEnabled ? gradientColor1 : qrColor),
+      frameFont,
+      frameSize,
+      frameStrokeEnabled,
+      frameStrokeWidth,
+      frameStrokeColor,
+      frameShadowEnabled,
+      frameShadowBlur,
+      frameShadowColor,
       bgColor,
       bgTransparent
     });
@@ -881,7 +889,13 @@ function drawCenterText(ctx, text, canvasSize, options) {
  * Draw decorative frame around the QR code
  */
 function drawFrame(ctx, size, options) {
-  const { frameStyle, frameText, frameColor, bgColor, bgTransparent } = options;
+  const { 
+    frameStyle, frameText, frameColor, 
+    frameFont, frameSize, 
+    frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
+    frameShadowEnabled, frameShadowBlur, frameShadowColor,
+    bgColor, bgTransparent 
+  } = options;
   const padding = size * 0.03; // Moved closer to edge (3%) to give QR more room
   const innerSize = size - padding * 2;
   
@@ -890,93 +904,107 @@ function drawFrame(ctx, size, options) {
   ctx.strokeStyle = frameColor;
   ctx.lineWidth = size * 0.025; // Slightly thicker for premium feel
   
+  const labelHeight = size * 0.14;
+  const labelY = size - padding - labelHeight;
+  const textY = size - padding - labelHeight / 2;
+  const labelW = innerSize - size * 0.1;
+  const labelX = padding + size * 0.05;
+
+  ctx.beginPath();
   switch (frameStyle) {
-    case FRAME_STYLES.SCAN_ME: {
-      const labelHeight = size * 0.16;
-      const cornerRadius = size * 0.08;
-      
-      // Removed Main box outline for cleaner look
-      
-      // Label box at bottom - solid pill style
-      ctx.beginPath();
-      const labelPadding = size * 0.02;
-      drawRoundedRectPath(ctx, padding + labelPadding, size - padding - labelHeight + labelPadding, innerSize - labelPadding * 2, labelHeight - labelPadding * 2, cornerRadius * 0.5);
+    case FRAME_STYLES.SOLID:
+      ctx.fillRect(labelX, labelY, labelW, labelHeight);
+      break;
+    case FRAME_STYLES.ROUNDED:
+      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight * 0.2);
       ctx.fill();
-      
-      // Indicator line/pill at the very bottom of the label box
-      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
-      const indicatorW = innerSize * 0.2;
-      const indicatorH = size * 0.01;
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, (size - indicatorW) / 2, size - padding - labelHeight * 0.25, indicatorW, indicatorH, indicatorH / 2);
+      break;
+    case FRAME_STYLES.PILL:
+      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight / 2);
       ctx.fill();
-
-      // Text
-      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
-      ctx.font = `bold ${labelHeight * 0.42}px Outfit, Segoe UI, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 1.7);
       break;
-    }
-    case FRAME_STYLES.TEXT_BOTTOM: {
-      const labelHeight = size * 0.12;
-      const cornerRadius = size * 0.04;
-      
-      // Removed outer box for cleaner look
-      
-      // Solid Stamp label at bottom
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding + size * 0.05, size - padding - labelHeight, innerSize - size * 0.1, labelHeight, cornerRadius);
+    case FRAME_STYLES.OUTLINE:
+      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight * 0.2);
+      ctx.lineWidth = size * 0.01;
+      ctx.stroke();
+      break;
+    case FRAME_STYLES.UNDERLINE:
+      ctx.lineWidth = size * 0.015;
+      ctx.moveTo(labelX + labelW * 0.1, labelY + labelHeight * 0.85);
+      ctx.lineTo(labelX + labelW * 0.9, labelY + labelHeight * 0.85);
+      ctx.stroke();
+      break;
+    case FRAME_STYLES.RIBBON:
+      ctx.moveTo(labelX, labelY);
+      ctx.lineTo(labelX + labelW, labelY);
+      ctx.lineTo(labelX + labelW - labelHeight * 0.4, labelY + labelHeight / 2);
+      ctx.lineTo(labelX + labelW, labelY + labelHeight);
+      ctx.lineTo(labelX, labelY + labelHeight);
+      ctx.lineTo(labelX + labelHeight * 0.4, labelY + labelHeight / 2);
       ctx.fill();
-
-      // Text
-      ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
-      ctx.font = `bold ${labelHeight * 0.45}px Outfit, Segoe UI, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(frameText, size / 2, size - padding - labelHeight / 2);
       break;
-    }
-    case FRAME_STYLES.BOX: {
-      ctx.strokeRect(padding, padding, innerSize, innerSize);
+    case FRAME_STYLES.GLOW:
+      ctx.shadowColor = frameColor;
+      ctx.shadowBlur = size * 0.04;
+      drawRoundedRectPath(ctx, labelX + size * 0.02, labelY + size * 0.02, labelW - size * 0.04, labelHeight - size * 0.04, labelHeight * 0.2);
+      ctx.fill();
+      ctx.shadowBlur = 0; // reset
       break;
-    }
-    case FRAME_STYLES.ROUNDED: {
-      ctx.beginPath();
-      drawRoundedRectPath(ctx, padding, padding, innerSize, innerSize, size * 0.1);
-      ctx.stroke();
-      break;
-    }
-    case FRAME_STYLES.MODERN: {
-      const cornerSize = size * 0.18;
-      // TL
-      ctx.beginPath();
-      ctx.moveTo(padding, padding + cornerSize);
-      ctx.lineTo(padding, padding);
-      ctx.lineTo(padding + cornerSize, padding);
-      ctx.stroke();
-      // TR
-      ctx.beginPath();
-      ctx.moveTo(size - padding - cornerSize, padding);
-      ctx.lineTo(size - padding, padding);
-      ctx.lineTo(size - padding, padding + cornerSize);
-      ctx.stroke();
-      // BR
-      ctx.beginPath();
-      ctx.moveTo(size - padding, size - padding - cornerSize);
-      ctx.lineTo(size - padding, size - padding);
-      ctx.lineTo(size - padding - cornerSize, size - padding);
-      ctx.stroke();
-      // BL
-      ctx.beginPath();
-      ctx.moveTo(padding + cornerSize, size - padding);
-      ctx.lineTo(padding, size - padding);
-      ctx.lineTo(padding, size - padding - cornerSize);
+    case FRAME_STYLES.BRACKETS:
+      ctx.lineWidth = size * 0.015;
+      ctx.moveTo(labelX + labelW * 0.1, labelY + labelHeight * 0.15);
+      ctx.lineTo(labelX, labelY + labelHeight * 0.15);
+      ctx.lineTo(labelX, labelY + labelHeight * 0.85);
+      ctx.lineTo(labelX + labelW * 0.1, labelY + labelHeight * 0.85);
+      
+      ctx.moveTo(labelX + labelW * 0.9, labelY + labelHeight * 0.15);
+      ctx.lineTo(labelX + labelW, labelY + labelHeight * 0.15);
+      ctx.lineTo(labelX + labelW, labelY + labelHeight * 0.85);
+      ctx.lineTo(labelX + labelW * 0.9, labelY + labelHeight * 0.85);
       ctx.stroke();
       break;
-    }
+    case FRAME_STYLES.HEXAGON:
+      ctx.moveTo(labelX + labelHeight * 0.4, labelY);
+      ctx.lineTo(labelX + labelW - labelHeight * 0.4, labelY);
+      ctx.lineTo(labelX + labelW, labelY + labelHeight / 2);
+      ctx.lineTo(labelX + labelW - labelHeight * 0.4, labelY + labelHeight);
+      ctx.lineTo(labelX + labelHeight * 0.4, labelY + labelHeight);
+      ctx.lineTo(labelX, labelY + labelHeight / 2);
+      ctx.fill();
+      break;
+    case FRAME_STYLES.DOTS:
+      ctx.lineWidth = size * 0.01;
+      ctx.setLineDash([size * 0.02, size * 0.02]);
+      drawRoundedRectPath(ctx, labelX, labelY, labelW, labelHeight, labelHeight * 0.2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      break;
   }
+
+  // Text
+  ctx.fillStyle = bgTransparent ? '#ffffff' : bgColor;
+  ctx.font = `bold ${size * frameSize}px ${frameFont}, Outfit, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  if (frameShadowEnabled) { 
+    ctx.shadowColor = frameShadowColor; 
+    ctx.shadowBlur = frameShadowBlur; 
+    ctx.shadowOffsetX = 2; 
+    ctx.shadowOffsetY = 2; 
+  }
+  
+  if (frameStrokeEnabled) { 
+    ctx.strokeStyle = frameStrokeColor; 
+    ctx.lineWidth = frameStrokeWidth; 
+    ctx.strokeText(frameText, size / 2, textY); 
+  }
+  
+  ctx.fillText(frameText, size / 2, textY);
+  ctx.shadowColor = 'transparent'; 
+  ctx.shadowBlur = 0; 
+  ctx.shadowOffsetX = 0; 
+  ctx.shadowOffsetY = 0;
   
   ctx.restore();
 }
