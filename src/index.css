@@ -439,7 +439,7 @@ body {
 
 .preview-qr-wrapper:hover {
   box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), 0 0 60px var(--accent-glow);
-  transform: translateY(-10px) scale(1.02);
+  
 }
 
 .preview-qr-wrapper:hover::before {
@@ -6926,3 +6926,42 @@ video {
   max-width: 440px; /* Limits width on desktop */
 }
 
+
+/* --- Focus Mode --- */
+.unified-toolbar-card.focus-mode {
+  box-shadow: none !important;
+  background: transparent !important;
+  border: none !important;
+  padding-bottom: 0 !important;
+}
+
+.unified-toolbar-card.focus-mode .seg-control,
+.unified-toolbar-card.focus-mode .toggle-row,
+.unified-toolbar-card.focus-mode .swatch-grid-mini,
+.unified-toolbar-card.focus-mode .font-scroll-container,
+.unified-toolbar-card.focus-mode .pos-grid,
+.unified-toolbar-card.focus-mode .slider-label,
+.unified-toolbar-card.focus-mode .slider-value,
+.unified-toolbar-card.focus-mode .panel-label,
+.unified-toolbar-card.focus-mode .toolbar-properties-panel > div > div:not(.fade-in):not(.slider-group) {
+  display: none !important;
+}
+
+.unified-toolbar-card.focus-mode .slider-group {
+  margin: 0 !important;
+}
+
+.toolbar-tabs-row.focus-mode {
+  display: none !important;
+}
+
+.app.redesigned:has(.focus-mode) .app-tabs-row,
+.app.redesigned:has(.focus-mode) .tab-content-container,
+.app.redesigned:has(.focus-mode) .app-header {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.app.redesigned:has(.focus-mode) .qr-preview-card {
+  
+}

@@ -432,7 +432,10 @@ export default function App() {
   const [isDataModalOpen, setIsDataModalOpen] = useState(false);
   const [formatDropdownOpen, setFormatDropdownOpen] = useState(false);
   const downloadBtnRef = useRef(null);
-  const [logoImgError, setLogoImgError] = useState(false);
+  const [isDraggingSlider, setIsDraggingSlider] = useState(false);
+  const [isDraggingCanvas, setIsDraggingCanvas] = useState(false);
+  const dragType = useRef(null); // 'logo' or 'text'
+  const dragStartOffset = useRef({ x: 0, y: 0 });
   const [customFonts, setCustomFonts] = useState([]);
   const fontInputRef = useRef(null);
 
@@ -898,6 +901,125 @@ export default function App() {
       logo.image.onerror = () => showToast('Logo failed to load', 'error');
     }
   }, [renderCanvas, logo]);
+  const getQRContentArea = useCallback(() => {
+    const size = 512;
+    const padding = size * 0.03;
+    let contentX = 0;
+    let contentY = 0;
+    let contentSize = size;
+
+    if (frameStyle !== 'none') {
+      const labelHeight = size * 0.14;
+      contentSize = size - (padding * 2) - labelHeight - (size * 0.06); 
+      contentX = (size - contentSize) / 2;
+      contentY = padding + (size - padding * 2 - labelHeight - contentSize) / 2;
+    }
+    return { contentX, contentY, contentSize };
+  }, [frameStyle]);
+
+  // ── Canvas Interaction (Drag to Position) ──
+  const handleCanvasInteraction = useCallback((e) => {
+    if (!canvasRef.current || !qrMatrixInfo) return;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    // Convert click to canvas coordinates (0-512)
+    const scale = 512 / rect.width;
+    const x = (clientX - rect.left) * scale;
+    const y = (clientY - rect.top) * scale;
+
+    const { contentX, contentY, contentSize } = getQRContentArea();
+
+    // Helper to check if point is in rect with generous padding
+    const inRect = (px, py, rx, ry, rw, rh) => {
+      const pad = 25; // Generous hit area
+      return px >= rx - pad && px <= rx + rw + pad && py >= ry - pad && py <= ry + rh + pad;
+    };
+
+    // 1. Check Logo
+    if (logo?.image) {
+      const lw = contentSize * logoSize;
+      const lh = lw * (logo.image.height / logo.image.width);
+      const lx = contentX + (contentSize - lw) * logoPosX;
+      const ly = contentY + (contentSize - lh) * logoPosY;
+      
+      if (inRect(x, y, lx, ly, lw, lh)) {
+        setIsDraggingCanvas(true);
+        dragType.current = 'logo';
+        dragStartOffset.current = { x: x - lx, y: y - ly };
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // 2. Check Text
+    if (textCenterEnabled && textCenterText) {
+      const fontSize = contentSize * textCenterSize;
+      const tw = textCenterText.length * fontSize * 0.6;
+      const th = fontSize;
+      const tx = contentX + (contentSize - tw) * textCenterPosX;
+      const ty = contentY + (contentSize - th) * textCenterPosY;
+
+      if (inRect(x, y, tx, ty, tw, th)) {
+        setIsDraggingCanvas(true);
+        dragType.current = 'text';
+        dragStartOffset.current = { x: x - tx, y: y - ty };
+        e.preventDefault();
+        return;
+      }
+    }
+  }, [qrMatrixInfo, logo, logoSize, logoPosX, logoPosY, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, getQRContentArea]);
+
+  const handleCanvasMove = useCallback((e) => {
+    if (!isDraggingCanvas || !canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    const scale = 512 / rect.width;
+    const x = (clientX - rect.left) * scale;
+    const y = (clientY - rect.top) * scale;
+
+    const { contentX, contentY, contentSize } = getQRContentArea();
+    const newTargetX = x - dragStartOffset.current.x - contentX;
+    const newTargetY = y - dragStartOffset.current.y - contentY;
+
+    if (dragType.current === 'logo' && logo?.image) {
+      const lw = contentSize * logoSize;
+      const lh = lw * (logo.image.height / logo.image.width);
+      setLogoPosX(Math.max(0, Math.min(1, newTargetX / (contentSize - lw))));
+      setLogoPosY(Math.max(0, Math.min(1, newTargetY / (contentSize - lh))));
+    } else if (dragType.current === 'text') {
+      const fontSize = contentSize * textCenterSize;
+      const tw = textCenterText.length * fontSize * 0.6;
+      const th = fontSize;
+      setTextCenterPosX(Math.max(0, Math.min(1, newTargetX / (contentSize - tw))));
+      setTextCenterPosY(Math.max(0, Math.min(1, newTargetY / (contentSize - th))));
+    }
+  }, [isDraggingCanvas, logo, logoSize, textCenterSize, textCenterText, getQRContentArea]);
+
+  const stopCanvasDrag = useCallback(() => {
+    setIsDraggingCanvas(false);
+    dragType.current = null;
+  }, []);
+
+  useEffect(() => {
+    if (isDraggingCanvas) {
+      window.addEventListener('mousemove', handleCanvasMove);
+      window.addEventListener('mouseup', stopCanvasDrag);
+      window.addEventListener('touchmove', handleCanvasMove, { passive: false });
+      window.addEventListener('touchend', stopCanvasDrag);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleCanvasMove);
+      window.removeEventListener('mouseup', stopCanvasDrag);
+      window.removeEventListener('touchmove', handleCanvasMove);
+      window.removeEventListener('touchend', stopCanvasDrag);
+    };
+  }, [isDraggingCanvas, handleCanvasMove, stopCanvasDrag]);
 
   // ── Tab definitions ──
   const TABS = [
@@ -1161,7 +1283,17 @@ export default function App() {
                       <span className="preview-placeholder-text">Your QR code will appear here</span>
                     </div>
                   ) : (
-                    <canvas ref={canvasRef} className="preview-canvas" style={{ willChange: 'transform' }} />
+                    <canvas 
+                      ref={canvasRef} 
+                      className="preview-canvas" 
+                      onMouseDown={handleCanvasInteraction}
+                      onTouchStart={handleCanvasInteraction}
+                      style={{ 
+                        willChange: 'transform',
+                        cursor: isDraggingCanvas ? 'grabbing' : (logo?.image || textCenterEnabled ? 'move' : 'default'),
+                        touchAction: 'none'
+                      }} 
+                    />
                   )}
                 </div>
 
@@ -1368,15 +1500,15 @@ export default function App() {
             {/* ─── Shared Unified Expandable Toolbar (Centralized Bottom Layer) ─── */}
             {((activeTab === 'logo' && logo) || activeTab === 'text') && (
               <div className="logo-toolbar-container">
-                <div className="unified-toolbar-card">
+                <div className={`unified-toolbar-card ${isDraggingSlider ? 'focus-mode' : ''}`}>
                   {/* LOGO PROPERTIES */}
                   {activeTab === 'logo' && logoPopup && (
                     <div className="toolbar-properties-panel">
                       {logoPopup === 'size' && (
                         <div className="fade-in">
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                            <Slider label="Logo Size" value={logoSize} min={0.1} max={0.4} step={0.01} onChange={setLogoSize} />
-                            <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
+                            <Slider label="Logo Size" value={logoSize} min={0.1} max={0.4} step={0.01} onChange={setLogoSize} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
+                            <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                           </div>
                         </div>
                       )}
@@ -1392,7 +1524,7 @@ export default function App() {
                                   <div key={color} className={`swatch-item${logoOutlineColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoOutlineColor(color)} />
                                 ))}
                               </div>
-                              <Slider label="Stroke Width" value={logoOutlineWidth} min={1} max={10} step={1} onChange={setLogoOutlineWidth} />
+                              <Slider label="Stroke Width" value={logoOutlineWidth} min={1} max={10} step={1} onChange={setLogoOutlineWidth} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                             </div>
                           )}
                         </div>
@@ -1438,8 +1570,8 @@ export default function App() {
                                 )))}
                               </div>
                             </div>
-                            <Slider label="Horizontal" value={logoPosX} min={0} max={1} step={0.01} onChange={setLogoPosX} />
-                            <Slider label="Vertical" value={logoPosY} min={0} max={1} step={0.01} onChange={setLogoPosY} />
+                            <Slider label="Horizontal" value={logoPosX} min={0} max={1} step={0.01} onChange={setLogoPosX} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
+                            <Slider label="Vertical" value={logoPosY} min={0} max={1} step={0.01} onChange={setLogoPosY} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                           </div>
                         </div>
                       )}
@@ -1501,7 +1633,7 @@ export default function App() {
                       )}
                       {textPopup === 'size' && (
                         <div className="fade-in">
-                          <Slider label="Size" min={0.02} max={0.18} step={0.01} value={textEditMode === 'center' ? textCenterSize : frameSize} onChange={textEditMode === 'center' ? setTextCenterSize : setFrameSize} />
+                          <Slider label="Size" min={0.02} max={0.18} step={0.01} value={textEditMode === 'center' ? textCenterSize : frameSize} onChange={textEditMode === 'center' ? setTextCenterSize : setFrameSize} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                         </div>
                       )}
                       {textPopup === 'color' && (
@@ -1526,7 +1658,7 @@ export default function App() {
                                   <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterStrokeColor(color) : setFrameStrokeColor(color)} />
                                 ))}
                               </div>
-                              <Slider label="Stroke Width" min={1} max={20} value={textEditMode === 'center' ? textCenterStrokeWidth : frameStrokeWidth} onChange={textEditMode === 'center' ? setTextCenterStrokeWidth : setFrameStrokeWidth} />
+                              <Slider label="Stroke Width" min={1} max={20} value={textEditMode === 'center' ? textCenterStrokeWidth : frameStrokeWidth} onChange={textEditMode === 'center' ? setTextCenterStrokeWidth : setFrameStrokeWidth} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                             </div>
                           )}
                         </div>
@@ -1543,7 +1675,7 @@ export default function App() {
                                   <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterShadowColor : frameShadowColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterShadowColor(color) : setFrameShadowColor(color)} />
                                 ))}
                               </div>
-                              <Slider label="Shadow Blur" min={0} max={30} value={textEditMode === 'center' ? textCenterShadowBlur : frameShadowBlur} onChange={textEditMode === 'center' ? setTextCenterShadowBlur : setFrameShadowBlur} />
+                              <Slider label="Shadow Blur" min={0} max={30} value={textEditMode === 'center' ? textCenterShadowBlur : frameShadowBlur} onChange={textEditMode === 'center' ? setTextCenterShadowBlur : setFrameShadowBlur} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                             </div>
                           )}
                         </div>
@@ -1594,8 +1726,8 @@ export default function App() {
                                 )))}
                               </div>
                             </div>
-                            <Slider label="Horizontal" value={textCenterPosX} min={0} max={1} step={0.01} onChange={setTextCenterPosX} />
-                            <Slider label="Vertical" value={textCenterPosY} min={0} max={1} step={0.01} onChange={setTextCenterPosY} />
+                            <Slider label="Horizontal" value={textCenterPosX} min={0} max={1} step={0.01} onChange={setTextCenterPosX} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
+                            <Slider label="Vertical" value={textCenterPosY} min={0} max={1} step={0.01} onChange={setTextCenterPosY} onStart={() => setIsDraggingSlider(true)} onEnd={() => setIsDraggingSlider(false)} />
                           </div>
                         </div>
                       )}
@@ -1603,7 +1735,7 @@ export default function App() {
                   )}
 
                   {/* BOTTOM TABS ROW (Context-aware) */}
-                  <div className="toolbar-tabs-row">
+                  <div className={`toolbar-tabs-row ${isDraggingSlider ? 'focus-mode' : ''}`}>
                     {activeTab === 'logo' && (
                       <>
                         <button className={`text-toolbar-btn ${logoPopup === 'size' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'size' ? null : 'size')}><ChevronUp size={18} /><span>Size</span></button>
