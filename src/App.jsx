@@ -1407,10 +1407,10 @@ export default function App() {
                   )}
 
                   {/* 3. Action Toolbar (Responsive Container) */}
-                  {activeTab === 'logo' && (
+                  {logo && (
                     <div className="logo-toolbar-container">
                       <div className="logo-toolbar-wrapper">
-                        <div className="text-toolbar" style={{ margin: '0', opacity: logo ? 1 : 0.6, pointerEvents: logo ? 'all' : 'none' }}>
+                        <div className="text-toolbar" style={{ margin: '0' }}>
                           <button className={`text-toolbar-btn ${logoPopup === 'size' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'size' ? null : 'size')}><ChevronUp size={18} /><span>Size</span></button>
                           <button className={`text-toolbar-btn ${logoPopup === 'stroke' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'stroke' ? null : 'stroke')}><Pencil size={18} /><span>Stroke</span></button>
                           <button className={`text-toolbar-btn ${logoPopup === 'bg' ? 'active' : ''}`} onClick={() => setLogoPopup(logoPopup === 'bg' ? null : 'bg')}><Hexagon size={18} /><span>Background</span></button>
@@ -1594,7 +1594,7 @@ export default function App() {
                   )}
 
                   {/* ─── Action Toolbar (Responsive Container) ─── */}
-                  {activeTab === 'text' && (
+                  {(textCenterEnabled || (frameStyle !== 'none' && frameStyle !== 'simple-border' && frameStyle !== 'rounded-border')) && (
                     <div className="logo-toolbar-container">
                       <div className="logo-toolbar-wrapper">
                         <div className="text-toolbar" style={{ margin: '0' }}>
