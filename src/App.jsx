@@ -1957,7 +1957,6 @@ export default function App() {
               <span className="bottom-nav-icon">
                 <tab.icon size={24} strokeWidth={2} />
               </span>
-              <span className="bottom-nav-label-desktop">{tab.label}</span>
             </button>
           ))}
         </nav>
