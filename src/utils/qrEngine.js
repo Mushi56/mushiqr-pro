@@ -210,12 +210,14 @@ export function renderQR(canvas, options) {
     eyeStyle = EYE_STYLES.SQUARE,
     eyeColor = '',
     eyeOuterColor = '',
+    syncEyes = true,
     gradientEnabled = false,
     gradientColor1 = '#000000',
     gradientColor2 = '#0066ff',
     gradientType = 'linear',
     logo = null,
-    logoSize = 0.25,
+    logoWidth = 0.18,
+    logoHeight = 0.18,
     logoPadding = 10,
     logoBackground = false,
     logoBgColor = '#ffffff',
@@ -250,6 +252,22 @@ export function renderQR(canvas, options) {
     frameShadowEnabled = false,
     frameShadowBlur = 5,
     frameShadowColor = 'rgba(0,0,0,0.5)',
+    logoOpacity = 1,
+    logoRotation = 0,
+    logoShadowEnabled = false,
+    logoShadowColor = 'rgba(0,0,0,0.5)',
+    logoShadowBlur = 10,
+    logoShadowOffsetX = 0,
+    logoShadowOffsetY = 4,
+    logoInnerShadowEnabled = false,
+    logoEraseColorEnabled = false,
+    logoEraseColor = '#ffffff',
+    logoTexture = 'none',
+    logoCrop = 'none',
+    textCenterRotation = 0,
+    qrTextureEnabled = false,
+    qrTexture = null,
+    qrTextureSyncEyes = true
   } = options;
 
   if (!matrix || !canvas) return;
@@ -308,11 +326,11 @@ export function renderQR(canvas, options) {
   let fillStyle;
   if (gradientEnabled) {
     if (gradientType === 'linear') {
-      fillStyle = ctx.createLinearGradient(contentX, contentY, contentX + contentSize, contentY + contentSize);
+      fillStyle = ctx.createLinearGradient(0, 0, size, size);
     } else {
       fillStyle = ctx.createRadialGradient(
-        contentX + contentSize / 2, contentY + contentSize / 2, 0, 
-        contentX + contentSize / 2, contentY + contentSize / 2, contentSize / 2
+        size / 2, size / 2, 0, 
+        size / 2, size / 2, size / 2
       );
     }
     fillStyle.addColorStop(0, gradientColor1);
@@ -321,44 +339,78 @@ export function renderQR(canvas, options) {
     fillStyle = qrColor;
   }
 
-  // Draw QR modules
-    for (let row = 0; row < moduleCount; row++) {
-      for (let col = 0; col < moduleCount; col++) {
-        const isFinder = isFinderPattern(row, col, moduleCount);
-        const x = contentX + (col + quietZone) * cellSize;
-        const y = contentY + (row + quietZone) * cellSize;
+  // --- TEXTURE HANDLING PREP ---
+  let silhouetteCanvas, silhouetteCtx;
+  if (qrTextureEnabled && qrTexture?.image) {
+    silhouetteCanvas = document.createElement('canvas');
+    silhouetteCanvas.width = size;
+    silhouetteCanvas.height = size;
+    silhouetteCtx = silhouetteCanvas.getContext('2d');
+  }
 
-        if (isFinder) {
-          const finderInfo = getFinderPatternInfo(row, col, moduleCount);
-          const relRow = row - (finderInfo.centerRow - 3);
-          const relCol = col - (finderInfo.centerCol - 3);
-          
-          // Only draw the entire eye once from the top-left cell (0,0 relative)
-          if (relRow === 0 && relCol === 0) {
-            const useEyeColor = eyeColor || (gradientEnabled ? gradientColor1 : qrColor);
-            const useEyeOuterColor = eyeOuterColor || useEyeColor;
-            drawEye(ctx, x, y, cellSize * 7, eyeStyle, useEyeOuterColor, useEyeColor);
-          }
-          continue;
-        }
+  // 1. Draw Eyes (Finder Patterns)
+  const eyePositions = [
+    { r: 0, c: 0 }, // Top-left
+    { r: 0, c: moduleCount - 7 }, // Top-right
+    { r: moduleCount - 7, c: 0 } // Bottom-left
+  ];
+  
+  eyePositions.forEach(pos => {
+    const x = contentX + (pos.c + quietZone) * cellSize;
+    const y = contentY + (pos.r + quietZone) * cellSize;
+    
+    const useEyeColor = syncEyes ? fillStyle : (eyeColor || qrColor);
+    const useEyeOuterColor = syncEyes ? fillStyle : (eyeOuterColor || useEyeColor);
+    
+    // If texture enabled and syncing eyes, draw eye on silhouette
+    if (qrTextureEnabled && qrTexture?.image && qrTextureSyncEyes) {
+      drawEye(silhouetteCtx, x, y, cellSize * 7, eyeStyle, '#000', '#000');
+    } else {
+      drawEye(ctx, x, y, cellSize * 7, eyeStyle, useEyeOuterColor, useEyeColor);
+    }
+  });
+  
+  // 2. Draw QR modules
+  for (let row = 0; row < moduleCount; row++) {
+    for (let col = 0; col < moduleCount; col++) {
+      if (isFinderPattern(row, col, moduleCount)) continue;
+      if (!matrix[row][col]) continue;
 
-        if (!matrix[row][col]) continue;
+      const x = contentX + (col + quietZone) * cellSize;
+      const y = contentY + (row + quietZone) * cellSize;
 
-        const neighbors = {
-          top: row > 0 && matrix[row-1][col] && !isFinderPattern(row-1, col, moduleCount),
-          bottom: row < moduleCount - 1 && matrix[row+1][col] && !isFinderPattern(row+1, col, moduleCount),
-          left: col > 0 && matrix[row][col-1] && !isFinderPattern(row, col-1, moduleCount),
-          right: col < moduleCount - 1 && matrix[row][col+1] && !isFinderPattern(row, col+1, moduleCount)
-        };
+      const neighbors = {
+        top: row > 0 && matrix[row-1][col] && !isFinderPattern(row-1, col, moduleCount),
+        bottom: row < moduleCount - 1 && matrix[row+1][col] && !isFinderPattern(row+1, col, moduleCount),
+        left: col > 0 && matrix[row][col-1] && !isFinderPattern(row, col-1, moduleCount),
+        right: col < moduleCount - 1 && matrix[row][col+1] && !isFinderPattern(row, col+1, moduleCount)
+      };
+
+      if (qrTextureEnabled && qrTexture?.image) {
+        silhouetteCtx.fillStyle = '#000';
+        drawDotModule(silhouetteCtx, x, y, cellSize, dotStyle, neighbors, options);
+      } else {
         ctx.fillStyle = fillStyle;
         drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, options);
       }
     }
+  }
+
+  // --- APPLY TEXTURE ---
+  if (qrTextureEnabled && qrTexture?.image) {
+    ctx.save();
+    silhouetteCtx.globalCompositeOperation = 'source-in';
+    silhouetteCtx.drawImage(qrTexture.image, contentX, contentY, contentSize, contentSize);
+    ctx.drawImage(silhouetteCanvas, 0, 0);
+    ctx.restore();
+  }
 
   // Draw logo or Text
   if (logo) {
     drawLogo(ctx, logo, size, {
-      logoSize,
+      ...options,
+      logoWidth,
+      logoHeight,
       logoPadding,
       logoBackground,
       logoBgColor,
@@ -369,6 +421,18 @@ export function renderQR(canvas, options) {
       logoOutlineOpacity,
       logoPosX,
       logoPosY,
+      logoOpacity,
+      logoRotation,
+      logoShadowEnabled,
+      logoShadowColor,
+      logoShadowBlur,
+      logoShadowOffsetX,
+      logoShadowOffsetY,
+      logoInnerShadowEnabled,
+      logoEraseColorEnabled,
+      logoEraseColor,
+      logoTexture,
+      logoCrop,
       contentX,
       contentY,
       contentSize,
@@ -388,6 +452,7 @@ export function renderQR(canvas, options) {
       textCenterShadowColor,
       textCenterPosX,
       textCenterPosY,
+      textCenterRotation,
       logoPadding,
       logoBackground,
       logoBgColor,
@@ -396,7 +461,8 @@ export function renderQR(canvas, options) {
       contentY,
       contentSize,
       moduleCount,
-      quietZone
+      quietZone,
+      showHandle: options.showHandle
     });
   }
 
@@ -538,12 +604,11 @@ function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = {}) {
  */
 function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
   const s = size / 28; // Scale factor from 28x28 coordinate space
+
+  // 1. Draw Outer Ring Path
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(s, s);
-  
-  // 1. Draw Outer Ring (using even-odd fill for the hole)
-  ctx.fillStyle = outerColor;
   ctx.beginPath();
   switch (style) {
     case EYE_STYLES.CIRCLE:
@@ -556,75 +621,56 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       drawRoundedRectPath(ctx, 4, 4, 20, 20, 4);
       break;
     case EYE_STYLES.LEAF:
-      // Outer
       ctx.moveTo(0, 0); ctx.lineTo(20, 0); ctx.quadraticCurveTo(28, 0, 28, 8); ctx.lineTo(28, 28); ctx.lineTo(8, 28); ctx.quadraticCurveTo(0, 28, 0, 20); ctx.closePath();
-      // Inner Hole
       ctx.moveTo(4, 4); ctx.lineTo(20, 4); ctx.quadraticCurveTo(24, 4, 24, 8); ctx.lineTo(24, 24); ctx.lineTo(8, 24); ctx.quadraticCurveTo(4, 24, 4, 20); ctx.closePath();
       break;
     case EYE_STYLES.FLOWER:
-      // Outer Flower (more solid for scanning)
       for (let i = 0; i < 24; i++) {
         const a = i * Math.PI / 12;
         const r = i % 2 === 0 ? 14 : 12.5;
         ctx.lineTo(14 + r * Math.cos(a), 14 + r * Math.sin(a));
       }
       ctx.closePath();
-      // Hole
       ctx.moveTo(14 + 10, 14);
       ctx.arc(14, 14, 9, 0, Math.PI * 2, true);
       break;
     case EYE_STYLES.SHIELD:
-      // Outer
       ctx.moveTo(0, 2); ctx.lineTo(28, 2); ctx.lineTo(28, 14); ctx.quadraticCurveTo(28, 24, 14, 28); ctx.quadraticCurveTo(0, 24, 0, 14); ctx.closePath();
-      // Hole
       ctx.moveTo(4, 6); ctx.lineTo(24, 6); ctx.lineTo(24, 14); ctx.quadraticCurveTo(24, 20, 14, 24); ctx.quadraticCurveTo(4, 20, 4, 14); ctx.closePath();
       break;
     case EYE_STYLES.OCTAGON:
-      // Outer
       ctx.moveTo(9, 0); ctx.lineTo(19, 0); ctx.lineTo(28, 9); ctx.lineTo(28, 19); ctx.lineTo(19, 28); ctx.lineTo(9, 28); ctx.lineTo(0, 19); ctx.lineTo(0, 9); ctx.closePath();
-      // Hole
       ctx.moveTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24); ctx.lineTo(4, 18); ctx.lineTo(4, 10); ctx.closePath();
       break;
     case EYE_STYLES.HEXAGON:
-      // Scan-safe: Rounded-square outer, standard hole, hexagonal inner dot
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 6);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 3);
-      break;
     case EYE_STYLES.STAR:
-      // Scan-safe: Rounded-square outer, standard hole, star inner dot
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 4);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 2);
+    case EYE_STYLES.TRIANGLE:
+    case EYE_STYLES.ROUNDED:
+      const r_outer = style === EYE_STYLES.TRIANGLE ? 12 : (style === EYE_STYLES.HEXAGON ? 6 : (style === EYE_STYLES.STAR ? 4 : 8));
+      const r_inner = style === EYE_STYLES.TRIANGLE ? 8 : (style === EYE_STYLES.HEXAGON ? 3 : (style === EYE_STYLES.STAR ? 2 : 4));
+      drawRoundedRectPath(ctx, 0, 0, 28, 28, r_outer);
+      drawRoundedRectPath(ctx, 4, 4, 20, 20, r_inner);
       break;
     case EYE_STYLES.HEART:
-      // "Spotlight" — Sharp square outer + circle hole (unique combo)
       ctx.rect(0, 0, 28, 28);
       ctx.moveTo(24, 14);
       ctx.arc(14, 14, 10, 0, Math.PI * 2, true);
       break;
-    case EYE_STYLES.TRIANGLE:
-      // "Pillow" — Super-rounded outer (almost circle, softer than ROUNDED)
-      drawRoundedRectPath(ctx, 0, 0, 28, 28, 12);
-      drawRoundedRectPath(ctx, 4, 4, 20, 20, 8);
-      break;
     case EYE_STYLES.GEOMETRIC:
-      // Original working cross-shaped cutout
       ctx.rect(0, 0, 28, 28);
       ctx.moveTo(4, 10); ctx.lineTo(10, 10); ctx.lineTo(10, 4); ctx.lineTo(18, 4); ctx.lineTo(18, 10);
       ctx.lineTo(24, 10); ctx.lineTo(24, 18); ctx.lineTo(18, 18); ctx.lineTo(18, 24); ctx.lineTo(10, 24);
       ctx.lineTo(10, 18); ctx.lineTo(4, 18); ctx.closePath();
       break;
     case EYE_STYLES.MODERN:
-      // Scan-safe: Square outer with rounded inner gap, double-ring aesthetic via inner dot
       ctx.rect(0, 0, 28, 28);
       drawRoundedRectPath(ctx, 4, 4, 20, 20, 3);
       break;
     case EYE_STYLES.DIAMOND:
-      // Scan-safe: Solid square outer, diamond-shaped hole, diamond inner
       drawRoundedRectPath(ctx, 0, 0, 28, 28, 2);
       ctx.moveTo(14, 5); ctx.lineTo(23, 14); ctx.lineTo(14, 23); ctx.lineTo(5, 14); ctx.closePath();
       break;
     case EYE_STYLES.LCD:
-      // "Notch" — Semi-rounded outer + sharp square hole
       drawRoundedRectPath(ctx, 0, 0, 28, 28, 5);
       ctx.rect(4, 4, 20, 20);
       break;
@@ -633,10 +679,14 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       ctx.rect(4, 4, 20, 20);
       break;
   }
+  ctx.restore();
+  ctx.fillStyle = outerColor;
   ctx.fill('evenodd');
 
-  // 2. Draw Inner Dot
-  ctx.fillStyle = innerColor;
+  // 2. Draw Inner Dot Path
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(s, s);
   ctx.beginPath();
   switch (style) {
     case EYE_STYLES.CIRCLE:
@@ -648,7 +698,6 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       ctx.arc(14, 14, 6, 0, Math.PI * 2);
       break;
     case EYE_STYLES.HEXAGON: {
-      // Hexagonal inner dot
       const hr = 6;
       ctx.moveTo(14 + hr, 14);
       for (let i = 1; i <= 6; i++) {
@@ -662,20 +711,16 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       ctx.moveTo(14, 8); ctx.lineTo(20, 14); ctx.lineTo(14, 20); ctx.lineTo(8, 14); ctx.closePath();
       break;
     case EYE_STYLES.TRIANGLE:
-      // Pillow: super-rounded inner dot
       drawRoundedRectPath(ctx, 8, 8, 12, 12, 5);
       break;
     case EYE_STYLES.GEOMETRIC:
-      // Plus-shaped inner dot (original working)
       ctx.rect(12, 8, 4, 12);
       ctx.rect(8, 12, 12, 4);
       break;
     case EYE_STYLES.LCD:
-      // Notch: sharp square inner dot
       ctx.rect(8, 8, 12, 12);
       break;
     case EYE_STYLES.MODERN:
-      // Double ring inner: outer ring + center dot
       drawRoundedRectPath(ctx, 7, 7, 14, 14, 2);
       break;
     case EYE_STYLES.ROUNDED:
@@ -686,9 +731,9 @@ function drawEye(ctx, x, y, size, style, outerColor, innerColor) {
       ctx.rect(8, 8, 12, 12);
       break;
   }
-  ctx.fill();
-  
   ctx.restore();
+  ctx.fillStyle = innerColor;
+  ctx.fill();
 }
 
 /**
@@ -715,7 +760,8 @@ function drawRoundedRect(ctx, x, y, w, h, r) {
  */
 function drawLogo(ctx, logoImg, canvasSize, options) {
   const {
-    logoSize,
+    logoWidth,
+    logoHeight,
     logoPadding,
     logoBackground,
     logoBgColor,
@@ -723,18 +769,29 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
     logoOutline,
     logoOutlineColor,
     logoOutlineWidth,
-    logoOutlineOpacity,
+    logoOpacity = 1,
+    logoRotation = 0,
+    logoShadowEnabled = false,
+    logoShadowColor = 'rgba(0,0,0,0.5)',
+    logoShadowBlur = 10,
+    logoShadowOffsetX = 0,
+    logoShadowOffsetY = 4,
+    logoInnerShadowEnabled = false,
+    logoEraseColorEnabled = false,
+    logoEraseColor = '#ffffff',
+    logoTexture = 'none',
     logoPosX = 0.5,
     logoPosY = 0.5,
     contentX = 0,
     contentY = 0,
     contentSize = canvasSize,
     moduleCount = 21,
-    quietZone = 2
+    quietZone = 2,
+    showHandle = false
   } = options;
 
-  const logoW = contentSize * logoSize;
-  const logoH = logoW * (logoImg.height / logoImg.width);
+  const logoW = Math.max(1, contentSize * (logoWidth || 0.18));
+  const logoH = Math.max(1, contentSize * (logoHeight || 0.18));
   const rawX = contentX + (contentSize - logoW) * logoPosX;
   const rawY = contentY + (contentSize - logoH) * logoPosY;
   
@@ -748,28 +805,201 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
   const paddedX = logoX - logoPadding;
   const paddedY = logoY - logoPadding;
 
+  const centerX = logoX + logoW / 2;
+  const centerY = logoY + logoH / 2;
+
   ctx.save();
 
-  // Draw outline (smart shape-following)
-  if (logoOutline && logoOutlineWidth > 0) {
-    ctx.globalAlpha = logoOutlineOpacity;
-    drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, {
-      outlineColor: logoOutlineColor,
-      outlineWidth: logoOutlineWidth,
-      logoBgShape,
-      logoPadding,
-    });
-    ctx.globalAlpha = 1;
+  try {
+    // 1. Setup Rotation at Center of Logo
+    ctx.translate(centerX, centerY);
+    ctx.rotate((logoRotation * Math.PI) / 180);
+    ctx.translate(-centerX, -centerY);
+
+    // 2. Apply Shadow (if enabled)
+    if (logoShadowEnabled) {
+      ctx.shadowColor = logoShadowColor;
+      ctx.shadowBlur = logoShadowBlur;
+      ctx.shadowOffsetX = logoShadowOffsetX;
+      ctx.shadowOffsetY = logoShadowOffsetY;
+    }
+
+    // 3. Draw Background
+    if (logoBackground) {
+      drawBackgroundShape(ctx, logoBgShape, paddedX, paddedY, paddedW, paddedH, logoBgColor, contentSize * 0.005);
+    }
+
+    // 4. Draw Outline
+    if (logoOutline && logoOutlineWidth > 0) {
+      ctx.globalAlpha = logoOutlineOpacity;
+      drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, {
+        outlineColor: logoOutlineColor,
+        outlineWidth: logoOutlineWidth,
+        logoBgShape,
+        logoPadding,
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    // 5. Final Processing of Logo Image (Opacity, Erase Color, Texture)
+    ctx.globalAlpha = logoOpacity;
+    
+    // Process image if color erase, texture, or CROP is needed
+    if (logoEraseColorEnabled || logoTexture !== 'none' || logoCrop !== 'none') {
+      const procCanvas = document.createElement('canvas');
+      procCanvas.width = Math.max(1, logoW);
+      procCanvas.height = Math.max(1, logoH);
+      const pctx = procCanvas.getContext('2d');
+      
+      // Apply Crop Mask BEFORE drawing the image if it's a mask
+      if (logoCrop !== 'none') {
+        pctx.beginPath();
+        if (logoCrop === 'circle') {
+          pctx.arc(logoW/2, logoH/2, Math.min(logoW, logoH)/2, 0, Math.PI * 2);
+        } else if (logoCrop === 'rounded') {
+          const r = Math.min(logoW, logoH) * 0.2;
+          // Compatible rounded rect
+          pctx.moveTo(r, 0);
+          pctx.lineTo(logoW - r, 0);
+          pctx.quadraticCurveTo(logoW, 0, logoW, r);
+          pctx.lineTo(logoW, logoH - r);
+          pctx.quadraticCurveTo(logoW, logoH, logoW - r, logoH);
+          pctx.lineTo(r, logoH);
+          pctx.quadraticCurveTo(0, logoH, 0, logoH - r);
+          pctx.lineTo(0, r);
+          pctx.quadraticCurveTo(0, 0, r, 0);
+          pctx.closePath();
+        } else {
+          pctx.rect(0, 0, logoW, logoH);
+        }
+        pctx.clip();
+      }
+
+      pctx.drawImage(logoImg, 0, 0, logoW, logoH);
+
+      // Erase Color Filter
+      if (logoEraseColorEnabled && logoEraseColor) {
+        const imgData = pctx.getImageData(0, 0, Math.max(1, logoW), Math.max(1, logoH));
+        const data = imgData.data;
+        const target = hexToRgb(logoEraseColor);
+        const tolerance = 50; // Color distance tolerance
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i+1], b = data[i+2];
+          const dist = Math.sqrt((r-target.r)**2 + (g-target.g)**2 + (b-target.b)**2);
+          if (dist < tolerance) data[i+3] = 0;
+        }
+        pctx.putImageData(imgData, 0, 0);
+      }
+
+      // Apply Texture Overlay
+      if (logoTexture !== 'none') {
+        pctx.globalCompositeOperation = 'source-atop';
+        pctx.fillStyle = getTexturePattern(logoTexture, pctx, logoW, logoH);
+        pctx.globalAlpha = 0.4;
+        pctx.fillRect(0, 0, logoW, logoH);
+        pctx.globalAlpha = 1;
+      }
+
+      ctx.drawImage(procCanvas, logoX, logoY, logoW, logoH);
+    } else {
+      ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
+    }
+
+    // 6. Draw Inner Shadow (on top of the logo)
+    if (logoInnerShadowEnabled) {
+      const isCanvas = document.createElement('canvas');
+      isCanvas.width = Math.max(1, logoW);
+      isCanvas.height = Math.max(1, logoH);
+      const isCtx = isCanvas.getContext('2d');
+      
+      isCtx.drawImage(logoImg, 0, 0, logoW, logoH);
+      isCtx.globalCompositeOperation = 'source-out';
+      isCtx.shadowColor = logoShadowColor; 
+      isCtx.shadowBlur = 10;
+      isCtx.shadowOffsetX = 2;
+      isCtx.shadowOffsetY = 2;
+      isCtx.fillRect(0, 0, logoW, logoH);
+      
+      isCtx.globalCompositeOperation = 'destination-in';
+      isCtx.drawImage(logoImg, 0, 0, logoW, logoH);
+      
+      ctx.drawImage(isCanvas, logoX, logoY, logoW, logoH);
+    }
+  } catch (err) {
+    console.error("Logo Render Error:", err);
+    // Fallback: Just draw the basic logo
+    ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
   }
 
-  // Draw background behind logo
-  if (logoBackground) {
-    drawBackgroundShape(ctx, logoBgShape, paddedX, paddedY, paddedW, paddedH, logoBgColor, contentSize * 0.005);
-  }
-
-  // Draw the logo image preserving transparency
-  ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
   ctx.restore();
+
+  // Draw Resize Handles (5-point system) if requested
+  if (options.showHandle) {
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate((logoRotation * Math.PI) / 180);
+    ctx.translate(-centerX, -centerY);
+
+    ctx.strokeStyle = '#007AFF'; 
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(logoX, logoY, logoW, logoH);
+    ctx.setLineDash([]);
+    
+    const hSize = 10;
+    const bigHSize = 16;
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#007AFF';
+    ctx.lineWidth = 1.5;
+
+    const drawH = (hx, hy, size = hSize, isCircle = false) => {
+        ctx.beginPath();
+        if (isCircle) {
+            ctx.arc(hx, hy, size/2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            ctx.fillRect(hx - size/2, hy - size/2, size, size);
+            ctx.strokeRect(hx - size/2, hy - size/2, size, size);
+        }
+    };
+
+    // 1. Top-Left (Rotate)
+    ctx.fillStyle = 'var(--accent-primary, #FF3B30)';
+    drawH(logoX, logoY, 12, true); 
+    // Small rotate symbol
+    ctx.strokeStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(logoX, logoY, 4, 0, Math.PI * 1.5);
+    ctx.stroke();
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#007AFF';
+
+    // 2. Right (Stretch X)
+    drawH(logoX + logoW, logoY + logoH/2); 
+
+    // 3. Bottom (Stretch Y)
+    drawH(logoX + logoW/2, logoY + logoH); 
+
+    // 4. Bottom-Right (Resize Proportional - Big Circle)
+    drawH(logoX + logoW, logoY + logoH, bigHSize, true);
+
+    // 5. Top-Right (Delete Button - Red Circle with X)
+    ctx.fillStyle = '#FF3B30';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    drawH(logoX + logoW, logoY, 22, true);
+    // Draw X
+    ctx.beginPath();
+    ctx.moveTo(logoX + logoW - 6, logoY - 6);
+    ctx.lineTo(logoX + logoW + 6, logoY + 6);
+    ctx.moveTo(logoX + logoW + 6, logoY - 6);
+    ctx.lineTo(logoX + logoW - 6, logoY + 6);
+    ctx.stroke();
+
+    ctx.restore();
+  }
 }
 
 /**
@@ -817,9 +1047,10 @@ function drawCenterText(ctx, text, canvasSize, options) {
     textCenterStrokeWidth = 2,
     textCenterStrokeColor = '#ffffff',
     textCenterShadowEnabled = false,
-    textCenterShadowBlur = 5,
+    textCenterShadowColor = 'rgba(0,0,0,0.5)',
     textCenterPosX = 0.5,
     textCenterPosY = 0.5,
+    textCenterRotation = 0,
     logoPadding,
     logoBackground,
     logoBgColor,
@@ -854,6 +1085,11 @@ function drawCenterText(ctx, text, canvasSize, options) {
   const paddedX = logoX;
   const paddedY = logoY;
 
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  ctx.rotate((textCenterRotation * Math.PI) / 180);
+  ctx.translate(-centerX, -centerY);
+
   // 1. Clear area if background is enabled
   if (logoBackground) {
     drawBackgroundShape(ctx, logoBgShape, paddedX, paddedY, paddedW, paddedH, logoBgColor, contentSize * 0.005);
@@ -886,6 +1122,61 @@ function drawCenterText(ctx, text, canvasSize, options) {
   ctx.fillStyle = textCenterColor || '#000000';
   ctx.fillText(text, centerX, centerY);
   ctx.restore();
+  ctx.restore();
+
+  // Draw Transformation Frame (5-point system) if requested
+  if (options.showHandle) {
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate((textCenterRotation * Math.PI) / 180);
+    ctx.translate(-centerX, -centerY);
+
+    ctx.strokeStyle = '#007AFF'; 
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(logoX, logoY, paddedW, paddedH);
+    ctx.setLineDash([]);
+    
+    const hSize = 10;
+    const bigHSize = 16;
+    
+    const drawH = (hx, hy, size = hSize, isCircle = false, color = '#ffffff', stroke = '#007AFF') => {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.strokeStyle = stroke;
+        if (isCircle) {
+            ctx.arc(hx, hy, size/2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            ctx.fillRect(hx - size/2, hy - size/2, size, size);
+            ctx.strokeRect(hx - size/2, hy - size/2, size, size);
+        }
+    };
+
+    // 1. Top-Left (Rotate)
+    drawH(logoX, logoY, 12, true, '#FF3B30', '#ffffff'); 
+    ctx.strokeStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(logoX, logoY, 4, 0, Math.PI * 1.5);
+    ctx.stroke();
+
+    // 2. Bottom-Right (Resize Proportional - Big Circle)
+    drawH(logoX + paddedW, logoY + paddedH, bigHSize, true);
+
+    // 3. Top-Right (Delete Button)
+    drawH(logoX + paddedW, logoY, 22, true, '#FF3B30', '#ffffff');
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(logoX + paddedW - 6, logoY - 6);
+    ctx.lineTo(logoX + paddedW + 6, logoY + 6);
+    ctx.moveTo(logoX + paddedW + 6, logoY - 6);
+    ctx.lineTo(logoX + paddedW - 6, logoY + 6);
+    ctx.stroke();
+
+    ctx.restore();
+  }
 }
 
 /**
@@ -1124,4 +1415,66 @@ function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, module
   resY = Math.max(minY, Math.min(maxY, resY));
 
   return { x: resX, y: resY };
+}
+
+/**
+ * Helper to convert hex to rgb
+ */
+function hexToRgb(hex) {
+  if (!hex || typeof hex !== 'string') return { r: 255, g: 255, b: 255 };
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 255, g: 255, b: 255 };
+}
+
+/**
+ * Helper to create texture patterns
+ */
+function getTexturePattern(type, ctx, w, h) {
+  const tCanvas = document.createElement('canvas');
+  const tCtx = tCanvas.getContext('2d');
+  tCanvas.width = 16;
+  tCanvas.height = 16;
+
+  switch (type) {
+    case 'glass':
+      tCtx.fillStyle = 'rgba(255,255,255,0.2)';
+      tCtx.fillRect(0, 0, 16, 16);
+      tCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+      tCtx.strokeRect(0, 0, 16, 16);
+      break;
+    case 'carbon':
+      tCtx.fillStyle = '#111';
+      tCtx.fillRect(0, 0, 16, 16);
+      tCtx.fillStyle = '#222';
+      tCtx.fillRect(0, 0, 8, 8);
+      tCtx.fillRect(8, 8, 8, 8);
+      break;
+    case 'metal':
+      const grad = tCtx.createLinearGradient(0, 0, 16, 16);
+      grad.addColorStop(0, '#888');
+      grad.addColorStop(0.5, '#fff');
+      grad.addColorStop(1, '#888');
+      tCtx.fillStyle = grad;
+      tCtx.fillRect(0, 0, 16, 16);
+      break;
+    case 'mesh':
+      tCtx.strokeStyle = '#555';
+      tCtx.beginPath();
+      tCtx.moveTo(0, 0); tCtx.lineTo(16, 16);
+      tCtx.moveTo(16, 0); tCtx.lineTo(0, 16);
+      tCtx.stroke();
+      break;
+    case 'dots':
+      tCtx.fillStyle = '#555';
+      tCtx.beginPath();
+      tCtx.arc(8, 8, 2, 0, Math.PI * 2);
+      tCtx.fill();
+      break;
+  }
+
+  return ctx.createPattern(tCanvas, 'repeat');
 }

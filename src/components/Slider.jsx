@@ -3,7 +3,10 @@ export default function Slider({ label, value, onChange, onStart, onEnd, min = 0
     <div className="slider-group">
       <div className="slider-header">
         <span className="slider-label">{label}</span>
-        <span className="slider-value">{value}{unit}</span>
+        <span className="slider-value">
+          {typeof value === 'number' ? (Math.round(value * 100) / 100) : value}
+          {unit}
+        </span>
       </div>
       <input
         type="range"

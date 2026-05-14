@@ -205,7 +205,7 @@ export default function QRDataInput({ type, data, onChange }) {
     case QR_TYPES.VCARD:
       return (
         <>
-          <div className="form-grid-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             <div className="form-group">
               <label className="form-label">First Name</label>
               <input
@@ -367,7 +367,7 @@ export default function QRDataInput({ type, data, onChange }) {
             <label className="form-label">Location</label>
             <input className="form-input" placeholder="e.g. 123 Main St" value={data.location || ''} onChange={(e) => updateField('location', e.target.value)} />
           </div>
-          <div className="form-grid-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             <div className="form-group">
               <label className="form-label">Start Date</label>
               <input type="date" className="form-input" value={data.startDate || ''} onChange={(e) => updateField('startDate', e.target.value)} />

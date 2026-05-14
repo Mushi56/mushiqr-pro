@@ -26,7 +26,6 @@ import {
   ShieldCheck,
   UploadCloud,
   X,
-  Check,
   Menu,
   Info,
   Shield,
@@ -44,7 +43,12 @@ import {
   PlusCircle,
   Undo2,
   Redo2,
-  Eye
+  Check,
+  RotateCw,
+  Filter,
+  Crop,
+  Eraser,
+  Layers
 } from 'lucide-react';
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
@@ -79,23 +83,114 @@ const TEXT_SHAPES = [
 ];
 
 /* ── Color Presets ── */
+/* ── Color Presets (Expanded to 50) ── */
 const COLOR_PRESETS = [
-  { name: 'Classic', qr: '#000000', bg: '#ffffff' },
-  { name: 'Midnight', qr: '#ffffff', bg: '#030305' },
+  { name: 'Classic', qr: '#000000', bg: '#FFFFFF' },
+  { name: 'Midnight', qr: '#FFFFFF', bg: '#030305' },
+  { name: 'Vibrant Red', qr: '#FF3B30', bg: '#FFFFFF' },
+  { name: 'Electric Blue', qr: '#007AFF', bg: '#FFFFFF' },
+  { name: 'Emerald', qr: '#34C759', bg: '#FFFFFF' },
+  { name: 'Sunny', qr: '#FFCC00', bg: '#FFFFFF' },
+  { name: 'Purple Neon', qr: '#AF52DE', bg: '#0F0F1A' },
+  { name: 'Orange Glow', qr: '#FF9500', bg: '#FFFFFF' },
+  { name: 'Indigo', qr: '#5856D6', bg: '#FFFFFF' },
+  { name: 'Pink Punch', qr: '#FF2D55', bg: '#FFFFFF' },
   { name: 'Cyan Neon', qr: '#00F0FF', bg: '#0A0A0F' },
-  { name: 'Pink Neon', qr: '#FF007F', bg: '#0A0A0F' },
-  { name: 'Ocean', qr: '#0369a1', bg: '#e0f2fe' },
-  { name: 'Forest', qr: '#166534', bg: '#dcfce7' },
-  { name: 'Sunset', qr: '#9a3412', bg: '#fff7ed' },
-  { name: 'Royal', qr: '#4f46e5', bg: '#eef2ff' },
-  { name: 'Rose', qr: '#9f1239', bg: '#fff1f2' },
-  { name: 'Gold', qr: '#854d0e', bg: '#fefce8' },
-  { name: 'Mint', qr: '#00D1B2', bg: '#F0FFF4' },
-  { name: 'Lavender', qr: '#8E44AD', bg: '#F4ECF7' },
-  { name: 'Solar', qr: '#F39C12', bg: '#FCF3CF' },
-  { name: 'Emerald', qr: '#27AE60', bg: '#E9F7EF' },
-  { name: 'Nordic', qr: '#2C3E50', bg: '#ECF0F1' },
-  { name: 'Deep Sea', qr: '#00416A', bg: '#E1E8EB' },
+  { name: 'Rose Gold', qr: '#E91E63', bg: '#FFF1F2' },
+  { name: 'Deep Ocean', qr: '#1A237E', bg: '#E8EAF6' },
+  { name: 'Forest', qr: '#1B5E20', bg: '#E8F5E9' },
+  { name: 'Hot Chili', qr: '#B71C1C', bg: '#FFEBEE' },
+  { name: 'Amber', qr: '#FF6F00', bg: '#FFF8E1' },
+  { name: 'Teal Mist', qr: '#004D40', bg: '#E0F2F1' },
+  { name: 'Slate', qr: '#263238', bg: '#ECEFF1' },
+  { name: 'Royal Purple', qr: '#4A148C', bg: '#F3E5F5' },
+  { name: 'Lemonade', qr: '#FBC02D', bg: '#FFFDE7' },
+  { name: 'Cyberpunk', qr: '#FFFF00', bg: '#FF00FF' },
+  { name: 'Matrix', qr: '#00FF00', bg: '#000000' },
+  { name: 'Blood Orange', qr: '#FF3D00', bg: '#FBE9E7' },
+  { name: 'Space Grey', qr: '#9E9E9E', bg: '#212121' },
+  { name: 'Mint Leaf', qr: '#00B894', bg: '#E8FDF9' },
+  { name: 'Grape', qr: '#6C5CE7', bg: '#EFEEFE' },
+  { name: 'Sky High', qr: '#0984E3', bg: '#EBF5FF' },
+  { name: 'Coral', qr: '#D63031', bg: '#FFFAFA' },
+  { name: 'Golden Hour', qr: '#F39C12', bg: '#1A1A1A' },
+  { name: 'Tropical', qr: '#00D1B2', bg: '#F5FFFA' },
+  { name: 'Volcano', qr: '#E74C3C', bg: '#34495E' },
+  { name: 'Amethyst', qr: '#9B59B6', bg: '#F4ECF7' },
+  { name: 'Cobalt', qr: '#2980B9', bg: '#EBF5FB' },
+  { name: 'Pumpkin', qr: '#D35400', bg: '#FBEEE6' },
+  { name: 'Asbestos', qr: '#7F8C8D', bg: '#F2F4F4' },
+  { name: 'Belize', qr: '#2980B9', bg: '#2C3E50' },
+  { name: 'Carrot', qr: '#E67E22', bg: '#1A1A1A' },
+  { name: 'Sunflower', qr: '#F1C40F', bg: '#2C3E50' },
+  { name: 'Turquoise', qr: '#1ABC9C', bg: '#16A085' },
+  { name: 'Wet Asphalt', qr: '#ECF0F1', bg: '#34495E' },
+  { name: 'Alizarin', qr: '#E74C3C', bg: '#FFFFFF' },
+  { name: 'Wisteria', qr: '#8E44AD', bg: '#FFFFFF' },
+  { name: 'Silver', qr: '#2C3E50', bg: '#BDC3C7' },
+  { name: 'Concrete', qr: '#FFFFFF', bg: '#95A5A6' },
+  { name: 'Green Sea', qr: '#FFFFFF', bg: '#16A085' },
+  { name: 'Shadow', qr: '#34495E', bg: '#2C3E50' },
+  { name: 'Midnight Blue', qr: '#2C3E50', bg: '#FFFFFF' },
+  { name: 'Soft Pink', qr: '#FF80AB', bg: '#FCE4EC' },
+  { name: 'Cool Mint', qr: '#1DE9B6', bg: '#E0F2F1' },
+  { name: 'Light Blue', qr: '#00B0FF', bg: '#E1F5FE' },
+  { name: 'Warm Amber', qr: '#FFAB00', bg: '#FFF8E1' },
+  { name: 'Deep Purple', qr: '#6200EA', bg: '#EDE7F6' },
+];
+
+/* ── Gradient Presets (Expanded to 50) ── */
+const GRADIENT_PRESETS = [
+  { name: 'Sunset', c1: '#FF512F', c2: '#DD2476' },
+  { name: 'Ocean', c1: '#2193b0', c2: '#6dd5ed' },
+  { name: 'Neon Night', c1: '#00F0FF', c2: '#7000FF' },
+  { name: 'Lush', c1: '#56ab2f', c2: '#a8e063' },
+  { name: 'Midnight', c1: '#232526', c2: '#414345' },
+  { name: 'Candy', c1: '#ee9ca7', c2: '#ffdde1' },
+  { name: 'Skyline', c1: '#1488CC', c2: '#2B32B2' },
+  { name: 'Royal', c1: '#16222A', c2: '#3A6073' },
+  { name: 'Sunrise', c1: '#f12711', c2: '#f5af19' },
+  { name: 'Purple Love', c1: '#cc2b5e', c2: '#753a88' },
+  { name: 'Deep Sea', c1: '#2C3E50', c2: '#4CA1AF' },
+  { name: 'Fire', c1: '#f83600', c2: '#f9d423' },
+  { name: 'Peach', c1: '#ED4264', c2: '#FFEDBC' },
+  { name: 'Violet', c1: '#7F00FF', c2: '#E100FF' },
+  { name: 'Emerald', c1: '#00b09b', c2: '#96c93d' },
+  { name: 'Bora Bora', c1: '#2BC0E4', c2: '#EAECC6' },
+  { name: 'Misty', c1: '#E0EAFC', c2: '#CFDEF3' },
+  { name: 'Steel', c1: '#1F1C2C', c2: '#928DAB' },
+  { name: 'Juicy', c1: '#FF8008', c2: '#FFC837' },
+  { name: 'Pinky', c1: '#DD5E89', c2: '#F7BB97' },
+  { name: 'Seaweed', c1: '#4b6cb7', c2: '#182848' },
+  { name: 'Cherry', c1: '#EB3349', c2: '#F45C43' },
+  { name: 'Mojito', c1: '#48c6ef', c2: '#6f86d6' },
+  { name: 'Aqua', c1: '#00c6ff', c2: '#0072ff' },
+  { name: 'Blueberry', c1: '#6a11cb', c2: '#2575fc' },
+  { name: 'Bloody Mary', c1: '#FF512F', c2: '#DD2476' },
+  { name: 'Rose', c1: '#e91e63', c2: '#ff8a80' },
+  { name: 'Gold', c1: '#D4AF37', c2: '#F9E29C' },
+  { name: 'Mint', c1: '#00b09b', c2: '#96c93d' },
+  { name: 'Indigo', c1: '#396afc', c2: '#2948ff' },
+  { name: 'Lime', c1: '#a8ff78', c2: '#78ffd6' },
+  { name: 'Flamingo', c1: '#ff4b2b', c2: '#ff416c' },
+  { name: 'Galaxy', c1: '#240b36', c2: '#c31432' },
+  { name: 'Space', c1: '#0f0c29', c2: '#302b63' },
+  { name: 'Cloudy', c1: '#fdfbfb', c2: '#ebedee' },
+  { name: 'Forest', c1: '#5a3f37', c2: '#2c7744' },
+  { name: 'Wine', c1: '#af2d2d', c2: '#631010' },
+  { name: 'Magic', c1: '#5f2c82', c2: '#49a09d' },
+  { name: 'Plum', c1: '#ada996', c2: '#f2f2f2' },
+  { name: 'Steel Blue', c1: '#3a7bd5', c2: '#00d2ff' },
+  { name: 'Turquoise', c1: '#136a8a', c2: '#267871' },
+  { name: 'Venice', c1: '#085078', c2: '#85D8CE' },
+  { name: 'Horizon', c1: '#003973', c2: '#E5E5BE' },
+  { name: 'Electric', c1: '#6a11cb', c2: '#2575fc' },
+  { name: 'Lava', c1: '#f12711', c2: '#f5af19' },
+  { name: 'Toxic', c1: '#11998e', c2: '#38ef7d' },
+  { name: 'Citrus', c1: '#FDC830', c2: '#F37335' },
+  { name: 'Frost', c1: '#000428', c2: '#004e92' },
+  { name: 'Coal', c1: '#000000', c2: '#434343' },
+  { name: 'Titanium', c1: '#283048', c2: '#859398' },
 ];
 
 const SWATCH_PRESETS = [
@@ -371,6 +466,11 @@ export default function App() {
   const [gradientColor1, setGradientColor1] = useState('#6c5ce7');
   const [gradientColor2, setGradientColor2] = useState('#a78bfa');
   const [gradientType, setGradientType] = useState('linear');
+  
+  // ── QR Texture ──
+  const [qrTextureEnabled, setQrTextureEnabled] = useState(false);
+  const [qrTexture, setQrTexture] = useState(null); // { src, image, name }
+  const [qrTextureSyncEyes, setQrTextureSyncEyes] = useState(true);
 
   // ── Shapes ──
   const [dotStyle, setDotStyle] = useState(DOT_STYLES.SQUARE);
@@ -380,7 +480,8 @@ export default function App() {
 
   // ── Logo ──
   const [logo, setLogo] = useState(null);
-  const [logoSize, setLogoSize] = useState(0.18);
+  const [logoWidth, setLogoWidth] = useState(0.18);
+  const [logoHeight, setLogoHeight] = useState(0.18);
   const [logoPadding, setLogoPadding] = useState(10);
   const [logoBackground, setLogoBackground] = useState(false);
   const [logoBgColor, setLogoBgColor] = useState('#ffffff');
@@ -391,6 +492,20 @@ export default function App() {
   const [logoOutlineOpacity, setLogoOutlineOpacity] = useState(1);
   const [logoPosX, setLogoPosX] = useState(0.5);
   const [logoPosY, setLogoPosY] = useState(0.5);
+
+  // New Logo Features
+  const [logoOpacity, setLogoOpacity] = useState(1);
+  const [logoRotation, setLogoRotation] = useState(0);
+  const [logoShadowEnabled, setLogoShadowEnabled] = useState(false);
+  const [logoShadowColor, setLogoShadowColor] = useState('rgba(0,0,0,0.5)');
+  const [logoShadowBlur, setLogoShadowBlur] = useState(10);
+  const [logoShadowOffsetX, setLogoShadowOffsetX] = useState(0);
+  const [logoShadowOffsetY, setLogoShadowOffsetY] = useState(4);
+  const [logoInnerShadowEnabled, setLogoInnerShadowEnabled] = useState(false);
+  const [logoEraseColorEnabled, setLogoEraseColorEnabled] = useState(false);
+  const [logoEraseColor, setLogoEraseColor] = useState('#ffffff');
+  const [logoTexture, setLogoTexture] = useState('none');
+  const [logoCrop, setLogoCrop] = useState({ x: 0, y: 0, w: 1, h: 1 });
 
   // ── Frame ──
   const [frameStyle, setFrameStyle] = useState('none');
@@ -407,8 +522,6 @@ export default function App() {
   const [textCenterEnabled, setTextCenterEnabled] = useState(false);
   const [textPopup, setTextPopup] = useState(null);
   const [logoPopup, setLogoPopup] = useState(null);
-  const [colorPopup, setColorPopup] = useState(null);
-  const [shapesPopup, setShapesPopup] = useState(null);
   const [textEditMode, setTextEditMode] = useState('center');
 
   const [textCenterText, setTextCenterText] = useState('');
@@ -423,10 +536,15 @@ export default function App() {
   const [textCenterShadowColor, setTextCenterShadowColor] = useState('rgba(0,0,0,0.5)');
   const [textCenterPosX, setTextCenterPosX] = useState(0.5);
   const [textCenterPosY, setTextCenterPosY] = useState(0.5);
+  const [textCenterRotation, setTextCenterRotation] = useState(0);
+  const [colorPopup, setColorPopup] = useState(null);
+  const [shapePopup, setShapePopup] = useState(null);
 
   // ── References ──
   const canvasRef = useRef(null);
   const renderTimeoutRef = useRef(null);
+  const tempCanvas = useRef(document.createElement('canvas'));
+  const tempCtx = useRef(tempCanvas.current.getContext('2d'));
   const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
   const [toast, setToast] = useState(null);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
@@ -443,159 +561,213 @@ export default function App() {
   const dragStartOffset = useRef({ x: 0, y: 0 });
   const [customFonts, setCustomFonts] = useState([]);
   const fontInputRef = useRef(null);
-
-  // --- Undo/Redo System ---
   const [history, setHistory] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
-  const isUndoing = useRef(false);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const isInternalUpdate = useRef(false);
+  const preEditSnapshot = useRef(null);
 
-  useEffect(() => {
-    setHistory([getState()]);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const startEditing = (type, val) => {
+    preEditSnapshot.current = getSnapshot();
+    if (type === 'logo') setLogoPopup(val);
+    else if (type === 'text') setTextPopup(val);
+    else if (type === 'color') setColorPopup(val);
+    else if (type === 'shapes') setShapePopup(val);
+  };
 
-  const getState = useCallback(() => ({
-    qrType, qrData, errorLevel, qrColor, bgColor, bgTransparent, eyeColor, eyeOuterColor, syncEyes,
-    gradientEnabled, gradientColor1, gradientColor2, gradientType, dotStyle, eyeStyle, dotPadding, eyePadding,
-    logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape, logoOutline, logoOutlineColor,
-    logoOutlineWidth, logoPosX, logoPosY, frameStyle, frameText, frameColor, frameFont, frameSize,
-    frameStrokeEnabled, frameStrokeWidth, frameStrokeColor, frameShadowEnabled, frameShadowBlur, frameShadowColor,
-    textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont, textCenterStrokeEnabled,
-    textCenterStrokeWidth, textCenterStrokeColor, textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
-    textCenterPosX, textCenterPosY
-  }), [
-    qrType, qrData, errorLevel, qrColor, bgColor, bgTransparent, eyeColor, eyeOuterColor, syncEyes,
-    gradientEnabled, gradientColor1, gradientColor2, gradientType, dotStyle, eyeStyle, dotPadding, eyePadding,
-    logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape, logoOutline, logoOutlineColor,
-    logoOutlineWidth, logoPosX, logoPosY, frameStyle, frameText, frameColor, frameFont, frameSize,
-    frameStrokeEnabled, frameStrokeWidth, frameStrokeColor, frameShadowEnabled, frameShadowBlur, frameShadowColor,
-    textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont, textCenterStrokeEnabled,
-    textCenterStrokeWidth, textCenterStrokeColor, textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
-    textCenterPosX, textCenterPosY
+  const cancelEditing = () => {
+    if (preEditSnapshot.current) {
+      applySnapshot(preEditSnapshot.current);
+    }
+    setLogoPopup(null);
+    setTextPopup(null);
+    setColorPopup(null);
+    setShapePopup(null);
+    preEditSnapshot.current = null;
+  };
+
+  const applyEditing = () => {
+    setLogoPopup(null);
+    setTextPopup(null);
+    setColorPopup(null);
+    setShapePopup(null);
+    preEditSnapshot.current = null;
+    saveSnapshot(); // Save the final result to history
+  };
+
+  const getSnapshot = useCallback(() => {
+    return {
+      qrType, qrData, qrColor, bgColor, bgTransparent, eyeColor, eyeOuterColor, syncEyes,
+      gradientEnabled, gradientColor1, gradientColor2, gradientType,
+      qrTextureEnabled, qrTexture: qrTexture ? { src: qrTexture.src, name: qrTexture.name } : null,
+      qrTextureSyncEyes,
+      dotStyle, eyeStyle, dotPadding, eyePadding,
+      logo: logo ? { src: logo.src, name: logo.name } : null,
+      logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
+      logoOutline, logoOutlineColor, logoOutlineWidth, logoPosX, logoPosY,
+      logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
+      logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop,
+      frameStyle, frameText, frameColor, frameFont, frameSize,
+      frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
+      frameShadowEnabled, frameShadowBlur, frameShadowColor,
+      textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
+      textCenterPosX, textCenterPosY, textCenterRotation
+    };
+  }, [
+    qrType, qrData, qrColor, bgColor, bgTransparent, eyeColor, eyeOuterColor, syncEyes,
+    gradientEnabled, gradientColor1, gradientColor2, gradientType,
+    qrTextureEnabled, qrTexture, qrTextureSyncEyes,
+    dotStyle, eyeStyle, dotPadding, eyePadding,
+    logo, logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
+    logoOutline, logoOutlineColor, logoOutlineWidth, logoPosX, logoPosY,
+    logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
+    logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop,
+    frameStyle, frameText, frameColor, frameFont, frameSize,
+    frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
+    frameShadowEnabled, frameShadowBlur, frameShadowColor,
+    textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont,
+    textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
+    textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
+    textCenterPosX, textCenterPosY, textCenterRotation
   ]);
 
-  const applyState = (state) => {
-    isUndoing.current = true;
-    setQrType(state.qrType);
-    setQrData(state.qrData);
-    setErrorLevel(state.errorLevel);
-    setQrColor(state.qrColor);
-    setBgColor(state.bgColor);
-    setBgTransparent(state.bgTransparent);
-    setEyeColor(state.eyeColor);
-    setEyeOuterColor(state.eyeOuterColor);
-    setSyncEyes(state.syncEyes);
-    setGradientEnabled(state.gradientEnabled);
-    setGradientColor1(state.gradientColor1);
-    setGradientColor2(state.gradientColor2);
-    setGradientType(state.gradientType);
-    setDotStyle(state.dotStyle);
-    setEyeStyle(state.eyeStyle);
-    setDotPadding(state.dotPadding);
-    setEyePadding(state.eyePadding);
-    setLogo(state.logo);
-    setLogoSize(state.logoSize);
-    setLogoPadding(state.logoPadding);
-    setLogoBackground(state.logoBackground);
-    setLogoBgColor(state.logoBgColor);
-    setLogoBgShape(state.logoBgShape);
-    setLogoOutline(state.logoOutline);
-    setLogoOutlineColor(state.logoOutlineColor);
-    setLogoOutlineWidth(state.logoOutlineWidth);
-    setLogoPosX(state.logoPosX);
-    setLogoPosY(state.logoPosY);
-    setFrameStyle(state.frameStyle);
-    setFrameText(state.frameText);
-    setFrameColor(state.frameColor);
-    setFrameFont(state.frameFont);
-    setFrameSize(state.frameSize);
-    setFrameStrokeEnabled(state.frameStrokeEnabled);
-    setFrameStrokeWidth(state.frameStrokeWidth);
-    setFrameStrokeColor(state.frameStrokeColor);
-    setFrameShadowEnabled(state.frameShadowEnabled);
-    setFrameShadowBlur(state.frameShadowBlur);
-    setFrameShadowColor(state.frameShadowColor);
-    setTextCenterEnabled(state.textCenterEnabled);
-    setTextCenterText(state.textCenterText);
-    setTextCenterSize(state.textCenterSize);
-    setTextCenterColor(state.textCenterColor);
-    setTextCenterFont(state.textCenterFont);
-    setTextCenterStrokeEnabled(state.textCenterStrokeEnabled);
-    setTextCenterStrokeWidth(state.textCenterStrokeWidth);
-    setTextCenterStrokeColor(state.textCenterStrokeColor);
-    setTextCenterShadowEnabled(state.textCenterShadowEnabled);
-    setTextCenterShadowBlur(state.textCenterShadowBlur);
-    setTextCenterShadowColor(state.textCenterShadowColor);
-    setTextCenterPosX(state.textCenterPosX);
-    setTextCenterPosY(state.textCenterPosY);
-    setTimeout(() => { isUndoing.current = false; }, 800);
-  };
-
-  const pushHistory = useCallback(() => {
-    if (isUndoing.current) return;
-    const currentState = getState();
-    setHistory(prev => {
-      if (prev.length > 0) {
-        const last = prev[prev.length - 1];
-        const dataChanged = JSON.stringify(currentState.qrData) !== JSON.stringify(last.qrData);
-        const othersChanged = Object.keys(currentState).some(key => key !== 'qrData' && currentState[key] !== last[key]);
-        if (!dataChanged && !othersChanged) return prev;
-      }
-      return [...prev.slice(-49), currentState];
-    });
-    setRedoStack([]);
-  }, [getState]);
-
-  useEffect(() => {
-    const timer = setTimeout(pushHistory, 500);
-    return () => clearTimeout(timer);
-  }, [pushHistory]);
-
-  const undo = () => {
-    if (history.length <= 1) return;
-    const currentState = history[history.length - 1];
-    const previousState = history[history.length - 2];
-    setRedoStack(prev => [currentState, ...prev]);
-    setHistory(prev => prev.slice(0, -1));
-    applyState(previousState);
-  };
-
-  const redo = () => {
-    if (redoStack.length === 0) return;
-    const nextState = redoStack[0];
-    setRedoStack(prev => prev.slice(1));
-    setHistory(prev => [...prev, nextState]);
-    applyState(nextState);
-  };
-
-  const [editSnapshot, setEditSnapshot] = useState(null);
-  
-  const handleOpenProperty = (type, mode) => {
-    setEditSnapshot(getState());
-    setLogoPopup(mode === 'logo' ? type : null);
-    setTextPopup(mode === 'text' ? type : null);
-    setColorPopup(mode === 'color' ? type : null);
-    setShapesPopup(mode === 'shapes' ? type : null);
-  };
-
-  const handleApplyProperty = () => {
-    setEditSnapshot(null);
-    setLogoPopup(null);
-    setTextPopup(null);
-    setColorPopup(null);
-    setShapesPopup(null);
-    pushHistory();
-  };
-
-  const handleCancelProperty = () => {
-    if (editSnapshot) {
-      applyState(editSnapshot);
+  const saveSnapshot = useCallback(() => {
+    if (isInternalUpdate.current) return;
+    const current = getSnapshot();
+    
+    // Avoid saving if the current state matches the one we're already at in history
+    // This prevents Redo from breaking after an Undo action.
+    if (historyIndex >= 0 && history[historyIndex]) {
+      if (JSON.stringify(current) === JSON.stringify(history[historyIndex])) return;
     }
-    setEditSnapshot(null);
-    setLogoPopup(null);
-    setTextPopup(null);
-    setColorPopup(null);
-    setShapesPopup(null);
+
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(current);
+      if (newHistory.length > 50) newHistory.shift();
+      return newHistory;
+    });
+    setHistoryIndex(prev => {
+      const newIndex = (historyIndex < 49) ? historyIndex + 1 : 49;
+      return newIndex;
+    });
+  }, [getSnapshot, historyIndex, history]);
+
+  const undo = useCallback(() => {
+    if (historyIndex <= 0) return;
+    const prevIndex = historyIndex - 1;
+    const snapshot = history[prevIndex];
+    applySnapshot(snapshot);
+    setHistoryIndex(prevIndex);
+  }, [history, historyIndex]);
+
+  const redo = useCallback(() => {
+    if (historyIndex >= history.length - 1) return;
+    const nextIndex = historyIndex + 1;
+    const snapshot = history[nextIndex];
+    applySnapshot(snapshot);
+    setHistoryIndex(nextIndex);
+  }, [history, historyIndex]);
+
+  const applySnapshot = (s) => {
+    isInternalUpdate.current = true;
+    if (s.qrType !== undefined) setQrType(s.qrType);
+    if (s.qrData !== undefined) setQrData(s.qrData);
+    if (s.qrTextureEnabled !== undefined) setQrTextureEnabled(s.qrTextureEnabled);
+    if (s.qrTextureSyncEyes !== undefined) setQrTextureSyncEyes(s.qrTextureSyncEyes);
+    if (s.qrTexture) {
+      const img = new Image();
+      img.onload = () => setQrTexture({ ...s.qrTexture, image: img });
+      img.src = s.qrTexture.src;
+    } else if (s.qrTexture === null) {
+      setQrTexture(null);
+    }
+    if (s.qrColor !== undefined) setQrColor(s.qrColor);
+    if (s.bgColor !== undefined) setBgColor(s.bgColor);
+    if (s.bgTransparent !== undefined) setBgTransparent(s.bgTransparent);
+    if (s.eyeColor !== undefined) setEyeColor(s.eyeColor);
+    if (s.eyeOuterColor !== undefined) setEyeOuterColor(s.eyeOuterColor);
+    if (s.syncEyes !== undefined) setSyncEyes(s.syncEyes);
+    if (s.gradientEnabled !== undefined) setGradientEnabled(s.gradientEnabled);
+    if (s.gradientColor1 !== undefined) setGradientColor1(s.gradientColor1);
+    if (s.gradientColor2 !== undefined) setGradientColor2(s.gradientColor2);
+    if (s.gradientType !== undefined) setGradientType(s.gradientType);
+    if (s.dotStyle !== undefined) setDotStyle(s.dotStyle);
+    if (s.eyeStyle !== undefined) setEyeStyle(s.eyeStyle);
+    if (s.dotPadding !== undefined) setDotPadding(s.dotPadding);
+    if (s.eyePadding !== undefined) setEyePadding(s.eyePadding);
+    
+    if (s.logo) {
+      if (!logo || logo.src !== s.logo.src) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => setLogo({ src: s.logo.src, name: s.logo.name, image: img });
+        img.src = s.logo.src;
+      }
+    } else {
+      setLogo(null);
+    }
+
+    if (s.logoWidth !== undefined) setLogoWidth(s.logoWidth);
+    if (s.logoHeight !== undefined) setLogoHeight(s.logoHeight);
+    if (s.logoPadding !== undefined) setLogoPadding(s.logoPadding);
+    if (s.logoBackground !== undefined) setLogoBackground(s.logoBackground);
+    if (s.logoBgColor !== undefined) setLogoBgColor(s.logoBgColor);
+    if (s.logoBgShape !== undefined) setLogoBgShape(s.logoBgShape);
+    if (s.logoOutline !== undefined) setLogoOutline(s.logoOutline);
+    if (s.logoOutlineColor !== undefined) setLogoOutlineColor(s.logoOutlineColor);
+    if (s.logoOutlineWidth !== undefined) setLogoOutlineWidth(s.logoOutlineWidth);
+    if (s.logoPosX !== undefined) setLogoPosX(s.logoPosX);
+    if (s.logoPosY !== undefined) setLogoPosY(s.logoPosY);
+    if (s.frameStyle !== undefined) setFrameStyle(s.frameStyle);
+    if (s.frameText !== undefined) setFrameText(s.frameText);
+    if (s.frameColor !== undefined) setFrameColor(s.frameColor);
+    if (s.frameFont !== undefined) setFrameFont(s.frameFont);
+    if (s.frameSize !== undefined) setFrameSize(s.frameSize);
+    if (s.frameStrokeEnabled !== undefined) setFrameStrokeEnabled(s.frameStrokeEnabled);
+    if (s.frameStrokeWidth !== undefined) setFrameStrokeWidth(s.frameStrokeWidth);
+    if (s.frameStrokeColor !== undefined) setFrameStrokeColor(s.frameStrokeColor);
+    if (s.frameShadowEnabled !== undefined) setFrameShadowEnabled(s.frameShadowEnabled);
+    if (s.frameShadowBlur !== undefined) setFrameShadowBlur(s.frameShadowBlur);
+    if (s.frameShadowColor !== undefined) setFrameShadowColor(s.frameShadowColor);
+    if (s.textCenterEnabled !== undefined) setTextCenterEnabled(s.textCenterEnabled);
+    if (s.textCenterText !== undefined) setTextCenterText(s.textCenterText);
+    if (s.textCenterSize !== undefined) setTextCenterSize(s.textCenterSize);
+    if (s.textCenterColor !== undefined) setTextCenterColor(s.textCenterColor);
+    if (s.textCenterFont !== undefined) setTextCenterFont(s.textCenterFont);
+    if (s.textCenterStrokeEnabled !== undefined) setTextCenterStrokeEnabled(s.textCenterStrokeEnabled);
+    if (s.textCenterStrokeWidth !== undefined) setTextCenterStrokeWidth(s.textCenterStrokeWidth);
+    if (s.textCenterStrokeColor !== undefined) setTextCenterStrokeColor(s.textCenterStrokeColor);
+    if (s.textCenterShadowEnabled !== undefined) setTextCenterShadowEnabled(s.textCenterShadowEnabled);
+    if (s.textCenterShadowBlur !== undefined) setTextCenterShadowBlur(s.textCenterShadowBlur);
+    if (s.textCenterShadowColor !== undefined) setTextCenterShadowColor(s.textCenterShadowColor);
+    if (s.textCenterPosX !== undefined) setTextCenterPosX(s.textCenterPosX);
+    if (s.textCenterPosY !== undefined) setTextCenterPosY(s.textCenterPosY);
+    if (s.textCenterRotation !== undefined) setTextCenterRotation(s.textCenterRotation);
+    
+    setTimeout(() => { isInternalUpdate.current = false; }, 50);
   };
+
+  // Initial snapshot
+  useEffect(() => {
+    if (history.length === 0) {
+      const initial = getSnapshot();
+      setHistory([initial]);
+      setHistoryIndex(0);
+    }
+  }, []);
+
+  // Debounced auto-save for continuous and discrete changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      saveSnapshot();
+    }, 800); // Slightly faster debounce
+    return () => clearTimeout(timer);
+  }, [
+    qrColor, bgColor, logoWidth, logoHeight, logoPosX, logoPosY, textCenterSize, textCenterPosX, textCenterPosY,
+    frameSize, dotPadding, eyePadding, textCenterText, frameText,
+    dotStyle, eyeStyle, qrType, logo, syncEyes, gradientEnabled, frameStyle,
+    eyeColor, eyeOuterColor, logoBackground, logoOutline, textCenterEnabled
+  ]);
 
   const handleFontUpload = (e) => {
     const file = e.target.files[0];
@@ -705,7 +877,7 @@ export default function App() {
           qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
           qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
           dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
-          logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+          logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
           logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
           logoSrc: logo?.src || null,
           logoName: logo?.name || null,
@@ -845,7 +1017,7 @@ export default function App() {
       qrType, qrData, displayText: dataString.substring(0, 50), errorLevel,
       qrColor, bgColor, bgTransparent, gradientEnabled, gradientColor1, gradientColor2, gradientType,
       dotStyle, eyeStyle, eyeColor, eyeOuterColor, dotPadding, eyePadding,
-      logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+      logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
       logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
       logoSrc: logo?.src || null,
       logoName: logo?.name || null,
@@ -882,7 +1054,9 @@ export default function App() {
     // If the storage includes a logo placeholder or source, we'd handle it here.
     // For now, we clear the logo or keep it if it's not provided in the template.
     if (item.logo === null) setLogo(null);
-    if (item.logoSize) setLogoSize(item.logoSize);
+    if (item.logoWidth) setLogoWidth(item.logoWidth);
+    if (item.logoHeight) setLogoHeight(item.logoHeight);
+    else if (item.logoWidth, logoHeight) { setLogoWidth(item.logoWidth, logoHeight); setLogoHeight(item.logoWidth, logoHeight); }
     if (item.logoPadding !== undefined) setLogoPadding(item.logoPadding);
     if (item.logoBackground !== undefined) setLogoBackground(item.logoBackground);
     if (item.logoBgColor) setLogoBgColor(item.logoBgColor);
@@ -917,8 +1091,6 @@ export default function App() {
   };
 
   const resetGenerator = () => {
-    setHistory([]);
-    setRedoStack([]);
     // Content
     setQrType(QR_TYPES.URL);
     setQrData({ url: 'https://example.com' });
@@ -947,7 +1119,8 @@ export default function App() {
 
     // Logo
     setLogo(null);
-    setLogoSize(0.18);
+    setLogoWidth(0.18);
+    setLogoHeight(0.18);
     setLogoPadding(10);
     setLogoBackground(false);
     setLogoBgColor('#ffffff');
@@ -1003,11 +1176,18 @@ export default function App() {
       renderQR(canvasRef.current, {
         ...qrMatrixInfo, size: 512,
         qrColor, bgColor, bgTransparent, dotStyle, eyeStyle,
-        eyeColor: syncEyes ? qrColor : eyeColor,
-        eyeOuterColor: syncEyes ? qrColor : eyeOuterColor,
+        eyeColor,
+        eyeOuterColor,
+        syncEyes,
         dotPadding, eyePadding,
-        gradientEnabled, gradientColor1, gradientColor2, gradientType,
-        logo: logo?.image, logoSize, logoPadding,
+        gradientEnabled,
+        gradientColor1,
+        gradientColor2,
+        gradientType,
+        qrTextureEnabled,
+        qrTexture,
+        qrTextureSyncEyes,
+        logo: logo?.image, logoWidth, logoHeight, logoPadding,
         logoBackground, logoBgColor, logoBgShape,
         logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
         quietZone: 2, frameStyle, frameText, frameColor, frameFont,
@@ -1018,12 +1198,16 @@ export default function App() {
         frameShadowEnabled,
         frameShadowBlur,
         frameShadowColor,
-        textCenter: textCenterEnabled ? textCenterText : null, 
+        textCenterEnabled, 
+        textCenter: textCenterEnabled ? textCenterText : null,
         textCenterSize, textCenterColor, textCenterFont,
         textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
         textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
-        textCenterPosX, textCenterPosY,
+        textCenterPosX, textCenterPosY, textCenterRotation,
         logoPosX, logoPosY,
+        logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
+        logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop,
+        showHandle: (activeTab === 'logo' && logo) || (activeTab === 'text' && textCenterEnabled)
       });
     };
 
@@ -1037,7 +1221,7 @@ export default function App() {
   }, [
     qrMatrixInfo, qrColor, bgColor, bgTransparent, dotStyle, eyeStyle, eyeColor,
     eyeOuterColor, syncEyes, gradientEnabled, gradientColor1, gradientColor2, gradientType,
-    logo, logoSize, logoPadding, logoBackground, logoBgColor, logoBgShape,
+    logo, logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
     dotPadding, eyePadding, frameStyle, frameText, frameColor, frameFont,
         frameSize,
@@ -1051,7 +1235,11 @@ export default function App() {
 
     textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
     textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
-    textCenterPosX, textCenterPosY, logoPosX, logoPosY
+    textCenterPosX, textCenterPosY, logoPosX, logoPosY,
+    logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
+    logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, 
+    qrTextureEnabled, qrTexture, qrTextureSyncEyes,
+    activeTab
   ]);
 
   useEffect(() => {
@@ -1060,7 +1248,11 @@ export default function App() {
       logo.image.onload = renderCanvas;
       logo.image.onerror = () => showToast('Logo failed to load', 'error');
     }
-  }, [renderCanvas, logo]);
+    if (qrTexture?.image && !qrTexture.image.complete) {
+      qrTexture.image.onload = renderCanvas;
+      qrTexture.image.onerror = () => showToast('Texture failed to load', 'error');
+    }
+  }, [renderCanvas, logo, qrTexture]);
   const getQRContentArea = useCallback(() => {
     const size = 512;
     const padding = size * 0.03;
@@ -1094,43 +1286,112 @@ export default function App() {
 
     // Helper to check if point is in rect with generous padding
     const inRect = (px, py, rx, ry, rw, rh) => {
-      const pad = 25; // Generous hit area
+      const pad = 25; 
       return px >= rx - pad && px <= rx + rw + pad && py >= ry - pad && py <= ry + rh + pad;
     };
 
     // 1. Check Logo
     if (logo?.image) {
-      const lw = contentSize * logoSize;
-      const lh = lw * (logo.image.height / logo.image.width);
+      const lw = contentSize * logoWidth;
+      const lh = contentSize * logoHeight;
       const lx = contentX + (contentSize - lw) * logoPosX;
       const ly = contentY + (contentSize - lh) * logoPosY;
       
-      if (inRect(x, y, lx, ly, lw, lh)) {
+      const centerX = lx + lw / 2;
+      const centerY = ly + lh / 2;
+
+      const dx_raw = x - centerX;
+      const dy_raw = y - centerY;
+      const ang = (-logoRotation * Math.PI) / 180;
+      const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
+      const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
+
+      const hSize = 40; 
+      const checkH = (hx, hy, type) => {
+          if (localX >= hx - hSize && localX <= hx + hSize && localY >= hy - hSize && localY <= hy + hSize) {
+              setIsDraggingCanvas(true);
+              dragType.current = type;
+              dragStartOffset.current = { x: localX, y: localY, startW: logoWidth, startH: logoHeight, startPosX: logoPosX, startPosY: logoPosY, startRotation: logoRotation };
+              e.preventDefault();
+              return true;
+          }
+          return false;
+      };
+
+      if (checkH(lx, ly, 'rotate-logo')) return;
+      if (checkH(lx + lw, ly + lh, 'resize-logo-br')) return;
+      if (checkH(lx + lw, ly + lh/2, 'resize-logo-r')) return;
+      if (checkH(lx + lw/2, ly + lh, 'resize-logo-b')) return;
+      
+      // Delete Button
+      if (checkH(lx + lw, ly, 'delete-logo')) {
+        setLogo(null);
+        setIsDraggingCanvas(false);
+        dragType.current = null;
+        e.preventDefault();
+        return;
+      }
+      
+      if (inRect(localX, localY, lx, ly, lw, lh)) {
         setIsDraggingCanvas(true);
         dragType.current = 'logo';
-        dragStartOffset.current = { x: x - lx, y: y - ly };
+        dragStartOffset.current = { x: localX - lx, y: localY - ly };
         e.preventDefault();
         return;
       }
     }
 
-    // 2. Check Text
     if (textCenterEnabled && textCenterText) {
       const fontSize = contentSize * textCenterSize;
-      const tw = textCenterText.length * fontSize * 0.6;
-      const th = fontSize;
+      tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+      const metrics = tempCtx.current.measureText(textCenterText);
+      const tw = metrics.width + (logoPadding || 10) * 2;
+      const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
+      
       const tx = contentX + (contentSize - tw) * textCenterPosX;
       const ty = contentY + (contentSize - th) * textCenterPosY;
+      
+      const centerX = tx + tw / 2;
+      const centerY = ty + th / 2;
 
-      if (inRect(x, y, tx, ty, tw, th)) {
+      const dx_raw = x - centerX;
+      const dy_raw = y - centerY;
+      const ang = (-textCenterRotation * Math.PI) / 180;
+      const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
+      const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
+
+      const hSize = 40;
+      const checkH = (hx, hy, type) => {
+          if (localX >= hx - hSize && localX <= hx + hSize && localY >= hy - hSize && localY <= hy + hSize) {
+              setIsDraggingCanvas(true);
+              dragType.current = type;
+              dragStartOffset.current = { x: localX, y: localY, startSize: textCenterSize, startPosX: textCenterPosX, startPosY: textCenterPosY, startRotation: textCenterRotation, startW: tw / contentSize, startH: th / contentSize };
+              e.preventDefault();
+              return true;
+          }
+          return false;
+      };
+
+      if (checkH(tx, ty, 'rotate-text')) return;
+      if (checkH(tx + tw, ty + th, 'resize-text-br')) return;
+      
+      if (checkH(tx + tw, ty, 'delete-text')) {
+        setTextCenterEnabled(false);
+        setIsDraggingCanvas(false);
+        dragType.current = null;
+        e.preventDefault();
+        return;
+      }
+
+      if (inRect(localX, localY, tx, ty, tw, th)) {
         setIsDraggingCanvas(true);
         dragType.current = 'text';
-        dragStartOffset.current = { x: x - tx, y: y - ty };
+        dragStartOffset.current = { x: localX - tx, y: localY - ty };
         e.preventDefault();
         return;
       }
     }
-  }, [qrMatrixInfo, logo, logoSize, logoPosX, logoPosY, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, getQRContentArea]);
+  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, textCenterRotation, logoPadding, getQRContentArea]);
 
   const handleCanvasMove = useCallback((e) => {
     if (!isDraggingCanvas || !canvasRef.current) return;
@@ -1144,22 +1405,104 @@ export default function App() {
     const y = (clientY - rect.top) * scale;
 
     const { contentX, contentY, contentSize } = getQRContentArea();
-    const newTargetX = x - dragStartOffset.current.x - contentX;
-    const newTargetY = y - dragStartOffset.current.y - contentY;
 
-    if (dragType.current === 'logo' && logo?.image) {
-      const lw = contentSize * logoSize;
-      const lh = lw * (logo.image.height / logo.image.width);
-      setLogoPosX(Math.max(0, Math.min(1, newTargetX / (contentSize - lw))));
-      setLogoPosY(Math.max(0, Math.min(1, newTargetY / (contentSize - lh))));
+    if (dragType.current === 'rotate-logo') {
+        const lw = contentSize * logoWidth;
+        const lh = contentSize * logoHeight;
+        const lx = contentX + (contentSize - lw) * logoPosX;
+        const ly = contentY + (contentSize - lh) * logoPosY;
+        const centerX = lx + lw / 2;
+        const centerY = ly + lh / 2;
+        const angle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
+        setLogoRotation(Math.round(angle + 135));
+    } else if (dragType.current === 'rotate-text') {
+        const fontSize = contentSize * textCenterSize;
+        tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+        const metrics = tempCtx.current.measureText(textCenterText);
+        const tw = metrics.width + (logoPadding || 10) * 2;
+        const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
+        const tx = contentX + (contentSize - tw) * textCenterPosX;
+        const ty = contentY + (contentSize - th) * textCenterPosY;
+        const centerX = tx + tw / 2;
+        const centerY = ty + th / 2;
+        const angle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
+        setTextCenterRotation(Math.round(angle + 135));
+    } else if (dragType.current && dragType.current.startsWith('resize-logo')) {
+        const lw = contentSize * logoWidth;
+        const lh = contentSize * logoHeight;
+        const lx = contentX + (contentSize - lw) * logoPosX;
+        const ly = contentY + (contentSize - lh) * logoPosY;
+        const centerX = lx + lw / 2;
+        const centerY = ly + lh / 2;
+        const dx_raw = x - centerX;
+        const dy_raw = y - centerY;
+        const ang = (-logoRotation * Math.PI) / 180;
+        const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
+        const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
+        const diffX = (localX - dragStartOffset.current.x) / contentSize;
+        const diffY = (localY - dragStartOffset.current.y) / contentSize;
+        let newW = dragStartOffset.current.startW;
+        let newH = dragStartOffset.current.startH;
+        if (dragType.current === 'resize-logo-br') {
+            const scale = Math.max(0.1, 1 + diffX * 2); 
+            newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW * scale));
+            newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH * scale));
+        } else if (dragType.current === 'resize-logo-r') {
+            newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW + diffX * 2));
+        } else if (dragType.current === 'resize-logo-b') {
+            newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH + diffY * 2));
+        } else if (dragType.current === 'resize-logo-tr') {
+            newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW + diffX * 2));
+            newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH - diffY * 2));
+        }
+        setLogoWidth(Math.round(newW * 100) / 100);
+        setLogoHeight(Math.round(newH * 100) / 100);
+    } else if (dragType.current && dragType.current.startsWith('resize-text')) {
+        const dx = x - dragStartOffset.current.x;
+        const diff = dx / contentSize;
+        const newSize = Math.max(0.05, Math.min(0.5, dragStartOffset.current.startSize + diff * 2));
+        setTextCenterSize(Math.round(newSize * 100) / 100);
+    } else if (dragType.current === 'logo' && logo?.image) {
+        const lw = contentSize * logoWidth;
+        const lh = contentSize * logoHeight;
+        const lx = contentX + (contentSize - lw) * logoPosX;
+        const ly = contentY + (contentSize - lh) * logoPosY;
+        const centerX = lx + lw / 2;
+        const centerY = ly + lh / 2;
+        const dx_raw = x - centerX;
+        const dy_raw = y - centerY;
+        const ang = (-logoRotation * Math.PI) / 180;
+        const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
+        const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
+        const newTargetX = localX - dragStartOffset.current.x - contentX;
+        const newTargetY = localY - dragStartOffset.current.y - contentY;
+        const valX = Math.max(0, Math.min(1, newTargetX / (contentSize - lw)));
+        const valY = Math.max(0, Math.min(1, newTargetY / (contentSize - lh)));
+        setLogoPosX(Math.round(valX * 1000) / 1000);
+        setLogoPosY(Math.round(valY * 1000) / 1000);
     } else if (dragType.current === 'text') {
       const fontSize = contentSize * textCenterSize;
-      const tw = textCenterText.length * fontSize * 0.6;
-      const th = fontSize;
-      setTextCenterPosX(Math.max(0, Math.min(1, newTargetX / (contentSize - tw))));
-      setTextCenterPosY(Math.max(0, Math.min(1, newTargetY / (contentSize - th))));
+      tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+      const metrics = tempCtx.current.measureText(textCenterText);
+      const tw = metrics.width + (logoPadding || 10) * 2;
+      const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
+      
+      const centerX = (contentX + (contentSize - tw) * textCenterPosX) + tw/2;
+      const centerY = (contentY + (contentSize - th) * textCenterPosY) + th/2;
+      const dx_raw = x - centerX;
+      const dy_raw = y - centerY;
+      const ang = (-textCenterRotation * Math.PI) / 180;
+      const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
+      const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
+
+      const newTargetX = localX - dragStartOffset.current.x - contentX;
+      const newTargetY = localY - dragStartOffset.current.y - contentY;
+      const valX = Math.max(0, Math.min(1, newTargetX / (contentSize - tw)));
+      const valY = Math.max(0, Math.min(1, newTargetY / (contentSize - th)));
+      setTextCenterPosX(Math.round(valX * 1000) / 1000);
+      setTextCenterPosY(Math.round(valY * 1000) / 1000);
     }
-  }, [isDraggingCanvas, logo, logoSize, textCenterSize, textCenterText, getQRContentArea]);
+  }, [isDraggingCanvas, logo, logoWidth, logoHeight, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, textCenterRotation, textCenterFont, logoPadding, getQRContentArea]);
 
   const stopCanvasDrag = useCallback(() => {
     setIsDraggingCanvas(false);
@@ -1231,28 +1574,7 @@ export default function App() {
             </button>
           )}
           <AppIcon size={36} shadow />
-          {activePage === 'generator' ? (
-            <div className="header-history-controls" style={{ marginLeft: '12px', display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={undo} 
-                disabled={history.length <= 1} 
-                className="header-history-btn"
-                title="Undo"
-              >
-                <Undo2 size={18} />
-              </button>
-              <button 
-                onClick={redo} 
-                disabled={redoStack.length === 0} 
-                className="header-history-btn"
-                title="Redo"
-              >
-                <Redo2 size={18} />
-              </button>
-            </div>
-          ) : (
-            <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
-          )}
+          <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
         </div>
 
         <div className="app-header-actions">
@@ -1478,6 +1800,44 @@ export default function App() {
                   )}
                 </div>
 
+                {/* Centered Undo/Redo Controls below QR */}
+                <div className="preview-actions-centered" style={{ display: 'flex', gap: '14px', marginTop: '4px' }}>
+                  <button 
+                    onClick={undo} 
+                    disabled={historyIndex <= 0}
+                    style={{ 
+                      width: '46px', height: '46px', borderRadius: '14px', 
+                      background: 'var(--bg-elevated)', 
+                      border: '1px solid var(--border-color)', 
+                      color: historyIndex <= 0 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                      cursor: historyIndex <= 0 ? 'default' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      opacity: historyIndex <= 0 ? 0.5 : 1
+                    }}
+                  >
+                    <Undo2 size={22} strokeWidth={2.5} />
+                  </button>
+                  <button 
+                    onClick={redo} 
+                    disabled={historyIndex >= history.length - 1}
+                    style={{ 
+                      width: '46px', height: '46px', borderRadius: '14px', 
+                      background: 'var(--bg-elevated)', 
+                      border: '1px solid var(--border-color)', 
+                      color: historyIndex >= history.length - 1 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                      cursor: historyIndex >= history.length - 1 ? 'default' : 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      opacity: historyIndex >= history.length - 1 ? 0.5 : 1
+                    }}
+                  >
+                    <Redo2 size={22} strokeWidth={2.5} />
+                  </button>
+                </div>
+
 
 
               </section>
@@ -1500,405 +1860,672 @@ export default function App() {
                 </div>
               )}
 
-              {/* Color Tab */}
-              {activeTab === 'color' && (
-                <div className="tab-panel fade-in" id="panel-color">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px' }}>
-                    <div className="panel-empty-state" style={{ opacity: 0.5, textAlign: 'center', marginTop: '40px' }}>
-                      <Palette size={32} style={{ marginBottom: '12px' }} />
-                      <p>Adjust colors using the toolbar below</p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              {/* Shapes Tab */}
-              {activeTab === 'shapes' && (
-                <div className="tab-panel fade-in" id="panel-shapes">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px' }}>
-                    <div className="panel-empty-state" style={{ opacity: 0.5, textAlign: 'center', marginTop: '40px' }}>
-                      <Hexagon size={32} style={{ marginBottom: '12px' }} />
-                      <p>Adjust shapes using the toolbar below</p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Logo Tab */}
               {activeTab === 'logo' && (
                 <div className="tab-panel fade-in" id="panel-logo">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px' }}>
-                    <div className="panel-empty-state" style={{ opacity: 0.5, textAlign: 'center', marginTop: '40px' }}>
-                      <ImageIcon size={32} style={{ marginBottom: '12px' }} />
-                      <p>Manage your logo using the toolbar below</p>
-                    </div>
+                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px 100px 20px' }}>
+                    {/* 1. Presets Section */}
+                    <LogoPresets 
+                      logo={logo} 
+                      onLogoChange={(l) => { 
+                        setLogo(l); 
+                        setLogoWidth(0.18); 
+                        setLogoHeight(0.18); 
+                        setLogoRotation(0);
+                        setLogoPosX(0.5);
+                        setLogoPosY(0.5);
+                        startEditing('logo', 'size'); 
+                      }} 
+                      onLogoRemove={() => { 
+                        setLogo(null); 
+                        setLogoWidth(0.18);
+                        setLogoHeight(0.18);
+                        setLogoRotation(0);
+                        if (logoPopup) cancelEditing(); 
+                      }} 
+                    />
                   </div>
+
                 </div>
               )}
 
-              {/* Text Tab */}
-              {activeTab === 'text' && (
-                <div className="tab-panel fade-in" id="panel-text">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px' }}>
-                    <div className="panel-empty-state" style={{ opacity: 0.5, textAlign: 'center', marginTop: '40px' }}>
-                      <Type size={32} style={{ marginBottom: '12px' }} />
-                      <p>Customize your text using the toolbar below</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+
+
+
             </section>
 
             {/* ─── Shared Unified Expandable Toolbar (Centralized Bottom Layer) ─── */}
-            {['color', 'shapes', 'logo', 'text'].includes(activeTab) && (
+            {((activeTab === 'logo' && logo) || activeTab === 'text' || activeTab === 'color' || activeTab === 'shapes') && (
               <div className="logo-toolbar-container">
                 <div className="unified-toolbar-card">
-                   {(logoPopup || textPopup || colorPopup || shapesPopup) && (
-                    <div className="property-edit-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-elevated)', borderTopLeftRadius: 'inherit', borderTopRightRadius: 'inherit' }}>
-                       <button onClick={handleCancelProperty} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '8px' }}>
-                         <X size={20} />
-                       </button>
-                       
-                       <button onClick={handleApplyProperty} style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '8px' }}>
-                         <Check size={20} />
-                       </button>
-                    </div>
-                  )}
+                  {(logoPopup || textPopup || colorPopup || shapePopup) ? (
+                    <div className="toolbar-editing-view fade-in">
+                      <div className="toolbar-editing-header">
+                        <button className="toolbar-cancel-btn" onClick={cancelEditing}>
+                          <X size={20} />
+                        </button>
+                        <button className="toolbar-apply-btn" onClick={applyEditing}>
+                          <Check size={20} />
+                        </button>
+                      </div>
 
-                  {/* PROPERTIES PANEL */}
-                  {(logoPopup || textPopup || colorPopup || shapesPopup) && (
-                    <div className="toolbar-properties-panel" style={{ padding: '20px', background: 'var(--bg-primary)' }}>
-                      
-                      {/* COLOR PROPERTIES */}
-                      {activeTab === 'color' && colorPopup && (
+                      <div className="toolbar-properties-panel-full">
+                      {logoPopup === 'size' && (
                         <div className="fade-in">
-                          {colorPopup === 'themes' && (
-                            <div className="color-presets-row">
-                              {COLOR_PRESETS.map(preset => (
-                                <div
-                                  key={preset.name}
-                                  className={`color-preset-swatch${activePreset === preset.name ? ' active' : ''}`}
-                                  title={preset.name}
-                                  style={{ background: `linear-gradient(135deg, ${preset.qr} 50%, ${preset.bg} 50%)` }}
-                                  onClick={() => { setQrColor(preset.qr); setBgColor(preset.bg); setLogoBgColor(preset.bg); setLogoOutlineColor(preset.qr); setBgTransparent(false); setActivePreset(preset.name); }}
-                                />
-                              ))}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                            <Slider label="Logo Width" value={logoWidth} min={0.05} max={0.6} step={0.01} onChange={setLogoWidth} />
+                            <Slider label="Logo Height" value={logoHeight} min={0.05} max={0.6} step={0.01} onChange={setLogoHeight} />
+                            <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
+                          </div>
+                        </div>
+                      )}
+                      {logoPopup === 'stroke' && (
+                        <div className="fade-in">
+                          <Toggle label="Enable Stroke" checked={logoOutline} onChange={setLogoOutline} />
+                          {logoOutline && (
+                            <div className="fade-in" style={{ marginTop: '14px' }}>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Stroke Color</div>
+                              <div className="swatch-grid-mini" style={{ marginBottom: '18px' }}>
+                                <ColorPicker isSwatch={true} icon={Pipette} value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div key={color} className={`swatch-item${logoOutlineColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoOutlineColor(color)} />
+                                ))}
+                              </div>
+                              <Slider label="Stroke Width" value={logoOutlineWidth} min={1} max={10} step={1} onChange={setLogoOutlineWidth} />
                             </div>
                           )}
-                          {colorPopup === 'dots' && (
-                            <div className="swatch-grid-mini">
-                              <ColorPicker isSwatch={true} icon={Pipette} value={qrColor} onChange={(c) => { setQrColor(c); setLogoOutlineColor(c); }} onOpenAdvanced={handleOpenAdv} />
-                              {SWATCH_PRESETS.map(color => (
-                                <div key={color} className={`swatch-item${qrColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => { setQrColor(color); setLogoOutlineColor(color); }} />
-                              ))}
-                            </div>
-                          )}
-                          {colorPopup === 'bg' && (
-                            <div className="swatch-grid-mini">
-                              <ColorPicker isSwatch={true} icon={Pipette} value={bgColor} onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} onOpenAdvanced={handleOpenAdv} />
-                              {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
-                                <div key={color} className={`swatch-item${bgColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => { setBgColor(color); setLogoBgColor(color); setBgTransparent(false); }} />
-                              ))}
-                            </div>
-                          )}
-                          {colorPopup === 'eyes' && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                              <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
-                              <div style={{ opacity: syncEyes ? 0.5 : 1 }}>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>Inner Eyes</div>
-                                <div className="swatch-grid-mini" style={{ marginBottom: '14px' }}>
-                                  <ColorPicker isSwatch={true} icon={Pipette} value={syncEyes ? qrColor : (eyeColor || qrColor)} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} disabled={syncEyes} />
-                                  {SWATCH_PRESETS.map(color => (
-                                    <div key={color} className={`swatch-item${(syncEyes ? qrColor : eyeColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => !syncEyes && setEyeColor(color)} />
-                                  ))}
-                                </div>
-                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>Outer Eyes</div>
-                                <div className="swatch-grid-mini">
-                                  <ColorPicker isSwatch={true} icon={Pipette} value={syncEyes ? qrColor : (eyeOuterColor || qrColor)} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} disabled={syncEyes} />
-                                  {SWATCH_PRESETS.map(color => (
-                                    <div key={color} className={`swatch-item${(syncEyes ? qrColor : eyeOuterColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => !syncEyes && setEyeOuterColor(color)} />
-                                  ))}
-                                </div>
+                        </div>
+                      )}
+                      {logoPopup === 'bg' && (
+                        <div className="fade-in">
+                          <Toggle label="Enable Background" checked={logoBackground} onChange={setLogoBackground} />
+                          {logoBackground && (
+                            <div className="fade-in" style={{ marginTop: '14px' }}>
+                              <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '14px' }}>
+                                {TEXT_SHAPES.map(shape => {
+                                  const isActive = logoBgShape === shape.id;
+                                  return (
+                                    <button 
+                                      key={shape.id} 
+                                      onClick={() => setLogoBgShape(shape.id)}
+                                      className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
+                                      style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: isActive ? '0 4px 12px rgba(255,59,48,0.3)' : 'none' }}
+                                    >
+                                      {shape.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Background Color</div>
+                              <div className="swatch-grid-mini">
+                                <ColorPicker isSwatch={true} icon={Pipette} value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div key={color} className={`swatch-item${logoBgColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoBgColor(color)} />
+                                ))}
                               </div>
                             </div>
                           )}
                         </div>
                       )}
-
-                      {/* SHAPES PROPERTIES */}
-                      {activeTab === 'shapes' && shapesPopup && (
+                      {logoPopup === 'pos' && (
                         <div className="fade-in">
-                          {shapesPopup === 'corner' && (
-                            <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
-                          )}
-                          {shapesPopup === 'dots' && (
-                            <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
-                          )}
+                          <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <div className="pos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'var(--bg-elevated)', borderRadius: '16px' }}>
+                                {[0, 0.5, 1].map(y => [0, 0.5, 1].map(x => (
+                                  <button key={`${x}-${y}`} onClick={() => { setLogoPosX(x); setLogoPosY(y); }} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)', background: logoPosX === x && logoPosY === y ? 'var(--accent-primary)' : 'var(--bg-primary)', cursor: 'pointer', transition: 'all 0.2s ease' }} />
+                                )))}
+                              </div>
+                            </div>
+                            <Slider label="Horizontal" value={logoPosX} min={0} max={1} step={0.01} onChange={setLogoPosX} />
+                            <Slider label="Vertical" value={logoPosY} min={0} max={1} step={0.01} onChange={setLogoPosY} />
+                          </div>
                         </div>
                       )}
-
-                      {/* LOGO PROPERTIES */}
-                      {activeTab === 'logo' && logoPopup && (
+                      {logoPopup === 'rotate' && (
                         <div className="fade-in">
-                          {logoPopup === 'source' && (
-                            <LogoPresets logo={logo} onLogoChange={setLogo} onLogoRemove={() => setLogo(null)} />
-                          )}
-                          {logoPopup === 'size' && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                              <Slider label="Logo Size" value={logoSize} min={0.1} max={0.4} step={0.01} onChange={setLogoSize} />
-                              <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
+                          <Slider label="Rotation" value={logoRotation} min={0} max={360} step={1} onChange={setLogoRotation} />
+                        </div>
+                      )}
+                      {logoPopup === 'opacity' && (
+                        <div className="fade-in">
+                          <Slider label="Opacity" value={logoOpacity} min={0} max={1} step={0.01} onChange={setLogoOpacity} />
+                        </div>
+                      )}
+                      {logoPopup === 'shadow' && (
+                        <div className="fade-in">
+                          <Toggle label="Drop Shadow" checked={logoShadowEnabled} onChange={setLogoShadowEnabled} />
+                          {logoShadowEnabled && (
+                            <div className="fade-in" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '-8px' }}>Shadow Color</div>
+                               <ColorPicker value={logoShadowColor} onChange={setLogoShadowColor} />
+                               <Slider label="Blur" value={logoShadowBlur} min={0} max={40} step={1} onChange={setLogoShadowBlur} />
+                               <div style={{ display: 'flex', gap: '12px' }}>
+                                 <div style={{ flex: 1 }}><Slider label="Offset X" value={logoShadowOffsetX} min={-20} max={20} step={1} onChange={setLogoShadowOffsetX} /></div>
+                                 <div style={{ flex: 1 }}><Slider label="Offset Y" value={logoShadowOffsetY} min={-20} max={20} step={1} onChange={setLogoShadowOffsetY} /></div>
+                               </div>
                             </div>
                           )}
-                          {logoPopup === 'stroke' && (
-                            <>
-                              <Toggle label="Enable Stroke" checked={logoOutline} onChange={setLogoOutline} />
-                              {logoOutline && (
-                                <div className="fade-in" style={{ marginTop: '14px' }}>
-                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Stroke Color</div>
-                                  <div className="swatch-grid-mini" style={{ marginBottom: '18px' }}>
-                                    <ColorPicker isSwatch={true} icon={Pipette} value={logoOutlineColor} onChange={setLogoOutlineColor} onOpenAdvanced={handleOpenAdv} />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div key={color} className={`swatch-item${logoOutlineColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoOutlineColor(color)} />
-                                    ))}
-                                  </div>
-                                  <Slider label="Stroke Width" value={logoOutlineWidth} min={1} max={10} step={1} onChange={setLogoOutlineWidth} />
-                                </div>
-                              )}
-                            </>
-                          )}
-                          {logoPopup === 'bg' && (
-                            <>
-                              <Toggle label="Enable Background" checked={logoBackground} onChange={setLogoBackground} />
-                              {logoBackground && (
-                                <div className="fade-in" style={{ marginTop: '14px' }}>
-                                  <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '14px' }}>
-                                    {TEXT_SHAPES.map(shape => {
-                                      const isActive = logoBgShape === shape.id;
-                                      return (
-                                        <button 
-                                          key={shape.id} 
-                                          onClick={() => setLogoBgShape(shape.id)}
-                                          className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
-                                          style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: isActive ? '0 4px 12px rgba(255,59,48,0.3)' : 'none' }}
-                                        >
-                                          {shape.label}
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Background Color</div>
-                                  <div className="swatch-grid-mini">
-                                    <ColorPicker isSwatch={true} icon={Pipette} value={logoBgColor} onChange={setLogoBgColor} onOpenAdvanced={handleOpenAdv} />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div key={color} className={`swatch-item${logoBgColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setLogoBgColor(color)} />
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </>
-                          )}
-                          {logoPopup === 'pos' && (
-                            <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
-                              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                <div className="pos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'var(--bg-elevated)', borderRadius: '16px' }}>
-                                  {[0, 0.5, 1].map(y => [0, 0.5, 1].map(x => (
-                                    <button key={`${x}-${y}`} onClick={() => { setLogoPosX(x); setLogoPosY(y); }} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)', background: logoPosX === x && logoPosY === y ? 'var(--accent-primary)' : 'var(--bg-primary)', cursor: 'pointer', transition: 'all 0.2s ease' }} />
-                                  )))}
-                                </div>
-                              </div>
-                              <Slider label="Horizontal" value={logoPosX} min={0} max={1} step={0.01} onChange={setLogoPosX} />
-                              <Slider label="Vertical" value={logoPosY} min={0} max={1} step={0.01} onChange={setLogoPosY} />
-                            </div>
-                          )}
+                          <div style={{ marginTop: '16px' }}>
+                            <Toggle label="Inner Shadow" checked={logoInnerShadowEnabled} onChange={setLogoInnerShadowEnabled} />
+                          </div>
+                        </div>
+                      )}
+                      {logoPopup === 'filter' && (
+                        <div className="fade-in">
+                           <Toggle label="Erase Color (Green Screen)" checked={logoEraseColorEnabled} onChange={setLogoEraseColorEnabled} />
+                           {logoEraseColorEnabled && (
+                             <div className="fade-in" style={{ marginTop: '16px' }}>
+                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Target Color to Remove</div>
+                               <ColorPicker value={logoEraseColor} onChange={setLogoEraseColor} />
+                               <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '8px' }}>Automatically removes the selected color (e.g. white/black backgrounds).</p>
+                             </div>
+                           )}
+                        </div>
+                      )}
+                      {logoPopup === 'texture' && (
+                        <div className="fade-in">
+                           <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
+                                {['none', 'glass', 'carbon', 'metal', 'mesh', 'dots'].map(t => {
+                                  const isActive = logoTexture === t;
+                                  return (
+                                    <button 
+                                      key={t} 
+                                      onClick={() => setLogoTexture(t)}
+                                      className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
+                                      style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', textTransform: 'capitalize' }}
+                                    >
+                                      {t}
+                                    </button>
+                                  );
+                                })}
+                           </div>
+                        </div>
+                      )}
+                      {logoPopup === 'crop' && (
+                        <div className="fade-in">
+                           <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>Quick Shape Crop</div>
+                           <div className="seg-control" style={{ marginBottom: '16px' }}>
+                             <button className={`seg-btn ${logoCrop === 'none' ? 'active' : ''}`} onClick={() => setLogoCrop('none')}>None</button>
+                             <button className={`seg-btn ${logoCrop === 'circle' ? 'active' : ''}`} onClick={() => setLogoCrop('circle')}>Circle</button>
+                             <button className={`seg-btn ${logoCrop === 'rounded' ? 'active' : ''}`} onClick={() => setLogoCrop('rounded')}>Rounded</button>
+                             <button className={`seg-btn ${logoCrop === 'square' ? 'active' : ''}`} onClick={() => setLogoCrop('square')}>Square</button>
+                           </div>
+                           <p style={{ fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                             Select a shape to instantly mask your logo.
+                           </p>
                         </div>
                       )}
 
                       {/* TEXT PROPERTIES */}
-                      {activeTab === 'text' && textPopup && (
+                      {textPopup === 'input' && (
                         <div className="fade-in">
-                          {textPopup === 'input' && (
-                            <>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Enable Text</div>
-                                <Toggle
-                                  checked={textEditMode === 'center' ? textCenterEnabled : frameStyle !== 'none'}
-                                  onChange={(val) => {
-                                    if (textEditMode === 'center') {
-                                      setTextCenterEnabled(val);
-                                      if (val) setLogo(null);
-                                    } else {
-                                      setFrameStyle(val ? 'text-bottom' : 'none');
-                                    }
-                                  }}
-                                />
-                              </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Enable Text</div>
+                            <Toggle
+                              checked={textEditMode === 'center' ? textCenterEnabled : frameStyle !== 'none'}
+                              onChange={(val) => {
+                                if (textEditMode === 'center') {
+                                  setTextCenterEnabled(val);
+                                  if (val) {
+                                    setLogo(null);
+                                    setLogoWidth(0.18);
+                                    setLogoHeight(0.18);
+                                    setLogoRotation(0);
+                                  }
+                                } else {
+                                  setFrameStyle(val ? 'text-bottom' : 'none');
+                                }
+                              }}
+                            />
+                          </div>
 
-                              <div className="seg-control" style={{ marginBottom: '16px' }}>
-                                <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>QR Text</button>
-                                <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom Text</button>
-                              </div>
-
-                              {textEditMode === 'center' && (
-                                <div style={{ opacity: textCenterEnabled ? 1 : 0.5, pointerEvents: textCenterEnabled ? 'all' : 'none' }}>
-                                  <input type="text" maxLength={18} value={textCenterText} onChange={(e) => setTextCenterText(e.target.value)} placeholder="Type QR text..." className="text-input-premium" style={{ width: '100%', marginBottom: '4px' }} />
-                                </div>
-                              )}
-
-                              {textEditMode === 'bottom' && (
-                                <div style={{ opacity: frameStyle !== 'none' ? 1 : 0.5, pointerEvents: frameStyle !== 'none' ? 'all' : 'none' }}>
-                                  <input type="text" value={frameText} onChange={(e) => { setFrameText(e.target.value); if (frameStyle === 'none' && e.target.value.trim() !== '') { setFrameStyle('solid'); } }} placeholder="Type bottom text..." className="text-input-premium" style={{ width: '100%', marginBottom: '4px' }} />
-                                </div>
-                              )}
-                            </>
-                          )}
-                          
-                          {textPopup === 'fonts' && (
-                            <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
-                              <button onClick={() => fontInputRef.current?.click()} className="font-scroll-btn" style={{ flex: '0 0 auto', padding: '10px 20px', borderRadius: '12px', background: 'transparent', color: 'var(--accent-primary)', border: '2px dashed var(--accent-primary)', fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '8px' }}><Plus size={14} /> Add Font</button>
-                              <input type="file" ref={fontInputRef} style={{ display: 'none' }} accept=".ttf,.otf,.woff,.woff2" onChange={handleFontUpload} />
-                              {customFonts.map(font => (
-                                <button key={font.id} onClick={() => { if (textEditMode === 'center') setTextCenterFont(font.id); else { setFrameFont(font.id); if (frameStyle === 'none') setFrameStyle('text-bottom'); } }} className={`font-scroll-btn ${(textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'active' : ''}`} style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--border-color)', fontFamily: font.id, fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', boxShadow: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '0 4px 12px rgba(255,59,48,0.3)' : 'none', transition: 'all 0.2s ease' }}>{font.label} ★</button>
-                              ))}
-                              {FONT_OPTIONS.map(font => (
-                                <button key={font.id} onClick={() => { if (textEditMode === 'center') setTextCenterFont(font.id); else { setFrameFont(font.id); if (frameStyle === 'none') setFrameStyle('text-bottom'); } }} className={`font-scroll-btn ${(textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'active' : ''}`} style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'var(--accent-primary)' : 'var(--border-color)', fontFamily: font.id, fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', boxShadow: (textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? '0 4px 12px rgba(255,59,48,0.3)' : 'none', transition: 'all 0.2s ease' }}>{font.label}</button>
-                              ))}
+                          <div className="editing-row-item">
+                            <div className="seg-control" style={{ marginBottom: '16px' }}>
+                              <button className={`seg-btn ${textEditMode === 'center' ? 'active' : ''}`} onClick={() => setTextEditMode('center')}>QR Text</button>
+                              <button className={`seg-btn ${textEditMode === 'bottom' ? 'active' : ''}`} onClick={() => setTextEditMode('bottom')}>Bottom Text</button>
                             </div>
-                          )}
-                          {textPopup === 'size' && (
-                            <Slider label="Size" min={0.02} max={0.18} step={0.01} value={textEditMode === 'center' ? textCenterSize : frameSize} onChange={textEditMode === 'center' ? setTextCenterSize : setFrameSize} />
-                          )}
-                          {textPopup === 'color' && (
-                            <div className="swatch-grid-mini">
-                              <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? textCenterColor : frameColor} onChange={textEditMode === 'center' ? setTextCenterColor : setFrameColor} onOpenAdvanced={handleOpenAdv} />
-                              {SWATCH_PRESETS.map(color => (
-                                <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterColor : frameColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterColor(color) : setFrameColor(color)} />
-                              ))}
-                            </div>
-                          )}
-                          {textPopup === 'stroke' && (
-                            <>
-                              <Toggle label="Enable Stroke" checked={textEditMode === 'center' ? textCenterStrokeEnabled : frameStrokeEnabled} onChange={textEditMode === 'center' ? setTextCenterStrokeEnabled : setFrameStrokeEnabled} />
-                              {(textEditMode === 'center' ? textCenterStrokeEnabled : frameStrokeEnabled) && (
-                                <div className="fade-in" style={{ marginTop: '14px' }}>
-                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Stroke Color</div>
-                                  <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
-                                    <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor} onChange={textEditMode === 'center' ? setTextCenterStrokeColor : setFrameStrokeColor} onOpenAdvanced={handleOpenAdv} />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterStrokeColor(color) : setFrameStrokeColor(color)} />
-                                    ))}
-                                  </div>
-                                  <Slider label="Stroke Width" min={1} max={20} value={textEditMode === 'center' ? textCenterStrokeWidth : frameStrokeWidth} onChange={textEditMode === 'center' ? setTextCenterStrokeWidth : setFrameStrokeWidth} />
-                                </div>
-                              )}
-                            </>
-                          )}
-                          {textPopup === 'shadow' && (
-                            <>
-                              <Toggle label="Enable Shadow" checked={textEditMode === 'center' ? textCenterShadowEnabled : frameShadowEnabled} onChange={textEditMode === 'center' ? setTextCenterShadowEnabled : setFrameShadowEnabled} />
-                              {(textEditMode === 'center' ? textCenterShadowEnabled : frameShadowEnabled) && (
-                                <div className="fade-in" style={{ marginTop: '14px' }}>
-                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Shadow Color</div>
-                                  <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
-                                    <ColorPicker isSwatch={true} icon={Pipette} iconSize={14} value={textEditMode === 'center' ? textCenterShadowColor : frameShadowColor} onChange={textEditMode === 'center' ? setTextCenterShadowColor : setFrameShadowColor} onOpenAdvanced={handleOpenAdv} />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterShadowColor : frameShadowColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterShadowColor(color) : setFrameShadowColor(color)} />
-                                    ))}
-                                  </div>
-                                  <Slider label="Shadow Blur" min={0} max={30} value={textEditMode === 'center' ? textCenterShadowBlur : frameShadowBlur} onChange={textEditMode === 'center' ? setTextCenterShadowBlur : setFrameShadowBlur} />
-                                </div>
-                              )}
-                            </>
-                          )}
-                          {textPopup === 'bg' && (
-                            <>
-                              {textEditMode === 'center' && (
-                                <Toggle label="Enable Background" checked={logoBackground} onChange={setLogoBackground} />
-                              )}
-                              {(textEditMode === 'bottom' || logoBackground) && (
-                                <div className="fade-in" style={{ marginTop: textEditMode === 'center' ? '14px' : '0' }}>
-                                  <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '14px' }}>
-                                    {TEXT_SHAPES.map(shape => {
-                                      const isActive = textEditMode === 'center' ? logoBgShape === shape.id : frameStyle === shape.id;
-                                      return (
-                                        <button 
-                                          key={shape.id} 
-                                          onClick={() => {
-                                            if (textEditMode === 'center') setLogoBgShape(shape.id);
-                                            else setFrameStyle(shape.id);
-                                          }}
-                                          className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
-                                          style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: isActive ? '0 4px 12px rgba(255,59,48,0.3)' : 'none' }}
-                                        >
-                                          {shape.label}
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Shape Color</div>
-                                  <div className="swatch-grid-mini">
-                                    <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? logoBgColor : frameColor} onChange={textEditMode === 'center' ? setLogoBgColor : setFrameColor} onOpenAdvanced={handleOpenAdv} />
-                                    {SWATCH_PRESETS.map(color => (
-                                      <div key={color} className={`swatch-item${(textEditMode === 'center' ? logoBgColor : frameColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setLogoBgColor(color) : setFrameColor(color)} />
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </>
-                          )}
-                          {textPopup === 'pos' && (
-                            <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
-                              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                <div className="pos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'var(--bg-elevated)', borderRadius: '16px' }}>
-                                  {[0, 0.5, 1].map(y => [0, 0.5, 1].map(x => (
-                                    <button key={`${x}-${y}`} onClick={() => { setTextCenterPosX(x); setTextCenterPosY(y); }} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)', background: textCenterPosX === x && textCenterPosY === y ? 'var(--accent-primary)' : 'var(--bg-primary)', cursor: 'pointer', transition: 'all 0.2s ease' }} />
-                                  )))}
-                                </div>
+                            <input 
+                              type="text" 
+                              maxLength={textEditMode === 'center' ? 18 : 50} 
+                              value={textEditMode === 'center' ? textCenterText : frameText} 
+                              onChange={(e) => textEditMode === 'center' ? setTextCenterText(e.target.value) : setFrameText(e.target.value)} 
+                              placeholder={`Type ${textEditMode === 'center' ? 'QR' : 'bottom'} text...`} 
+                              className="text-input-premium" 
+                              style={{ width: '100%' }} 
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {textPopup === 'fonts' && (
+                        <div className="fade-in">
+                          <button onClick={() => fontInputRef.current?.click()} className="font-scroll-btn-wide"><Plus size={14} /> Add Font</button>
+                          <input type="file" ref={fontInputRef} style={{ display: 'none' }} accept=".ttf,.otf,.woff,.woff2" onChange={handleFontUpload} />
+                          <div className="fonts-grid">
+                            {customFonts.map(font => (
+                              <button key={font.id} onClick={() => { if (textEditMode === 'center') setTextCenterFont(font.id); else { setFrameFont(font.id); if (frameStyle === 'none') setFrameStyle('text-bottom'); } }} className={`font-btn ${(textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'active' : ''}`} style={{ fontFamily: font.id }}>{font.label} ★</button>
+                            ))}
+                            {FONT_OPTIONS.map(font => (
+                              <button key={font.id} onClick={() => { if (textEditMode === 'center') setTextCenterFont(font.id); else { setFrameFont(font.id); if (frameStyle === 'none') setFrameStyle('text-bottom'); } }} className={`font-btn ${(textEditMode === 'center' ? textCenterFont : frameFont) === font.id ? 'active' : ''}`} style={{ fontFamily: font.id }}>{font.label}</button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {textPopup === 'size' && (
+                        <div className="fade-in">
+                          <Slider label="Size" min={0.02} max={0.18} step={0.01} value={textEditMode === 'center' ? textCenterSize : frameSize} onChange={textEditMode === 'center' ? setTextCenterSize : setFrameSize} />
+                        </div>
+                      )}
+                      {textPopup === 'color' && (
+                        <div className="fade-in">
+                          <div className="swatch-grid-mini">
+                            <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? textCenterColor : frameColor} onChange={textEditMode === 'center' ? setTextCenterColor : setFrameColor} onOpenAdvanced={handleOpenAdv} />
+                            {SWATCH_PRESETS.map(color => (
+                              <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterColor : frameColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterColor(color) : setFrameColor(color)} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {textPopup === 'stroke' && (
+                        <div className="fade-in">
+                          <Toggle label="Enable Stroke" checked={textEditMode === 'center' ? textCenterStrokeEnabled : frameStrokeEnabled} onChange={textEditMode === 'center' ? setTextCenterStrokeEnabled : setFrameStrokeEnabled} />
+                          {(textEditMode === 'center' ? textCenterStrokeEnabled : frameStrokeEnabled) && (
+                            <div className="fade-in" style={{ marginTop: '14px' }}>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Stroke Color</div>
+                              <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
+                                <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor} onChange={textEditMode === 'center' ? setTextCenterStrokeColor : setFrameStrokeColor} onOpenAdvanced={handleOpenAdv} />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterStrokeColor : frameStrokeColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterStrokeColor(color) : setFrameStrokeColor(color)} />
+                                ))}
                               </div>
-                              <Slider label="Horizontal" value={textCenterPosX} min={0} max={1} step={0.01} onChange={setTextCenterPosX} />
-                              <Slider label="Vertical" value={textCenterPosY} min={0} max={1} step={0.01} onChange={setTextCenterPosY} />
+                              <Slider label="Stroke Width" min={1} max={20} value={textEditMode === 'center' ? textCenterStrokeWidth : frameStrokeWidth} onChange={textEditMode === 'center' ? setTextCenterStrokeWidth : setFrameStrokeWidth} />
                             </div>
                           )}
                         </div>
                       )}
-                    </div>
-                  )}
+                      {textPopup === 'shadow' && (
+                        <div className="fade-in">
+                          <Toggle label="Enable Shadow" checked={textEditMode === 'center' ? textCenterShadowEnabled : frameShadowEnabled} onChange={textEditMode === 'center' ? setTextCenterShadowEnabled : setFrameShadowEnabled} />
+                          {(textEditMode === 'center' ? textCenterShadowEnabled : frameShadowEnabled) && (
+                            <div className="fade-in" style={{ marginTop: '14px' }}>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Shadow Color</div>
+                              <div className="swatch-grid-mini" style={{ marginBottom: '12px' }}>
+                                <ColorPicker isSwatch={true} icon={Pipette} iconSize={14} value={textEditMode === 'center' ? textCenterShadowColor : frameShadowColor} onChange={textEditMode === 'center' ? setTextCenterShadowColor : setFrameShadowColor} onOpenAdvanced={handleOpenAdv} />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div key={color} className={`swatch-item${(textEditMode === 'center' ? textCenterShadowColor : frameShadowColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setTextCenterShadowColor(color) : setFrameShadowColor(color)} />
+                                ))}
+                              </div>
+                              <Slider label="Shadow Blur" min={0} max={30} value={textEditMode === 'center' ? textCenterShadowBlur : frameShadowBlur} onChange={textEditMode === 'center' ? setTextCenterShadowBlur : setFrameShadowBlur} />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {textPopup === 'bg' && (
+                        <div className="fade-in">
+                          {textEditMode === 'center' && (
+                            <Toggle label="Enable Background" checked={logoBackground} onChange={setLogoBackground} />
+                          )}
+                          {(textEditMode === 'bottom' || logoBackground) && (
+                            <div className="fade-in" style={{ marginTop: textEditMode === 'center' ? '14px' : '0' }}>
+                              <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '14px' }}>
+                                {TEXT_SHAPES.map(shape => {
+                                  const isActive = textEditMode === 'center' ? logoBgShape === shape.id : frameStyle === shape.id;
+                                  return (
+                                    <button 
+                                      key={shape.id} 
+                                      onClick={() => {
+                                        if (textEditMode === 'center') setLogoBgShape(shape.id);
+                                        else setFrameStyle(shape.id);
+                                      }}
+                                      className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
+                                      style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', cursor: 'pointer', transition: 'all 0.2s ease', boxShadow: isActive ? '0 4px 12px rgba(255,59,48,0.3)' : 'none' }}
+                                    >
+                                      {shape.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Shape Color</div>
+                              <div className="swatch-grid-mini">
+                                <ColorPicker isSwatch={true} icon={Pipette} value={textEditMode === 'center' ? logoBgColor : frameColor} onChange={textEditMode === 'center' ? setLogoBgColor : setFrameColor} onOpenAdvanced={handleOpenAdv} />
+                                {SWATCH_PRESETS.map(color => (
+                                  <div key={color} className={`swatch-item${(textEditMode === 'center' ? logoBgColor : frameColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => textEditMode === 'center' ? setLogoBgColor(color) : setFrameColor(color)} />
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {textPopup === 'pos' && (
+                        <div className="fade-in">
+                          <div style={{ display: 'flex', gap: '16px', flexDirection: 'column' }}>
+                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                              <div className="pos-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '8px', background: 'var(--bg-elevated)', borderRadius: '16px' }}>
+                                {[0, 0.5, 1].map(y => [0, 0.5, 1].map(x => (
+                                  <button key={`${x}-${y}`} onClick={() => { setTextCenterPosX(x); setTextCenterPosY(y); }} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)', background: textCenterPosX === x && textCenterPosY === y ? 'var(--accent-primary)' : 'var(--bg-primary)', cursor: 'pointer', transition: 'all 0.2s ease' }} />
+                                )))}
+                              </div>
+                            </div>
+                            <Slider label="Horizontal" value={textCenterPosX} min={0} max={1} step={0.01} onChange={setTextCenterPosX} />
+                            <Slider label="Vertical" value={textCenterPosY} min={0} max={1} step={0.01} onChange={setTextCenterPosY} />
+                          </div>
+                        </div>
+                      )}
+                      {textPopup === 'rotate' && (
+                        <div className="fade-in">
+                          <Slider 
+                            label="Rotation" 
+                            value={textCenterRotation} 
+                            min={0} 
+                            max={360} 
+                            step={1} 
+                            onChange={(val) => {
+                              if (textEditMode === 'center') setTextCenterRotation(val);
+                            }} 
+                          />
+                        </div>
+                      )}
 
-                  {/* MAIN TOOLS ROW (Hidden when editing) */}
-                  {!logoPopup && !textPopup && !colorPopup && !shapesPopup && (
-                    <div className="toolbar-tabs-row">
+
+                      {colorPopup === 'presets' && (
+                        <div className="fade-in">
+                          <div className="swatch-grid-mini" style={{ padding: '4px 0 16px 0', gap: '10px' }}>
+                            {COLOR_PRESETS.map(p => {
+                              const isSelected = qrColor === p.qr && bgColor === p.bg;
+                              return (
+                                <button 
+                                  key={p.name} 
+                                  onClick={() => { 
+                                    setQrColor(p.qr); 
+                                    setBgColor(p.bg); 
+                                    if (syncEyes) { setEyeColor(p.qr); setEyeOuterColor(p.qr); } 
+                                    setBgTransparent(false);
+                                  }} 
+                                  style={{ 
+                                    flex: '0 0 auto',
+                                    display: 'flex', 
+                                    flexDirection: 'column',
+                                    alignItems: 'center', 
+                                    gap: '6px', 
+                                    background: 'none', 
+                                    border: 'none',
+                                    padding: '0',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    width: '60px'
+                                  }}
+                                >
+                                  <div style={{ 
+                                    width: '44px', 
+                                    height: '44px', 
+                                    borderRadius: '12px', 
+                                    background: p.bg, 
+                                    border: isSelected ? '2px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    overflow: 'hidden',
+                                    boxShadow: isSelected ? '0 8px 16px rgba(255,59,48,0.25)' : '0 2px 6px rgba(0,0,0,0.06)',
+                                    transition: 'all 0.2s ease'
+                                  }}>
+                                    <div style={{ width: '20px', height: '20px', borderRadius: '4px', background: p.qr }} />
+                                  </div>
+                                  <span style={{ 
+                                    fontSize: '10px', 
+                                    fontWeight: isSelected ? 700 : 500, 
+                                    color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)', 
+                                    whiteSpace: 'nowrap', 
+                                    overflow: 'hidden', 
+                                    textOverflow: 'ellipsis', 
+                                    width: '100%', 
+                                    textAlign: 'center' 
+                                  }}>{p.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                      {colorPopup === 'dots' && (
+                        <div className="fade-in">
+                          <div className="swatch-grid-mini">
+                            <ColorPicker isSwatch={true} icon={Pipette} value={qrColor} onChange={(c) => { setQrColor(c); }} onOpenAdvanced={handleOpenAdv} />
+                            {SWATCH_PRESETS.map(color => (
+                              <div key={color} className={`swatch-item${qrColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => { setQrColor(color); }} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {colorPopup === 'bg' && (
+                        <div className="fade-in">
+                          <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
+                          <div className="swatch-grid-mini" style={{ marginTop: '16px' }}>
+                            <ColorPicker isSwatch={true} icon={Pipette} value={bgColor} onChange={(c) => { setBgColor(c); setLogoBgColor(c); setBgTransparent(false); }} onOpenAdvanced={handleOpenAdv} />
+                            {['#FFFFFF', '#000000', ...SWATCH_PRESETS.slice(2)].map(color => (
+                              <div key={color} className={`swatch-item${!bgTransparent && bgColor === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => { setBgColor(color); setLogoBgColor(color); setBgTransparent(false); }} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {colorPopup === 'eyes' && (
+                        <div className="fade-in">
+                          <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
+                          {!syncEyes && (
+                            <div className="fade-in" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              <div>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>Inner Eyes</div>
+                                <div className="swatch-grid-mini">
+                                  <ColorPicker isSwatch={true} icon={Pipette} value={eyeColor || qrColor} onChange={setEyeColor} onOpenAdvanced={handleOpenAdv} />
+                                  {SWATCH_PRESETS.map(color => (
+                                    <div key={color} className={`swatch-item${(eyeColor || qrColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setEyeColor(color)} />
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>Outer Eyes</div>
+                                <div className="swatch-grid-mini">
+                                  <ColorPicker isSwatch={true} icon={Pipette} value={eyeOuterColor || qrColor} onChange={setEyeOuterColor} onOpenAdvanced={handleOpenAdv} />
+                                  {SWATCH_PRESETS.map(color => (
+                                    <div key={color} className={`swatch-item${(eyeOuterColor || qrColor) === color ? ' active' : ''}`} style={{ backgroundColor: color }} onClick={() => setEyeOuterColor(color)} />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {colorPopup === 'gradient' && (
+                        <div className="fade-in">
+                          <Toggle label="Enable Gradient" checked={gradientEnabled} onChange={setGradientEnabled} />
+                          {gradientEnabled && (
+                            <div className="fade-in" style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              <Toggle label="Sync Eyes with Gradient" checked={syncEyes} onChange={setSyncEyes} />
+                              <div className="swatch-grid-mini" style={{ padding: '0 0 12px 0', gap: '10px' }}>
+                                {GRADIENT_PRESETS.map(p => {
+                                  const isSelected = gradientColor1 === p.c1 && gradientColor2 === p.c2;
+                                  return (
+                                    <button 
+                                      key={p.name} 
+                                      onClick={() => { 
+                                        setGradientColor1(p.c1); 
+                                        setGradientColor2(p.c2); 
+                                      }} 
+                                      style={{ 
+                                        flex: '0 0 auto',
+                                        display: 'flex', 
+                                        flexDirection: 'column',
+                                        alignItems: 'center', 
+                                        gap: '6px', 
+                                        background: 'none', 
+                                        border: 'none',
+                                        padding: '0',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        width: '60px'
+                                      }}
+                                    >
+                                      <div style={{ 
+                                        width: '44px', 
+                                        height: '44px', 
+                                        borderRadius: '12px', 
+                                        background: `linear-gradient(135deg, ${p.c1}, ${p.c2})`, 
+                                        border: isSelected ? '2px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                                        boxShadow: isSelected ? '0 8px 16px rgba(255,59,48,0.25)' : '0 2px 6px rgba(0,0,0,0.06)',
+                                        transition: 'all 0.2s ease'
+                                      }} />
+                                      <span style={{ 
+                                        fontSize: '10px', 
+                                        fontWeight: isSelected ? 700 : 500, 
+                                        color: isSelected ? 'var(--accent-primary)' : 'var(--text-secondary)', 
+                                        whiteSpace: 'nowrap', 
+                                        overflow: 'hidden', 
+                                        textOverflow: 'ellipsis', 
+                                        width: '100%', 
+                                        textAlign: 'center' 
+                                      }}>{p.name}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              <div className="seg-control">
+                                <button className={`seg-btn ${gradientType === 'linear' ? 'active' : ''}`} onClick={() => setGradientType('linear')}>Linear</button>
+                                <button className={`seg-btn ${gradientType === 'radial' ? 'active' : ''}`} onClick={() => setGradientType('radial')}>Radial</button>
+                              </div>
+                              <div style={{ display: 'flex', gap: '12px' }}>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>Color 1</div>
+                                  <ColorPicker value={gradientColor1} onChange={setGradientColor1} onOpenAdvanced={handleOpenAdv} />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>Color 2</div>
+                                  <ColorPicker value={gradientColor2} onChange={setGradientColor2} onOpenAdvanced={handleOpenAdv} />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {colorPopup === 'texture' && (
+                        <div className="fade-in">
+                          <Toggle label="Enable QR Texture" checked={qrTextureEnabled} onChange={setQrTextureEnabled} />
+                          {qrTextureEnabled && (
+                            <div className="fade-in" style={{ marginTop: '16px' }}>
+                              <Toggle label="Sync Eyes with Texture" checked={qrTextureSyncEyes} onChange={setQrTextureSyncEyes} />
+                              <div style={{ marginTop: '16px', display: 'flex', gap: '10px', flexDirection: 'column' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Select or Upload Texture</div>
+                                <div className="font-scroll-container" style={{ display: 'flex', gap: '10px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
+                                  <button 
+                                    onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.onchange = (e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onload = (re) => {
+                                            const img = new Image();
+                                            img.onload = () => setQrTexture({ src: re.target.result, image: img, name: file.name });
+                                            img.src = re.target.result;
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      };
+                                      input.click();
+                                    }}
+                                    className="font-scroll-btn"
+                                    style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: 'var(--bg-elevated)', color: 'var(--accent-primary)', border: '1px dashed var(--accent-primary)', fontSize: '14px' }}
+                                  >
+                                    <Plus size={16} /> Upload
+                                  </button>
+                                  {['glass', 'carbon', 'metal', 'mesh', 'dots', 'gold', 'silver', 'marble'].map(t => {
+                                    const isActive = qrTexture?.name === t;
+                                    return (
+                                      <button 
+                                        key={t} 
+                                        onClick={() => {
+                                          const img = new Image();
+                                          const src = `/textures/${t}.jpg`; 
+                                          img.onload = () => setQrTexture({ src, image: img, name: t });
+                                          img.src = src;
+                                        }}
+                                        className={`font-scroll-btn ${isActive ? 'active' : ''}`} 
+                                        style={{ flex: '0 0 auto', padding: '10px 18px', borderRadius: '12px', background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)', color: isActive ? '#fff' : 'var(--text-primary)', border: '1px solid', borderColor: isActive ? 'var(--accent-primary)' : 'var(--border-color)', fontSize: '14px', whiteSpace: 'nowrap', textTransform: 'capitalize' }}
+                                      >
+                                        {t}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                {qrTexture && (
+                                  <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', textAlign: 'center' }}>
+                                    Active: <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>{qrTexture.name}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {shapePopup === 'dots' && (
+                        <div className="fade-in">
+                          <DotStyleSelector value={dotStyle} onChange={setDotStyle} />
+                        </div>
+                      )}
+                      {shapePopup === 'eyes' && (
+                        <div className="fade-in">
+                          <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                    <div className="toolbar-tabs-row fade-in">
                       {activeTab === 'color' && (
                         <>
-                          <button className={`text-toolbar-btn ${colorPopup === 'themes' ? 'active' : ''}`} onClick={() => handleOpenProperty('themes', 'color')}><LayoutGrid size={18} /><span>Themes</span></button>
-                          <button className={`text-toolbar-btn ${colorPopup === 'dots' ? 'active' : ''}`} onClick={() => handleOpenProperty('dots', 'color')}><Palette size={18} /><span>Dots</span></button>
-                          <button className={`text-toolbar-btn ${colorPopup === 'bg' ? 'active' : ''}`} onClick={() => handleOpenProperty('bg', 'color')}><Hexagon size={18} /><span>Background</span></button>
-                          <button className={`text-toolbar-btn ${colorPopup === 'eyes' ? 'active' : ''}`} onClick={() => handleOpenProperty('eyes', 'color')}><Eye size={18} /><span>Eyes</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('color', 'presets')}><Bookmark size={18} /><span>Presets</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('color', 'dots')}><Palette size={18} /><span>Dots</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('color', 'bg')}><ImageIcon size={18} /><span>BG</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('color', 'eyes')}><ScanLine size={18} /><span>Eyes</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('color', 'gradient')}><Shapes size={18} /><span>Gradient</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('color', 'texture')}><Layers size={18} /><span>Texture</span></button>
                         </>
                       )}
                       {activeTab === 'shapes' && (
                         <>
-                          <button className={`text-toolbar-btn ${shapesPopup === 'corner' ? 'active' : ''}`} onClick={() => handleOpenProperty('corner', 'shapes')}><Maximize size={18} /><span>Corners</span></button>
-                          <button className={`text-toolbar-btn ${shapesPopup === 'dots' ? 'active' : ''}`} onClick={() => handleOpenProperty('dots', 'shapes')}><LayoutGrid size={18} /><span>Dots</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('shapes', 'dots')}><LayoutGrid size={18} /><span>Dots</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('shapes', 'eyes')}><Hexagon size={18} /><span>Eyes</span></button>
                         </>
                       )}
                       {activeTab === 'logo' && (
                         <>
-                          <button className={`text-toolbar-btn ${logoPopup === 'source' ? 'active' : ''}`} onClick={() => handleOpenProperty('source', 'logo')}><ImageIcon size={18} /><span>Logo</span></button>
-                          <button className={`text-toolbar-btn ${logoPopup === 'size' ? 'active' : ''}`} onClick={() => handleOpenProperty('size', 'logo')}><ChevronUp size={18} /><span>Size</span></button>
-                          <button className={`text-toolbar-btn ${logoPopup === 'pos' ? 'active' : ''}`} onClick={() => handleOpenProperty('pos', 'logo')}><Maximize size={18} /><span>Position</span></button>
-                          <button className={`text-toolbar-btn ${logoPopup === 'stroke' ? 'active' : ''}`} onClick={() => handleOpenProperty('stroke', 'logo')}><Pencil size={18} /><span>Stroke</span></button>
-                          <button className={`text-toolbar-btn ${logoPopup === 'bg' ? 'active' : ''}`} onClick={() => handleOpenProperty('bg', 'logo')}><Hexagon size={18} /><span>Background</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'size')}><ChevronUp size={18} /><span>Size</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'pos')}><Maximize size={18} /><span>Position</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'stroke')}><Pencil size={18} /><span>Stroke</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'bg')}><Hexagon size={18} /><span>Background</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'rotate')}><RotateCw size={18} /><span>Rotate</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'opacity')}><Sun size={18} /><span>Opacity</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'shadow')}><Moon size={18} /><span>Shadow</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'filter')}><Filter size={18} /><span>Filters</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'texture')}><Layers size={18} /><span>Texture</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('logo', 'crop')}><Crop size={18} /><span>Crop</span></button>
                         </>
                       )}
                       {activeTab === 'text' && (
                         <>
-                          <button className={`text-toolbar-btn ${textPopup === 'input' ? 'active' : ''}`} onClick={() => handleOpenProperty('input', 'text')}><PlusCircle size={18} /><span>Content</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'pos' ? 'active' : ''}`} onClick={() => handleOpenProperty('pos', 'text')}><Maximize size={18} /><span>Position</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'fonts' ? 'active' : ''}`} onClick={() => handleOpenProperty('fonts', 'text')}><Type size={18} /><span>Fonts</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'size' ? 'active' : ''}`} onClick={() => handleOpenProperty('size', 'text')}><ChevronUp size={18} /><span>Size</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'color' ? 'active' : ''}`} onClick={() => handleOpenProperty('color', 'text')}><Palette size={18} /><span>Color</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'stroke' ? 'active' : ''}`} onClick={() => handleOpenProperty('stroke', 'text')}><Pencil size={18} /><span>Stroke</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'shadow' ? 'active' : ''}`} onClick={() => handleOpenProperty('shadow', 'text')}><Moon size={18} /><span>Shadow</span></button>
-                          <button className={`text-toolbar-btn ${textPopup === 'bg' ? 'active' : ''}`} onClick={() => handleOpenProperty('bg', 'text')}><Hexagon size={18} /><span>Shape</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'input')}><PlusCircle size={18} /><span>Content</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'pos')}><Maximize size={18} /><span>Position</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'fonts')}><Type size={18} /><span>Fonts</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'size')}><ChevronUp size={18} /><span>Size</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'color')}><Palette size={18} /><span>Color</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'stroke')}><Pencil size={18} /><span>Stroke</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'shadow')}><Moon size={18} /><span>Shadow</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'rotate')}><RotateCw size={18} /><span>Rotate</span></button>
+                          <button className="text-toolbar-btn" onClick={() => startEditing('text', 'bg')}><Hexagon size={18} /><span>Shape</span></button>
                         </>
                       )}
                     </div>
@@ -1906,7 +2533,10 @@ export default function App() {
                 </div>
               </div>
             )}
+
           </>
+        ) : activePage === 'scanner' ? (
+          <QRScanner onBack={() => setActivePage('home')} navigateTo={navigateTo} />
         ) : activePage === 'home' ? (
           <HomePage 
             onNavigate={(page) => {
@@ -1928,19 +2558,12 @@ export default function App() {
             activePage={activePage}
             onMenuClick={() => navigateTo('settings')}
           />
-        ) : activePage === 'scanner' ? (
-          <QRScanner 
-            onScan={(data) => {
-              const parsed = JSON.parse(data);
-              onLoadQR(parsed);
-              showToast('QR Code scanned successfully!', 'success');
-            }}
-            onClose={() => setActivePage('home')}
-          />
-        ) : activePage === 'history' ? (
-          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
-        ) : (
+        ) : activePage === 'saved' ? (
           <SavedPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
+        ) : activePage === 'settings' ? (
+          <SettingsPage theme={theme} setTheme={setTheme} effectiveTheme={effectiveTheme} />
+        ) : (
+          <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
         )}
       </main>
 
@@ -1955,8 +2578,9 @@ export default function App() {
             >
               <div className="bottom-nav-highlight" />
               <span className="bottom-nav-icon">
-                <tab.icon size={24} strokeWidth={2} />
+                <tab.icon size={20} strokeWidth={2} />
               </span>
+              <span className="bottom-nav-label">{tab.label}</span>
             </button>
           ))}
         </nav>
@@ -1964,18 +2588,19 @@ export default function App() {
 
       {/* ── Main App Navigation ── */}
       {(['home', 'saved', 'history', 'settings'].includes(activePage)) && (
-        <div className="main-app-nav">
+        <nav className="bottom-nav">
           <button 
-            onClick={() => navigateTo('home')} 
-            className={`main-nav-btn ${activePage === 'home' ? 'active' : ''}`}
+            className={`bottom-nav-tab${activePage === 'home' ? ' active' : ''}`}
+            onClick={() => navigateTo('home')}
           >
-            <Home size={26} />
+            <span className="bottom-nav-icon"><Home size={22} /></span>
           </button>
+          
           <button 
-            onClick={() => navigateTo('saved')} 
-            className={`main-nav-btn ${activePage === 'saved' ? 'active' : ''}`}
+            className={`bottom-nav-tab${activePage === 'saved' ? ' active' : ''}`}
+            onClick={() => navigateTo('saved')}
           >
-            <Bookmark size={26} />
+            <span className="bottom-nav-icon"><Bookmark size={22} /></span>
           </button>
           
           {/* Integrated Scan Button */}
@@ -1985,45 +2610,49 @@ export default function App() {
               display: 'flex', 
               flexDirection: 'column', 
               alignItems: 'center', 
-              gap: '2px',
-              marginTop: '-32px',
-              cursor: 'pointer'
+              justifyContent: 'center',
+              marginTop: '-30px',
+              cursor: 'pointer',
+              flex: 1
             }}
           >
             <button 
               className="floating-scan-btn"
               style={{ 
-                width: '72px',
-                height: '72px',
-                borderRadius: '36px',
+                width: '64px',
+                height: '64px',
+                borderRadius: '32px',
                 background: 'var(--accent-primary)',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 10px 28px rgba(214, 0, 54, 0.45)',
+                boxShadow: '0 8px 24px rgba(214, 0, 54, 0.4)',
                 color: 'white',
                 zIndex: 101,
-                outline: 'none'
+                transition: 'transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67)'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
               <ScanLine size={28} />
             </button>
           </div>
 
           <button 
-            onClick={() => navigateTo('history')} 
-            className={`main-nav-btn ${activePage === 'history' ? 'active' : ''}`}
+            className={`bottom-nav-tab${activePage === 'history' ? ' active' : ''}`}
+            onClick={() => navigateTo('history')}
           >
-            <History size={26} />
+            <span className="bottom-nav-icon"><History size={22} /></span>
           </button>
+          
           <button 
-            onClick={() => navigateTo('settings')} 
-            className={`main-nav-btn ${activePage === 'settings' ? 'active' : ''}`}
+            className={`bottom-nav-tab${activePage === 'settings' ? ' active' : ''}`}
+            onClick={() => navigateTo('settings')}
           >
-            <Settings size={26} />
+            <span className="bottom-nav-icon"><Settings size={22} /></span>
           </button>
-        </div>
+        </nav>
       )}
 
       {/* ── QR Data Modal ── */}
