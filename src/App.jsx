@@ -460,6 +460,8 @@ export default function App() {
   const [eyeOuterColor, setEyeOuterColor] = useState('');
   const [syncEyes, setSyncEyes] = useState(true);
   const [activePreset, setActivePreset] = useState(null);
+  const [isPipetteActive, setIsPipetteActive] = useState(false);
+  const [pipetteTarget, setPipetteTarget] = useState(null); // { setter }
 
   // ── Gradient ──
   const [gradientEnabled, setGradientEnabled] = useState(false);
@@ -896,12 +898,10 @@ export default function App() {
     }
   }, [logo]);
 
-  // ── Android Back Button Logic ──
   // ── Back Button Handling (Centralized) ──
   const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
 
-  // Update the ref whenever dependencies change
   backHandlerRef.current = () => {
     if (activePage === 'home' && !advPicker.open && !formatDropdownOpen && !isMenuOpen && !isDataModalOpen) {
       const now = Date.now();
@@ -1276,6 +1276,25 @@ export default function App() {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    if (isPipetteActive) {
+      const rect = canvas.getBoundingClientRect();
+      const scale = 512 / rect.width;
+      const x = (clientX - rect.left) * scale;
+      const y = (clientY - rect.top) * scale;
+      
+      const ctx = canvas.getContext('2d');
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
+      
+      if (pipetteTarget?.setter) {
+        pipetteTarget.setter(hex);
+      }
+      setIsPipetteActive(false);
+      setAdvPicker(prev => ({ ...prev, open: true, color: hex }));
+      e.preventDefault();
+      return;
+    }
     
     // Convert click to canvas coordinates (0-512)
     const scale = 512 / rect.width;
@@ -2705,7 +2724,52 @@ export default function App() {
           if (advPicker.setter) advPicker.setter(advPicker.color);
           setAdvPicker({ ...advPicker, open: false });
         }}
+        onEnterPipetteMode={() => {
+          setPipetteTarget({ setter: advPicker.setter });
+          setAdvPicker(prev => ({ ...prev, open: false }));
+          setIsPipetteActive(true);
+        }}
       />
+
+      {isPipetteActive && (
+        <div 
+          className="pipette-overlay fade-in"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10000,
+            pointerEvents: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(2px)'
+          }}
+        >
+          <div style={{ 
+            background: 'var(--bg-primary)', 
+            padding: '16px 24px', 
+            borderRadius: '20px', 
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            border: '1px solid var(--accent-primary)',
+            pointerEvents: 'all'
+          }}>
+            <Pipette size={24} className="text-accent" />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '15px' }}>Pipette Active</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Tap on the preview to pick a color</div>
+            </div>
+            <button 
+              onClick={() => { setIsPipetteActive(false); setAdvPicker(prev => ({ ...prev, open: true })); }}
+              style={{ marginLeft: '12px', padding: '8px 16px', borderRadius: '10px', background: 'var(--bg-elevated)', border: 'none', color: 'var(--text-primary)', fontWeight: 600 }}
+            >Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

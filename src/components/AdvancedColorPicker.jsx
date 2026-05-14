@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Check, Plus, Minus, Hash, Pipette } from 'lucide-react';
 
-export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel, onChange }) {
+export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, onCancel, onChange, onEnterPipetteMode }) {
   const [tempColor, setTempColor] = useState(initialColor || '#ff0000');
   const [activeTab, setActiveTab] = useState('RGB');
   
@@ -145,7 +145,11 @@ export default function AdvancedColorPicker({ isOpen, initialColor, onConfirm, o
 
   const openEyeDropper = async () => {
     if (!window.EyeDropper) {
-      alert("Your browser does not support the EyeDropper API. Please use a modern browser like Chrome or Edge.");
+      if (onEnterPipetteMode) {
+        onEnterPipetteMode();
+      } else {
+        alert("Your browser does not support the EyeDropper API. Please use a modern browser like Chrome or Edge.");
+      }
       return;
     }
     
