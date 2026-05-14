@@ -1451,8 +1451,8 @@ export default function App() {
       {/* ── Main Content Area ── */}
       <main className="app-main-redesigned">
         {activePage === 'generator' ? (
-          <div className="generator-layout-wrapper">
-            {/* ── QR Preview Column (Left on Desktop) ── */}
+          <>
+            {/* ── QR Preview Card (always visible) ── */}
             <ErrorBoundary>
               <section className="qr-preview-card">
                 <div className={`qr-preview-wrapper ${getFrameClass()}`}>
@@ -1906,7 +1906,7 @@ export default function App() {
                 </div>
               </div>
             )}
-          </div>
+          </>
         ) : activePage === 'home' ? (
           <HomePage 
             onNavigate={(page) => {
@@ -1944,25 +1944,9 @@ export default function App() {
         )}
       </main>
 
-      {/* ── Desktop Navigation Sidebar/Tabbar (Hidden on Mobile) ── */}
+      {/* ── Bottom Navigation Bar (Only for Generator) ── */}
       {activePage === 'generator' && (
-        <div className="desktop-nav-container">
-           {TABS.map(tab => (
-            <button
-              key={tab.id}
-              className={`desktop-nav-tab ${activeTab === tab.id ? 'active' : ''}`}
-              onClick={() => handleTabChange(tab.id)}
-            >
-              <tab.icon size={20} />
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ── Mobile Bottom Navigation Bar ── */}
-      {activePage === 'generator' && (
-        <nav className="bottom-nav mobile-only">
+        <nav className="bottom-nav">
           {TABS.map(tab => (
             <button
               key={tab.id}
@@ -1973,6 +1957,7 @@ export default function App() {
               <span className="bottom-nav-icon">
                 <tab.icon size={24} strokeWidth={2} />
               </span>
+              <span className="bottom-nav-label-desktop">{tab.label}</span>
             </button>
           ))}
         </nav>

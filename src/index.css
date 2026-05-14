@@ -1934,8 +1934,8 @@ input[type="range"]::-moz-range-thumb {
 
 .quick-create-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 16px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
@@ -1944,19 +1944,21 @@ input[type="range"]::-moz-range-thumb {
 @media (max-width: 640px) {
   .quick-create-grid {
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+    gap: 8px;
   }
 }
 
 @media (max-width: 480px) {
   .quick-create-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
   }
 }
 
 @media (max-width: 360px) {
   .quick-create-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
   }
 }
 
@@ -4417,9 +4419,10 @@ input[type="range"]::-moz-range-thumb {
 
 /* ── Desktop / Tablet: Professional Split Layout ── */
 @media (min-width: 768px) {
-  .generator-layout-wrapper {
+  .app-main-redesigned {
     flex-direction: row;
     overflow: hidden;
+    height: calc(100dvh - var(--header-height));
   }
 
   .qr-preview-card {
@@ -4439,7 +4442,7 @@ input[type="range"]::-moz-range-thumb {
 
   .qr-preview-wrapper {
     max-width: 400px;
-    width: 90%;
+    width: 85%;
     padding: 24px;
     box-shadow: var(--shadow-lg), 0 0 60px rgba(0,0,0,0.1);
     transform: scale(1.05);
@@ -4472,17 +4475,32 @@ input[type="range"]::-moz-range-thumb {
     border-top: 1px solid var(--border-color);
   }
 
-  /* Navigation Sidebar/Tabbar on Desktop */
-  .desktop-nav-container {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    padding: 12px 20px;
+  .bottom-nav {
+    height: 60px;
+    padding: 0 40px;
     background: var(--bg-elevated);
-    border-bottom: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
     position: sticky;
     top: 0;
-    z-index: 110;
+    z-index: 101;
+    order: -1;
+  }
+
+  .bottom-nav-tab {
+    flex: 0 0 auto;
+    padding: 0 20px;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .bottom-nav-label-desktop {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .bottom-nav-highlight {
+    display: none;
   }
 
   .desktop-nav-tab {
@@ -7294,8 +7312,8 @@ video {
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
 }
 .text-toolbar-btn {
-  flex: 0 0 90px;
-  height: 70px;
+  flex: 0 0 75px; /* Reduced from 90px to fit 5 items on mobile */
+  height: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
