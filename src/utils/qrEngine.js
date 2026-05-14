@@ -830,12 +830,25 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
       drawBackgroundShape(ctx, logoBgShape, paddedX, paddedY, paddedW, paddedH, logoBgColor, contentSize * 0.005);
     }
 
-    // 5. Final Processing of Logo Image (Opacity, Erase Color, Texture)
-    let finalLogoSource = logoImg;
-    let procCanvas = null;
+    // 4. Draw Outline
+    if (logoOutline && logoOutlineWidth > 0) {
+      ctx.globalAlpha = logoOutlineOpacity;
+      drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, {
+        outlineColor: logoOutlineColor,
+        outlineWidth: logoOutlineWidth,
+        logoBgShape,
+        logoPadding,
+        hasBackground: logoBackground
+      });
+      ctx.globalAlpha = 1;
+    }
 
+    // 5. Final Processing of Logo Image (Opacity, Erase Color, Texture)
+    ctx.globalAlpha = logoOpacity;
+    
+    // Process image if color erase, texture, or CROP is needed
     if (logoEraseColorEnabled || logoTexture !== 'none' || logoCrop !== 'none') {
-      procCanvas = document.createElement('canvas');
+      const procCanvas = document.createElement('canvas');
       procCanvas.width = Math.max(1, logoW);
       procCanvas.height = Math.max(1, logoH);
       const pctx = procCanvas.getContext('2d');
@@ -847,6 +860,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
           pctx.arc(logoW/2, logoH/2, Math.min(logoW, logoH)/2, 0, Math.PI * 2);
         } else if (logoCrop === 'rounded') {
           const r = Math.min(logoW, logoH) * 0.2;
+          // Compatible rounded rect
           pctx.moveTo(r, 0);
           pctx.lineTo(logoW - r, 0);
           pctx.quadraticCurveTo(logoW, 0, logoW, r);
@@ -870,7 +884,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
         const imgData = pctx.getImageData(0, 0, Math.max(1, logoW), Math.max(1, logoH));
         const data = imgData.data;
         const target = hexToRgb(logoEraseColor);
-        const tolerance = 50; 
+        const tolerance = 50; // Color distance tolerance
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i], g = data[i+1], b = data[i+2];
           const dist = Math.sqrt((r-target.r)**2 + (g-target.g)**2 + (b-target.b)**2);
@@ -887,29 +901,11 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
         pctx.fillRect(0, 0, logoW, logoH);
         pctx.globalAlpha = 1;
       }
-      finalLogoSource = procCanvas;
-    }
 
-    // 4. Draw Outline (Moved here so it uses processed image)
-    if (logoOutline && logoOutlineWidth > 0) {
-      ctx.save();
-      ctx.globalAlpha = (logoOutlineOpacity || 1) * logoOpacity;
-      drawSmartOutline(ctx, finalLogoSource, canvasSize, logoW, logoH, logoX, logoY, {
-        outlineColor: logoOutlineColor,
-        outlineWidth: logoOutlineWidth,
-        logoBgShape,
-        logoPadding,
-        logoBackground,
-        paddedX, paddedY, paddedW, paddedH,
-        contentSize
-      });
-      ctx.restore();
+      ctx.drawImage(procCanvas, logoX, logoY, logoW, logoH);
+    } else {
+      ctx.drawImage(logoImg, logoX, logoY, logoW, logoH);
     }
-
-    // Draw the actual logo
-    ctx.globalAlpha = logoOpacity;
-    ctx.drawImage(finalLogoSource, logoX, logoY, logoW, logoH);
-    ctx.globalAlpha = 1;
 
     // 6. Draw Inner Shadow (on top of the logo)
     if (logoInnerShadowEnabled) {
@@ -1012,30 +1008,34 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
  * Smart outline that follows logo shape using fast circular stamping (Stroke effect)
  */
 function drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, options) {
-  const { outlineColor, outlineWidth, logoBackground, logoBgShape, paddedX, paddedY, paddedW, paddedH, contentSize } = options;
+  const { outlineColor, outlineWidth, logoBgShape, logoPadding, hasBackground } = options;
 
-  if (logoBackground) {
-    // If background exists, draw outline around the background shape
+  if (hasBackground) {
+    // If there's a background, we outline the background shape instead of the logo pixels
+    const paddedW = logoW + logoPadding * 2;
+    const paddedH = logoH + logoPadding * 2;
+    const paddedX = logoX - logoPadding;
+    const paddedY = logoY - logoPadding;
+
     ctx.strokeStyle = outlineColor;
-    ctx.lineWidth = outlineWidth * 2; // Double because stroke is centered on edge
+    ctx.lineWidth = outlineWidth * 2; // Double because stroke is centered
     ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
     
-    // We use a path to draw the stroke
-    ctx.beginPath();
-    const r = contentSize * 0.005; // Corner radius matching drawBackgroundShape
     if (logoBgShape === 'circle') {
-      ctx.arc(paddedX + paddedW/2, paddedY + paddedH/2, Math.max(paddedW, paddedH)/2 + outlineWidth/2, 0, Math.PI * 2);
+      ctx.beginPath();
+      ctx.arc(paddedX + paddedW / 2, paddedY + paddedH / 2, Math.min(paddedW, paddedH) / 2, 0, Math.PI * 2);
+      ctx.stroke();
     } else if (logoBgShape === 'rounded') {
-      drawRoundedRectPath(ctx, paddedX - outlineWidth/2, paddedY - outlineWidth/2, paddedW + outlineWidth, paddedH + outlineWidth, r + outlineWidth/2);
+      const r = Math.min(paddedW, paddedH) * 0.2;
+      ctx.beginPath();
+      drawRoundedRectPath(ctx, paddedX, paddedY, paddedW, paddedH, r);
+      ctx.stroke();
     } else {
-      ctx.rect(paddedX - outlineWidth/2, paddedY - outlineWidth/2, paddedW + outlineWidth, paddedH + outlineWidth);
+      ctx.strokeRect(paddedX, paddedY, paddedW, paddedH);
     }
-    ctx.stroke();
     return;
   }
 
-  // Fallback: Logo Silhouette Outline
   // Step 1: Create a solid color silhouette of the logo
   const silhouetteCanvas = document.createElement('canvas');
   const silCtx = silhouetteCanvas.getContext('2d');
@@ -1047,9 +1047,7 @@ function drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, 
   silCtx.fillStyle = outlineColor;
   silCtx.fillRect(0, 0, logoW, logoH);
 
-  // Step 2: Stamp the silhouette in a circle to create a smooth, thick stroke
   const steps = Math.max(16, Math.ceil(outlineWidth * Math.PI)); 
-  
   for (let i = 0; i < steps; i++) {
     const angle = (i * 2 * Math.PI) / steps;
     const dx = Math.cos(angle) * outlineWidth;

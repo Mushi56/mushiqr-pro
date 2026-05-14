@@ -462,6 +462,7 @@ export default function App() {
   const [activePreset, setActivePreset] = useState(null);
   const [isPipetteActive, setIsPipetteActive] = useState(false);
   const [pipetteTarget, setPipetteTarget] = useState(null); // { setter }
+  const [canvasSelection, setCanvasSelection] = useState(null); // 'logo' | 'text' | null
 
   // ── Gradient ──
   const [gradientEnabled, setGradientEnabled] = useState(false);
@@ -473,7 +474,6 @@ export default function App() {
   const [qrTextureEnabled, setQrTextureEnabled] = useState(false);
   const [qrTexture, setQrTexture] = useState(null); // { src, image, name }
   const [qrTextureSyncEyes, setQrTextureSyncEyes] = useState(true);
-  const [selectedItem, setSelectedItem] = useState(null); // 'logo', 'text', or null
 
   // ── Shapes ──
   const [dotStyle, setDotStyle] = useState(DOT_STYLES.SQUARE);
@@ -1208,7 +1208,8 @@ export default function App() {
         logoPosX, logoPosY,
         logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
         logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop,
-        showHandle: selectedItem === 'logo' || selectedItem === 'text'
+        showHandle: canvasSelection === 'logo' || canvasSelection === 'text',
+        selectedType: canvasSelection
       });
     };
 
@@ -1240,7 +1241,6 @@ export default function App() {
     logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
     logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, 
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
-    selectedItem,
     activeTab
   ]);
 
@@ -1275,6 +1275,12 @@ export default function App() {
   const handleCanvasInteraction = useCallback((e) => {
     if (!canvasRef.current || !qrMatrixInfo) return;
     const canvas = canvasRef.current;
+    
+    // Clear selection if not pipette
+    if (!isPipetteActive) {
+      setCanvasSelection(null);
+    }
+
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -1339,15 +1345,14 @@ export default function App() {
           return false;
       };
 
-      if (checkH(lx, ly, 'rotate-logo')) { setSelectedItem('logo'); return; }
-      if (checkH(lx + lw, ly + lh, 'resize-logo-br')) { setSelectedItem('logo'); return; }
-      if (checkH(lx + lw, ly + lh/2, 'resize-logo-r')) { setSelectedItem('logo'); return; }
-      if (checkH(lx + lw/2, ly + lh, 'resize-logo-b')) { setSelectedItem('logo'); return; }
+      if (checkH(lx, ly, 'rotate-logo')) { setCanvasSelection('logo'); return; }
+      if (checkH(lx + lw, ly + lh, 'resize-logo-br')) { setCanvasSelection('logo'); return; }
+      if (checkH(lx + lw, ly + lh/2, 'resize-logo-r')) { setCanvasSelection('logo'); return; }
+      if (checkH(lx + lw/2, ly + lh, 'resize-logo-b')) { setCanvasSelection('logo'); return; }
       
       // Delete Button
       if (checkH(lx + lw, ly, 'delete-logo')) {
         setLogo(null);
-        setSelectedItem(null);
         setIsDraggingCanvas(false);
         dragType.current = null;
         e.preventDefault();
@@ -1355,8 +1360,8 @@ export default function App() {
       }
       
       if (inRect(localX, localY, lx, ly, lw, lh)) {
+        setCanvasSelection('logo');
         setIsDraggingCanvas(true);
-        setSelectedItem('logo');
         dragType.current = 'logo';
         dragStartOffset.current = { x: localX - lx, y: localY - ly };
         e.preventDefault();
@@ -1395,12 +1400,14 @@ export default function App() {
           return false;
       };
 
-      if (checkH(tx, ty, 'rotate-text')) { setSelectedItem('text'); return; }
-      if (checkH(tx + tw, ty + th, 'resize-text-br')) { setSelectedItem('text'); return; }
+      if (checkH(tx, ty, 'rotate-text')) { setCanvasSelection('text'); return; }
+      if (checkH(tx + tw, ty + th, 'resize-text-br')) {
+        setCanvasSelection('text');
+        return;
+      }
       
       if (checkH(tx + tw, ty, 'delete-text')) {
         setTextCenterEnabled(false);
-        setSelectedItem(null);
         setIsDraggingCanvas(false);
         dragType.current = null;
         e.preventDefault();
@@ -1408,18 +1415,15 @@ export default function App() {
       }
 
       if (inRect(localX, localY, tx, ty, tw, th)) {
+        setCanvasSelection('text');
         setIsDraggingCanvas(true);
-        setSelectedItem('text');
         dragType.current = 'text';
         dragStartOffset.current = { x: localX - tx, y: localY - ty };
         e.preventDefault();
         return;
       }
     }
-
-    // Default: Clicked elsewhere
-    setSelectedItem(null);
-  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, textCenterRotation, logoPadding, getQRContentArea, selectedItem]);
+  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, textCenterRotation, logoPadding, getQRContentArea]);
 
   const handleCanvasMove = useCallback((e) => {
     if (!isDraggingCanvas || !canvasRef.current) return;
