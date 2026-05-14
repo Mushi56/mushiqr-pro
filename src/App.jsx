@@ -1451,8 +1451,8 @@ export default function App() {
       {/* ── Main Content Area ── */}
       <main className="app-main-redesigned">
         {activePage === 'generator' ? (
-          <>
-            {/* ── QR Preview Card (always visible) ── */}
+          <div className="generator-layout-wrapper">
+            {/* ── QR Preview Column (Left on Desktop) ── */}
             <ErrorBoundary>
               <section className="qr-preview-card">
                 <div className={`qr-preview-wrapper ${getFrameClass()}`}>
@@ -1906,10 +1906,7 @@ export default function App() {
                 </div>
               </div>
             )}
-
-          </>
-        ) : activePage === 'scanner' ? (
-          <QRScanner onBack={() => setActivePage('home')} navigateTo={navigateTo} />
+          </div>
         ) : activePage === 'home' ? (
           <HomePage 
             onNavigate={(page) => {
@@ -1931,18 +1928,41 @@ export default function App() {
             activePage={activePage}
             onMenuClick={() => navigateTo('settings')}
           />
-        ) : activePage === 'saved' ? (
-          <SavedPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
-        ) : activePage === 'settings' ? (
-          <SettingsPage theme={theme} setTheme={setTheme} effectiveTheme={effectiveTheme} />
-        ) : (
+        ) : activePage === 'scanner' ? (
+          <QRScanner 
+            onScan={(data) => {
+              const parsed = JSON.parse(data);
+              onLoadQR(parsed);
+              showToast('QR Code scanned successfully!', 'success');
+            }}
+            onClose={() => setActivePage('home')}
+          />
+        ) : activePage === 'history' ? (
           <HistoryPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
+        ) : (
+          <SavedPage onLoadQR={handleLoadQR} onNavigate={navigateTo} />
         )}
       </main>
 
-      {/* ── Bottom Navigation Bar (Only for Generator) ── */}
+      {/* ── Desktop Navigation Sidebar/Tabbar (Hidden on Mobile) ── */}
       {activePage === 'generator' && (
-        <nav className="bottom-nav">
+        <div className="desktop-nav-container">
+           {TABS.map(tab => (
+            <button
+              key={tab.id}
+              className={`desktop-nav-tab ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => handleTabChange(tab.id)}
+            >
+              <tab.icon size={20} />
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Mobile Bottom Navigation Bar ── */}
+      {activePage === 'generator' && (
+        <nav className="bottom-nav mobile-only">
           {TABS.map(tab => (
             <button
               key={tab.id}
