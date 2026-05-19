@@ -447,6 +447,9 @@ export default function App() {
   const [activePreset, setActivePreset] = useState(null);
   const [isPipetteActive, setIsPipetteActive] = useState(false);
   const [pipetteTarget, setPipetteTarget] = useState(null); // { setter }
+  const [pipetteColor, setPipetteColor] = useState('#ffffff');
+  const [pipettePos, setPipettePos] = useState({ x: 50, y: 50 });
+  const initialPipetteColor = useRef('#ffffff');
   const [canvasSelection, setCanvasSelection] = useState(null); // 'logo' | 'text' | null
 
   // ── Gradient ──
@@ -1330,6 +1333,61 @@ export default function App() {
     return { contentX, contentY, contentSize };
   }, [frameStyle]);
 
+  // ── Drag Pipette Extraction ──
+  const updatePipetteColorFromPos = useCallback((xPercent, yPercent) => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const x = Math.max(0, Math.min(511, Math.round((xPercent / 100) * 512)));
+    const y = Math.max(0, Math.min(511, Math.round((yPercent / 100) * 512)));
+    try {
+      const ctx = canvas.getContext('2d');
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
+      setPipetteColor(hex);
+      if (pipetteTarget?.setter) {
+        pipetteTarget.setter(hex);
+      }
+    } catch (e) {
+      console.warn("Failed to extract color:", e);
+    }
+  }, [pipetteTarget]);
+
+  const handlePipetteMove = useCallback((clientX, clientY) => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+    const xPercent = (x / rect.width) * 100;
+    const yPercent = (y / rect.height) * 100;
+    setPipettePos({ x: xPercent, y: yPercent });
+    updatePipetteColorFromPos(xPercent, yPercent);
+  }, [updatePipetteColorFromPos]);
+
+  const handlePipettePointerDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const handleMove = (moveEvt) => {
+      const clientX = moveEvt.touches ? moveEvt.touches[0].clientX : moveEvt.clientX;
+      const clientY = moveEvt.touches ? moveEvt.touches[0].clientY : moveEvt.clientY;
+      handlePipetteMove(clientX, clientY);
+    };
+    const handleUp = () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleUp);
+    };
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchend', handleUp);
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    handlePipetteMove(clientX, clientY);
+  };
+
   // ── Canvas Interaction (Drag to Position) ──
   const handleCanvasInteraction = useCallback((e) => {
     if (!canvasRef.current || !qrMatrixInfo) return;
@@ -1348,25 +1406,6 @@ export default function App() {
     const rect = canvas.getBoundingClientRect();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-    if (isPipetteActive) {
-      const rect = canvas.getBoundingClientRect();
-      const scale = 512 / rect.width;
-      const x = (clientX - rect.left) * scale;
-      const y = (clientY - rect.top) * scale;
-      
-      const ctx = canvas.getContext('2d');
-      const pixel = ctx.getImageData(x, y, 1, 1).data;
-      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
-      
-      if (pipetteTarget?.setter) {
-        pipetteTarget.setter(hex);
-      }
-      setIsPipetteActive(false);
-      setAdvPicker(prev => ({ ...prev, open: true, color: hex }));
-      e.preventDefault();
-      return;
-    }
     
     // Convert click to canvas coordinates (0-512)
     const scale = 512 / rect.width;
@@ -2125,6 +2164,54 @@ export default function App() {
                         touchAction: 'none'
                       }} 
                     />
+                  )}
+                  {isPipetteActive && (
+                    <>
+                      {/* Intercept drags and touch movements on the preview card */}
+                      <div 
+                        onPointerDown={handlePipettePointerDown}
+                        onTouchStart={handlePipettePointerDown}
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          zIndex: 9999,
+                          cursor: 'crosshair',
+                          touchAction: 'none',
+                          borderRadius: 'inherit'
+                        }}
+                      />
+                      {/* Floating circular magnifying glass targeting colors */}
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          left: `${pipettePos.x}%`,
+                          top: `${pipettePos.y}%`,
+                          transform: 'translate(-50%, -50%)',
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          border: '3px solid #fff',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.5), inset 0 0 4px rgba(0,0,0,0.3)',
+                          backgroundColor: pipetteColor,
+                          pointerEvents: 'none',
+                          zIndex: 10000,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'background-color 0.1s ease'
+                        }}
+                      >
+                        <div 
+                          style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: '#fff',
+                            boxShadow: '0 0 2px rgba(0,0,0,0.5)'
+                          }}
+                        />
+                      </div>
+                    </>
                   )}
                 </div>
 
@@ -3037,6 +3124,9 @@ export default function App() {
           setAdvPicker({ ...advPicker, open: false });
         }}
         onEnterPipetteMode={() => {
+          initialPipetteColor.current = advPicker.color || '#ffffff';
+          setPipetteColor(advPicker.color || '#ffffff');
+          setPipettePos({ x: 50, y: 50 });
           setPipetteTarget({ setter: advPicker.setter });
           setAdvPicker(prev => ({ ...prev, open: false }));
           setIsPipetteActive(true);
@@ -3050,35 +3140,109 @@ export default function App() {
             position: 'fixed',
             inset: 0,
             zIndex: 10000,
-            pointerEvents: 'none',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(0,0,0,0.3)',
-            backdropFilter: 'blur(2px)'
+            justifyContent: 'flex-end',
+            background: 'rgba(0,0,0,0.45)',
+            backdropFilter: 'blur(4px)',
+            padding: '24px 20px calc(24px + env(safe-area-inset-bottom))',
+            pointerEvents: 'all'
           }}
         >
+          {/* Instructions HUD */}
+          <div style={{
+            position: 'absolute',
+            top: 'calc(80px + env(safe-area-inset-top))',
+            background: 'rgba(0,0,0,0.75)',
+            padding: '10px 20px',
+            borderRadius: '20px',
+            color: '#fff',
+            fontSize: '13px',
+            fontWeight: 600,
+            textAlign: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            pointerEvents: 'none'
+          }}>
+            Drag or tap on the QR preview to target a color
+          </div>
+
+          {/* Symmetrical Control HUD */}
           <div style={{ 
             background: 'var(--bg-primary)', 
-            padding: '16px 24px', 
-            borderRadius: '20px', 
-            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+            padding: '16px 20px', 
+            borderRadius: '24px', 
+            boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
-            border: '1px solid var(--accent-primary)',
-            pointerEvents: 'all'
+            justifyContent: 'space-between',
+            gap: '16px',
+            width: '100%',
+            maxWidth: '340px',
+            border: '1px solid var(--border-color)'
           }}>
-            <Pipette size={24} className="text-accent" />
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '15px' }}>Pipette Active</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Tap on the preview to pick a color</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ 
+                width: '36px', 
+                height: '36px', 
+                borderRadius: '10px', 
+                backgroundColor: pipetteColor, 
+                border: '2px solid #fff',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)' 
+              }} />
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-primary)' }}>{pipetteColor}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Targeted Color</div>
+              </div>
             </div>
-            <button 
-              onClick={() => { setIsPipetteActive(false); setAdvPicker(prev => ({ ...prev, open: true })); }}
-              style={{ marginLeft: '12px', padding: '8px 16px', borderRadius: '10px', background: 'var(--bg-elevated)', border: 'none', color: 'var(--text-primary)', fontWeight: 600 }}
-            >Cancel</button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={() => {
+                  if (pipetteTarget?.setter) {
+                    pipetteTarget.setter(initialPipetteColor.current);
+                  }
+                  setIsPipetteActive(false);
+                  setAdvPicker(prev => ({ ...prev, open: true, color: initialPipetteColor.current }));
+                }}
+                style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  borderRadius: '12px', 
+                  background: 'var(--bg-hover)', 
+                  border: '1px solid var(--border-color)', 
+                  color: 'var(--text-primary)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <X size={18} />
+              </button>
+              <button 
+                onClick={() => {
+                  setIsPipetteActive(false);
+                  setAdvPicker(prev => ({ ...prev, open: true, color: pipetteColor }));
+                }}
+                style={{ 
+                  width: '40px', 
+                  height: '40px', 
+                  borderRadius: '12px', 
+                  background: 'var(--accent-primary)', 
+                  border: 'none', 
+                  color: '#fff', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(255,45,85,0.3)',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <Check size={18} />
+              </button>
+            </div>
           </div>
         </div>
       )}
