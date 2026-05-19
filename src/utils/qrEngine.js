@@ -811,6 +811,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
   const centerY = logoY + logoH / 2;
 
   ctx.save();
+  ctx.globalAlpha = logoOpacity;
 
   try {
     // 1. Setup Rotation at Center of Logo
@@ -833,7 +834,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
 
     // 4. Draw Outline
     if (logoOutline && logoOutlineWidth > 0) {
-      ctx.globalAlpha = logoOutlineOpacity;
+      ctx.globalAlpha = logoOpacity * logoOutlineOpacity;
       drawSmartOutline(ctx, logoImg, canvasSize, logoW, logoH, logoX, logoY, {
         outlineColor: logoOutlineColor,
         outlineWidth: logoOutlineWidth,
@@ -841,11 +842,10 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
         logoPadding,
         hasBackground: logoBackground
       });
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = logoOpacity;
     }
 
     // 5. Final Processing of Logo Image (Opacity, Erase Color, Texture)
-    ctx.globalAlpha = logoOpacity;
     
     // Process image if color erase, texture, or CROP is needed
     if (logoEraseColorEnabled || logoTexture !== 'none' || logoCrop !== 'none') {
