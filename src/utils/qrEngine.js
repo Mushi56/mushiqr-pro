@@ -1467,7 +1467,7 @@ function drawRoundedRectPath(ctx, x, y, w, h, r) {
 /**
  * Constrain an element to stay within the QR content area and avoid the 3 finder patterns (eyes)
  */
-function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, moduleCount, quietZone) {
+export function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, moduleCount, quietZone) {
   const totalModules = moduleCount + quietZone * 2;
   const cellSize = contentSize / totalModules;
   // Eye region is 7x7 modules. We add 1 module buffer for safe scanning.

@@ -60,7 +60,7 @@ import LogoPresets from './components/LogoPresets';
 import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
-import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData } from './utils/qrEngine';
+import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData, constrainToSafeZone } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
 import { saveToHistory, getSaved, saveToSaved, getPreferences, savePreferences } from './utils/storage';
 import QRScanner from './components/QRScanner';
@@ -1299,7 +1299,7 @@ export default function App() {
 
     textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
     textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
-    textCenterPosX, textCenterPosY, logoPosX, logoPosY,
+    textCenterPosX, textCenterPosY, textCenterRotation, logoPosX, logoPosY,
     logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
     logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, 
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
@@ -1424,8 +1424,11 @@ export default function App() {
     if (logo?.image) {
       const lw = contentSize * logoWidth;
       const lh = contentSize * logoHeight;
-      const lx = contentX + (contentSize - lw) * logoPosX;
-      const ly = contentY + (contentSize - lh) * logoPosY;
+      const rawLx = contentX + (contentSize - lw) * logoPosX;
+      const rawLy = contentY + (contentSize - lh) * logoPosY;
+      const safeLogoPos = constrainToSafeZone(rawLx, rawLy, lw, lh, contentX, contentY, contentSize, 21, 2);
+      const lx = safeLogoPos.x;
+      const ly = safeLogoPos.y;
       
       const centerX = lx + lw / 2;
       const centerY = ly + lh / 2;
@@ -1513,8 +1516,11 @@ export default function App() {
       const tw = metrics.width + (logoPadding || 10) * 2;
       const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
       
-      const tx = contentX + (contentSize - tw) * textCenterPosX;
-      const ty = contentY + (contentSize - th) * textCenterPosY;
+      const rawTx = contentX + (contentSize - tw) * textCenterPosX;
+      const rawTy = contentY + (contentSize - th) * textCenterPosY;
+      const safeTextPos = constrainToSafeZone(rawTx, rawTy, tw, th, contentX, contentY, contentSize, 21, 2);
+      const tx = safeTextPos.x;
+      const ty = safeTextPos.y;
       
       const centerX = tx + tw / 2;
       const centerY = ty + th / 2;
@@ -1611,8 +1617,11 @@ export default function App() {
     if (dragType.current === 'rotate-logo') {
         const lw = contentSize * logoWidth;
         const lh = contentSize * logoHeight;
-        const lx = contentX + (contentSize - lw) * logoPosX;
-        const ly = contentY + (contentSize - lh) * logoPosY;
+        const rawLx = contentX + (contentSize - lw) * logoPosX;
+        const rawLy = contentY + (contentSize - lh) * logoPosY;
+        const safeLogoPos = constrainToSafeZone(rawLx, rawLy, lw, lh, contentX, contentY, contentSize, 21, 2);
+        const lx = safeLogoPos.x;
+        const ly = safeLogoPos.y;
         const centerX = lx + lw / 2;
         const centerY = ly + lh / 2;
         
@@ -1636,8 +1645,11 @@ export default function App() {
         const metrics = tempCtx.current.measureText(textCenterText);
         const tw = metrics.width + (logoPadding || 10) * 2;
         const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
-        const tx = contentX + (contentSize - tw) * textCenterPosX;
-        const ty = contentY + (contentSize - th) * textCenterPosY;
+        const rawTx = contentX + (contentSize - tw) * textCenterPosX;
+        const rawTy = contentY + (contentSize - th) * textCenterPosY;
+        const safeTextPos = constrainToSafeZone(rawTx, rawTy, tw, th, contentX, contentY, contentSize, 21, 2);
+        const tx = safeTextPos.x;
+        const ty = safeTextPos.y;
         const centerX = tx + tw / 2;
         const centerY = ty + th / 2;
         
@@ -1658,8 +1670,11 @@ export default function App() {
     } else if (dragType.current && dragType.current.startsWith('resize-logo')) {
         const lw = contentSize * logoWidth;
         const lh = contentSize * logoHeight;
-        const lx = contentX + (contentSize - lw) * logoPosX;
-        const ly = contentY + (contentSize - lh) * logoPosY;
+        const rawLx = contentX + (contentSize - lw) * logoPosX;
+        const rawLy = contentY + (contentSize - lh) * logoPosY;
+        const safeLogoPos = constrainToSafeZone(rawLx, rawLy, lw, lh, contentX, contentY, contentSize, 21, 2);
+        const lx = safeLogoPos.x;
+        const ly = safeLogoPos.y;
         const centerX = lx + lw / 2;
         const centerY = ly + lh / 2;
         const dx_raw = x - centerX;
@@ -1672,8 +1687,11 @@ export default function App() {
         
         const startW_px = contentSize * dragStartOffset.current.startW;
         const startH_px = contentSize * dragStartOffset.current.startH;
-        const lx_start = contentX + (contentSize - startW_px) * dragStartOffset.current.startPosX;
-        const ly_start = contentY + (contentSize - startH_px) * dragStartOffset.current.startPosY;
+        const rawLxStart = contentX + (contentSize - startW_px) * dragStartOffset.current.startPosX;
+        const rawLyStart = contentY + (contentSize - startH_px) * dragStartOffset.current.startPosY;
+        const safeLogoStart = constrainToSafeZone(rawLxStart, rawLyStart, startW_px, startH_px, contentX, contentY, contentSize, 21, 2);
+        const lx_start = safeLogoStart.x;
+        const ly_start = safeLogoStart.y;
 
         let newW = dragStartOffset.current.startW;
         let newH = dragStartOffset.current.startH;
@@ -1757,8 +1775,11 @@ export default function App() {
         
         const startW = dragStartOffset.current.startW * contentSize;
         const startH = dragStartOffset.current.startH * contentSize;
-        const tx_start = contentX + (contentSize - startW) * dragStartOffset.current.startPosX;
-        const ty_start = contentY + (contentSize - startH) * dragStartOffset.current.startPosY;
+        const rawTxStart = contentX + (contentSize - startW) * dragStartOffset.current.startPosX;
+        const rawTyStart = contentY + (contentSize - startH) * dragStartOffset.current.startPosY;
+        const safeTextStart = constrainToSafeZone(rawTxStart, rawTyStart, startW, startH, contentX, contentY, contentSize, 21, 2);
+        const tx_start = safeTextStart.x;
+        const ty_start = safeTextStart.y;
         
         const fontSize = contentSize * newSize;
         tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
