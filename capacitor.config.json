@@ -6,7 +6,7 @@
     "StatusBar": {
       "style": "DARK",
       "backgroundColor": "#13131D",
-      "overlaysWebView": true,
+      "overlaysWebView": false,
       "androidStatusBarPadding": false
     },
     "Camera": {

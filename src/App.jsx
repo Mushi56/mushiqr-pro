@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
 import {
   QrCode,
   Sun,
@@ -827,8 +828,16 @@ export default function App() {
     const updateStatusBar = async () => {
       try {
         await StatusBar.show();
-        // Set overlaysWebView to TRUE and add padding in CSS for the 24dp status bar
-        await StatusBar.setOverlaysWebView({ overlay: true });
+        
+        const platform = Capacitor.getPlatform();
+        if (platform === 'android') {
+          // Disable overlay on Android for a clean solid status bar and 0px extra header space
+          await StatusBar.setOverlaysWebView({ overlay: false });
+          document.documentElement.classList.add('platform-android');
+        } else {
+          await StatusBar.setOverlaysWebView({ overlay: true });
+          document.documentElement.classList.add('platform-ios');
+        }
         
         if (effectiveTheme === 'dark') {
           await StatusBar.setStyle({ style: 'DARK' }); // Light text/icons for dark background
