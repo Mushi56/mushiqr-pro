@@ -462,7 +462,8 @@ export function renderQR(canvas, options) {
       contentSize,
       moduleCount,
       quietZone,
-      showHandle: options.showHandle
+      showHandle: options.showHandle,
+      selectedType: options.selectedType
     });
   }
 
