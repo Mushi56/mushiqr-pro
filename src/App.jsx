@@ -2160,8 +2160,26 @@ export default function App() {
                       {logoPopup === 'size' && (
                         <div className="fade-in">
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                            <Slider label="Logo Width" value={logoWidth} min={0.05} max={0.6} step={0.01} onChange={setLogoWidth} />
-                            <Slider label="Logo Height" value={logoHeight} min={0.05} max={0.6} step={0.01} onChange={setLogoHeight} />
+                            <Slider 
+                              label="Logo Size (Combined)" 
+                              value={logoWidth} 
+                              min={0.05} 
+                              max={0.6} 
+                              step={0.01} 
+                              onChange={(val) => {
+                                const ratio = logoWidth > 0 ? (logoHeight / logoWidth) : 1;
+                                setLogoWidth(val);
+                                setLogoHeight(Math.max(0.05, Math.min(0.6, val * ratio)));
+                              }} 
+                            />
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                              <div style={{ flex: 1 }}>
+                                <Slider label="Width" value={logoWidth} min={0.05} max={0.6} step={0.01} onChange={setLogoWidth} />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <Slider label="Height" value={logoHeight} min={0.05} max={0.6} step={0.01} onChange={setLogoHeight} />
+                              </div>
+                            </div>
                             <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
                           </div>
                         </div>
