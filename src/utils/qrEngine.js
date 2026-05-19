@@ -462,8 +462,7 @@ export function renderQR(canvas, options) {
       contentSize,
       moduleCount,
       quietZone,
-      showHandle: options.showHandle,
-      selectedType: options.selectedType
+      showHandle: options.showHandle
     });
   }
 
@@ -1467,7 +1466,7 @@ function drawRoundedRectPath(ctx, x, y, w, h, r) {
 /**
  * Constrain an element to stay within the QR content area and avoid the 3 finder patterns (eyes)
  */
-export function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, moduleCount, quietZone) {
+function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, moduleCount, quietZone) {
   const totalModules = moduleCount + quietZone * 2;
   const cellSize = contentSize / totalModules;
   // Eye region is 7x7 modules. We add 1 module buffer for safe scanning.

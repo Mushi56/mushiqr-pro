@@ -3485,7 +3485,7 @@ input[type="range"]::-moz-range-thumb {
   -webkit-overflow-scrolling: touch;
 }
 
-/* ── QR Preview Card ── */
+/* Ã¢â€â‚¬Ã¢â€â‚¬ QR Preview Card Ã¢â€â‚¬Ã¢â€â‚¬ */
 .qr-preview-card {
   position: sticky;
   top: 0;
@@ -3493,9 +3493,9 @@ input[type="range"]::-moz-range-thumb {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  padding: 24px;
-  min-height: auto;
+  gap: 20px; /* Increased gap */
+  padding: 30px 16px 24px; /* Increased vertical padding */
+  min-height: 480px; /* Increased from 440px for larger preview */
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
@@ -3506,7 +3506,8 @@ input[type="range"]::-moz-range-thumb {
 .qr-preview-wrapper {
   position: relative;
   width: 100%;
-  max-width: 260px;
+  max-width: 360px;
+  /* Increased from 320px */
   aspect-ratio: 1;
 
   display: flex;
@@ -7077,28 +7078,5 @@ video {
   gap: 8px;
   margin-bottom: 16px;
   cursor: pointer;
-}
-
-/* ========================================
-   ANDROID PLATFORM OVERRIDES (Notch/Status Bar Fixes)
-   ======================================== */
-.platform-android .app-header {
-  --header-height: 64px !important;
-  padding-top: 0px !important;
-}
-
-.platform-android .settings-page,
-.platform-android .saved-page,
-.platform-android .home-page,
-.platform-android .history-page {
-  padding-top: 0px !important;
-}
-
-.platform-android .modal-overlay {
-  padding-top: 20px !important;
-}
-
-.platform-android .qrs-header {
-  padding-top: 12px !important;
 }
 

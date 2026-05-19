@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
-import { Capacitor } from '@capacitor/core';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
 import {
   QrCode,
   Sun,
@@ -60,7 +57,7 @@ import LogoPresets from './components/LogoPresets';
 import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
-import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData, constrainToSafeZone } from './utils/qrEngine';
+import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
 import { saveToHistory, getSaved, saveToSaved, getPreferences, savePreferences } from './utils/storage';
 import QRScanner from './components/QRScanner';
@@ -447,9 +444,6 @@ export default function App() {
   const [activePreset, setActivePreset] = useState(null);
   const [isPipetteActive, setIsPipetteActive] = useState(false);
   const [pipetteTarget, setPipetteTarget] = useState(null); // { setter }
-  const [pipetteColor, setPipetteColor] = useState('#ffffff');
-  const [pipettePos, setPipettePos] = useState({ x: 50, y: 50 });
-  const initialPipetteColor = useRef('#ffffff');
   const [canvasSelection, setCanvasSelection] = useState(null); // 'logo' | 'text' | null
 
   // ── Gradient ──
@@ -833,16 +827,8 @@ export default function App() {
     const updateStatusBar = async () => {
       try {
         await StatusBar.show();
-        
-        const platform = Capacitor.getPlatform();
-        if (platform === 'android') {
-          // Disable overlay on Android for a clean solid status bar and 0px extra header space
-          await StatusBar.setOverlaysWebView({ overlay: false });
-          document.documentElement.classList.add('platform-android');
-        } else {
-          await StatusBar.setOverlaysWebView({ overlay: true });
-          document.documentElement.classList.add('platform-ios');
-        }
+        // Set overlaysWebView to TRUE and add padding in CSS for the 24dp status bar
+        await StatusBar.setOverlaysWebView({ overlay: true });
         
         if (effectiveTheme === 'dark') {
           await StatusBar.setStyle({ style: 'DARK' }); // Light text/icons for dark background
@@ -1008,51 +994,17 @@ export default function App() {
   };
 
   // ── Share ──
-  const handleShare = async () => {
+  const handleShare = () => {
     if (!canvasRef.current) return;
-    
-    if (Capacitor.isNativePlatform()) {
+    canvasRef.current.toBlob(async (blob) => {
       try {
-        const base64Data = canvasRef.current.toDataURL('image/png').replace(/^data:image\/png;base64,/, '');
-        
-        // Request permissions just in case
-        try { await Filesystem.requestPermissions(); } catch {}
-        
-        const filename = `mushi-qr-${Date.now()}.png`;
-        
-        // Write to Cache
-        const savedFile = await Filesystem.writeFile({
-          path: filename,
-          data: base64Data,
-          directory: Directory.Cache
-        });
-        
-        // Share
-        await Share.share({
-          title: 'Mushi Qr Pro',
-          url: savedFile.uri,
-          dialogTitle: 'Share your QR Code'
-        });
+        const file = new File([blob], 'qrcode.png', { type: 'image/png' });
+        await navigator.share({ files: [file], title: 'My QR Code' });
+        showToast('Shared successfully!');
       } catch (err) {
-        console.error('Native sharing failed:', err);
-        showToast('Share failed', 'error');
+        if (err.name !== 'AbortError') showToast('Share failed', 'error');
       }
-    } else {
-      // Web Fallback
-      if (navigator.share) {
-        canvasRef.current.toBlob(async (blob) => {
-          try {
-            const file = new File([blob], 'qrcode.png', { type: 'image/png' });
-            await navigator.share({ files: [file], title: 'My QR Code' });
-            showToast('Shared successfully!');
-          } catch (err) {
-            if (err.name !== 'AbortError') showToast('Share failed', 'error');
-          }
-        });
-      } else {
-        showToast('Sharing is not supported in this browser', 'error');
-      }
-    }
+    });
   };
 
   // ── Download ──
@@ -1299,7 +1251,7 @@ export default function App() {
 
     textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
     textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
-    textCenterPosX, textCenterPosY, textCenterRotation, logoPosX, logoPosY,
+    textCenterPosX, textCenterPosY, logoPosX, logoPosY,
     logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
     logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, 
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
@@ -1333,61 +1285,6 @@ export default function App() {
     return { contentX, contentY, contentSize };
   }, [frameStyle]);
 
-  // ── Drag Pipette Extraction ──
-  const updatePipetteColorFromPos = useCallback((xPercent, yPercent) => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const x = Math.max(0, Math.min(511, Math.round((xPercent / 100) * 512)));
-    const y = Math.max(0, Math.min(511, Math.round((yPercent / 100) * 512)));
-    try {
-      const ctx = canvas.getContext('2d');
-      const pixel = ctx.getImageData(x, y, 1, 1).data;
-      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
-      setPipetteColor(hex);
-      if (pipetteTarget?.setter) {
-        pipetteTarget.setter(hex);
-      }
-    } catch (e) {
-      console.warn("Failed to extract color:", e);
-    }
-  }, [pipetteTarget]);
-
-  const handlePipetteMove = useCallback((clientX, clientY) => {
-    if (!canvasRef.current) return;
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
-    const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
-    const xPercent = (x / rect.width) * 100;
-    const yPercent = (y / rect.height) * 100;
-    setPipettePos({ x: xPercent, y: yPercent });
-    updatePipetteColorFromPos(xPercent, yPercent);
-  }, [updatePipetteColorFromPos]);
-
-  const handlePipettePointerDown = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const handleMove = (moveEvt) => {
-      const clientX = moveEvt.touches ? moveEvt.touches[0].clientX : moveEvt.clientX;
-      const clientY = moveEvt.touches ? moveEvt.touches[0].clientY : moveEvt.clientY;
-      handlePipetteMove(clientX, clientY);
-    };
-    const handleUp = () => {
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
-      window.removeEventListener('touchmove', handleMove);
-      window.removeEventListener('touchend', handleUp);
-    };
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
-    window.addEventListener('touchmove', handleMove, { passive: false });
-    window.addEventListener('touchend', handleUp);
-    
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    handlePipetteMove(clientX, clientY);
-  };
-
   // ── Canvas Interaction (Drag to Position) ──
   const handleCanvasInteraction = useCallback((e) => {
     if (!canvasRef.current || !qrMatrixInfo) return;
@@ -1407,6 +1304,25 @@ export default function App() {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     
+    if (isPipetteActive) {
+      const rect = canvas.getBoundingClientRect();
+      const scale = 512 / rect.width;
+      const x = (clientX - rect.left) * scale;
+      const y = (clientY - rect.top) * scale;
+      
+      const ctx = canvas.getContext('2d');
+      const pixel = ctx.getImageData(x, y, 1, 1).data;
+      const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
+      
+      if (pipetteTarget?.setter) {
+        pipetteTarget.setter(hex);
+      }
+      setIsPipetteActive(false);
+      setAdvPicker(prev => ({ ...prev, open: true, color: hex }));
+      e.preventDefault();
+      return;
+    }
+    
     // Convert click to canvas coordinates (0-512)
     const scale = 512 / rect.width;
     const x = (clientX - rect.left) * scale;
@@ -1424,11 +1340,8 @@ export default function App() {
     if (logo?.image) {
       const lw = contentSize * logoWidth;
       const lh = contentSize * logoHeight;
-      const rawLx = contentX + (contentSize - lw) * logoPosX;
-      const rawLy = contentY + (contentSize - lh) * logoPosY;
-      const safeLogoPos = constrainToSafeZone(rawLx, rawLy, lw, lh, contentX, contentY, contentSize, 21, 2);
-      const lx = safeLogoPos.x;
-      const ly = safeLogoPos.y;
+      const lx = contentX + (contentSize - lw) * logoPosX;
+      const ly = contentY + (contentSize - lh) * logoPosY;
       
       const centerX = lx + lw / 2;
       const centerY = ly + lh / 2;
@@ -1516,11 +1429,8 @@ export default function App() {
       const tw = metrics.width + (logoPadding || 10) * 2;
       const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
       
-      const rawTx = contentX + (contentSize - tw) * textCenterPosX;
-      const rawTy = contentY + (contentSize - th) * textCenterPosY;
-      const safeTextPos = constrainToSafeZone(rawTx, rawTy, tw, th, contentX, contentY, contentSize, 21, 2);
-      const tx = safeTextPos.x;
-      const ty = safeTextPos.y;
+      const tx = contentX + (contentSize - tw) * textCenterPosX;
+      const ty = contentY + (contentSize - th) * textCenterPosY;
       
       const centerX = tx + tw / 2;
       const centerY = ty + th / 2;
@@ -1617,11 +1527,8 @@ export default function App() {
     if (dragType.current === 'rotate-logo') {
         const lw = contentSize * logoWidth;
         const lh = contentSize * logoHeight;
-        const rawLx = contentX + (contentSize - lw) * logoPosX;
-        const rawLy = contentY + (contentSize - lh) * logoPosY;
-        const safeLogoPos = constrainToSafeZone(rawLx, rawLy, lw, lh, contentX, contentY, contentSize, 21, 2);
-        const lx = safeLogoPos.x;
-        const ly = safeLogoPos.y;
+        const lx = contentX + (contentSize - lw) * logoPosX;
+        const ly = contentY + (contentSize - lh) * logoPosY;
         const centerX = lx + lw / 2;
         const centerY = ly + lh / 2;
         
@@ -1645,11 +1552,8 @@ export default function App() {
         const metrics = tempCtx.current.measureText(textCenterText);
         const tw = metrics.width + (logoPadding || 10) * 2;
         const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
-        const rawTx = contentX + (contentSize - tw) * textCenterPosX;
-        const rawTy = contentY + (contentSize - th) * textCenterPosY;
-        const safeTextPos = constrainToSafeZone(rawTx, rawTy, tw, th, contentX, contentY, contentSize, 21, 2);
-        const tx = safeTextPos.x;
-        const ty = safeTextPos.y;
+        const tx = contentX + (contentSize - tw) * textCenterPosX;
+        const ty = contentY + (contentSize - th) * textCenterPosY;
         const centerX = tx + tw / 2;
         const centerY = ty + th / 2;
         
@@ -1670,11 +1574,8 @@ export default function App() {
     } else if (dragType.current && dragType.current.startsWith('resize-logo')) {
         const lw = contentSize * logoWidth;
         const lh = contentSize * logoHeight;
-        const rawLx = contentX + (contentSize - lw) * logoPosX;
-        const rawLy = contentY + (contentSize - lh) * logoPosY;
-        const safeLogoPos = constrainToSafeZone(rawLx, rawLy, lw, lh, contentX, contentY, contentSize, 21, 2);
-        const lx = safeLogoPos.x;
-        const ly = safeLogoPos.y;
+        const lx = contentX + (contentSize - lw) * logoPosX;
+        const ly = contentY + (contentSize - lh) * logoPosY;
         const centerX = lx + lw / 2;
         const centerY = ly + lh / 2;
         const dx_raw = x - centerX;
@@ -1687,11 +1588,8 @@ export default function App() {
         
         const startW_px = contentSize * dragStartOffset.current.startW;
         const startH_px = contentSize * dragStartOffset.current.startH;
-        const rawLxStart = contentX + (contentSize - startW_px) * dragStartOffset.current.startPosX;
-        const rawLyStart = contentY + (contentSize - startH_px) * dragStartOffset.current.startPosY;
-        const safeLogoStart = constrainToSafeZone(rawLxStart, rawLyStart, startW_px, startH_px, contentX, contentY, contentSize, 21, 2);
-        const lx_start = safeLogoStart.x;
-        const ly_start = safeLogoStart.y;
+        const lx_start = contentX + (contentSize - startW_px) * dragStartOffset.current.startPosX;
+        const ly_start = contentY + (contentSize - startH_px) * dragStartOffset.current.startPosY;
 
         let newW = dragStartOffset.current.startW;
         let newH = dragStartOffset.current.startH;
@@ -1775,11 +1673,8 @@ export default function App() {
         
         const startW = dragStartOffset.current.startW * contentSize;
         const startH = dragStartOffset.current.startH * contentSize;
-        const rawTxStart = contentX + (contentSize - startW) * dragStartOffset.current.startPosX;
-        const rawTyStart = contentY + (contentSize - startH) * dragStartOffset.current.startPosY;
-        const safeTextStart = constrainToSafeZone(rawTxStart, rawTyStart, startW, startH, contentX, contentY, contentSize, 21, 2);
-        const tx_start = safeTextStart.x;
-        const ty_start = safeTextStart.y;
+        const tx_start = contentX + (contentSize - startW) * dragStartOffset.current.startPosX;
+        const ty_start = contentY + (contentSize - startH) * dragStartOffset.current.startPosY;
         
         const fontSize = contentSize * newSize;
         tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
@@ -2075,7 +1970,7 @@ export default function App() {
                         >
                           <Bookmark size={20} />
                         </button>
-                        {(Capacitor.isNativePlatform() || (typeof navigator !== 'undefined' && navigator.share)) && (
+                        {typeof navigator !== 'undefined' && navigator.canShare && (
                           <button
                             className="menu-link-btn"
                             onClick={(e) => { e.stopPropagation(); handleShare(); setFormatDropdownOpen(false); }}
@@ -2185,54 +2080,6 @@ export default function App() {
                         touchAction: 'none'
                       }} 
                     />
-                  )}
-                  {isPipetteActive && (
-                    <>
-                      {/* Intercept drags and touch movements on the preview card */}
-                      <div 
-                        onPointerDown={handlePipettePointerDown}
-                        onTouchStart={handlePipettePointerDown}
-                        style={{
-                          position: 'absolute',
-                          inset: 0,
-                          zIndex: 9999,
-                          cursor: 'crosshair',
-                          touchAction: 'none',
-                          borderRadius: 'inherit'
-                        }}
-                      />
-                      {/* Floating circular magnifying glass targeting colors */}
-                      <div 
-                        style={{
-                          position: 'absolute',
-                          left: `${pipettePos.x}%`,
-                          top: `${pipettePos.y}%`,
-                          transform: 'translate(-50%, -50%)',
-                          width: '40px',
-                          height: '40px',
-                          borderRadius: '50%',
-                          border: '3px solid #fff',
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.5), inset 0 0 4px rgba(0,0,0,0.3)',
-                          backgroundColor: pipetteColor,
-                          pointerEvents: 'none',
-                          zIndex: 10000,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          transition: 'background-color 0.1s ease'
-                        }}
-                      >
-                        <div 
-                          style={{
-                            width: '6px',
-                            height: '6px',
-                            borderRadius: '50%',
-                            backgroundColor: '#fff',
-                            boxShadow: '0 0 2px rgba(0,0,0,0.5)'
-                          }}
-                        />
-                      </div>
-                    </>
                   )}
                 </div>
 
@@ -3145,9 +2992,6 @@ export default function App() {
           setAdvPicker({ ...advPicker, open: false });
         }}
         onEnterPipetteMode={() => {
-          initialPipetteColor.current = advPicker.color || '#ffffff';
-          setPipetteColor(advPicker.color || '#ffffff');
-          setPipettePos({ x: 50, y: 50 });
           setPipetteTarget({ setter: advPicker.setter });
           setAdvPicker(prev => ({ ...prev, open: false }));
           setIsPipetteActive(true);
@@ -3161,109 +3005,35 @@ export default function App() {
             position: 'fixed',
             inset: 0,
             zIndex: 10000,
+            pointerEvents: 'none',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'flex-end',
-            background: 'rgba(0,0,0,0.45)',
-            backdropFilter: 'blur(4px)',
-            padding: '24px 20px calc(24px + env(safe-area-inset-bottom))',
-            pointerEvents: 'all'
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(2px)'
           }}
         >
-          {/* Instructions HUD */}
-          <div style={{
-            position: 'absolute',
-            top: 'calc(80px + env(safe-area-inset-top))',
-            background: 'rgba(0,0,0,0.75)',
-            padding: '10px 20px',
-            borderRadius: '20px',
-            color: '#fff',
-            fontSize: '13px',
-            fontWeight: 600,
-            textAlign: 'center',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            pointerEvents: 'none'
-          }}>
-            Drag or tap on the QR preview to target a color
-          </div>
-
-          {/* Symmetrical Control HUD */}
           <div style={{ 
             background: 'var(--bg-primary)', 
-            padding: '16px 20px', 
-            borderRadius: '24px', 
-            boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+            padding: '16px 24px', 
+            borderRadius: '20px', 
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            width: '100%',
-            maxWidth: '340px',
-            border: '1px solid var(--border-color)'
+            gap: '12px',
+            border: '1px solid var(--accent-primary)',
+            pointerEvents: 'all'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ 
-                width: '36px', 
-                height: '36px', 
-                borderRadius: '10px', 
-                backgroundColor: pipetteColor, 
-                border: '2px solid #fff',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)' 
-              }} />
-              <div>
-                <div style={{ fontWeight: 800, fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-primary)' }}>{pipetteColor}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Targeted Color</div>
-              </div>
+            <Pipette size={24} className="text-accent" />
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '15px' }}>Pipette Active</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Tap on the preview to pick a color</div>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={() => {
-                  if (pipetteTarget?.setter) {
-                    pipetteTarget.setter(initialPipetteColor.current);
-                  }
-                  setIsPipetteActive(false);
-                  setAdvPicker(prev => ({ ...prev, open: true, color: initialPipetteColor.current }));
-                }}
-                style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  borderRadius: '12px', 
-                  background: 'var(--bg-hover)', 
-                  border: '1px solid var(--border-color)', 
-                  color: 'var(--text-primary)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <X size={18} />
-              </button>
-              <button 
-                onClick={() => {
-                  setIsPipetteActive(false);
-                  setAdvPicker(prev => ({ ...prev, open: true, color: pipetteColor }));
-                }}
-                style={{ 
-                  width: '40px', 
-                  height: '40px', 
-                  borderRadius: '12px', 
-                  background: 'var(--accent-primary)', 
-                  border: 'none', 
-                  color: '#fff', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(255,45,85,0.3)',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Check size={18} />
-              </button>
-            </div>
+            <button 
+              onClick={() => { setIsPipetteActive(false); setAdvPicker(prev => ({ ...prev, open: true })); }}
+              style={{ marginLeft: '12px', padding: '8px 16px', borderRadius: '10px', background: 'var(--bg-elevated)', border: 'none', color: 'var(--text-primary)', fontWeight: 600 }}
+            >Cancel</button>
           </div>
         </div>
       )}
