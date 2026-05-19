@@ -491,6 +491,7 @@ export default function App() {
   const [logoEraseColor, setLogoEraseColor] = useState('#ffffff');
   const [logoTexture, setLogoTexture] = useState('none');
   const [logoCrop, setLogoCrop] = useState({ x: 0, y: 0, w: 1, h: 1 });
+  const [logoAspectRatioLocked, setLogoAspectRatioLocked] = useState(true);
 
   // ── Frame ──
   const [frameStyle, setFrameStyle] = useState('none');
@@ -618,7 +619,7 @@ export default function App() {
       logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
       logoOutline, logoOutlineColor, logoOutlineWidth, logoPosX, logoPosY,
       logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
-      logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop,
+      logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, logoAspectRatioLocked,
       frameStyle, frameText, frameColor, frameFont, frameSize,
       frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
       frameShadowEnabled, frameShadowBlur, frameShadowColor,
@@ -635,7 +636,7 @@ export default function App() {
     logo, logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoPosX, logoPosY,
     logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
-    logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop,
+    logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, logoAspectRatioLocked,
     frameStyle, frameText, frameColor, frameFont, frameSize,
     frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
     frameShadowEnabled, frameShadowBlur, frameShadowColor,
@@ -724,6 +725,7 @@ export default function App() {
 
     if (s.logoWidth !== undefined) setLogoWidth(s.logoWidth);
     if (s.logoHeight !== undefined) setLogoHeight(s.logoHeight);
+    if (s.logoAspectRatioLocked !== undefined) setLogoAspectRatioLocked(s.logoAspectRatioLocked);
     if (s.logoPadding !== undefined) setLogoPadding(s.logoPadding);
     if (s.logoBackground !== undefined) setLogoBackground(s.logoBackground);
     if (s.logoBgColor !== undefined) setLogoBgColor(s.logoBgColor);
@@ -2160,26 +2162,47 @@ export default function App() {
                       {logoPopup === 'size' && (
                         <div className="fade-in">
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                            <Slider 
-                              label="Logo Size (Combined)" 
-                              value={logoWidth} 
-                              min={0.05} 
-                              max={0.6} 
-                              step={0.01} 
-                              onChange={(val) => {
-                                const ratio = logoWidth > 0 ? (logoHeight / logoWidth) : 1;
-                                setLogoWidth(val);
-                                setLogoHeight(Math.max(0.05, Math.min(0.6, val * ratio)));
-                              }} 
-                            />
-                            <div style={{ display: 'flex', gap: '12px' }}>
-                              <div style={{ flex: 1 }}>
-                                <Slider label="Width" value={logoWidth} min={0.05} max={0.6} step={0.01} onChange={setLogoWidth} />
-                              </div>
-                              <div style={{ flex: 1 }}>
-                                <Slider label="Height" value={logoHeight} min={0.05} max={0.6} step={0.01} onChange={setLogoHeight} />
-                              </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                              <Slider 
+                                label="Logo Width" 
+                                value={logoWidth} 
+                                min={0.05} 
+                                max={0.6} 
+                                step={0.01} 
+                                onChange={(val) => {
+                                  if (logoAspectRatioLocked) {
+                                    const ratio = logoWidth > 0 ? (logoHeight / logoWidth) : 1;
+                                    setLogoWidth(val);
+                                    setLogoHeight(Math.max(0.05, Math.min(0.6, val * ratio)));
+                                  } else {
+                                    setLogoWidth(val);
+                                  }
+                                }} 
+                              />
+                              <Slider 
+                                label="Logo Height" 
+                                value={logoHeight} 
+                                min={0.05} 
+                                max={0.6} 
+                                step={0.01} 
+                                onChange={(val) => {
+                                  if (logoAspectRatioLocked) {
+                                    const ratio = logoHeight > 0 ? (logoWidth / logoHeight) : 1;
+                                    setLogoHeight(val);
+                                    setLogoWidth(Math.max(0.05, Math.min(0.6, val * ratio)));
+                                  } else {
+                                    setLogoHeight(val);
+                                  }
+                                }} 
+                              />
                             </div>
+                            
+                            <Toggle 
+                              label="Resize Combined" 
+                              checked={logoAspectRatioLocked} 
+                              onChange={setLogoAspectRatioLocked} 
+                            />
+                            
                             <Slider label="Logo Padding" value={logoPadding} min={0} max={20} step={1} onChange={setLogoPadding} />
                           </div>
                         </div>
