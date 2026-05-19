@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback, Component } from 'react';
 import { App as CapApp } from '@capacitor/app';
 import { StatusBar } from '@capacitor/status-bar';
 import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import {
   QrCode,
   Sun,
@@ -1003,17 +1005,51 @@ export default function App() {
   };
 
   // ── Share ──
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!canvasRef.current) return;
-    canvasRef.current.toBlob(async (blob) => {
+    
+    if (Capacitor.isNativePlatform()) {
       try {
-        const file = new File([blob], 'qrcode.png', { type: 'image/png' });
-        await navigator.share({ files: [file], title: 'My QR Code' });
-        showToast('Shared successfully!');
+        const base64Data = canvasRef.current.toDataURL('image/png').replace(/^data:image\/png;base64,/, '');
+        
+        // Request permissions just in case
+        try { await Filesystem.requestPermissions(); } catch {}
+        
+        const filename = `mushi-qr-${Date.now()}.png`;
+        
+        // Write to Cache
+        const savedFile = await Filesystem.writeFile({
+          path: filename,
+          data: base64Data,
+          directory: Directory.Cache
+        });
+        
+        // Share
+        await Share.share({
+          title: 'Mushi Qr Pro',
+          url: savedFile.uri,
+          dialogTitle: 'Share your QR Code'
+        });
       } catch (err) {
-        if (err.name !== 'AbortError') showToast('Share failed', 'error');
+        console.error('Native sharing failed:', err);
+        showToast('Share failed', 'error');
       }
-    });
+    } else {
+      // Web Fallback
+      if (navigator.share) {
+        canvasRef.current.toBlob(async (blob) => {
+          try {
+            const file = new File([blob], 'qrcode.png', { type: 'image/png' });
+            await navigator.share({ files: [file], title: 'My QR Code' });
+            showToast('Shared successfully!');
+          } catch (err) {
+            if (err.name !== 'AbortError') showToast('Share failed', 'error');
+          }
+        });
+      } else {
+        showToast('Sharing is not supported in this browser', 'error');
+      }
+    }
   };
 
   // ── Download ──
@@ -1979,7 +2015,7 @@ export default function App() {
                         >
                           <Bookmark size={20} />
                         </button>
-                        {typeof navigator !== 'undefined' && navigator.canShare && (
+                        {(Capacitor.isNativePlatform() || (typeof navigator !== 'undefined' && navigator.share)) && (
                           <button
                             className="menu-link-btn"
                             onClick={(e) => { e.stopPropagation(); handleShare(); setFormatDropdownOpen(false); }}
