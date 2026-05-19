@@ -10,7 +10,7 @@ export default function Terms() {
         <p style={styles.updated}>Last updated: April 7, 2026</p>
 
         <Section title="1. Acceptance of Terms">
-          By accessing and using MushiQR Pro, you accept and agree to be bound by the terms and provision of this agreement.
+          By accessing and using Mushi Qr Pro, you accept and agree to be bound by the terms and provision of this agreement.
         </Section>
 
         <Section title="2. Use of Service">
@@ -26,7 +26,7 @@ export default function Terms() {
         </Section>
 
         <Section title="5. Limitation of Liability">
-          In no event shall MushiQR Pro or its operators be liable for any indirect, incidental, special, consequential or punitive damages arising out of or related to your use of the service.
+          In no event shall Mushi Qr Pro or its operators be liable for any indirect, incidental, special, consequential or punitive damages arising out of or related to your use of the service.
         </Section>
 
         <Section title="6. Contact Us">

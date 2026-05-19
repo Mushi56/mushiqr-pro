@@ -1,6 +1,6 @@
 {
   "appId": "com.mushiqr.pro",
-  "appName": "MushiQR Pro",
+  "appName": "Mushi Qr Pro",
   "webDir": "dist",
   "plugins": {
     "StatusBar": {

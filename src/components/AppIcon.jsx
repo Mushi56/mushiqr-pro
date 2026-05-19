@@ -27,7 +27,7 @@ export default function AppIcon({ size = 42, shadow = false, className = '', sty
     >
       <img
         src="/logo.png"
-        alt="MushiQR Pro"
+        alt="Mushi Qr Pro"
         style={{
           width: '100%',
           height: '100%',
