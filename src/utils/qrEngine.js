@@ -781,6 +781,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
     logoEraseColorEnabled = false,
     logoEraseColor = '#ffffff',
     logoTexture = 'none',
+    logoCrop = 'none',
     logoPosX = 0.5,
     logoPosY = 0.5,
     contentX = 0,
@@ -936,23 +937,40 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
   ctx.restore();
 
   // Draw Resize Handles (5-point system) if requested
-  if (options.showHandle) {
+  if (options.showHandle && options.selectedType === 'logo') {
+    // Draw Center Alignment Guide Lines
+    ctx.save();
+    ctx.strokeStyle = '#007AFF'; // Premium blue alignment guidelines
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    
+    if (logoPosX === 0.5) {
+        ctx.beginPath();
+        ctx.moveTo(contentX + contentSize / 2, contentY);
+        ctx.lineTo(contentX + contentSize / 2, contentY + contentSize);
+        ctx.stroke();
+    }
+    if (logoPosY === 0.5) {
+        ctx.beginPath();
+        ctx.moveTo(contentX, contentY + contentSize / 2);
+        ctx.lineTo(contentX + contentSize, contentY + contentSize / 2);
+        ctx.stroke();
+    }
+    ctx.restore();
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate((logoRotation * Math.PI) / 180);
     ctx.translate(-centerX, -centerY);
 
     ctx.strokeStyle = '#007AFF'; 
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 4.5; // Premium bold solid outline stroke
     ctx.strokeRect(logoX, logoY, logoW, logoH);
-    ctx.setLineDash([]);
     
     const hSize = 10;
     const bigHSize = 16;
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#007AFF';
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 2.5; // Bold handles stroke
 
     const drawH = (hx, hy, size = hSize, isCircle = false) => {
         ctx.beginPath();
@@ -966,14 +984,44 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
         }
     };
 
-    // 1. Top-Left (Rotate)
-    ctx.fillStyle = 'var(--accent-primary, #FF3B30)';
-    drawH(logoX, logoY, 12, true); 
-    // Small rotate symbol
-    ctx.strokeStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(logoX, logoY, 4, 0, Math.PI * 1.5);
-    ctx.stroke();
+    // 1. Bottom-Left Curved Rotate Bracket Arrow (Radius 16, Offset -20, 20)
+    const drawRotateBracket = (bx, by, angleStart, angleEnd, ox, oy) => {
+        ctx.save();
+        ctx.strokeStyle = '#007AFF';
+        ctx.lineWidth = 4.5; // Bold rotate bracket stroke
+        ctx.beginPath();
+        const ax = bx + ox;
+        const ay = by + oy;
+        ctx.arc(ax, ay, 16, angleStart, angleEnd); // Radius increased to 16
+        ctx.stroke();
+        
+        ctx.fillStyle = '#007AFF';
+        const drawArrow = (arrowX, arrowY, rotAngle) => {
+            ctx.save();
+            ctx.translate(arrowX, arrowY);
+            ctx.rotate(rotAngle);
+            ctx.beginPath();
+            ctx.moveTo(-4, -4);
+            ctx.lineTo(4, 0);
+            ctx.lineTo(-4, 4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        };
+        
+        const e1x = ax + 16 * Math.cos(angleStart);
+        const e1y = ay + 16 * Math.sin(angleStart);
+        drawArrow(e1x, e1y, angleStart + Math.PI/2);
+        
+        const e2x = ax + 16 * Math.cos(angleEnd);
+        const e2y = ay + 16 * Math.sin(angleEnd);
+        drawArrow(e2x, e2y, angleEnd - Math.PI/2);
+        
+        ctx.restore();
+    };
+
+    // Draw only Bottom-Left rotate bracket (offset -20, 20)
+    drawRotateBracket(logoX, logoY + logoH, 0.5 * Math.PI, Math.PI, -20, 20);
     
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#007AFF';
@@ -990,7 +1038,7 @@ function drawLogo(ctx, logoImg, canvasSize, options) {
     // 5. Top-Right (Delete Button - Red Circle with X)
     ctx.fillStyle = '#FF3B30';
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3.5; // Bold delete button X stroke
     drawH(logoX + logoW, logoY, 22, true);
     // Draw X
     ctx.beginPath();
@@ -1146,17 +1194,34 @@ function drawCenterText(ctx, text, canvasSize, options) {
   ctx.restore();
 
   // Draw Transformation Frame (5-point system) if requested
-  if (options.showHandle) {
+  if (options.showHandle && options.selectedType === 'text') {
+    // Draw Center Alignment Guide Lines
+    ctx.save();
+    ctx.strokeStyle = '#007AFF'; // Premium blue alignment guidelines
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    
+    if (textCenterPosX === 0.5) {
+        ctx.beginPath();
+        ctx.moveTo(contentX + contentSize / 2, contentY);
+        ctx.lineTo(contentX + contentSize / 2, contentY + contentSize);
+        ctx.stroke();
+    }
+    if (textCenterPosY === 0.5) {
+        ctx.beginPath();
+        ctx.moveTo(contentX, contentY + contentSize / 2);
+        ctx.lineTo(contentX + contentSize, contentY + contentSize / 2);
+        ctx.stroke();
+    }
+    ctx.restore();
     ctx.save();
     ctx.translate(centerX, centerY);
     ctx.rotate((textCenterRotation * Math.PI) / 180);
     ctx.translate(-centerX, -centerY);
 
     ctx.strokeStyle = '#007AFF'; 
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 4.5; // Premium bold solid outline stroke
     ctx.strokeRect(logoX, logoY, paddedW, paddedH);
-    ctx.setLineDash([]);
     
     const hSize = 10;
     const bigHSize = 16;
@@ -1165,6 +1230,7 @@ function drawCenterText(ctx, text, canvasSize, options) {
         ctx.beginPath();
         ctx.fillStyle = color;
         ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2.5; // Bold handles stroke
         if (isCircle) {
             ctx.arc(hx, hy, size/2, 0, Math.PI * 2);
             ctx.fill();
@@ -1175,12 +1241,44 @@ function drawCenterText(ctx, text, canvasSize, options) {
         }
     };
 
-    // 1. Top-Left (Rotate)
-    drawH(logoX, logoY, 12, true, '#FF3B30', '#ffffff'); 
-    ctx.strokeStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(logoX, logoY, 4, 0, Math.PI * 1.5);
-    ctx.stroke();
+    // 1. Bottom-Left Curved Rotate Bracket Arrow (Radius 16, Offset -20, 20)
+    const drawRotateBracket = (bx, by, angleStart, angleEnd, ox, oy) => {
+        ctx.save();
+        ctx.strokeStyle = '#007AFF';
+        ctx.lineWidth = 4.5; // Bold rotate bracket stroke
+        ctx.beginPath();
+        const ax = bx + ox;
+        const ay = by + oy;
+        ctx.arc(ax, ay, 16, angleStart, angleEnd); // Radius increased to 16
+        ctx.stroke();
+        
+        ctx.fillStyle = '#007AFF';
+        const drawArrow = (arrowX, arrowY, rotAngle) => {
+            ctx.save();
+            ctx.translate(arrowX, arrowY);
+            ctx.rotate(rotAngle);
+            ctx.beginPath();
+            ctx.moveTo(-4, -4);
+            ctx.lineTo(4, 0);
+            ctx.lineTo(-4, 4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        };
+        
+        const e1x = ax + 16 * Math.cos(angleStart);
+        const e1y = ay + 16 * Math.sin(angleStart);
+        drawArrow(e1x, e1y, angleStart + Math.PI/2);
+        
+        const e2x = ax + 16 * Math.cos(angleEnd);
+        const e2y = ay + 16 * Math.sin(angleEnd);
+        drawArrow(e2x, e2y, angleEnd - Math.PI/2);
+        
+        ctx.restore();
+    };
+
+    // Draw only Bottom-Left rotate bracket (offset -20, 20)
+    drawRotateBracket(logoX, logoY + paddedH, 0.5 * Math.PI, Math.PI, -20, 20);
 
     // 2. Bottom-Right (Resize Proportional - Big Circle)
     drawH(logoX + paddedW, logoY + paddedH, bigHSize, true);
@@ -1188,7 +1286,7 @@ function drawCenterText(ctx, text, canvasSize, options) {
     // 3. Top-Right (Delete Button)
     drawH(logoX + paddedW, logoY, 22, true, '#FF3B30', '#ffffff');
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3.5; // Bold delete button X stroke
     ctx.beginPath();
     ctx.moveTo(logoX + paddedW - 6, logoY - 6);
     ctx.lineTo(logoX + paddedW + 6, logoY + 6);
@@ -1385,44 +1483,51 @@ function constrainToSafeZone(x, y, w, h, contentX, contentY, contentSize, module
   let resX = x;
   let resY = y;
 
-  // Safety Nudging (Absolute Eye Avoidance)
-  for (let i = 0; i < eyes.length; i++) {
-    const eye = eyes[i];
-    const eyeAbsX = contentX + eye.x;
-    const eyeAbsY = contentY + eye.y;
-    
-    // Check intersection
-    if (resX < eyeAbsX + eye.w && resX + w > eyeAbsX && resY < eyeAbsY + eye.h && resY + h > eyeAbsY) {
-       // We are in the Danger Zone! 
-       // Escape options MUST stay within the QR module area [minX, maxX]
-       const canGoRight = (eyeAbsX + eye.w + w) <= (contentX + contentSize - qzOffset);
-       const canGoDown = (eyeAbsY + eye.h + h) <= (contentY + contentSize - qzOffset);
-       const canGoLeft = (eyeAbsX - w) >= (contentX + qzOffset);
-       const canGoUp = (eyeAbsY - h) >= (contentY + qzOffset);
+  // If the element is very large, eye avoidance is mathematically impossible and will force 
+  // the element to the center, breaking canvas handle alignments. In this case, we bypass
+  // the safety zone and only apply boundary clamping.
+  const isVeryLarge = w > contentSize * 0.32 || h > contentSize * 0.32;
 
-       const distRight = (eyeAbsX + eye.w) - resX;
-       const distLeft = (resX + w) - eyeAbsX;
-       const distBottom = (eyeAbsY + eye.h) - resY;
-       const distTop = (resY + h) - eyeAbsY;
+  if (!isVeryLarge) {
+    // Safety Nudging (Absolute Eye Avoidance)
+    for (let i = 0; i < eyes.length; i++) {
+      const eye = eyes[i];
+      const eyeAbsX = contentX + eye.x;
+      const eyeAbsY = contentY + eye.y;
+      
+      // Check intersection
+      if (resX < eyeAbsX + eye.w && resX + w > eyeAbsX && resY < eyeAbsY + eye.h && resY + h > eyeAbsY) {
+         // We are in the Danger Zone! 
+         // Escape options MUST stay within the QR module area [minX, maxX]
+         const canGoRight = (eyeAbsX + eye.w + w) <= (contentX + contentSize - qzOffset);
+         const canGoDown = (eyeAbsY + eye.h + h) <= (contentY + contentSize - qzOffset);
+         const canGoLeft = (eyeAbsX - w) >= (contentX + qzOffset);
+         const canGoUp = (eyeAbsY - h) >= (contentY + qzOffset);
 
-       // Filter escape routes that stay in bounds
-       const options = [];
-       if (canGoRight) options.push({ dist: distRight, axis: 'x', val: eyeAbsX + eye.w });
-       if (canGoLeft) options.push({ dist: distLeft, axis: 'x', val: eyeAbsX - w });
-       if (canGoDown) options.push({ dist: distBottom, axis: 'y', val: eyeAbsY + eye.h });
-       if (canGoUp) options.push({ dist: distTop, axis: 'y', val: eyeAbsY - h });
+         const distRight = (eyeAbsX + eye.w) - resX;
+         const distLeft = (resX + w) - eyeAbsX;
+         const distBottom = (eyeAbsY + eye.h) - resY;
+         const distTop = (resY + h) - eyeAbsY;
 
-       if (options.length > 0) {
-         // Sort by distance to find the closest valid escape
-         options.sort((a, b) => a.dist - b.dist);
-         const best = options[0];
-         if (best.axis === 'x') resX = best.val;
-         else resY = best.val;
-       } else {
-         // EMERGENCY: If it doesn't fit anywhere else (rare), force to center
-         resX = contentX + (contentSize - w) / 2;
-         resY = contentY + (contentSize - h) / 2;
-       }
+         // Filter escape routes that stay in bounds
+         const options = [];
+         if (canGoRight) options.push({ dist: distRight, axis: 'x', val: eyeAbsX + eye.w });
+         if (canGoLeft) options.push({ dist: distLeft, axis: 'x', val: eyeAbsX - w });
+         if (canGoDown) options.push({ dist: distBottom, axis: 'y', val: eyeAbsY + eye.h });
+         if (canGoUp) options.push({ dist: distTop, axis: 'y', val: eyeAbsY - h });
+
+         if (options.length > 0) {
+           // Sort by distance to find the closest valid escape
+           options.sort((a, b) => a.dist - b.dist);
+           const best = options[0];
+           if (best.axis === 'x') resX = best.val;
+           else resY = best.val;
+         } else {
+           // EMERGENCY: If it doesn't fit anywhere else (rare), force to center
+           resX = contentX + (contentSize - w) / 2;
+           resY = contentY + (contentSize - h) / 2;
+         }
+      }
     }
   }
 

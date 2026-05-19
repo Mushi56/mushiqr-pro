@@ -365,25 +365,7 @@ export default function App() {
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
 
-  const handleTabChange = (tabId) => {
-    if (tabId !== activeTab) {
-      setTabHistory(prev => [...prev, activeTab]);
-      setActiveTab(tabId);
-    }
-  };
 
-  // Custom navigation wrapper to track history
-  const navigateTo = (page) => {
-    if (page !== activePage) {
-      setPreviousPage(activePage);
-      setActivePage(page);
-      // Clear tab history when starting a new session or returning home
-      if (page === 'generator' || page === 'home') {
-        setTabHistory([]);
-        if (page === 'generator') setActiveTab('content');
-      }
-    }
-  };
 
   const goBack = () => {
     // 1. Close overlays first
@@ -570,7 +552,9 @@ export default function App() {
   const preEditSnapshot = useRef(null);
 
   const startEditing = (type, val) => {
-    preEditSnapshot.current = getSnapshot();
+    if (!preEditSnapshot.current) {
+      preEditSnapshot.current = getSnapshot();
+    }
     if (type === 'logo') setLogoPopup(val);
     else if (type === 'text') setTextPopup(val);
     else if (type === 'color') setColorPopup(val);
@@ -597,6 +581,32 @@ export default function App() {
     saveSnapshot(); // Save the final result to history
   };
 
+  const handleTabChange = (tabId) => {
+    if (tabId !== activeTab) {
+      if (logoPopup || textPopup || colorPopup || shapePopup) {
+        applyEditing();
+      }
+      setTabHistory(prev => [...prev, activeTab]);
+      setActiveTab(tabId);
+    }
+  };
+
+  // Custom navigation wrapper to track history
+  const navigateTo = (page) => {
+    if (page !== activePage) {
+      if (logoPopup || textPopup || colorPopup || shapePopup) {
+        applyEditing();
+      }
+      setPreviousPage(activePage);
+      setActivePage(page);
+      // Clear tab history when starting a new session or returning home
+      if (page === 'generator' || page === 'home') {
+        setTabHistory([]);
+        if (page === 'generator') setActiveTab('content');
+      }
+    }
+  };
+
   const getSnapshot = useCallback(() => {
     return {
       qrType, qrData, qrColor, bgColor, bgTransparent, eyeColor, eyeOuterColor, syncEyes,
@@ -612,6 +622,8 @@ export default function App() {
       frameStyle, frameText, frameColor, frameFont, frameSize,
       frameStrokeEnabled, frameStrokeWidth, frameStrokeColor,
       frameShadowEnabled, frameShadowBlur, frameShadowColor,
+      textCenterEnabled, textCenterText, textCenterSize, textCenterColor, textCenterFont,
+      textCenterStrokeEnabled, textCenterStrokeWidth, textCenterStrokeColor,
       textCenterShadowEnabled, textCenterShadowBlur, textCenterShadowColor,
       textCenterPosX, textCenterPosY, textCenterRotation
     };
@@ -1241,7 +1253,7 @@ export default function App() {
     logoOpacity, logoRotation, logoShadowEnabled, logoShadowColor, logoShadowBlur, logoShadowOffsetX, logoShadowOffsetY,
     logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoTexture, logoCrop, 
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
-    activeTab
+    activeTab, canvasSelection
   ]);
 
   useEffect(() => {
@@ -1275,6 +1287,11 @@ export default function App() {
   const handleCanvasInteraction = useCallback((e) => {
     if (!canvasRef.current || !qrMatrixInfo) return;
     const canvas = canvasRef.current;
+    
+    // Save snapshot before dragging/resizing starts if not already set
+    if (!preEditSnapshot.current) {
+      preEditSnapshot.current = getSnapshot();
+    }
     
     // Clear selection if not pipette
     if (!isPipetteActive) {
@@ -1333,37 +1350,71 @@ export default function App() {
       const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
       const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
 
-      const hSize = 40; 
+      const hSize = 24; 
       const checkH = (hx, hy, type) => {
           if (localX >= hx - hSize && localX <= hx + hSize && localY >= hy - hSize && localY <= hy + hSize) {
               setIsDraggingCanvas(true);
               dragType.current = type;
-              dragStartOffset.current = { x: localX, y: localY, startW: logoWidth, startH: logoHeight, startPosX: logoPosX, startPosY: logoPosY, startRotation: logoRotation };
+              dragStartOffset.current = { 
+                  x: localX, 
+                  y: localY, 
+                  startW: logoWidth, 
+                  startH: logoHeight, 
+                  startPosX: logoPosX, 
+                  startPosY: logoPosY, 
+                  startRotation: logoRotation,
+                  startMouseAngle: Math.atan2(y - centerY, x - centerX) * 180 / Math.PI
+              };
               e.preventDefault();
               return true;
           }
           return false;
       };
 
-      if (checkH(lx, ly, 'rotate-logo')) { setCanvasSelection('logo'); return; }
-      if (checkH(lx + lw, ly + lh, 'resize-logo-br')) { setCanvasSelection('logo'); return; }
-      if (checkH(lx + lw, ly + lh/2, 'resize-logo-r')) { setCanvasSelection('logo'); return; }
-      if (checkH(lx + lw/2, ly + lh, 'resize-logo-b')) { setCanvasSelection('logo'); return; }
-      
-      // Delete Button
-      if (checkH(lx + lw, ly, 'delete-logo')) {
-        setLogo(null);
-        setIsDraggingCanvas(false);
-        dragType.current = null;
-        e.preventDefault();
-        return;
+      // Only allow interacting with handles (resizing, rotating, deleting) if the logo is already selected
+      if (canvasSelection === 'logo') {
+        // Bottom-Left Rotate Bracket (Offset -20, 20) with a larger hit area check (hSize = 24)
+        const checkRotateLogo = (hx, hy) => {
+            const rotHSize = 24; // Extra generous touch target size for rotation handle
+            if (localX >= hx - rotHSize && localX <= hx + rotHSize && localY >= hy - rotHSize && localY <= hy + rotHSize) {
+                setIsDraggingCanvas(true);
+                dragType.current = 'rotate-logo';
+                dragStartOffset.current = { 
+                    x: localX, 
+                    y: localY, 
+                    startW: logoWidth, 
+                    startH: logoHeight, 
+                    startPosX: logoPosX, 
+                    startPosY: logoPosY, 
+                    startRotation: logoRotation,
+                    startMouseAngle: Math.atan2(y - centerY, x - centerX) * 180 / Math.PI
+                };
+                e.preventDefault();
+                return true;
+            }
+            return false;
+        };
+        if (checkRotateLogo(lx - 20, ly + lh + 20)) return;
+        if (checkH(lx + lw, ly + lh, 'resize-logo-br')) return;
+        if (checkH(lx + lw, ly + lh/2, 'resize-logo-r')) return;
+        if (checkH(lx + lw/2, ly + lh, 'resize-logo-b')) return;
+        
+        // Delete Button
+        if (checkH(lx + lw, ly, 'delete-logo')) {
+          setLogo(null);
+          setIsDraggingCanvas(false);
+          dragType.current = null;
+          e.preventDefault();
+          return;
+        }
       }
       
+      // Clicking inside the body region always triggers dragging/selection
       if (inRect(localX, localY, lx, ly, lw, lh)) {
         setCanvasSelection('logo');
         setIsDraggingCanvas(true);
         dragType.current = 'logo';
-        dragStartOffset.current = { x: localX - lx, y: localY - ly };
+        dragStartOffset.current = { x: x - lx, y: y - ly };
         e.preventDefault();
         return;
       }
@@ -1388,42 +1439,75 @@ export default function App() {
       const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
       const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
 
-      const hSize = 40;
+      const hSize = 24;
       const checkH = (hx, hy, type) => {
           if (localX >= hx - hSize && localX <= hx + hSize && localY >= hy - hSize && localY <= hy + hSize) {
               setIsDraggingCanvas(true);
               dragType.current = type;
-              dragStartOffset.current = { x: localX, y: localY, startSize: textCenterSize, startPosX: textCenterPosX, startPosY: textCenterPosY, startRotation: textCenterRotation, startW: tw / contentSize, startH: th / contentSize };
+              dragStartOffset.current = { 
+                  x: localX, 
+                  y: localY, 
+                  startSize: textCenterSize, 
+                  startPosX: textCenterPosX, 
+                  startPosY: textCenterPosY, 
+                  startRotation: textCenterRotation, 
+                  startW: tw / contentSize, 
+                  startH: th / contentSize,
+                  startMouseAngle: Math.atan2(y - centerY, x - centerX) * 180 / Math.PI
+              };
               e.preventDefault();
               return true;
           }
           return false;
       };
 
-      if (checkH(tx, ty, 'rotate-text')) { setCanvasSelection('text'); return; }
-      if (checkH(tx + tw, ty + th, 'resize-text-br')) {
-        setCanvasSelection('text');
-        return;
-      }
-      
-      if (checkH(tx + tw, ty, 'delete-text')) {
-        setTextCenterEnabled(false);
-        setIsDraggingCanvas(false);
-        dragType.current = null;
-        e.preventDefault();
-        return;
+      // Only allow interacting with handles if text is already selected
+      if (canvasSelection === 'text') {
+        // Bottom-Left Rotate Bracket (Offset -20, 20) with a larger hit area check (hSize = 24)
+        const checkRotateText = (hx, hy) => {
+            const rotHSize = 24; // Extra generous touch target size for rotation handle
+            if (localX >= hx - rotHSize && localX <= hx + rotHSize && localY >= hy - rotHSize && localY <= hy + rotHSize) {
+                setIsDraggingCanvas(true);
+                dragType.current = 'rotate-text';
+                dragStartOffset.current = { 
+                    x: localX, 
+                    y: localY, 
+                    startSize: textCenterSize, 
+                    startPosX: textCenterPosX, 
+                    startPosY: textCenterPosY, 
+                    startRotation: textCenterRotation, 
+                    startW: tw / contentSize, 
+                    startH: th / contentSize,
+                    startMouseAngle: Math.atan2(y - centerY, x - centerX) * 180 / Math.PI
+                };
+                e.preventDefault();
+                return true;
+            }
+            return false;
+        };
+        if (checkRotateText(tx - 20, ty + th + 20)) return;
+        if (checkH(tx + tw, ty + th, 'resize-text-br')) return;
+        
+        if (checkH(tx + tw, ty, 'delete-text')) {
+          setTextCenterEnabled(false);
+          setIsDraggingCanvas(false);
+          dragType.current = null;
+          e.preventDefault();
+          return;
+        }
       }
 
+      // Clicking inside the body region always triggers dragging/selection
       if (inRect(localX, localY, tx, ty, tw, th)) {
         setCanvasSelection('text');
         setIsDraggingCanvas(true);
         dragType.current = 'text';
-        dragStartOffset.current = { x: localX - tx, y: localY - ty };
+        dragStartOffset.current = { x: x - tx, y: y - ty };
         e.preventDefault();
         return;
       }
     }
-  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, textCenterRotation, logoPadding, getQRContentArea]);
+  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterPosX, textCenterPosY, textCenterRotation, logoPadding, getQRContentArea, canvasSelection, getSnapshot]);
 
   const handleCanvasMove = useCallback((e) => {
     if (!isDraggingCanvas || !canvasRef.current) return;
@@ -1445,8 +1529,21 @@ export default function App() {
         const ly = contentY + (contentSize - lh) * logoPosY;
         const centerX = lx + lw / 2;
         const centerY = ly + lh / 2;
-        const angle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
-        setLogoRotation(Math.round(angle + 135));
+        
+        const currentMouseAngle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
+        const angleDelta = currentMouseAngle - dragStartOffset.current.startMouseAngle;
+        let newRotation = dragStartOffset.current.startRotation + angleDelta;
+        
+        let normalizedRot = (newRotation % 360 + 360) % 360;
+        const snapTargets = [0, 45, 90, 135, 180, 225, 270, 315, 360];
+        const snapTolerance = 4;
+        for (const target of snapTargets) {
+            if (Math.abs(normalizedRot - target) <= snapTolerance) {
+                normalizedRot = target === 360 ? 0 : target;
+                break;
+            }
+        }
+        setLogoRotation(Math.round(normalizedRot));
     } else if (dragType.current === 'rotate-text') {
         const fontSize = contentSize * textCenterSize;
         tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
@@ -1457,8 +1554,21 @@ export default function App() {
         const ty = contentY + (contentSize - th) * textCenterPosY;
         const centerX = tx + tw / 2;
         const centerY = ty + th / 2;
-        const angle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
-        setTextCenterRotation(Math.round(angle + 135));
+        
+        const currentMouseAngle = Math.atan2(y - centerY, x - centerX) * 180 / Math.PI;
+        const angleDelta = currentMouseAngle - dragStartOffset.current.startMouseAngle;
+        let newRotation = dragStartOffset.current.startRotation + angleDelta;
+        
+        let normalizedRot = (newRotation % 360 + 360) % 360;
+        const snapTargets = [0, 45, 90, 135, 180, 225, 270, 315, 360];
+        const snapTolerance = 4;
+        for (const target of snapTargets) {
+            if (Math.abs(normalizedRot - target) <= snapTolerance) {
+                normalizedRot = target === 360 ? 0 : target;
+                break;
+            }
+        }
+        setTextCenterRotation(Math.round(normalizedRot));
     } else if (dragType.current && dragType.current.startsWith('resize-logo')) {
         const lw = contentSize * logoWidth;
         const lh = contentSize * logoHeight;
@@ -1473,43 +1583,141 @@ export default function App() {
         const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
         const diffX = (localX - dragStartOffset.current.x) / contentSize;
         const diffY = (localY - dragStartOffset.current.y) / contentSize;
+        
+        const startW_px = contentSize * dragStartOffset.current.startW;
+        const startH_px = contentSize * dragStartOffset.current.startH;
+        const lx_start = contentX + (contentSize - startW_px) * dragStartOffset.current.startPosX;
+        const ly_start = contentY + (contentSize - startH_px) * dragStartOffset.current.startPosY;
+
         let newW = dragStartOffset.current.startW;
         let newH = dragStartOffset.current.startH;
         if (dragType.current === 'resize-logo-br') {
-            const scale = Math.max(0.1, 1 + diffX * 2); 
+            const scale = Math.max(0.1, (dragStartOffset.current.startW + diffX) / dragStartOffset.current.startW);
             newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW * scale));
             newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH * scale));
+            
+            // Adjust dragStartOffset.current.x to align with the clamp boundaries
+            const maxScale = 0.6 / dragStartOffset.current.startW;
+            const minScale = 0.05 / dragStartOffset.current.startW;
+            const currentScale = (dragStartOffset.current.startW + diffX) / dragStartOffset.current.startW;
+            if (currentScale > maxScale) {
+                const maxDiffX = (maxScale - 1) * dragStartOffset.current.startW;
+                dragStartOffset.current.x = localX - maxDiffX * contentSize;
+            } else if (currentScale < minScale) {
+                const minDiffX = (minScale - 1) * dragStartOffset.current.startW;
+                dragStartOffset.current.x = localX - minDiffX * contentSize;
+            }
         } else if (dragType.current === 'resize-logo-r') {
-            newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW + diffX * 2));
+            newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW + diffX));
+            
+            // Adjust dragStartOffset.current.x to align with the clamp boundaries
+            const maxDiffX = 0.6 - dragStartOffset.current.startW;
+            const minDiffX = 0.05 - dragStartOffset.current.startW;
+            if (diffX > maxDiffX) {
+                dragStartOffset.current.x = localX - maxDiffX * contentSize;
+            } else if (diffX < minDiffX) {
+                dragStartOffset.current.x = localX - minDiffX * contentSize;
+            }
         } else if (dragType.current === 'resize-logo-b') {
-            newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH + diffY * 2));
-        } else if (dragType.current === 'resize-logo-tr') {
-            newW = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startW + diffX * 2));
-            newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH - diffY * 2));
+            newH = Math.max(0.05, Math.min(0.6, dragStartOffset.current.startH + diffY));
+            
+            // Adjust dragStartOffset.current.y to align with the clamp boundaries
+            const maxDiffY = 0.6 - dragStartOffset.current.startH;
+            const minDiffY = 0.05 - dragStartOffset.current.startH;
+            if (diffY > maxDiffY) {
+                dragStartOffset.current.y = localY - maxDiffY * contentSize;
+            } else if (diffY < minDiffY) {
+                dragStartOffset.current.y = localY - minDiffY * contentSize;
+            }
         }
+        
+        const newW_px = contentSize * newW;
+        const newH_px = contentSize * newH;
+        let newPosX = dragStartOffset.current.startPosX;
+        let newPosY = dragStartOffset.current.startPosY;
+        
+        // Symmetrical centering resize locks: if it was already centered at the start of the drag,
+        // we lock it to exactly 0.5 center to keep it centered perfectly.
+        // Otherwise, resize normally by keeping the top-left edge anchored with absolutely no jumps.
+        if (dragStartOffset.current.startPosX === 0.5) {
+            newPosX = 0.5;
+        } else if (contentSize - newW_px > 0) {
+            newPosX = Math.max(0, Math.min(1, (lx_start - contentX) / (contentSize - newW_px)));
+        }
+        
+        if (dragStartOffset.current.startPosY === 0.5) {
+            newPosY = 0.5;
+        } else if (contentSize - newH_px > 0) {
+            newPosY = Math.max(0, Math.min(1, (ly_start - contentY) / (contentSize - newH_px)));
+        }
+
         setLogoWidth(Math.round(newW * 100) / 100);
         setLogoHeight(Math.round(newH * 100) / 100);
+        setLogoPosX(Math.round(newPosX * 1000) / 1000);
+        setLogoPosY(Math.round(newPosY * 1000) / 1000);
     } else if (dragType.current && dragType.current.startsWith('resize-text')) {
         const dx = x - dragStartOffset.current.x;
         const diff = dx / contentSize;
-        const newSize = Math.max(0.05, Math.min(0.5, dragStartOffset.current.startSize + diff * 2));
+        const newSize = Math.max(0.05, Math.min(0.5, dragStartOffset.current.startSize + diff));
+        
+        // Adjust dragStartOffset.current.x to align with the clamp boundaries
+        const maxDiff = 0.5 - dragStartOffset.current.startSize;
+        const minDiff = 0.05 - dragStartOffset.current.startSize;
+        if (diff > maxDiff) {
+            dragStartOffset.current.x = x - maxDiff * contentSize;
+        } else if (diff < minDiff) {
+            dragStartOffset.current.x = x - minDiff * contentSize;
+        }
+        
+        const startW = dragStartOffset.current.startW * contentSize;
+        const startH = dragStartOffset.current.startH * contentSize;
+        const tx_start = contentX + (contentSize - startW) * dragStartOffset.current.startPosX;
+        const ty_start = contentY + (contentSize - startH) * dragStartOffset.current.startPosY;
+        
+        const fontSize = contentSize * newSize;
+        tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+        const metrics = tempCtx.current.measureText(textCenterText);
+        const newTw = metrics.width + (logoPadding || 10) * 2;
+        const newTh = (fontSize * 0.8) + (logoPadding || 10) * 2;
+        
+        let newPosX = dragStartOffset.current.startPosX;
+        let newPosY = dragStartOffset.current.startPosY;
+        
+        // Symmetrical centering resize locks: if it was already centered at the start of the drag,
+        // we lock it to exactly 0.5 center to keep it centered perfectly.
+        // Otherwise, resize normally by keeping the top-left edge anchored with absolutely no jumps.
+        if (dragStartOffset.current.startPosX === 0.5) {
+            newPosX = 0.5;
+        } else if (contentSize - newTw > 0) {
+            newPosX = Math.max(0, Math.min(1, (tx_start - contentX) / (contentSize - newTw)));
+        }
+        
+        if (dragStartOffset.current.startPosY === 0.5) {
+            newPosY = 0.5;
+        } else if (contentSize - newTh > 0) {
+            newPosY = Math.max(0, Math.min(1, (ty_start - contentY) / (contentSize - newTh)));
+        }
+        
         setTextCenterSize(Math.round(newSize * 100) / 100);
+        setTextCenterPosX(Math.round(newPosX * 1000) / 1000);
+        setTextCenterPosY(Math.round(newPosY * 1000) / 1000);
     } else if (dragType.current === 'logo' && logo?.image) {
         const lw = contentSize * logoWidth;
         const lh = contentSize * logoHeight;
-        const lx = contentX + (contentSize - lw) * logoPosX;
-        const ly = contentY + (contentSize - lh) * logoPosY;
-        const centerX = lx + lw / 2;
-        const centerY = ly + lh / 2;
-        const dx_raw = x - centerX;
-        const dy_raw = y - centerY;
-        const ang = (-logoRotation * Math.PI) / 180;
-        const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
-        const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
-        const newTargetX = localX - dragStartOffset.current.x - contentX;
-        const newTargetY = localY - dragStartOffset.current.y - contentY;
-        const valX = Math.max(0, Math.min(1, newTargetX / (contentSize - lw)));
-        const valY = Math.max(0, Math.min(1, newTargetY / (contentSize - lh)));
+        const newLx = x - dragStartOffset.current.x;
+        const newLy = y - dragStartOffset.current.y;
+        let valX = Math.max(0, Math.min(1, (newLx - contentX) / (contentSize - lw)));
+        let valY = Math.max(0, Math.min(1, (newLy - contentY) / (contentSize - lh)));
+        
+        // Snapping tolerance of 0.02 around 0.5 center
+        const snapTolerance = 0.02;
+        if (Math.abs(valX - 0.5) <= snapTolerance) {
+            valX = 0.5;
+        }
+        if (Math.abs(valY - 0.5) <= snapTolerance) {
+            valY = 0.5;
+        }
+        
         setLogoPosX(Math.round(valX * 1000) / 1000);
         setLogoPosY(Math.round(valY * 1000) / 1000);
     } else if (dragType.current === 'text') {
@@ -1519,18 +1727,20 @@ export default function App() {
       const tw = metrics.width + (logoPadding || 10) * 2;
       const th = (fontSize * 0.8) + (logoPadding || 10) * 2;
       
-      const centerX = (contentX + (contentSize - tw) * textCenterPosX) + tw/2;
-      const centerY = (contentY + (contentSize - th) * textCenterPosY) + th/2;
-      const dx_raw = x - centerX;
-      const dy_raw = y - centerY;
-      const ang = (-textCenterRotation * Math.PI) / 180;
-      const localX = centerX + dx_raw * Math.cos(ang) - dy_raw * Math.sin(ang);
-      const localY = centerY + dx_raw * Math.sin(ang) + dy_raw * Math.cos(ang);
-
-      const newTargetX = localX - dragStartOffset.current.x - contentX;
-      const newTargetY = localY - dragStartOffset.current.y - contentY;
-      const valX = Math.max(0, Math.min(1, newTargetX / (contentSize - tw)));
-      const valY = Math.max(0, Math.min(1, newTargetY / (contentSize - th)));
+      const newTx = x - dragStartOffset.current.x;
+      const newTy = y - dragStartOffset.current.y;
+      let valX = Math.max(0, Math.min(1, (newTx - contentX) / (contentSize - tw)));
+      let valY = Math.max(0, Math.min(1, (newTy - contentY) / (contentSize - th)));
+      
+      // Snapping tolerance of 0.02 around 0.5 center
+      const snapTolerance = 0.02;
+      if (Math.abs(valX - 0.5) <= snapTolerance) {
+          valX = 0.5;
+      }
+      if (Math.abs(valY - 0.5) <= snapTolerance) {
+          valY = 0.5;
+      }
+      
       setTextCenterPosX(Math.round(valX * 1000) / 1000);
       setTextCenterPosY(Math.round(valY * 1000) / 1000);
     }
@@ -1606,7 +1816,46 @@ export default function App() {
             </button>
           )}
           <AppIcon size={36} shadow />
-          <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
+          {activePage === 'generator' ? (
+            <div className="header-undo-redo" style={{ display: 'flex', gap: '8px', marginLeft: '12px' }}>
+              <button 
+                onClick={undo} 
+                disabled={historyIndex <= 0}
+                style={{ 
+                  width: '36px', height: '36px', borderRadius: '10px', 
+                  background: 'var(--bg-hover)', 
+                  border: '1px solid var(--border-color)', 
+                  color: historyIndex <= 0 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  cursor: historyIndex <= 0 ? 'default' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  opacity: historyIndex <= 0 ? 0.5 : 1
+                }}
+                title="Undo"
+              >
+                <Undo2 size={18} strokeWidth={2.5} />
+              </button>
+              <button 
+                onClick={redo} 
+                disabled={historyIndex >= history.length - 1}
+                style={{ 
+                  width: '36px', height: '36px', borderRadius: '10px', 
+                  background: 'var(--bg-hover)', 
+                  border: '1px solid var(--border-color)', 
+                  color: historyIndex >= history.length - 1 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  cursor: historyIndex >= history.length - 1 ? 'default' : 'pointer',
+                  transition: 'all 0.2s ease',
+                  opacity: historyIndex >= history.length - 1 ? 0.5 : 1
+                }}
+                title="Redo"
+              >
+                <Redo2 size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+          ) : (
+            <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
+          )}
         </div>
 
         <div className="app-header-actions">
@@ -1832,43 +2081,7 @@ export default function App() {
                   )}
                 </div>
 
-                {/* Centered Undo/Redo Controls below QR */}
-                <div className="preview-actions-centered" style={{ display: 'flex', gap: '14px', marginTop: '4px' }}>
-                  <button 
-                    onClick={undo} 
-                    disabled={historyIndex <= 0}
-                    style={{ 
-                      width: '46px', height: '46px', borderRadius: '14px', 
-                      background: 'var(--bg-elevated)', 
-                      border: '1px solid var(--border-color)', 
-                      color: historyIndex <= 0 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                      cursor: historyIndex <= 0 ? 'default' : 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      opacity: historyIndex <= 0 ? 0.5 : 1
-                    }}
-                  >
-                    <Undo2 size={22} strokeWidth={2.5} />
-                  </button>
-                  <button 
-                    onClick={redo} 
-                    disabled={historyIndex >= history.length - 1}
-                    style={{ 
-                      width: '46px', height: '46px', borderRadius: '14px', 
-                      background: 'var(--bg-elevated)', 
-                      border: '1px solid var(--border-color)', 
-                      color: historyIndex >= history.length - 1 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                      cursor: historyIndex >= history.length - 1 ? 'default' : 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      opacity: historyIndex >= history.length - 1 ? 0.5 : 1
-                    }}
-                  >
-                    <Redo2 size={22} strokeWidth={2.5} />
-                  </button>
-                </div>
+
 
 
 
@@ -1880,7 +2093,7 @@ export default function App() {
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '24px 20px 100px 20px', display: 'flex', flexDirection: 'column' }}>
                     <QRTypeSelector
                       activeType={qrType}
                       onTypeChange={(type) => {
