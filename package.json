@@ -9,6 +9,9 @@
     "build": "vite build",
     "build:admin": "vite build admin --config admin/vite.config.js",
     "lint": "eslint .",
+    "test": "node --test test/security_containment.test.js test/services/google_play_verifier.test.js",
+    "test:firebase": "firebase emulators:exec --only firestore \"node --test test/firebase/firestore_rules_emulator.test.js\"",
+    "test:firebase:local": "node --test test/firebase/firestore_rules_emulator.test.js",
     "preview": "vite preview",
     "preview:admin": "vite preview admin --config admin/vite.config.js",
     "cap:sync": "npm run build && npx cap sync android",
@@ -46,6 +49,7 @@
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
     "@eslint/js": "^9.39.4",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",

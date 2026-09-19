@@ -6,7 +6,7 @@
 
 import { auth, db } from './firebase';
 import { onIdTokenChanged } from 'firebase/auth';
-import { doc, getDoc, onSnapshot, collection, getDocs } from 'firebase/firestore';
+import { doc, onSnapshot, collection } from 'firebase/firestore';
 import { ALL_TEMPLATES_REGISTRY } from '../data/qrTemplates';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -375,13 +375,11 @@ class FeatureAccessManagerService {
     // 2. Overlay dynamic local offline cache (from previous live cloud sessions)
     let cachedFlags = null;
     let cachedPlans = null;
-    let cachedSub = null;
     let cachedMembership = null;
     try {
       cachedFlags = JSON.parse(localStorage.getItem(STORAGE_KEYS.GLOBAL_FLAGS) || 'null') ||
                     JSON.parse(localStorage.getItem('qrgen_feature_flags') || 'null');
       cachedPlans = JSON.parse(localStorage.getItem(STORAGE_KEYS.PLAN_CONFIGS) || 'null');
-      cachedSub = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_SUB) || 'null');
       cachedMembership = JSON.parse(localStorage.getItem('mushiqr_membership_config') || 'null');
     } catch {
       // Fallback
@@ -390,7 +388,9 @@ class FeatureAccessManagerService {
     this.globalFlags = { ...bundledFlags, ...(cachedFlags || {}) };          // global_config/featureFlags doc
     this.membershipConfig = { ...bundledMembership, ...(cachedMembership || {}) }; // global_config/membership doc
     this.planConfigs = { ...bundledPlans, ...(cachedPlans || {}) };          // subscription_plans docs
-    this.userSubscription = cachedSub;
+    // Never trust unauthenticated or client-controlled localStorage for subscription entitlement:
+    // Authoritative entitlement comes ONLY from authenticated Firestore document snapshots.
+    this.userSubscription = null;
     this.unsubFlags = null;
     this.unsubPlans = null;
     this.unsubSub = null;
@@ -446,6 +446,7 @@ class FeatureAccessManagerService {
       } else {
         this.userClaims = {};
         this.userSubscription = null;
+        try { localStorage.removeItem(STORAGE_KEYS.USER_SUB); } catch {}
         if (this.unsubSub) this.unsubSub();
         this.notifyListeners();
       }
@@ -542,7 +543,7 @@ class FeatureAccessManagerService {
         this.userSubscription = null;
         this.notifyListeners();
       });
-    } catch (e) {
+    } catch {
       this.userSubscription = null;
       this.notifyListeners();
     }
@@ -555,6 +556,11 @@ class FeatureAccessManagerService {
   getUserPlan() {
     const sub = this.userSubscription;
     if (!sub) return 'free';
+
+    // Anti-Tamper: Entitlement requires active authentication and matching UID
+    if (!this.currentUser || (sub.userId && sub.userId !== this.currentUser.uid)) {
+      return 'free';
+    }
 
     const rawPlan = (sub.planId || '').toLowerCase();
     

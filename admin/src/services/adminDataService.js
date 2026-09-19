@@ -689,19 +689,18 @@ export async function deleteUserProfile(uid) {
 
 export const deleteUserRecord = deleteUserProfile;
 
-export async function grantUserProAccess(uid, planId = 'pro_monthly') {
+export async function grantUserProAccess(uid, planId = 'monthly') {
   try {
-    await setDoc(doc(db, 'user_subscriptions', uid), {
-      userId: uid,
-      planId,
-      status: 'active',
+    const fn = httpsCallable(functions, 'updateUserSubscription');
+    const res = await fn({
+      targetUid: uid,
+      planId: planId === 'pro_monthly' ? 'monthly' : planId,
       isPro: true,
-      grantedBy: auth.currentUser?.email || 'Super Admin',
-      grantedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString(),
-    }, { merge: true });
+      durationDays: 365,
+      reason: `Admin manual grant by ${auth.currentUser?.email || 'Super Admin'}`
+    });
     await _audit('PRO_ACCESS_GRANTED', { uid, planId });
-    return { ok: true };
+    return res.data || { ok: true };
   } catch (e) {
     throw new Error(friendlyError(e));
   }
@@ -709,14 +708,16 @@ export async function grantUserProAccess(uid, planId = 'pro_monthly') {
 
 export async function revokeUserProAccess(uid) {
   try {
-    await setDoc(doc(db, 'user_subscriptions', uid), {
-      status: 'revoked',
+    const fn = httpsCallable(functions, 'updateUserSubscription');
+    const res = await fn({
+      targetUid: uid,
+      planId: 'free',
       isPro: false,
-      revokedBy: auth.currentUser?.email || 'Super Admin',
-      revokedAt: new Date().toISOString(),
-    }, { merge: true });
+      durationDays: null,
+      reason: `Admin manual revoke by ${auth.currentUser?.email || 'Super Admin'}`
+    });
     await _audit('PRO_ACCESS_REVOKED', { uid });
-    return { ok: true };
+    return res.data || { ok: true };
   } catch (e) {
     throw new Error(friendlyError(e));
   }

@@ -50,7 +50,78 @@ public class MainActivity extends BridgeActivity {
             }
         });
 
-        // Add native Javascript Interface for cold-boot launcher actions and security
+        // Initialize native Google Play Billing bridge
+        final com.mushiqr.pro.billing.PlayBillingBridge billingBridge = new com.mushiqr.pro.billing.PlayBillingBridge(this);
+        billingBridge.setEventListener(new com.mushiqr.pro.billing.PlayBillingBridge.BillingEventListener() {
+            @Override
+            public void onPurchaseSuccess(final String productId, final String purchaseToken, final String packageName) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            org.json.JSONObject payload = new org.json.JSONObject();
+                            payload.put("productId", productId);
+                            payload.put("purchaseToken", purchaseToken);
+                            payload.put("packageName", packageName);
+                            String js = "window.dispatchEvent(new CustomEvent('onPlayPurchaseSuccess', { detail: " + payload.toString() + " }));";
+                            getBridge().getWebView().evaluateJavascript(js, null);
+                        } catch (Exception e) {
+                            android.util.Log.e("MainActivity", "Failed to dispatch onPlayPurchaseSuccess", e);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onPurchasePending(final String productId) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            org.json.JSONObject payload = new org.json.JSONObject();
+                            payload.put("productId", productId);
+                            String js = "window.dispatchEvent(new CustomEvent('onPlayPurchasePending', { detail: " + payload.toString() + " }));";
+                            getBridge().getWebView().evaluateJavascript(js, null);
+                        } catch (Exception e) {
+                            android.util.Log.e("MainActivity", "Failed to dispatch onPlayPurchasePending", e);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onPurchaseCancelled(final String productId) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String js = "window.dispatchEvent(new CustomEvent('onPlayPurchaseCancelled', { detail: {} }));";
+                        getBridge().getWebView().evaluateJavascript(js, null);
+                    }
+                });
+            }
+
+            @Override
+            public void onPurchaseFailed(final String productId, final int responseCode, final String debugMessage) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            org.json.JSONObject payload = new org.json.JSONObject();
+                            payload.put("productId", productId != null ? productId : "");
+                            payload.put("responseCode", responseCode);
+                            payload.put("debugMessage", debugMessage != null ? debugMessage : "Purchase failed");
+                            String js = "window.dispatchEvent(new CustomEvent('onPlayPurchaseFailed', { detail: " + payload.toString() + " }));";
+                            getBridge().getWebView().evaluateJavascript(js, null);
+                        } catch (Exception e) {
+                            android.util.Log.e("MainActivity", "Failed to dispatch onPlayPurchaseFailed", e);
+                        }
+                    }
+                });
+            }
+        });
+        billingBridge.startConnection(null);
+
+        // Add native Javascript Interface for cold-boot launcher actions, security, and Play Billing
         webView.addJavascriptInterface(new Object() {
             @android.webkit.JavascriptInterface
             public String getPendingAction() {
@@ -69,6 +140,64 @@ public class MainActivity extends BridgeActivity {
                         } else {
                             getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE);
                         }
+                    }
+                });
+            }
+
+            @android.webkit.JavascriptInterface
+            public void launchGooglePlayPurchase(final String productId, final String obfuscatedAccountId, final String oldPurchaseToken, final int replacementMode) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        billingBridge.launchPurchase(productId, obfuscatedAccountId, oldPurchaseToken, replacementMode);
+                    }
+                });
+            }
+
+            @android.webkit.JavascriptInterface
+            public void queryGooglePlayPurchases() {
+                billingBridge.queryActivePurchases(new com.mushiqr.pro.billing.PlayBillingBridge.PurchasesQueryCallback() {
+                    @Override
+                    public void onSuccess(final java.util.List<com.mushiqr.pro.billing.PlayBillingBridge.PurchaseRecordDto> purchases) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    org.json.JSONArray array = new org.json.JSONArray();
+                                    for (com.mushiqr.pro.billing.PlayBillingBridge.PurchaseRecordDto p : purchases) {
+                                        org.json.JSONObject obj = new org.json.JSONObject();
+                                        obj.put("productId", p.productId);
+                                        obj.put("purchaseToken", p.purchaseToken);
+                                        obj.put("packageName", p.packageName);
+                                        array.put(obj);
+                                    }
+                                    org.json.JSONObject payload = new org.json.JSONObject();
+                                    payload.put("purchases", array);
+                                    String js = "window.dispatchEvent(new CustomEvent('onPlayPurchasesRestored', { detail: " + payload.toString() + " }));";
+                                    getBridge().getWebView().evaluateJavascript(js, null);
+                                } catch (Exception e) {
+                                    android.util.Log.e("MainActivity", "Failed to dispatch onPlayPurchasesRestored", e);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(final int responseCode, final String message) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    org.json.JSONObject payload = new org.json.JSONObject();
+                                    payload.put("responseCode", responseCode);
+                                    payload.put("message", message != null ? message : "Restore query failed");
+                                    String js = "window.dispatchEvent(new CustomEvent('onPlayPurchasesRestoreFailed', { detail: " + payload.toString() + " }));";
+                                    getBridge().getWebView().evaluateJavascript(js, null);
+                                } catch (Exception e) {
+                                    android.util.Log.e("MainActivity", "Failed to dispatch onPlayPurchasesRestoreFailed", e);
+                                }
+                            }
+                        });
                     }
                 });
             }

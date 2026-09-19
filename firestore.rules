@@ -108,16 +108,23 @@ service cloud.firestore {
     }
 
     // ── Authoritative User Subscriptions
-    // Users can read ONLY their own subscription; write is strictly disabled for normal clients (Cloud Functions & Admin SDK only)
+    // Users can read ONLY their own subscription; write is strictly disabled for ALL clients (Cloud Functions & Admin SDK only)
     match /user_subscriptions/{userId} {
       allow get: if isOwner(userId) || isSuperAdmin();
       allow list: if isSuperAdmin();
-      allow create, update, delete: if isSuperAdmin();
+      allow write: if false;
     }
 
     // ── Payment Transactions (Ledger)
     // Only Super Admin can read ledger; write is disabled for clients (Cloud Functions only)
     match /payment_transactions/{transactionId} {
+      allow read: if isSuperAdmin();
+      allow write: if false;
+    }
+
+    // ── Purchase Token Global Registry (Anti-Replay & Concurrency Lock)
+    // Client write is strictly disabled (Cloud Functions Admin SDK only)
+    match /play_purchase_tokens/{tokenHash} {
       allow read: if isSuperAdmin();
       allow write: if false;
     }

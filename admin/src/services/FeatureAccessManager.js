@@ -390,7 +390,8 @@ class FeatureAccessManagerService {
     this.globalFlags = { ...bundledFlags, ...(cachedFlags || {}) };          // global_config/featureFlags doc
     this.membershipConfig = { ...bundledMembership, ...(cachedMembership || {}) }; // global_config/membership doc
     this.planConfigs = { ...bundledPlans, ...(cachedPlans || {}) };          // subscription_plans docs
-    this.userSubscription = cachedSub;
+    // Never trust unauthenticated or client-controlled localStorage for subscription entitlement:
+    this.userSubscription = null;
     this.unsubFlags = null;
     this.unsubPlans = null;
     this.unsubSub = null;
@@ -555,6 +556,11 @@ class FeatureAccessManagerService {
   getUserPlan() {
     const sub = this.userSubscription;
     if (!sub) return 'free';
+
+    // Anti-Tamper: Entitlement requires active authentication and matching UID
+    if (!this.currentUser || (sub.userId && sub.userId !== this.currentUser.uid)) {
+      return 'free';
+    }
 
     const rawPlan = (sub.planId || '').toLowerCase();
     
