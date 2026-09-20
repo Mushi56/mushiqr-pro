@@ -9,11 +9,11 @@ const { defineSecret } = require('firebase-functions/params');
 const admin = require('firebase-admin');
 const { 
   GooglePlayVerifier, 
-  hashPurchaseToken,
-  computeObfuscatedAccountId,
-  deriveLedgerTransactionId,
-  RTDN_NOTIFICATION_TYPES,
   ALLOWED_PACKAGE_NAME,
+  RTDN_SUBSCRIPTION_NOTIFICATION_TYPE,
+  parseRTDNMessage,
+  hashPurchaseToken,
+  computeObfuscatedAccountId
 } = require('./services/googlePlayVerifier');
 
 // Define Cloud Secrets for server-side verification (server-only, zero client exposure)
@@ -165,8 +165,14 @@ exports.setUserRole = onCall(async (request) => {
 
   // Last Super Admin Protection
   if (currentRole === 'super_admin' && newRole !== 'super_admin') {
-    const listResult = await admin.auth().listUsers(1000);
-    const superAdminCount = listResult.users.filter(u => u.customClaims && u.customClaims.role === 'super_admin').length;
+    let superAdminCount = 0;
+    let nextPageToken;
+    do {
+      const listResult = await admin.auth().listUsers(1000, nextPageToken);
+      superAdminCount += listResult.users.filter(u => u.customClaims && u.customClaims.role === 'super_admin').length;
+      nextPageToken = listResult.pageToken;
+      if (superAdminCount > 1) break; // Early exit once more than 1 is found
+    } while (nextPageToken);
 
     if (superAdminCount <= 1) {
       throw new HttpsError(
@@ -212,8 +218,14 @@ exports.updateUserSubscription = onCall(async (request) => {
     throw new HttpsError('invalid-argument', 'Valid targetUid string must be provided.');
   }
 
-  const validPlanId = planId || (isPro ? 'monthly' : 'free');
-  const proActive = Boolean(isPro) || validPlanId !== 'free';
+  const ALLOWED_ADMIN_PLANS = ['free', 'weekly', 'monthly', 'yearly', 'lifetime'];
+  const requestedPlan = planId ? String(planId).toLowerCase().trim() : (isPro ? 'monthly' : 'free');
+  if (!ALLOWED_ADMIN_PLANS.includes(requestedPlan)) {
+    throw new HttpsError('invalid-argument', `Invalid planId '${planId}'. Allowed plans: ${ALLOWED_ADMIN_PLANS.join(', ')}.`);
+  }
+
+  const validPlanId = requestedPlan;
+  const proActive = validPlanId !== 'free' && (isPro !== false);
   const now = new Date();
   
   let expiryDate = null;
@@ -356,6 +368,7 @@ exports.saveAdminConfig = onCall(async (request) => {
 // Computes and returns the caller's own opaque HMAC-SHA256 account-binding
 // identifier for Google Play Billing (setObfuscatedAccountId).
 // Requires Firebase Authentication. Never exposes or logs the server secret.
+// Strictly fails closed if the server secret is unconfigured.
 // ═══════════════════════════════════════════════════════════════════════════
 exports.getBillingAccountBinding = onCall({ secrets: [playAccountBindingSecret] }, async (request) => {
   if (!request.auth || !request.auth.uid) {
@@ -364,8 +377,10 @@ exports.getBillingAccountBinding = onCall({ secrets: [playAccountBindingSecret] 
 
   const callerUid = request.auth.uid;
   const secretKey = process.env.PLAY_ACCOUNT_BINDING_SECRET;
-  if (!secretKey || typeof secretKey !== 'string' || secretKey.trim().length === 0) {
-    throw new HttpsError('failed-precondition', 'Billing account-binding configuration is missing on the server. Fails closed.');
+
+  if (!secretKey || secretKey.trim().length === 0) {
+    console.error('[GooglePlayBilling] Missing PLAY_ACCOUNT_BINDING_SECRET in environment.');
+    throw new HttpsError('failed-precondition', 'Billing account binding service is temporarily unconfigured.');
   }
 
   const obfuscatedAccountId = computeObfuscatedAccountId(callerUid, secretKey);
@@ -390,10 +405,16 @@ exports.verifyGooglePlayPurchase = onCall({ secrets: [googlePlayCredentialsSecre
   const callerUid = request.auth.uid;
   const { packageName, productId, purchaseToken } = request.data || {};
 
+  const bindingSecret = process.env.PLAY_ACCOUNT_BINDING_SECRET;
+  if (!bindingSecret || bindingSecret.trim().length === 0) {
+    console.error('[GooglePlayVerification] Missing PLAY_ACCOUNT_BINDING_SECRET in environment.');
+    throw new HttpsError('failed-precondition', 'Purchase verification service is temporarily unconfigured.');
+  }
+
   // 1. Validate request shape and strict product/package allowlists
   const verifier = new GooglePlayVerifier({
     credentialsJson: process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON || null,
-    accountBindingSecret: process.env.PLAY_ACCOUNT_BINDING_SECRET || null,
+    accountBindingSecret: bindingSecret,
   });
 
   const reqValidation = verifier.validateRequest({ packageName, productId, purchaseToken });
@@ -441,8 +462,10 @@ exports.verifyGooglePlayPurchase = onCall({ secrets: [googlePlayCredentialsSecre
   // Uses db.runTransaction to prevent race conditions when simultaneous requests with the same token arrive
   const tokenLockRef = db.collection('play_purchase_tokens').doc(tokenHash);
   const userSubRef = db.collection('user_subscriptions').doc(callerUid);
-  const transactionId = `gplay_tx_${tokenHash}`;
-  const txRef = db.collection('payment_transactions').doc(transactionId);
+  // Robust ledger identity: orderId takes precedence to capture individual billing cycles,
+  // falling back to tokenHash if orderId is not generated by Google Play
+  const ledgerId = entitlement.orderId ? `gplay_order_${entitlement.orderId.replace(/[^a-zA-Z0-9_-]/g, '_')}` : `gplay_tx_${tokenHash}`;
+  const txRef = db.collection('payment_transactions').doc(ledgerId);
   const userProfileRef = db.collection('app_users').doc(callerUid);
 
   let acknowledgedNow = false;
@@ -510,37 +533,20 @@ exports.verifyGooglePlayPurchase = onCall({ secrets: [googlePlayCredentialsSecre
     }, { merge: true });
 
     // E. Idempotent Payment Transaction Ledger Write
-    // Writes initial purchase activation record with both token identity and event-level identity
     if (!txSnap.exists) {
       t.set(txRef, {
-        transactionId,
+        transactionId: ledgerId,
+        eventType: 'INITIAL_PURCHASE',
         tokenHash,
         orderId: entitlement.orderId || null,
         userId: callerUid,
         provider: 'google_play',
         productId: cleanProductId,
         planId: entitlement.planId,
-        eventType: 'PURCHASE_INITIAL',
         status: 'COMPLETED',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
-
-    // Granular event ledger record for financial auditing
-    const eventTxId = deriveLedgerTransactionId(tokenHash, entitlement.orderId, 'PURCHASE_INITIAL');
-    const eventTxRef = db.collection('payment_transactions').doc(eventTxId);
-    t.set(eventTxRef, {
-      transactionId: eventTxId,
-      tokenHash,
-      orderId: entitlement.orderId || null,
-      userId: callerUid,
-      provider: 'google_play',
-      productId: cleanProductId,
-      planId: entitlement.planId,
-      eventType: 'PURCHASE_INITIAL',
-      status: 'COMPLETED',
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
   });
 
   // 5. Backend Subscription Acknowledgement
@@ -590,6 +596,234 @@ exports.verifyGooglePlayPurchase = onCall({ secrets: [googlePlayCredentialsSecre
     status: 'ACTIVE',
     expiryDate: entitlement.expiryDate,
   };
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// handleGooglePlayRTDN — Google Play Real-Time Developer Notifications Handler.
+// Triggered via Google Cloud Pub/Sub topic for Android Developer Notifications.
+// Receives subscription lifecycle events (RENEWED, CANCELED, IN_GRACE_PERIOD,
+// ON_HOLD, PAUSED, REVOKED, EXPIRED).
+// Verifies token with Google Play Developer API, updates Firestore entitlement,
+// and appends granular financial/lifecycle events to payment_transactions.
+// ═══════════════════════════════════════════════════════════════════════════
+exports.handleGooglePlayRTDN = onMessagePublished({
+  topic: 'play-subscription-notifications',
+  secrets: [googlePlayCredentialsSecret, playAccountBindingSecret]
+}, async (event) => {
+  const base64Data = event.data?.message?.data;
+  if (!base64Data) {
+    console.warn('[RTDN] Received Pub/Sub message with empty data payload.');
+    return;
+  }
+
+  let parsedMessage;
+  try {
+    parsedMessage = parseRTDNMessage(base64Data);
+  } catch (err) {
+    console.error('[RTDN] Failed to parse message:', err.message);
+    return;
+  }
+
+  // Check test notifications (Play Console ping)
+  if (parsedMessage.testNotification) {
+    console.log('[RTDN] Received Google Play test notification version:', parsedMessage.testNotification.version);
+    return;
+  }
+
+  const { packageName, eventTimeMillis, subscriptionNotification } = parsedMessage;
+  if (!subscriptionNotification) {
+    console.log('[RTDN] Non-subscription notification received, skipping.');
+    return;
+  }
+
+  if (packageName && packageName !== ALLOWED_PACKAGE_NAME) {
+    console.warn(`[RTDN] Unauthorized packageName '${packageName}'. Expected '${ALLOWED_PACKAGE_NAME}'.`);
+    return;
+  }
+
+  const { notificationType, purchaseToken, subscriptionId } = subscriptionNotification;
+  if (!purchaseToken) {
+    console.warn('[RTDN] Missing purchaseToken in subscriptionNotification.');
+    return;
+  }
+
+  const tokenHash = hashPurchaseToken(purchaseToken);
+  const bindingSecret = process.env.PLAY_ACCOUNT_BINDING_SECRET;
+  if (!bindingSecret) {
+    console.error('[RTDN] PLAY_ACCOUNT_BINDING_SECRET missing in environment. Aborting RTDN processing.');
+    return;
+  }
+
+  // 1. Resolve associated user via token lock registry
+  const tokenLockSnap = await db.collection('play_purchase_tokens').doc(tokenHash).get();
+  let targetUid = null;
+  if (tokenLockSnap.exists) {
+    targetUid = tokenLockSnap.data()?.userId;
+  } else {
+    // Fallback search in user_subscriptions by tokenHash
+    const subQuerySnap = await db.collection('user_subscriptions')
+      .where('tokenHash', '==', tokenHash)
+      .limit(1)
+      .get();
+    if (!subQuerySnap.empty) {
+      targetUid = subQuerySnap.docs[0].id;
+    }
+  }
+
+  if (!targetUid) {
+    console.warn(`[RTDN] No registered user found for token hash: ${tokenHash.slice(0, 10)}... (Type: ${notificationType})`);
+    return;
+  }
+
+  // 2. Query Google Play Developer API purchases.subscriptionsv2 for authoritative state
+  const verifier = new GooglePlayVerifier({
+    credentialsJson: process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON || null,
+    accountBindingSecret: bindingSecret,
+  });
+
+  let playData;
+  try {
+    playData = await verifier.fetchSubscriptionV2(ALLOWED_PACKAGE_NAME, purchaseToken);
+  } catch (err) {
+    console.error(`[RTDN] Google API error fetching token for UID ${targetUid}:`, err.message);
+    return;
+  }
+
+  // 3. Evaluate Authoritative Entitlement
+  const expectedProductId = subscriptionId || tokenLockSnap.data()?.productId;
+  const entitlement = verifier.evaluateEntitlement(playData, expectedProductId, targetUid);
+
+  // Map RTDN Notification Type to Event String
+  let eventType = 'SUBSCRIPTION_EVENT';
+  switch (notificationType) {
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RECOVERED:
+      eventType = 'RECOVERED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RENEWED:
+      eventType = 'RENEWED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_CANCELED:
+      eventType = 'CANCELED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_PURCHASED:
+      eventType = 'PURCHASED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_ON_HOLD:
+      eventType = 'ON_HOLD';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_IN_GRACE_PERIOD:
+      eventType = 'IN_GRACE_PERIOD';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RESTARTED:
+      eventType = 'RESTARTED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_PRICE_CHANGE_CONFIRMED:
+      eventType = 'PRICE_CHANGE_CONFIRMED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_DEFERRED:
+      eventType = 'DEFERRED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_PAUSED:
+      eventType = 'PAUSED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED:
+      eventType = 'PAUSE_SCHEDULE_CHANGED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_REVOKED:
+      eventType = 'REVOKED';
+      break;
+    case RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_EXPIRED:
+      eventType = 'EXPIRED';
+      break;
+    default:
+      eventType = `NOTIFICATION_${notificationType}`;
+      break;
+  }
+
+  console.log(`[RTDN] Processing ${eventType} for UID: ${targetUid} (State: ${entitlement.status})`);
+
+  // 4. Atomic Firestore Update: user_subscriptions, app_users, payment_transactions
+  const userSubRef = db.collection('user_subscriptions').doc(targetUid);
+  const userProfileRef = db.collection('app_users').doc(targetUid);
+
+  // Granular Ledger Entry ID:
+  // For RENEWED and other financial events, use orderId if present; otherwise combine tokenHash, eventType, and eventTimeMillis
+  // This guarantees duplicate Pub/Sub delivery is strictly idempotent and does not generate duplicate ledger documents.
+  const orderIdClean = entitlement.orderId ? entitlement.orderId.replace(/[^a-zA-Z0-9_-]/g, '_') : null;
+  const ledgerId = orderIdClean ? `gplay_order_${orderIdClean}` : `gplay_event_${tokenHash.slice(0, 16)}_${eventType}_${eventTimeMillis || 0}`;
+  const txRef = db.collection('payment_transactions').doc(ledgerId);
+
+  await db.runTransaction(async (t) => {
+    const userSubSnap = await t.get(userSubRef);
+    const existingSub = userSubSnap.exists ? userSubSnap.data() : null;
+
+    // Never downgrade manual admin lifetime grants
+    if (existingSub && existingSub.provider === 'manual_admin' && (existingSub.planId === 'lifetime' || existingSub.isLifetime)) {
+      console.log(`[RTDN] Preserving manual admin lifetime grant for UID ${targetUid}`);
+      return;
+    }
+
+    // A. Update user_subscriptions
+    t.set(userSubRef, {
+      userId: targetUid,
+      planId: entitlement.planId,
+      status: entitlement.status,
+      isPro: entitlement.hasActivePro,
+      provider: 'google_play',
+      productId: entitlement.productId || expectedProductId,
+      packageName: ALLOWED_PACKAGE_NAME,
+      tokenHash,
+      orderId: entitlement.orderId || null,
+      autoRenew: entitlement.autoRenewingPlan,
+      // If entitlement is no longer active (revoked, expired, on-hold), ensure expiryDate reflects the authoritative date or now
+      expiryDate: entitlement.expiryDate || (entitlement.hasActivePro ? existingSub?.expiryDate : new Date().toISOString()) || null,
+      rawPlayState: entitlement.rawPlayState,
+      lastRtdnEvent: eventType,
+      lastRtdnTime: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    // B. Sync app_users for quick feature check & admin UI
+    t.set(userProfileRef, {
+      planId: entitlement.planId,
+      subscriptionStatus: entitlement.status,
+      isPro: entitlement.hasActivePro,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    // C. Write financial / lifecycle event to payment_transactions ledger
+    t.set(txRef, {
+      transactionId: ledgerId,
+      eventType: `RTDN_${eventType}`,
+      notificationType,
+      tokenHash,
+      orderId: entitlement.orderId || null,
+      userId: targetUid,
+      provider: 'google_play',
+      productId: entitlement.productId || expectedProductId,
+      planId: entitlement.planId,
+      status: entitlement.hasActivePro ? 'COMPLETED' : 'INACTIVE',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+  });
+
+  // Acknowledge if eligible and pending
+  if (entitlement.requiresAcknowledgement) {
+    try {
+      await verifier.acknowledgeSubscription(ALLOWED_PACKAGE_NAME, entitlement.productId, purchaseToken);
+      await userSubRef.update({ acknowledgementState: 'ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED' });
+      console.log(`[RTDN] Acknowledged purchase token for UID ${targetUid}`);
+    } catch (ackErr) {
+      console.warn(`[RTDN] Acknowledgement notice for UID ${targetUid}:`, ackErr.message);
+    }
+  }
+
+  await writeAuditLog(targetUid, 'system', `RTDN_${eventType}`, targetUid, {
+    tokenHash,
+    orderId: entitlement.orderId || null,
+    status: entitlement.status,
+    hasActivePro: entitlement.hasActivePro,
+  });
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -725,149 +959,4 @@ exports.updatePlanFeatures = onCall(async (request) => {
     message: `Successfully updated features for plan '${planId}'.`,
     featureCount: validatedFeatures.length,
   };
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// handleGooglePlayRtdn — Real-Time Developer Notifications (RTDN) Pub/Sub Handler.
-// Processes asynchronous Google Play subscription lifecycle events (renewals,
-// cancellations, grace periods, on-hold, pauses, expirations, revocations).
-// Re-verifies state authoritatively with Google Play Developer API before updating.
-// ═══════════════════════════════════════════════════════════════════════════
-exports.handleGooglePlayRtdn = onMessagePublished({
-  topic: 'play-subs-rtdn',
-  secrets: [googlePlayCredentialsSecret, playAccountBindingSecret],
-}, async (event) => {
-  let messageData = null;
-  try {
-    const rawString = Buffer.from(event.data.message.data, 'base64').toString('utf8');
-    messageData = JSON.parse(rawString);
-  } catch (err) {
-    console.error('[RTDN] Failed to parse Pub/Sub message data:', err.message);
-    return;
-  }
-
-  // 1. Check for Play Console test ping
-  if (messageData.testNotification) {
-    console.log('[RTDN] Received Google Play testNotification. Version:', messageData.testNotification.version);
-    return;
-  }
-
-  const subNotification = messageData.subscriptionNotification;
-  if (!subNotification) {
-    console.warn('[RTDN] Pub/Sub message does not contain a subscriptionNotification. Ignoring.');
-    return;
-  }
-
-  const {
-    notificationType,
-    purchaseToken,
-    subscriptionId,
-  } = subNotification;
-
-  const eventName = RTDN_NOTIFICATION_TYPES[notificationType] || `UNKNOWN_TYPE_${notificationType}`;
-  const tokenHash = hashPurchaseToken(purchaseToken);
-
-  console.log(`[RTDN] Processing event ${eventName} (Type: ${notificationType}) for product ${subscriptionId}. TokenHash: ${tokenHash.slice(0, 10)}...`);
-
-  // 2. Identify subscription owner from authoritative token lock registry
-  const tokenLockSnap = await db.collection('play_purchase_tokens').doc(tokenHash).get();
-  if (!tokenLockSnap.exists) {
-    console.warn(`[RTDN] No registered user found for tokenHash ${tokenHash.slice(0, 10)}... (Event: ${eventName})`);
-    return;
-  }
-
-  const { userId, packageName } = tokenLockSnap.data();
-  if (!userId) {
-    console.warn(`[RTDN] Token lock record missing userId for tokenHash ${tokenHash.slice(0, 10)}...`);
-    return;
-  }
-
-  // 3. Query Google Play Developer API purchases.subscriptionsv2 authoritatively
-  const verifier = new GooglePlayVerifier({
-    credentialsJson: process.env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON || null,
-    accountBindingSecret: process.env.PLAY_ACCOUNT_BINDING_SECRET || null,
-  });
-
-  let playData = null;
-  try {
-    playData = await verifier.fetchSubscriptionV2(packageName || ALLOWED_PACKAGE_NAME, purchaseToken);
-  } catch (apiErr) {
-    console.error(`[RTDN] Error querying Google Play API for tokenHash ${tokenHash.slice(0, 10)}...:`, apiErr.message);
-    return;
-  }
-
-  // 4. Evaluate authoritative entitlement
-  const entitlement = verifier.evaluateEntitlement(playData, subscriptionId, userId);
-
-  // 5. Update user_subscriptions and payment_transactions atomically
-  const userSubRef = db.collection('user_subscriptions').doc(userId);
-  const userProfileRef = db.collection('app_users').doc(userId);
-  const eventTxId = deriveLedgerTransactionId(tokenHash, entitlement.orderId, eventName);
-  const eventTxRef = db.collection('payment_transactions').doc(eventTxId);
-
-  await db.runTransaction(async (t) => {
-    const subSnap = await t.get(userSubRef);
-    const existingSub = subSnap.exists ? subSnap.data() : null;
-
-    // Preserve manual_admin lifetime grants unconditionally
-    if (existingSub && existingSub.provider === 'manual_admin' && (existingSub.planId === 'lifetime' || existingSub.isLifetime)) {
-      console.log(`[RTDN] Preserving manual_admin lifetime subscription for UID ${userId}`);
-      return;
-    }
-
-    const hasActivePro = Boolean(entitlement.hasActivePro);
-    const newStatus = hasActivePro ? 'ACTIVE' : (entitlement.status || 'EXPIRED');
-
-    // Update user subscription record
-    t.set(userSubRef, {
-      userId,
-      planId: entitlement.planId || 'free',
-      status: newStatus,
-      provider: 'google_play',
-      productId: entitlement.productId || subscriptionId,
-      tokenHash,
-      orderId: entitlement.orderId || null,
-      autoRenew: entitlement.autoRenewingPlan || false,
-      expiryDate: entitlement.expiryDate || null,
-      rawPlayState: entitlement.rawPlayState,
-      lastRtdnEvent: eventName,
-      lastRtdnNotificationType: notificationType,
-      lastVerifiedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedBy: 'system_rtdn',
-    }, { merge: true });
-
-    // Sync to app_users
-    t.set(userProfileRef, {
-      planId: hasActivePro ? entitlement.planId : 'free',
-      subscriptionStatus: newStatus,
-      isPro: hasActivePro,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
-
-    // Record financial lifecycle event in ledger
-    t.set(eventTxRef, {
-      transactionId: eventTxId,
-      tokenHash,
-      orderId: entitlement.orderId || null,
-      userId,
-      provider: 'google_play',
-      productId: entitlement.productId || subscriptionId,
-      planId: entitlement.planId || 'free',
-      eventType: eventName,
-      rawNotificationType: notificationType,
-      status: hasActivePro ? 'COMPLETED' : 'STATUS_UPDATE',
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
-  });
-
-  await writeAuditLog(userId, 'system', `RTDN_${eventName}`, userId, {
-    tokenHash,
-    notificationType,
-    orderId: entitlement.orderId || null,
-    hasActivePro: entitlement.hasActivePro,
-    planId: entitlement.planId,
-  });
-
-  console.log(`[RTDN] Successfully processed ${eventName} for UID ${userId}. ActivePro: ${entitlement.hasActivePro}`);
 });

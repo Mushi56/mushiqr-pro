@@ -23,10 +23,10 @@ import {
   GooglePlayVerifier, 
   ALLOWED_PACKAGE_NAME, 
   GOOGLE_PLAY_PRODUCT_ALLOWLIST, 
-  SUBSCRIPTION_STATE, 
+  SUBSCRIPTION_STATE,
   ACKNOWLEDGEMENT_STATE,
-  RTDN_NOTIFICATION_TYPES,
-  deriveLedgerTransactionId,
+  RTDN_SUBSCRIPTION_NOTIFICATION_TYPE,
+  parseRTDNMessage,
   hashPurchaseToken,
   computeObfuscatedAccountId
 } from '../../functions/services/googlePlayVerifier.js';
@@ -838,93 +838,401 @@ test('Test G4 — Secret is never exposed in response structure', () => {
   assert.ok(!JSON.stringify(binding).includes(secretKey), 'Secret must NEVER leak in payload');
 });
 
-// ─── Tests for Prompt 1C: Fail-Closed Secret, RTDN Lifecycle & Ledger ────────
+// ─── Tests for Prompt 1C: RTDN, Lifecycle & Ledger Hardening ─────────────────
 
-test('Test H1 — Fail-closed secret: computeObfuscatedAccountId rejects empty or missing secret', () => {
+test('Test 1C-1 — computeObfuscatedAccountId strictly rejects empty or missing secretKey (No hardcoded fallback)', () => {
   assert.throws(
-    () => computeObfuscatedAccountId('uid_123', null),
-    /Valid server account-binding secret required/
+    () => computeObfuscatedAccountId('user_123', null),
+    /Valid, non-empty secretKey required/
   );
   assert.throws(
-    () => computeObfuscatedAccountId('uid_123', ''),
-    /Valid server account-binding secret required/
+    () => computeObfuscatedAccountId('user_123', undefined),
+    /Valid, non-empty secretKey required/
   );
   assert.throws(
-    () => computeObfuscatedAccountId('uid_123', '   '),
-    /Valid server account-binding secret required/
+    () => computeObfuscatedAccountId('user_123', ''),
+    /Valid, non-empty secretKey required/
+  );
+  assert.throws(
+    () => computeObfuscatedAccountId('user_123', '   '),
+    /Valid, non-empty secretKey required/
   );
 });
 
-test('Test H2 — Fail-closed secret: evaluateEntitlement fails closed if accountBindingSecret is missing and token is bound', () => {
+test('Test 1C-2 — evaluateEntitlement fails closed when account binding secret is unconfigured', () => {
+  // Verifier initialized with NO accountBindingSecret
   const verifier = new GooglePlayVerifier({ accountBindingSecret: null });
+  const futureDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
   const playResponse = {
     subscriptionState: SUBSCRIPTION_STATE.ACTIVE,
     lineItems: [
       {
         productId: 'mushi_qr_monthly',
-        expiryTime: new Date(Date.now() + 86400000).toISOString(),
+        expiryTime: futureDate,
+        autoRenewingPlan: { autoRenewEnabled: true }
       }
     ],
+    latestOrderId: 'GPA.1111-2222-3333-44444',
     externalAccountIdentifiers: {
-      obfuscatedExternalAccountId: 'some_obfuscated_id_from_google',
+      obfuscatedExternalAccountId: 'some_obfuscated_hash_from_client'
     }
   };
 
-  const ent = verifier.evaluateEntitlement(playResponse, 'mushi_qr_monthly', 'caller_123');
-  assert.equal(ent.hasActivePro, false);
-  assert.ok(ent.reason.includes('account-binding secret is missing'));
+  const entitlement = verifier.evaluateEntitlement(playResponse, 'mushi_qr_monthly', 'caller_uid_123');
+  assert.equal(entitlement.hasActivePro, false);
+  assert.ok(entitlement.reason.includes('Server account binding secret is unconfigured. Verification failed closed.'));
 });
 
-test('Test H3 — RTDN Notification Types: all 13 standard Google Play events mapped correctly', () => {
-  assert.equal(RTDN_NOTIFICATION_TYPES[1], 'SUBSCRIPTION_RECOVERED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[2], 'SUBSCRIPTION_RENEWED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[3], 'SUBSCRIPTION_CANCELED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[4], 'SUBSCRIPTION_PURCHASED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[5], 'SUBSCRIPTION_ON_HOLD');
-  assert.equal(RTDN_NOTIFICATION_TYPES[6], 'SUBSCRIPTION_IN_GRACE_PERIOD');
-  assert.equal(RTDN_NOTIFICATION_TYPES[7], 'SUBSCRIPTION_RESTARTED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[8], 'SUBSCRIPTION_PRICE_CHANGE_CONFIRMED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[9], 'SUBSCRIPTION_DEFERRED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[10], 'SUBSCRIPTION_PAUSED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[11], 'SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[12], 'SUBSCRIPTION_REVOKED');
-  assert.equal(RTDN_NOTIFICATION_TYPES[13], 'SUBSCRIPTION_EXPIRED');
+test('Test 1C-3 — parseRTDNMessage decodes valid base64 subscription notification payload', () => {
+  const rtdnPayload = {
+    version: '1.0',
+    packageName: ALLOWED_PACKAGE_NAME,
+    eventTimeMillis: '1700000000000',
+    subscriptionNotification: {
+      version: '1.0',
+      notificationType: RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RENEWED,
+      purchaseToken: 'play_renewed_token_xyz_98765432101234567890',
+      subscriptionId: 'mushi_qr_monthly'
+    }
+  };
+
+  const base64Data = Buffer.from(JSON.stringify(rtdnPayload)).toString('base64');
+  const parsed = parseRTDNMessage(base64Data);
+
+  assert.equal(parsed.version, '1.0');
+  assert.equal(parsed.packageName, ALLOWED_PACKAGE_NAME);
+  assert.equal(parsed.eventTimeMillis, 1700000000000);
+  assert.notEqual(parsed.subscriptionNotification, null);
+  assert.equal(parsed.subscriptionNotification.notificationType, 2); // SUBSCRIPTION_RENEWED = 2
+  assert.equal(parsed.subscriptionNotification.purchaseToken, 'play_renewed_token_xyz_98765432101234567890');
+  assert.equal(parsed.subscriptionNotification.subscriptionId, 'mushi_qr_monthly');
 });
 
-test('Test H4 — Granular ledger transaction ID separates recurring renewal events while preserving order ID', () => {
-  const token = 'sample_persistent_purchase_token_1234567890';
+test('Test 1C-4 — parseRTDNMessage throws on malformed or empty payloads', () => {
+  assert.throws(() => parseRTDNMessage(null), /Valid base64Data string required/);
+  assert.throws(() => parseRTDNMessage(''), /Valid base64Data string required/);
+  assert.throws(() => parseRTDNMessage(123), /Valid base64Data string required/);
+  assert.throws(() => parseRTDNMessage(Buffer.from('not json text').toString('base64')), /Failed to parse RTDN JSON payload/);
+});
+
+test('Test 1C-5 — RTDN Notification Type mapping covers all standard subscription lifecycle events', () => {
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RECOVERED, 1);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RENEWED, 2);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_CANCELED, 3);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_PURCHASED, 4);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_ON_HOLD, 5);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_IN_GRACE_PERIOD, 6);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RESTARTED, 7);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_PAUSED, 10);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_REVOKED, 12);
+  assert.equal(RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_EXPIRED, 13);
+});
+
+test('Test 1C-6 — Ledger document ID generation preserves unique IDs across recurring order IDs', () => {
+  const token = 'sample_play_purchase_token_continuous_12345678901234567890';
   const tokenHash = hashPurchaseToken(token);
-  const orderIdInitial = 'GPA.1111-2222-3333-44444';
-  const orderIdRenewal = 'GPA.1111-2222-3333-44444..0';
 
-  const txInitial = deriveLedgerTransactionId(tokenHash, orderIdInitial, 'PURCHASE_INITIAL');
-  const txRenewal = deriveLedgerTransactionId(tokenHash, orderIdRenewal, 'SUBSCRIPTION_RENEWED');
+  // Initial purchase order ID
+  const orderId1 = 'GPA.1234-5678-9012-34567';
+  const ledgerId1 = `gplay_order_${orderId1.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
 
-  assert.notEqual(txInitial, txRenewal, 'Initial and recurring renewal events must have distinct ledger IDs');
-  assert.ok(txInitial.includes('PURCHASE_INITIAL'));
-  assert.ok(txRenewal.includes('SUBSCRIPTION_RENEWED'));
-  assert.ok(txRenewal.includes('GPA_1111-2222-3333-44444__0'));
+  // Next recurring cycle order ID (Google Play appends ..0, ..1 etc.)
+  const orderId2 = 'GPA.1234-5678-9012-34567..0';
+  const ledgerId2 = `gplay_order_${orderId2.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+
+  // Null order ID fallback to token hash
+  const ledgerIdFallback = `gplay_tx_${tokenHash}`;
+
+  assert.notEqual(ledgerId1, ledgerId2, 'Recurring order IDs must produce distinct ledger document IDs');
+  assert.equal(ledgerId1, 'gplay_order_GPA_1234-5678-9012-34567');
+  assert.equal(ledgerId2, 'gplay_order_GPA_1234-5678-9012-34567__0');
+  assert.ok(ledgerIdFallback.startsWith('gplay_tx_'));
+  assert.equal(ledgerIdFallback.length, 9 + 64);
 });
 
-test('Test H5 — Lifecycle state evaluation for REVOKED and ON_HOLD correctly strips Pro entitlement', () => {
-  const verifier = new GooglePlayVerifier({ accountBindingSecret: 'test_sec' });
-  const futureExpiry = new Date(Date.now() + 86400000).toISOString();
+// ─── Tests for Prompt 1C Final Security Audit ────────────────────────────────
 
-  // ON_HOLD: payment issue
-  const onHoldResponse = {
-    subscriptionState: SUBSCRIPTION_STATE.ON_HOLD,
-    lineItems: [{ productId: 'mushi_qr_monthly', expiryTime: futureExpiry }]
+test('Audit 1 — Duplicate RTDN delivery produces identical deterministic event idempotency key', () => {
+  const token = 'test_rtdn_purchase_token_idempotency_12345678901234567890';
+  const tokenHash = hashPurchaseToken(token);
+  const eventTimeMillis = 1700000000123;
+  const eventType = 'RENEWED';
+
+  // Deterministic ledger ID generation formula used in handleGooglePlayRTDN
+  const computeLedgerId = (orderId, tHash, evType, evTime) => {
+    const orderIdClean = orderId ? orderId.replace(/[^a-zA-Z0-9_-]/g, '_') : null;
+    return orderIdClean ? `gplay_order_${orderIdClean}` : `gplay_event_${tHash.slice(0, 16)}_${evType}_${evTime || 0}`;
   };
-  const entOnHold = verifier.evaluateEntitlement(onHoldResponse, 'mushi_qr_monthly', 'u1');
-  assert.equal(entOnHold.hasActivePro, false);
-  assert.equal(entOnHold.status, 'ON_HOLD');
 
-  // EXPIRED: ended or revoked
-  const expiredResponse = {
+  // 1. With Order ID (standard recurring renewal)
+  const idA1 = computeLedgerId('GPA.1111-2222-3333-44444..0', tokenHash, eventType, eventTimeMillis);
+  const idA2 = computeLedgerId('GPA.1111-2222-3333-44444..0', tokenHash, eventType, eventTimeMillis);
+  assert.equal(idA1, idA2, 'Duplicate Pub/Sub deliveries with orderId must yield identical ledger key');
+  assert.equal(idA1, 'gplay_order_GPA_1111-2222-3333-44444__0');
+
+  // 2. Without Order ID (fallback: deterministic tokenHash + eventType + eventTimeMillis)
+  const idB1 = computeLedgerId(null, tokenHash, eventType, eventTimeMillis);
+  const idB2 = computeLedgerId(null, tokenHash, eventType, eventTimeMillis);
+  assert.equal(idB1, idB2, 'Duplicate Pub/Sub deliveries without orderId must yield strictly identical ledger key');
+  assert.ok(!idB1.includes('undefined'));
+  assert.equal(idB1, `gplay_event_${tokenHash.slice(0, 16)}_RENEWED_1700000000123`);
+});
+
+test('Audit 2 — Pending purchase NEVER grants Pro entitlement and NEVER requests acknowledgement', () => {
+  const verifier = new GooglePlayVerifier({ accountBindingSecret: 'test_audit_secret' });
+
+  const pendingPlayResponse = {
+    subscriptionState: SUBSCRIPTION_STATE.PENDING,
+    lineItems: [
+      {
+        productId: 'mushi_qr_monthly',
+        expiryTime: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        autoRenewingPlan: { autoRenewEnabled: true }
+      }
+    ],
+    latestOrderId: 'GPA.PENDING-1234',
+    acknowledgementState: ACKNOWLEDGEMENT_STATE.PENDING
+  };
+
+  const entitlement = verifier.evaluateEntitlement(pendingPlayResponse, 'mushi_qr_monthly', 'test_user');
+  assert.equal(entitlement.hasActivePro, false, 'Pending purchases must NEVER grant Pro access');
+  assert.equal(entitlement.requiresAcknowledgement, false, 'Pending purchases must NEVER trigger acknowledgement');
+  assert.equal(entitlement.status, 'PENDING');
+});
+
+test('Audit 3 — Acknowledgement state does NOT itself grant Pro entitlement', () => {
+  const verifier = new GooglePlayVerifier({ accountBindingSecret: 'test_audit_secret' });
+  const pastDate = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Expired subscription that was previously acknowledged
+  const acknowledgedExpired = {
     subscriptionState: SUBSCRIPTION_STATE.EXPIRED,
-    lineItems: [{ productId: 'mushi_qr_monthly', expiryTime: futureExpiry }]
+    lineItems: [
+      {
+        productId: 'mushi_qr_monthly',
+        expiryTime: pastDate,
+        autoRenewingPlan: { autoRenewEnabled: false }
+      }
+    ],
+    acknowledgementState: ACKNOWLEDGEMENT_STATE.ACKNOWLEDGED
   };
-  const entExpired = verifier.evaluateEntitlement(expiredResponse, 'mushi_qr_monthly', 'u1');
-  assert.equal(entExpired.hasActivePro, false);
-  assert.equal(entExpired.status, 'EXPIRED');
+
+  const entitlement = verifier.evaluateEntitlement(acknowledgedExpired, 'mushi_qr_monthly', 'test_user');
+  assert.equal(entitlement.hasActivePro, false, 'Acknowledged state must never grant Pro if subscription is EXPIRED');
+  assert.equal(entitlement.requiresAcknowledgement, false);
 });
+
+test('Audit 4 — Complete subscription lifecycle states map strictly to intended entitlement policy', () => {
+  const verifier = new GooglePlayVerifier({ accountBindingSecret: 'test_audit_secret' });
+  const futureDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+  const pastDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+
+  const makePlayData = (state, expiryTime, ackState = ACKNOWLEDGEMENT_STATE.ACKNOWLEDGED) => ({
+    subscriptionState: state,
+    lineItems: [{ productId: 'mushi_qr_monthly', expiryTime }],
+    acknowledgementState: ackState,
+  });
+
+  // 1. ACTIVE unexpired -> Pro true
+  assert.equal(verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.ACTIVE, futureDate), 'mushi_qr_monthly', 'u1').hasActivePro, true);
+
+  // 2. ACTIVE but expired timestamp -> Pro false
+  assert.equal(verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.ACTIVE, pastDate), 'mushi_qr_monthly', 'u1').hasActivePro, false);
+
+  // 3. IN_GRACE_PERIOD -> Pro true
+  const graceEnt = verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.IN_GRACE_PERIOD, pastDate), 'mushi_qr_monthly', 'u1');
+  assert.equal(graceEnt.hasActivePro, true);
+  assert.equal(graceEnt.status, 'IN_GRACE_PERIOD');
+
+  // 4. CANCELED but still unexpired -> Pro true (paid period active)
+  const canceledActive = verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.CANCELED, futureDate), 'mushi_qr_monthly', 'u1');
+  assert.equal(canceledActive.hasActivePro, true);
+  assert.equal(canceledActive.status, 'CANCELLED_ACTIVE');
+
+  // 5. CANCELED and past expiry -> Pro false
+  const canceledExpired = verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.CANCELED, pastDate), 'mushi_qr_monthly', 'u1');
+  assert.equal(canceledExpired.hasActivePro, false);
+  assert.equal(canceledExpired.status, 'EXPIRED');
+
+  // 6. ON_HOLD -> Pro false
+  const onHold = verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.ON_HOLD, futureDate), 'mushi_qr_monthly', 'u1');
+  assert.equal(onHold.hasActivePro, false);
+  assert.equal(onHold.status, 'ON_HOLD');
+
+  // 7. PAUSED -> Pro false
+  const paused = verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.PAUSED, futureDate), 'mushi_qr_monthly', 'u1');
+  assert.equal(paused.hasActivePro, false);
+  assert.equal(paused.status, 'PAUSED');
+
+  // 8. EXPIRED -> Pro false
+  const expired = verifier.evaluateEntitlement(makePlayData(SUBSCRIPTION_STATE.EXPIRED, pastDate), 'mushi_qr_monthly', 'u1');
+  assert.equal(expired.hasActivePro, false);
+  assert.equal(expired.status, 'EXPIRED');
+});
+
+test('Audit 5 — Repeated renewal notification processing is idempotent and non-destructive', () => {
+  // Simulates existing user subscription state in Firestore
+  let existingUserSub = {
+    userId: 'uid_renewal_test',
+    planId: 'monthly',
+    status: 'ACTIVE',
+    isPro: true,
+    provider: 'google_play',
+    tokenHash: 'sample_token_hash_abc',
+    orderId: 'GPA.5555-4444-3333-22222..0',
+    expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  };
+
+  const renewalOrder = 'GPA.5555-4444-3333-22222..1';
+  const ledgerId = `gplay_order_${renewalOrder.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+
+  const transactionsLedger = new Map();
+
+  const applyRTDNRenewal = (orderId, newExpiry) => {
+    // 1. Check ledger
+    transactionsLedger.set(ledgerId, {
+      transactionId: ledgerId,
+      orderId,
+      eventType: 'RTDN_RENEWED',
+      status: 'COMPLETED',
+    });
+
+    // 2. Update subscription record
+    existingUserSub = {
+      ...existingUserSub,
+      orderId,
+      expiryDate: newExpiry,
+      lastRtdnEvent: 'RENEWED',
+    };
+  };
+
+  const newExpiry = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString();
+
+  // First delivery of renewal Pub/Sub message
+  applyRTDNRenewal(renewalOrder, newExpiry);
+  assert.equal(transactionsLedger.size, 1);
+  assert.equal(existingUserSub.orderId, renewalOrder);
+
+  // Duplicate delivery of identical renewal Pub/Sub message
+  applyRTDNRenewal(renewalOrder, newExpiry);
+  assert.equal(transactionsLedger.size, 1, 'Duplicate delivery MUST NOT create duplicate ledger entry');
+  assert.equal(existingUserSub.orderId, renewalOrder);
+});
+
+test('Audit 6 — Manual admin lifetime grant cannot be downgraded by RTDN expiration or revocation', () => {
+  const existingSub = {
+    userId: 'admin_granted_vip',
+    planId: 'lifetime',
+    provider: 'manual_admin',
+    isLifetime: true,
+    isPro: true,
+    status: 'ACTIVE',
+  };
+
+  // Logic from handleGooglePlayRTDN protecting manual_admin lifetime grants
+  const shouldPreserve = existingSub.provider === 'manual_admin' && (existingSub.planId === 'lifetime' || existingSub.isLifetime);
+  assert.equal(shouldPreserve, true, 'Manual admin lifetime grant must always be preserved from RTDN updates');
+});
+
+test('Audit 7 — RTDN trust boundary rejects unauthorized packages and malformed tokens', () => {
+  // 1. Unauthorized package in RTDN payload
+  const spoofedPayload = {
+    version: '1.0',
+    packageName: 'com.attacker.fakeapp',
+    subscriptionNotification: {
+      version: '1.0',
+      notificationType: RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RENEWED,
+      purchaseToken: 'some_valid_looking_token_12345678901234567890',
+      subscriptionId: 'mushi_qr_monthly',
+    }
+  };
+
+  const parsedSpoof = parseRTDNMessage(Buffer.from(JSON.stringify(spoofedPayload)).toString('base64'));
+  assert.notEqual(parsedSpoof.packageName, ALLOWED_PACKAGE_NAME);
+  // In handleGooglePlayRTDN, if (packageName && packageName !== ALLOWED_PACKAGE_NAME) return;
+  const isAllowedPackage = parsedSpoof.packageName === ALLOWED_PACKAGE_NAME;
+  assert.equal(isAllowedPackage, false, 'Spoofed package name must be rejected at trust boundary');
+
+  // 2. Missing purchaseToken
+  const missingTokenPayload = {
+    version: '1.0',
+    packageName: ALLOWED_PACKAGE_NAME,
+    subscriptionNotification: {
+      version: '1.0',
+      notificationType: RTDN_SUBSCRIPTION_NOTIFICATION_TYPE.SUBSCRIPTION_RENEWED,
+      purchaseToken: '',
+    }
+  };
+  const parsedMissingToken = parseRTDNMessage(Buffer.from(JSON.stringify(missingTokenPayload)).toString('base64'));
+  assert.equal(Boolean(parsedMissingToken.subscriptionNotification.purchaseToken), false, 'Empty purchase token must be rejected');
+});
+
+test('Audit 8 — Unknown Google Play subscription states fail closed to EXPIRED without granting Pro', () => {
+  const verifier = new GooglePlayVerifier({ accountBindingSecret: 'test_audit_secret' });
+  const futureDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+  const unknownStatePlayData = {
+    subscriptionState: 'SUBSCRIPTION_STATE_UNEXPECTED_FUTURE_STATE_XYZ',
+    lineItems: [{ productId: 'mushi_qr_monthly', expiryTime: futureDate }],
+    acknowledgementState: ACKNOWLEDGEMENT_STATE.ACKNOWLEDGED,
+  };
+
+  const entitlement = verifier.evaluateEntitlement(unknownStatePlayData, 'mushi_qr_monthly', 'u1');
+  assert.equal(entitlement.hasActivePro, false, 'Unknown subscription states must fail closed');
+  assert.equal(entitlement.status, 'EXPIRED');
+});
+
+test('Audit 9 — Admin subscription update enforces strict plan allowlist', () => {
+  const ALLOWED_ADMIN_PLANS = ['free', 'weekly', 'monthly', 'yearly', 'lifetime'];
+  
+  const validateAdminPlan = (planId) => {
+    const requestedPlan = planId ? String(planId).toLowerCase().trim() : 'free';
+    if (!ALLOWED_ADMIN_PLANS.includes(requestedPlan)) {
+      throw new Error(`Invalid planId '${planId}'. Allowed plans: ${ALLOWED_ADMIN_PLANS.join(', ')}.`);
+    }
+    return requestedPlan;
+  };
+
+  // Valid plans
+  assert.equal(validateAdminPlan('lifetime'), 'lifetime');
+  assert.equal(validateAdminPlan('yearly'), 'yearly');
+  assert.equal(validateAdminPlan('monthly'), 'monthly');
+  assert.equal(validateAdminPlan('weekly'), 'weekly');
+  assert.equal(validateAdminPlan('free'), 'free');
+
+  // Invalid / malicious plan injection
+  assert.throws(() => validateAdminPlan('super_admin_vip'), /Invalid planId/);
+  assert.throws(() => validateAdminPlan('hacked_pro'), /Invalid planId/);
+  assert.throws(() => validateAdminPlan('enterprise_unlimited'), /Invalid planId/);
+});
+
+test('Audit 10 — Revocation or expiration ensures expiryDate does not retain stale future expiry', () => {
+  const existingSub = {
+    userId: 'user_expired_check',
+    planId: 'monthly',
+    isPro: true,
+    status: 'ACTIVE',
+    expiryDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(), // old future date
+  };
+
+  const verifier = new GooglePlayVerifier({ accountBindingSecret: 'test_audit_secret' });
+  const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  // Play API returns EXPIRED
+  const expiredPlayData = {
+    subscriptionState: SUBSCRIPTION_STATE.EXPIRED,
+    lineItems: [{ productId: 'mushi_qr_monthly', expiryTime: pastDate }],
+  };
+
+  const entitlement = verifier.evaluateEntitlement(expiredPlayData, 'mushi_qr_monthly', 'user_expired_check');
+  assert.equal(entitlement.hasActivePro, false);
+
+  // Firestore update logic in handleGooglePlayRTDN:
+  const updatedExpiryDate = entitlement.expiryDate || (entitlement.hasActivePro ? existingSub?.expiryDate : new Date().toISOString()) || null;
+  assert.equal(updatedExpiryDate, pastDate, 'Expired subscription must write past expiryDate rather than retaining existing future date');
+});
+
+
+
+

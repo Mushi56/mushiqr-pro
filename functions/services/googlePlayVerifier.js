@@ -54,24 +54,6 @@ const SUBSCRIPTION_STATE = {
   PENDING_PURCHASE_CANCELED: 'SUBSCRIPTION_STATE_PENDING_PURCHASE_CANCELED',
 };
 
-// Google Play Real-Time Developer Notifications (RTDN) Subscription Notification Types
-// Ref: https://developer.android.com/google/play/billing/rtdn-reference#sub
-const RTDN_NOTIFICATION_TYPES = {
-  1: 'SUBSCRIPTION_RECOVERED',
-  2: 'SUBSCRIPTION_RENEWED',
-  3: 'SUBSCRIPTION_CANCELED',
-  4: 'SUBSCRIPTION_PURCHASED',
-  5: 'SUBSCRIPTION_ON_HOLD',
-  6: 'SUBSCRIPTION_IN_GRACE_PERIOD',
-  7: 'SUBSCRIPTION_RESTARTED',
-  8: 'SUBSCRIPTION_PRICE_CHANGE_CONFIRMED',
-  9: 'SUBSCRIPTION_DEFERRED',
-  10: 'SUBSCRIPTION_PAUSED',
-  11: 'SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED',
-  12: 'SUBSCRIPTION_REVOKED',
-  13: 'SUBSCRIPTION_EXPIRED',
-};
-
 // Google Play Acknowledgement State Constants
 const ACKNOWLEDGEMENT_STATE = {
   UNSPECIFIED: 'ACKNOWLEDGEMENT_STATE_UNSPECIFIED',
@@ -79,17 +61,55 @@ const ACKNOWLEDGEMENT_STATE = {
   ACKNOWLEDGED: 'ACKNOWLEDGEMENT_STATE_ACKNOWLEDGED',
 };
 
+// Google Play Real-Time Developer Notifications (RTDN) SubscriptionNotification Types
+// Ref: https://developer.android.com/google/play/billing/rtdn-reference
+const RTDN_SUBSCRIPTION_NOTIFICATION_TYPE = {
+  SUBSCRIPTION_RECOVERED: 1,
+  SUBSCRIPTION_RENEWED: 2,
+  SUBSCRIPTION_CANCELED: 3,
+  SUBSCRIPTION_PURCHASED: 4,
+  SUBSCRIPTION_ON_HOLD: 5,
+  SUBSCRIPTION_IN_GRACE_PERIOD: 6,
+  SUBSCRIPTION_RESTARTED: 7,
+  SUBSCRIPTION_PRICE_CHANGE_CONFIRMED: 8,
+  SUBSCRIPTION_DEFERRED: 9,
+  SUBSCRIPTION_PAUSED: 10,
+  SUBSCRIPTION_PAUSE_SCHEDULE_CHANGED: 11,
+  SUBSCRIPTION_REVOKED: 12,
+  SUBSCRIPTION_EXPIRED: 13,
+};
+
 /**
- * Derives a granular financial transaction document ID.
- * Distinguishes initial purchases, recurring renewals, and lifecycle events
- * without overwriting previous billing event records.
+ * Decodes and validates a Google Play RTDN Pub/Sub message data payload.
  */
-function deriveLedgerTransactionId(tokenHash, orderId, eventType = 'PURCHASE_INITIAL') {
-  if (!tokenHash || typeof tokenHash !== 'string') {
-    throw new Error('Valid tokenHash required to derive ledger transaction ID.');
+function parseRTDNMessage(base64Data) {
+  if (!base64Data || typeof base64Data !== 'string') {
+    throw new Error('Valid base64Data string required for RTDN parsing.');
   }
-  const cleanOrder = orderId ? orderId.replace(/[^a-zA-Z0-9_-]/g, '_') : tokenHash.slice(0, 16);
-  return `gplay_${cleanOrder}_${eventType}`;
+
+  let jsonString;
+  try {
+    jsonString = Buffer.from(base64Data, 'base64').toString('utf8');
+  } catch (e) {
+    throw new Error(`Failed to decode base64 RTDN payload: ${e.message}`);
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(jsonString);
+  } catch (e) {
+    throw new Error(`Failed to parse RTDN JSON payload: ${e.message}`);
+  }
+
+  const { version, packageName, eventTimeMillis, subscriptionNotification, testNotification } = payload || {};
+
+  return {
+    version: version || '1.0',
+    packageName: packageName || null,
+    eventTimeMillis: eventTimeMillis ? Number(eventTimeMillis) : Date.now(),
+    subscriptionNotification: subscriptionNotification || null,
+    testNotification: testNotification || null,
+  };
 }
 
 /**
@@ -106,14 +126,14 @@ function hashPurchaseToken(purchaseToken) {
 /**
  * Computes a keyed deterministic obfuscated account identifier for Google Play Billing.
  * Replaces raw Firebase UID with a secure HMAC-SHA256 string (max 64 chars for Google Play).
- * Fails closed if secretKey is missing, empty, or not a string.
+ * Strictly requires a non-empty secretKey (no hardcoded salt fallback).
  */
 function computeObfuscatedAccountId(uid, secretKey) {
   if (!uid || typeof uid !== 'string') {
     throw new Error('Valid Firebase UID string required to compute obfuscated account ID.');
   }
   if (!secretKey || typeof secretKey !== 'string' || secretKey.trim().length === 0) {
-    throw new Error('Valid server account-binding secret required to compute obfuscated account ID. Fails closed.');
+    throw new Error('Valid, non-empty secretKey required to compute obfuscated account ID. Hardcoded fallback is prohibited.');
   }
   return crypto.createHmac('sha256', secretKey.trim()).update(uid.trim()).digest('hex');
 }
@@ -254,7 +274,7 @@ class GooglePlayVerifier {
     }
 
     // 1. Account binding check (current OR expired historical account identifiers)
-    // Requires accountBindingSecret when external account identifiers exist
+    // Supports keyed HMAC-SHA256 or direct callerUid for backward-compatibility
     const currentLinkedAccountId = playData.externalAccountIdentifiers?.obfuscatedExternalAccountId;
     const historicalLinkedAccountId = playData.expiredExternalAccountIdentifiers?.obfuscatedExternalAccountId;
     const linkedAccountId = currentLinkedAccountId || historicalLinkedAccountId || null;
@@ -263,10 +283,9 @@ class GooglePlayVerifier {
       if (!this.accountBindingSecret) {
         return {
           hasActivePro: false,
-          reason: 'Server configuration error: account-binding secret is missing. Evaluation failed closed.',
+          reason: 'Server account binding secret is unconfigured. Verification failed closed.',
         };
       }
-
       const expectedHmac = computeObfuscatedAccountId(callerUid, this.accountBindingSecret);
       const matchesCurrentDirect = currentLinkedAccountId === callerUid;
       const matchesCurrentHmac = currentLinkedAccountId === expectedHmac;
@@ -440,7 +459,11 @@ class GooglePlayVerifier {
         internalStatus = 'PAUSED';
         break;
       case SUBSCRIPTION_STATE.EXPIRED:
+        hasActivePro = false;
+        internalStatus = 'EXPIRED';
+        break;
       default:
+        console.warn(`[GooglePlayVerifier] Unknown or unexpected subscriptionState '${state}'. Failing closed to EXPIRED.`);
         hasActivePro = false;
         internalStatus = 'EXPIRED';
         break;
@@ -474,8 +497,8 @@ module.exports = {
   GOOGLE_PLAY_PRODUCT_ALLOWLIST,
   SUBSCRIPTION_STATE,
   ACKNOWLEDGEMENT_STATE,
-  RTDN_NOTIFICATION_TYPES,
-  deriveLedgerTransactionId,
+  RTDN_SUBSCRIPTION_NOTIFICATION_TYPE,
+  parseRTDNMessage,
   hashPurchaseToken,
   computeObfuscatedAccountId,
 };
