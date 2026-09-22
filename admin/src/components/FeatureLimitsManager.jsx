@@ -118,7 +118,7 @@ export default function FeatureLimitsManager() {
             onClick={handleSave}
             disabled={saving}
             style={{
-              background: 'linear-gradient(135deg, #FF4D9D, #7B61FF)',
+              background: '#D60036',
               color: '#fff',
               border: 'none',
               borderRadius: 10,
@@ -129,7 +129,7 @@ export default function FeatureLimitsManager() {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              boxShadow: '0 4px 14px rgba(255, 77, 157, 0.35)'
+              boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)'
             }}
           >
             <Save size={14} />

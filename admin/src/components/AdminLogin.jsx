@@ -401,7 +401,7 @@ export default function AdminLogin({ onLoginSuccess }) {
               width: '100%',
               height: '52px',
               borderRadius: '16px',
-              background: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)',
+              background: '#D60036',
               color: '#FFFFFF',
               border: 'none',
               fontSize: '15px',
@@ -411,7 +411,7 @@ export default function AdminLogin({ onLoginSuccess }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              boxShadow: '0 4px 18px rgba(255, 77, 157, 0.35)',
+              boxShadow: '0 4px 18px rgba(214, 0, 54, 0.35)',
               marginTop: '10px',
               transition: 'transform 0.1s ease',
               opacity: (loading || googleLoading) ? 0.7 : 1

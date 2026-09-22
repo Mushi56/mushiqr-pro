@@ -21,40 +21,40 @@ export function useAdminTheme() {
 // â”€â”€ Color Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export const getTokens = (isDark = false) => ({
   isDark,
-  // Brand accents matching reference
-  primaryPink:   '#FF4D9D',
-  primaryPurple: '#7B61FF',
-  successGreen:  '#22C55E',
-  warningOrange: '#F59E0B',
-  infoBlue:      '#3B82F6',
-  dangerRed:     '#EF4444',
-  accent:        '#FF4D9D',
-  accentLow:     'rgba(255, 77, 157, 0.15)',
-  purple:        '#7B61FF',
-  green:         '#22C55E',
-  orange:        '#F59E0B',
-  blue:          '#3B82F6',
-  red:           '#EF4444',
+  // Brand accents matching QR Code Generator Pro app
+  primaryPink:   '#D60036',
+  primaryPurple: '#B5002D',
+  successGreen:  '#00E676',
+  warningOrange: '#FFD54F',
+  infoBlue:      '#29B6F6',
+  dangerRed:     '#FF1744',
+  accent:        '#D60036',
+  accentLow:     'rgba(214, 0, 54, 0.18)',
+  purple:        '#B5002D',
+  green:         '#00E676',
+  orange:        '#FFD54F',
+  blue:          '#29B6F6',
+  red:           '#FF1744',
 
   // Gradient accents
-  pinkPurpleGrad: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)',
-  pinkSoftGrad:   'linear-gradient(135deg, rgba(255, 77, 157, 0.12) 0%, rgba(123, 97, 255, 0.12) 100%)',
+  pinkPurpleGrad: 'linear-gradient(135deg, #D60036 0%, #B5002D 100%)',
+  pinkSoftGrad:   'linear-gradient(135deg, rgba(214, 0, 54, 0.18) 0%, rgba(181, 0, 45, 0.18) 100%)',
 
-  // Sidebar (Always deep dark navy)
-  sidebarBg:      '#0F1221',
-  sidebarBorder:  'rgba(255, 255, 255, 0.07)',
-  sidebarText:    '#8E95A9',
+  // Sidebar (Deep midnight slate matching app)
+  sidebarBg:      '#0B0F19',
+  sidebarBorder:  'rgba(255, 255, 255, 0.08)',
+  sidebarText:    '#94A3B8',
   sidebarTextAct: '#FFFFFF',
-  sidebarItemHov: 'rgba(255, 255, 255, 0.05)',
-  sidebarActiveBg:'linear-gradient(135deg, rgba(255, 77, 157, 0.15) 0%, rgba(123, 97, 255, 0.15) 100%)',
-  sidebarActiveBorder: '#FF4D9D',
+  sidebarItemHov: 'rgba(255, 255, 255, 0.06)',
+  sidebarActiveBg:'linear-gradient(135deg, rgba(214, 0, 54, 0.18) 0%, rgba(181, 0, 45, 0.18) 100%)',
+  sidebarActiveBorder: '#D60036',
 
-  // Content Area (Light vs Dark)
-  bg:             isDark ? '#0B0E17' : '#F7F8FC',
-  bgCard:         isDark ? '#151928' : '#FFFFFF',
-  bgCardHover:    isDark ? '#1C2136' : '#FAFAFD',
-  bgInput:        isDark ? '#0F1322' : '#F1F3F9',
-  bgEl:           isDark ? '#0F1322' : '#F1F3F9',
+  // Content Area (Midnight Slate in Dark, Clean Slate in Light)
+  bg:             isDark ? '#0B0F19' : '#F1F5F9',
+  bgCard:         isDark ? '#151C2E' : '#FFFFFF',
+  bgCardHover:    isDark ? '#1A233A' : '#FAFAFD',
+  bgInput:        isDark ? '#111625' : '#F8FAFC',
+  bgEl:           isDark ? '#111625' : '#F8FAFC',
   border:         isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.08)',
   borderHov:      isDark ? 'rgba(255, 255, 255, 0.16)' : 'rgba(15, 23, 42, 0.16)',
   

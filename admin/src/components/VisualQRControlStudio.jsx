@@ -1015,7 +1015,7 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
       {feedbackToast && (
         <div style={{
           position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(15, 18, 33, 0.96)', border: '1.5px solid #FF4D9D',
+          background: 'rgba(15, 18, 33, 0.96)', border: '1.5px solid #D60036',
           borderRadius: 100, padding: '8px 18px', color: '#fff',
           fontSize: 12, fontWeight: 800, boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
           zIndex: 999999, display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap'
@@ -1093,19 +1093,20 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
                   setActiveSubTab('all');
                 }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6, padding: '6px 11px',
-                  borderRadius: 10, border: `1.5px solid ${isActive ? '#FF4D9D' : 'var(--ad-border)'}`,
-                  background: isActive ? 'rgba(255, 77, 157, 0.14)' : 'var(--ad-input)',
-                  color: isActive ? '#FF4D9D' : 'var(--ad-text-sec)',
-                  fontSize: 11, fontWeight: isActive ? 800 : 700, cursor: 'pointer',
-                  whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.15s ease'
+                  display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px',
+                  borderRadius: 12, border: 'none',
+                  background: isActive ? '#D60036' : 'var(--ad-input)',
+                  color: isActive ? '#FFFFFF' : 'var(--ad-text-sec)',
+                  fontSize: 11.5, fontWeight: isActive ? 800 : 600, cursor: 'pointer',
+                  whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: isActive ? '0 4px 12px rgba(214, 0, 54, 0.35)' : 'none'
                 }}
               >
                 <IconC size={13} />
                 <span>{t.label}</span>
                 <span style={{
-                  fontSize: 9, padding: '1px 5px', borderRadius: 6,
-                  background: isActive ? '#FF4D9D' : 'var(--ad-card)',
+                  fontSize: 9, padding: '1px 6px', borderRadius: 10,
+                  background: isActive ? 'rgba(255, 255, 255, 0.25)' : 'var(--ad-card)',
                   color: isActive ? '#fff' : 'var(--ad-text-sec)', fontWeight: 800
                 }}>
                   {t.count}
@@ -1115,7 +1116,7 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
           })}
         </div>
 
-        {/* Subcategory Navigation Tabs (Same style as Main Category Carousel, with 'All' first) */}
+        {/* Subcategory Navigation Tabs (Consistent borderless pill style, 12px radius) */}
         {SUB_TABS[activeTab] && SUB_TABS[activeTab].length > 0 && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto',
@@ -1130,20 +1131,21 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
                   key={st.id}
                   onClick={() => setActiveSubTab(st.id)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
-                    borderRadius: 8, border: `1.5px solid ${isSubActive ? '#7B61FF' : 'var(--ad-border)'}`,
-                    background: isSubActive ? 'rgba(123, 97, 255, 0.16)' : 'var(--ad-input)',
-                    color: isSubActive ? (isDark ? '#A78BFA' : '#7B61FF') : 'var(--ad-text-sec)',
-                    fontSize: 10.5, fontWeight: isSubActive ? 800 : 700, cursor: 'pointer',
-                    whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.15s ease'
+                    display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px',
+                    borderRadius: 12, border: 'none',
+                    background: isSubActive ? 'rgba(214, 0, 54, 0.18)' : 'var(--ad-input)',
+                    color: isSubActive ? '#D60036' : 'var(--ad-text-sec)',
+                    fontSize: 11, fontWeight: isSubActive ? 800 : 600, cursor: 'pointer',
+                    whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: isSubActive ? '0 2px 8px rgba(214, 0, 54, 0.2)' : 'none'
                   }}
                 >
                   {SubIcon && <SubIcon size={12} />}
                   <span>{st.label}</span>
                   {st.count !== undefined && (
                     <span style={{
-                      fontSize: 8.5, padding: '1px 5px', borderRadius: 5,
-                      background: isSubActive ? '#7B61FF' : 'var(--ad-card)',
+                      fontSize: 8.5, padding: '1px 6px', borderRadius: 10,
+                      background: isSubActive ? '#D60036' : 'var(--ad-card)',
                       color: isSubActive ? '#fff' : 'var(--ad-text-sec)', fontWeight: 800
                     }}>
                       {st.count}
@@ -2270,10 +2272,10 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, width: '100%' }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
-            background: 'linear-gradient(135deg, rgba(255, 77, 157, 0.2) 0%, rgba(214, 0, 54, 0.15) 100%)',
-            color: '#FF4D9D',
+            background: 'linear-gradient(135deg, rgba(214, 0, 54, 0.25) 0%, rgba(181, 0, 45, 0.2) 100%)',
+            color: '#D60036',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            boxShadow: '0 2px 8px rgba(255, 77, 157, 0.2)'
+            boxShadow: '0 2px 8px rgba(214, 0, 54, 0.25)'
           }}>
             <Icon size={18} strokeWidth={2.4} />
           </div>
@@ -2305,13 +2307,12 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             onClick={onMakeFree}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              padding: '6px 4px', minHeight: 32,
-              borderRadius: 8,
-              background: isDarkMode ? 'rgba(16, 185, 129, 0.18)' : '#ECFDF5',
-              border: `1.5px solid ${isDarkMode ? 'rgba(16, 185, 129, 0.45)' : '#A7F3D0'}`,
+              padding: '7px 4px', minHeight: 32,
+              borderRadius: 10, border: 'none',
+              background: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : '#ECFDF5',
               color: isDarkMode ? '#34D399' : '#047857',
               fontSize: 11, fontWeight: 800, cursor: 'pointer',
-              boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(4,120,87,0.06)',
+              boxShadow: 'none',
               transition: 'all 0.15s ease'
             }}
           >
@@ -2325,13 +2326,12 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             onClick={onMakePro}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              padding: '6px 4px', minHeight: 32,
-              borderRadius: 8,
-              background: isDarkMode ? 'rgba(245, 158, 11, 0.18)' : '#FFFBEB',
-              border: `1.5px solid ${isDarkMode ? 'rgba(245, 158, 11, 0.45)' : '#FDE68A'}`,
+              padding: '7px 4px', minHeight: 32,
+              borderRadius: 10, border: 'none',
+              background: isDarkMode ? 'rgba(245, 158, 11, 0.2)' : '#FFFBEB',
               color: isDarkMode ? '#FBBF24' : '#B45309',
               fontSize: 11, fontWeight: 800, cursor: 'pointer',
-              boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(180,83,9,0.06)',
+              boxShadow: 'none',
               transition: 'all 0.15s ease'
             }}
           >
@@ -2345,13 +2345,12 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             onClick={onEnableAll}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              padding: '6px 4px', minHeight: 32,
-              borderRadius: 8,
-              background: isDarkMode ? 'rgba(34, 197, 94, 0.18)' : '#F0FDF4',
-              border: `1.5px solid ${isDarkMode ? 'rgba(34, 197, 94, 0.45)' : '#BBF7D0'}`,
+              padding: '7px 4px', minHeight: 32,
+              borderRadius: 10, border: 'none',
+              background: isDarkMode ? 'rgba(34, 197, 94, 0.2)' : '#F0FDF4',
               color: isDarkMode ? '#4ADE80' : '#15803D',
               fontSize: 11, fontWeight: 800, cursor: 'pointer',
-              boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(21,128,61,0.06)',
+              boxShadow: 'none',
               transition: 'all 0.15s ease'
             }}
           >
@@ -2365,13 +2364,12 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             onClick={onDisableAll}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-              padding: '6px 4px', minHeight: 32,
-              borderRadius: 8,
-              background: isDarkMode ? 'rgba(239, 68, 68, 0.18)' : '#FEF2F2',
-              border: `1.5px solid ${isDarkMode ? 'rgba(239, 68, 68, 0.45)' : '#FECACA'}`,
+              padding: '7px 4px', minHeight: 32,
+              borderRadius: 10, border: 'none',
+              background: isDarkMode ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2',
               color: isDarkMode ? '#F87171' : '#B91C1C',
               fontSize: 11, fontWeight: 800, cursor: 'pointer',
-              boxShadow: isDarkMode ? 'none' : '0 1px 2px rgba(185,28,28,0.06)',
+              boxShadow: 'none',
               transition: 'all 0.15s ease'
             }}
           >
@@ -2392,12 +2390,14 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
 
   return (
     <div style={{
-      background: isOff ? (isDarkMode ? 'rgba(15, 18, 33, 0.4)' : '#F8FAFC') : 'var(--ad-input)',
-      border: `1.5px solid ${isOff ? (isDarkMode ? 'rgba(239, 68, 68, 0.3)' : '#FCA5A5') : (isPaid ? (isDarkMode ? 'rgba(245, 158, 11, 0.35)' : '#FCD34D') : (isDarkMode ? 'rgba(16, 185, 129, 0.35)' : '#6EE7B7'))}`,
+      background: isOff
+        ? (isDarkMode ? 'rgba(15, 18, 33, 0.4)' : '#F8FAFC')
+        : (isPaid ? (isDarkMode ? 'rgba(245, 158, 11, 0.1)' : '#FFFBEB') : (isDarkMode ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF')),
+      border: 'none',
       borderRadius: 14, padding: '11px 10px',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-      gap: 10, opacity: isOff ? 0.65 : 1, transition: 'all 0.18s ease',
-      boxShadow: isPaid ? '0 2px 8px rgba(245, 158, 11, 0.08)' : '0 2px 8px rgba(16, 185, 129, 0.08)',
+      gap: 10, opacity: isOff ? 0.65 : 1, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: isPaid ? '0 4px 14px rgba(245, 158, 11, 0.08)' : (isDarkMode ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)'),
       boxSizing: 'border-box', minWidth: 0
     }}>
       {/* Top row: Visual Thumbnail + Name + Desc */}
@@ -2407,13 +2407,13 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
         ) : gradientFill ? (
           <div style={{
             width: 38, height: 38, borderRadius: 10, background: gradientFill,
-            border: '1.5px solid rgba(255,255,255,0.2)', flexShrink: 0,
+            border: 'none', flexShrink: 0,
             boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
           }} />
         ) : imageUrl ? (
           <div style={{
             width: 38, height: 38, borderRadius: 10, background: '#fff',
-            border: '1px solid var(--ad-border)', padding: 4, flexShrink: 0,
+            border: 'none', padding: 4, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>
             <img src={imageUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -2421,8 +2421,8 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
         ) : (
           <div style={{
             width: 38, height: 38, borderRadius: 10,
-            background: isOff ? (isDarkMode ? 'rgba(148, 163, 184, 0.15)' : '#F1F5F9') : (isPaid ? (isDarkMode ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(214, 0, 54, 0.15))' : '#FEF3C7') : (isDarkMode ? 'rgba(16, 185, 129, 0.15)' : '#D1FAE5')),
-            color: isOff ? 'var(--ad-text-sec)' : (isPaid ? (isDarkMode ? '#F59E0B' : '#B45309') : (isDarkMode ? '#10B981' : '#047857')),
+            background: isOff ? (isDarkMode ? 'rgba(148, 163, 184, 0.15)' : '#F1F5F9') : (isPaid ? (isDarkMode ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7') : (isDarkMode ? 'rgba(214, 0, 54, 0.12)' : 'rgba(214, 0, 54, 0.08)')),
+            color: isOff ? 'var(--ad-text-sec)' : (isPaid ? '#F59E0B' : '#D60036'),
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
           }}>
             {Icon && <Icon size={18} strokeWidth={2.4} />}
@@ -2447,9 +2447,9 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
           )}
           {badge && (
             <span style={{
-              fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 4,
+              fontSize: 9, fontWeight: 800, padding: '1px 6px', borderRadius: 6,
               background: 'var(--ad-card)', color: 'var(--ad-text-sec)',
-              border: '1px solid var(--ad-border)', display: 'inline-block', marginTop: 4
+              border: 'none', display: 'inline-block', marginTop: 4
             }}>
               {badge}
             </span>
@@ -2467,10 +2467,9 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
           disabled={updating}
           onClick={onToggleEnable}
           style={{
-            display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px',
-            borderRadius: 7,
-            border: `1.5px solid ${enabled ? (isDarkMode ? 'rgba(34, 197, 94, 0.45)' : '#86EFAC') : (isDarkMode ? 'rgba(239, 68, 68, 0.45)' : '#FCA5A5')}`,
-            background: enabled ? (isDarkMode ? 'rgba(34, 197, 94, 0.18)' : '#F0FDF4') : (isDarkMode ? 'rgba(239, 68, 68, 0.18)' : '#FEF2F2'),
+            display: 'flex', alignItems: 'center', gap: 4, padding: '5px 9px',
+            borderRadius: 8, border: 'none',
+            background: enabled ? (isDarkMode ? 'rgba(34, 197, 94, 0.22)' : '#DCFCE7') : (isDarkMode ? 'rgba(239, 68, 68, 0.22)' : '#FEE2E2'),
             color: enabled ? (isDarkMode ? '#4ADE80' : '#15803D') : (isDarkMode ? '#F87171' : '#B91C1C'),
             fontSize: 9.5, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer', flexShrink: 0
@@ -2485,12 +2484,12 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
           disabled={updating}
           onClick={onToggleTier}
           style={{
-            display: 'flex', alignItems: 'center', gap: 4, padding: '4px 9px',
-            borderRadius: 100, border: `1.5px solid ${isPaid ? '#F59E0B' : '#10B981'}`,
-            background: isPaid ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            display: 'flex', alignItems: 'center', gap: 4, padding: '5px 10px',
+            borderRadius: 100, border: 'none',
+            background: isPaid ? '#F59E0B' : '#10B981',
             color: '#FFFFFF', fontSize: 9.5, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer', flexShrink: 0,
-            boxShadow: isPaid ? '0 2px 6px rgba(245, 158, 11, 0.35)' : '0 2px 6px rgba(16, 185, 129, 0.35)'
+            boxShadow: isPaid ? '0 2px 8px rgba(245, 158, 11, 0.35)' : '0 2px 8px rgba(16, 185, 129, 0.35)'
           }}
         >
           {updating ? (

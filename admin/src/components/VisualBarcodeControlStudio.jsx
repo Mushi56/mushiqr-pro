@@ -380,21 +380,21 @@ export default function VisualBarcodeControlStudio({ currentUser, isDark = false
                   setActiveSubTab('all');
                 }}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px',
-                  borderRadius: 10, border: `1px solid ${isActive ? '#3B82F6' : 'var(--ad-border)'}`,
-                  background: isActive ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.12) 100%)' : 'var(--ad-input)',
-                  color: isActive ? '#3B82F6' : 'var(--ad-text)',
-                  fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', cursor: 'pointer',
-                  flexShrink: 0, transition: 'all 0.15s ease',
-                  boxShadow: isActive ? '0 2px 8px rgba(59, 130, 246, 0.2)' : 'none'
+                  display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px',
+                  borderRadius: 12, border: 'none',
+                  background: isActive ? '#3B82F6' : 'var(--ad-input)',
+                  color: isActive ? '#FFFFFF' : 'var(--ad-text)',
+                  fontSize: 11.5, fontWeight: isActive ? 800 : 600, whiteSpace: 'nowrap', cursor: 'pointer',
+                  flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: isActive ? '0 4px 12px rgba(59, 130, 246, 0.35)' : 'none'
                 }}
               >
                 <IconC size={13} strokeWidth={2.4} />
                 <span>{t.label}</span>
                 <span style={{
-                  fontSize: 9, padding: '1px 5px', borderRadius: 6,
-                  background: isActive ? '#3B82F6' : 'rgba(150, 150, 150, 0.15)',
-                  color: isActive ? '#fff' : 'var(--ad-text-sec)', fontWeight: 800
+                  fontSize: 9, padding: '1px 6px', borderRadius: 10,
+                  background: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(150, 150, 150, 0.15)',
+                  color: isActive ? '#FFFFFF' : 'var(--ad-text-sec)', fontWeight: 800
                 }}>
                   {t.count}
                 </span>
@@ -403,7 +403,7 @@ export default function VisualBarcodeControlStudio({ currentUser, isDark = false
           })}
         </div>
 
-        {/* Subcategory Navigation Tabs (Same style as Main Category Navbar, with 'All' first) */}
+        {/* Subcategory Navigation Tabs (Consistent borderless pill style, 12px radius) */}
         {SUB_TABS[activeTab] && SUB_TABS[activeTab].length > 0 && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto',
@@ -418,19 +418,20 @@ export default function VisualBarcodeControlStudio({ currentUser, isDark = false
                   key={st.id}
                   onClick={() => setActiveSubTab(st.id)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px',
-                    borderRadius: 8, border: `1.5px solid ${isSubActive ? '#3B82F6' : 'var(--ad-border)'}`,
-                    background: isSubActive ? 'rgba(59, 130, 246, 0.16)' : 'var(--ad-input)',
+                    display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px',
+                    borderRadius: 12, border: 'none',
+                    background: isSubActive ? 'rgba(59, 130, 246, 0.2)' : 'var(--ad-input)',
                     color: isSubActive ? '#3B82F6' : 'var(--ad-text-sec)',
-                    fontSize: 10.5, fontWeight: isSubActive ? 800 : 700, cursor: 'pointer',
-                    whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.15s ease'
+                    fontSize: 11, fontWeight: isSubActive ? 800 : 600, cursor: 'pointer',
+                    whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: isSubActive ? '0 2px 8px rgba(59, 130, 246, 0.2)' : 'none'
                   }}
                 >
                   {SubIcon && <SubIcon size={12} />}
                   <span>{st.label}</span>
                   {st.count !== undefined && (
                     <span style={{
-                      fontSize: 8.5, padding: '1px 5px', borderRadius: 5,
+                      fontSize: 8.5, padding: '1px 6px', borderRadius: 10,
                       background: isSubActive ? '#3B82F6' : 'var(--ad-card)',
                       color: isSubActive ? '#fff' : 'var(--ad-text-sec)', fontWeight: 800
                     }}>
@@ -875,12 +876,12 @@ function BarcodeFormatControlTile({ standardKey, name, desc, tag, enabled, isPai
 
   return (
     <div style={{
-      background: isOff ? 'rgba(15, 18, 33, 0.4)' : 'var(--ad-input)',
-      border: `1.5px solid ${isOff ? 'rgba(239, 68, 68, 0.3)' : (isPaid ? 'rgba(245, 158, 11, 0.35)' : 'rgba(16, 185, 129, 0.35)')}`,
+      background: isOff ? (isDark ? 'rgba(15, 18, 33, 0.4)' : '#F8FAFC') : (isPaid ? (isDark ? 'rgba(245, 158, 11, 0.1)' : '#FFFBEB') : (isDark ? 'rgba(255, 255, 255, 0.04)' : '#FFFFFF')),
+      border: 'none',
       borderRadius: 14, padding: '10px 10px',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-      gap: 8, opacity: isOff ? 0.65 : 1, transition: 'all 0.18s ease',
-      boxShadow: isPaid ? '0 4px 14px rgba(245, 158, 11, 0.08)' : '0 4px 14px rgba(16, 185, 129, 0.08)'
+      gap: 8, opacity: isOff ? 0.65 : 1, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: isPaid ? '0 4px 14px rgba(245, 158, 11, 0.08)' : (isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.04)')
     }}>
       {/* Live Barcode Canvas Preview */}
       <MiniBarcodeCanvas standardKey={standardKey} name={name} isDark={isDark} />
@@ -896,8 +897,8 @@ function BarcodeFormatControlTile({ standardKey, name, desc, tag, enabled, isPai
           </span>
           {tag && (
             <span style={{
-              fontSize: 8.5, fontWeight: 800, padding: '1px 5px', borderRadius: 4,
-              background: 'rgba(59, 130, 246, 0.12)', color: '#3B82F6', whiteSpace: 'nowrap', flexShrink: 0
+              fontSize: 8.5, fontWeight: 800, padding: '1px 5px', borderRadius: 6,
+              background: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6', whiteSpace: 'nowrap', flexShrink: 0
             }}>
               {tag}
             </span>
@@ -921,9 +922,9 @@ function BarcodeFormatControlTile({ standardKey, name, desc, tag, enabled, isPai
           disabled={updating}
           onClick={onToggleEnable}
           style={{
-            display: 'flex', alignItems: 'center', gap: 3, padding: '3px 6px',
-            borderRadius: 6, border: `1px solid ${enabled ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
-            background: enabled ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            display: 'flex', alignItems: 'center', gap: 3, padding: '4px 8px',
+            borderRadius: 8, border: 'none',
+            background: enabled ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
             color: enabled ? '#22C55E' : '#EF4444', fontSize: 9, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer', flexShrink: 0
           }}
@@ -937,12 +938,12 @@ function BarcodeFormatControlTile({ standardKey, name, desc, tag, enabled, isPai
           disabled={updating}
           onClick={onToggleTier}
           style={{
-            display: 'flex', alignItems: 'center', gap: 3, padding: '3px 7px',
-            borderRadius: 100, border: `1.5px solid ${isPaid ? '#F59E0B' : '#10B981'}`,
-            background: isPaid ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            display: 'flex', alignItems: 'center', gap: 3, padding: '4px 9px',
+            borderRadius: 100, border: 'none',
+            background: isPaid ? '#F59E0B' : '#10B981',
             color: '#FFFFFF', fontSize: 9, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer', flexShrink: 0,
-            boxShadow: isPaid ? '0 2px 6px rgba(245, 158, 11, 0.35)' : '0 2px 6px rgba(16, 185, 129, 0.35)'
+            boxShadow: isPaid ? '0 2px 8px rgba(245, 158, 11, 0.35)' : '0 2px 8px rgba(16, 185, 129, 0.35)'
           }}
         >
           {updating ? (
@@ -964,20 +965,20 @@ function BarcodeToolControlTile({ name, desc, icon: Icon, enabled, isPaid, updat
 
   return (
     <div style={{
-      background: isOff ? 'rgba(15, 18, 33, 0.4)' : 'var(--ad-input)',
-      border: `1.5px solid ${isOff ? 'rgba(239, 68, 68, 0.3)' : (isPaid ? 'rgba(245, 158, 11, 0.35)' : 'rgba(16, 185, 129, 0.35)')}`,
+      background: isOff ? 'rgba(15, 18, 33, 0.4)' : (isPaid ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255, 255, 255, 0.04)'),
+      border: 'none',
       borderRadius: 14, padding: '10px 10px',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-      gap: 8, opacity: isOff ? 0.65 : 1, transition: 'all 0.18s ease',
-      boxShadow: isPaid ? '0 4px 14px rgba(245, 158, 11, 0.08)' : '0 4px 14px rgba(16, 185, 129, 0.08)'
+      gap: 8, opacity: isOff ? 0.65 : 1, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      boxShadow: isPaid ? '0 4px 14px rgba(245, 158, 11, 0.08)' : '0 2px 8px rgba(0,0,0,0.15)'
     }}>
       {/* Tool Icon Header */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        background: 'rgba(59, 130, 246, 0.08)', borderRadius: 8, padding: '6px 8px'
+        background: 'rgba(59, 130, 246, 0.12)', borderRadius: 10, padding: '6px 8px'
       }}>
         <div style={{
-          width: 26, height: 26, borderRadius: 6,
+          width: 26, height: 26, borderRadius: 8,
           background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
           color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
         }}>
@@ -1006,9 +1007,9 @@ function BarcodeToolControlTile({ name, desc, icon: Icon, enabled, isPaid, updat
           disabled={updating}
           onClick={onToggleEnable}
           style={{
-            display: 'flex', alignItems: 'center', gap: 3, padding: '3px 6px',
-            borderRadius: 6, border: `1px solid ${enabled ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
-            background: enabled ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            display: 'flex', alignItems: 'center', gap: 3, padding: '4px 8px',
+            borderRadius: 8, border: 'none',
+            background: enabled ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
             color: enabled ? '#22C55E' : '#EF4444', fontSize: 9, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer', flexShrink: 0
           }}
@@ -1022,12 +1023,12 @@ function BarcodeToolControlTile({ name, desc, icon: Icon, enabled, isPaid, updat
           disabled={updating}
           onClick={onToggleTier}
           style={{
-            display: 'flex', alignItems: 'center', gap: 3, padding: '3px 7px',
-            borderRadius: 100, border: `1.5px solid ${isPaid ? '#F59E0B' : '#10B981'}`,
-            background: isPaid ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            display: 'flex', alignItems: 'center', gap: 3, padding: '4px 9px',
+            borderRadius: 100, border: 'none',
+            background: isPaid ? '#F59E0B' : '#10B981',
             color: '#FFFFFF', fontSize: 9, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer', flexShrink: 0,
-            boxShadow: isPaid ? '0 2px 6px rgba(245, 158, 11, 0.35)' : '0 2px 6px rgba(16, 185, 129, 0.35)'
+            boxShadow: isPaid ? '0 2px 8px rgba(245, 158, 11, 0.35)' : '0 2px 8px rgba(16, 185, 129, 0.35)'
           }}
         >
           {updating ? (
@@ -1049,16 +1050,16 @@ function BarcodeThemePresetTile({ preset, enabled, isPaid, updating, onToggleEna
 
   return (
     <div style={{
-      background: isOff ? 'rgba(15, 18, 33, 0.4)' : 'var(--ad-input)',
-      border: `1.5px solid ${isOff ? 'rgba(239, 68, 68, 0.3)' : (isPaid ? 'rgba(245, 158, 11, 0.35)' : 'rgba(16, 185, 129, 0.35)')}`,
+      background: isOff ? 'rgba(15, 18, 33, 0.4)' : (isPaid ? 'rgba(245, 158, 11, 0.1)' : 'rgba(255, 255, 255, 0.04)'),
+      border: 'none',
       borderRadius: 12, padding: '8px',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-      gap: 6, opacity: isOff ? 0.65 : 1, transition: 'all 0.18s ease'
+      gap: 6, opacity: isOff ? 0.65 : 1, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
     }}>
       {/* Color Preview Swatch Pill */}
       <div style={{
         height: 32, borderRadius: 8, background: preset.bg,
-        border: '1px solid rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '0 8px', gap: 3
       }}>
         {/* Simulated Barcode Stripes */}
@@ -1090,9 +1091,9 @@ function BarcodeThemePresetTile({ preset, enabled, isPaid, updating, onToggleEna
           disabled={updating}
           onClick={onToggleEnable}
           style={{
-            display: 'flex', alignItems: 'center', gap: 2, padding: '2px 5px',
-            borderRadius: 5, border: `1px solid ${enabled ? 'rgba(34, 197, 94, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
-            background: enabled ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+            display: 'flex', alignItems: 'center', gap: 2, padding: '3px 6px',
+            borderRadius: 6, border: 'none',
+            background: enabled ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)',
             color: enabled ? '#22C55E' : '#EF4444', fontSize: 8.5, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer'
           }}
@@ -1105,9 +1106,9 @@ function BarcodeThemePresetTile({ preset, enabled, isPaid, updating, onToggleEna
           disabled={updating}
           onClick={onToggleTier}
           style={{
-            display: 'flex', alignItems: 'center', gap: 2, padding: '2px 6px',
-            borderRadius: 100, border: `1.5px solid ${isPaid ? '#F59E0B' : '#10B981'}`,
-            background: isPaid ? 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)' : 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+            display: 'flex', alignItems: 'center', gap: 2, padding: '3px 8px',
+            borderRadius: 100, border: 'none',
+            background: isPaid ? '#F59E0B' : '#10B981',
             color: '#FFFFFF', fontSize: 8.5, fontWeight: 800,
             cursor: updating ? 'not-allowed' : 'pointer'
           }}
@@ -1227,13 +1228,14 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             type="button"
             onClick={onMakeFree}
             style={{
-              padding: '6px 4px', borderRadius: 8,
-              border: '1px solid rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.12)',
-              color: '#10B981', fontSize: 10, fontWeight: 800, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3
+              padding: '7px 6px', borderRadius: 10, border: 'none',
+              background: 'rgba(16, 185, 129, 0.16)',
+              color: '#10B981', fontSize: 10.5, fontWeight: 800, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+              transition: 'all 0.15s ease'
             }}
           >
-            <Shield size={10} strokeWidth={2.5} />
+            <Shield size={11} strokeWidth={2.5} />
             <span>Make Free</span>
           </button>
 
@@ -1241,13 +1243,14 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             type="button"
             onClick={onMakePro}
             style={{
-              padding: '6px 4px', borderRadius: 8,
-              border: '1px solid rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.12)',
-              color: '#F59E0B', fontSize: 10, fontWeight: 800, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3
+              padding: '7px 6px', borderRadius: 10, border: 'none',
+              background: 'rgba(245, 158, 11, 0.16)',
+              color: '#F59E0B', fontSize: 10.5, fontWeight: 800, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+              transition: 'all 0.15s ease'
             }}
           >
-            <Crown size={10} strokeWidth={2.5} />
+            <Crown size={11} strokeWidth={2.5} />
             <span>Make Pro</span>
           </button>
 
@@ -1255,13 +1258,14 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             type="button"
             onClick={onEnableAll}
             style={{
-              padding: '6px 4px', borderRadius: 8,
-              border: '1px solid rgba(59, 130, 246, 0.4)', background: 'rgba(59, 130, 246, 0.12)',
-              color: '#3B82F6', fontSize: 10, fontWeight: 800, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3
+              padding: '7px 6px', borderRadius: 10, border: 'none',
+              background: 'rgba(59, 130, 246, 0.16)',
+              color: '#3B82F6', fontSize: 10.5, fontWeight: 800, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+              transition: 'all 0.15s ease'
             }}
           >
-            <Power size={10} strokeWidth={2.5} />
+            <Power size={11} strokeWidth={2.5} />
             <span>Enable All</span>
           </button>
 
@@ -1269,13 +1273,14 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
             type="button"
             onClick={onDisableAll}
             style={{
-              padding: '6px 4px', borderRadius: 8,
-              border: '1px solid rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.12)',
-              color: '#EF4444', fontSize: 10, fontWeight: 800, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3
+              padding: '7px 6px', borderRadius: 10, border: 'none',
+              background: 'rgba(239, 68, 68, 0.16)',
+              color: '#EF4444', fontSize: 10.5, fontWeight: 800, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+              transition: 'all 0.15s ease'
             }}
           >
-            <XCircle size={10} strokeWidth={2.5} />
+            <XCircle size={11} strokeWidth={2.5} />
             <span>Disable All</span>
           </button>
         </div>

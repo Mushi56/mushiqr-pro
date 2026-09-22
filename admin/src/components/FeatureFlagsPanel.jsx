@@ -1006,10 +1006,10 @@ export default function FeatureFlagsPanel({
             type="submit"
             disabled={submitting}
             style={{
-              marginTop: 10, background: 'linear-gradient(135deg, #FF4D9D, #7B61FF)',
+              marginTop: 10, background: '#D60036',
               color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
               fontSize: 14, fontWeight: 800, cursor: submitting ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 14px rgba(255, 77, 157, 0.35)'
+              boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)'
             }}
           >
             {submitting ? 'Saving...' : (isEdit ? 'Save Changes' : 'Create Feature Flag')}
@@ -1058,7 +1058,7 @@ export default function FeatureFlagsPanel({
         <button
           onClick={openCreateModal}
           style={{
-            background: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)',
+            background: '#D60036',
             border: 'none',
             borderRadius: 12,
             color: '#FFFFFF',
@@ -1069,7 +1069,7 @@ export default function FeatureFlagsPanel({
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            boxShadow: '0 4px 14px rgba(255, 77, 157, 0.35)',
+            boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)',
             flexShrink: 0
           }}
         >
@@ -1531,9 +1531,9 @@ export default function FeatureFlagsPanel({
               type="button"
               onClick={() => setFilterOpen(false)}
               style={{
-                padding: '8px 18px', borderRadius: 10, background: 'linear-gradient(135deg, #FF4D9D, #7B61FF)',
+                padding: '8px 18px', borderRadius: 10, background: '#D60036',
                 border: 'none', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(255, 77, 157, 0.3)'
+                boxShadow: '0 2px 10px rgba(214, 0, 54, 0.3)'
               }}
             >
               Done
@@ -2042,7 +2042,7 @@ function IOSSwitch({ checked, onChange, disabled }) {
         height: 26,
         borderRadius: 100,
         border: 'none',
-        background: checked ? 'linear-gradient(135deg, #FF4D9D, #7B61FF)' : 'rgba(148, 163, 184, 0.3)',
+        background: checked ? '#D60036' : 'rgba(148, 163, 184, 0.3)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         position: 'relative',
         transition: 'background 0.2s',

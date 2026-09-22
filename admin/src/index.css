@@ -12,13 +12,95 @@
   color-scheme: light dark;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* App Theme Alignment — Main QR Code Generator Color Scheme */
+  --bg-primary: #0B0F19;
+  --bg-secondary: #111625;
+  --bg-tertiary: #161C2E;
+  --bg-card: #151C2E;
+  --bg-elevated: #111625;
+  --bg-input: #151C2E;
+  --bg-hover: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --text-muted: #64748B;
+
+  /* Brand Crimson Accent */
+  --accent-primary: #D60036;
+  --accent-secondary: #B5002D;
+  --accent-gradient: linear-gradient(135deg, #D60036 0%, #B5002D 100%);
+  --accent-glow: rgba(214, 0, 54, 0.35);
+  --accent-soft: rgba(214, 0, 54, 0.18);
+
+  --border-color: rgba(255, 255, 255, 0.08);
+
+  /* Admin System Mappings */
+  --ad-bg: #0B0F19;
+  --ad-card: #151C2E;
+  --ad-input: #111625;
+  --ad-border: rgba(255, 255, 255, 0.08);
+  --ad-text: #FFFFFF;
+  --ad-text-sec: #94A3B8;
+  --ad-text-mut: #64748B;
+  --ad-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"], .ad-theme-root:not(.dark) {
+  --bg-primary: #F1F5F9;
+  --bg-secondary: #E2E8F0;
+  --bg-tertiary: #CBD5E1;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-input: #F8FAFC;
+  --bg-hover: rgba(15, 23, 42, 0.06);
+
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-tertiary: #64748B;
+  --text-muted: #94A3B8;
+
+  --border-color: rgba(15, 23, 42, 0.08);
+
+  --ad-bg: #F1F5F9;
+  --ad-card: #FFFFFF;
+  --ad-input: #F8FAFC;
+  --ad-border: rgba(15, 23, 42, 0.08);
+  --ad-text: #0F172A;
+  --ad-text-sec: #64748B;
+  --ad-text-mut: #94A3B8;
+  --ad-card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.dark, [data-theme="dark"], .ad-theme-root.dark {
+  --bg-primary: #0B0F19;
+  --bg-secondary: #111625;
+  --bg-tertiary: #161C2E;
+  --bg-card: #151C2E;
+  --bg-elevated: #111625;
+  --bg-input: #151C2E;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --text-muted: #64748B;
+
+  --ad-bg: #0B0F19;
+  --ad-card: #151C2E;
+  --ad-input: #111625;
+  --ad-border: rgba(255, 255, 255, 0.08);
+  --ad-text: #FFFFFF;
+  --ad-text-sec: #94A3B8;
+  --ad-text-mut: #64748B;
+  --ad-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #0F1221;
-  color: #F8FAFC;
+  background-color: var(--ad-bg, #0B0F19);
+  color: var(--ad-text, #FFFFFF);
   overflow-x: hidden;
 }
 

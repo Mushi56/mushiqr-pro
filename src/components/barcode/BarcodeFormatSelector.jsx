@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Check, Info, Pencil } from 'lucide-react';
+import { Search, Check, Info, Pencil, LayoutGrid, ShoppingCart, Factory, Globe, QrCode } from 'lucide-react';
 import { BARCODE_STANDARDS, renderBarcode } from '../../utils/barcodeEngine';
 import { BARCODE_CATEGORIES, FORMAT_CATEGORY_MAP, BARCODE_SPECS } from '../../utils/barcodeStandardsExtended';
 import { FeatureAccessManager } from '../../services/FeatureAccessManager';
@@ -103,40 +103,56 @@ export default function BarcodeFormatSelector({
       {/* ── Category Chips ── */}
       <div style={{
         display: 'flex',
-        gap: 8,
+        gap: 6,
         overflowX: 'auto',
-        paddingBottom: 4,
+        padding: '2px 0 4px 0',
         WebkitOverflowScrolling: 'touch',
-        scrollbarWidth: 'none'
+        scrollbarWidth: 'none',
+        flexShrink: 0
       }}>
         {BARCODE_CATEGORIES.map(cat => {
           const isActive = selectedCategory === cat.id;
+          const getCategoryIcon = () => {
+            switch (cat.id) {
+              case 'all': return <LayoutGrid size={13} />;
+              case 'retail': return <ShoppingCart size={13} />;
+              case 'industrial': return <Factory size={13} />;
+              case 'gs1': return <Globe size={13} />;
+              case '2d': return <QrCode size={13} />;
+              default: return null;
+            }
+          };
+
           return (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
               style={{
-                padding: '8px 16px',
-                borderRadius: 20,
-                border: isActive ? '1px solid var(--accent-primary, #D6003D)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
-                background: isActive ? 'rgba(214, 0, 61, 0.08)' : 'var(--bg-elevated, #FFFFFF)',
-                color: isActive ? 'var(--accent-primary, #D6003D)' : 'var(--text-secondary, #636366)',
-                fontWeight: isActive ? 700 : 600,
-                fontSize: 12,
+                flex: '0 0 auto',
+                padding: '7px 14px',
+                borderRadius: '12px',
+                border: 'none',
+                background: isActive ? 'var(--accent-primary, #D60036)' : 'var(--bg-card, #151C2E)',
+                color: isActive ? '#FFFFFF' : 'var(--text-secondary, #94A3B8)',
+                fontWeight: isActive ? 800 : 600,
+                fontSize: '12.5px',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
-                transition: 'all 0.2s ease',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6
+                gap: 6,
+                boxShadow: isActive ? '0 4px 12px rgba(214, 0, 54, 0.35)' : 'none'
               }}
             >
+              {getCategoryIcon()}
               <span>{cat.label}</span>
               {cat.id !== 'all' && (
                 <span style={{
                   fontSize: 10,
-                  opacity: 0.7,
-                  background: isActive ? 'rgba(214,0,61,0.15)' : 'var(--bg-hover, rgba(0,0,0,0.05))',
+                  opacity: isActive ? 0.9 : 0.7,
+                  background: isActive ? 'rgba(255, 255, 255, 0.22)' : 'var(--bg-hover, rgba(255,255,255,0.06))',
+                  color: isActive ? '#FFFFFF' : 'var(--text-tertiary, #64748B)',
                   padding: '1px 6px',
                   borderRadius: 10
                 }}>
@@ -173,8 +189,8 @@ export default function BarcodeFormatSelector({
                 onSelectFormat(item.id);
               }}
               style={{
-                background: isSelected ? 'rgba(214, 0, 61, 0.04)' : 'var(--bg-card, #FFFFFF)',
-                border: isSelected ? '2px solid var(--accent-primary, #D6003D)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                background: isSelected ? 'var(--accent-soft, rgba(214, 0, 54, 0.18))' : 'var(--bg-card, #151C2E)',
+                border: 'none',
                 borderRadius: 16,
                 padding: '10px 10px 8px 10px',
                 display: 'flex',
@@ -183,8 +199,8 @@ export default function BarcodeFormatSelector({
                 position: 'relative',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 boxShadow: isSelected
-                  ? '0 6px 20px rgba(214, 0, 61, 0.12)'
-                  : '0 2px 6px rgba(0,0,0,0.03)',
+                  ? '0 6px 20px rgba(214, 0, 54, 0.25)'
+                  : '0 2px 6px rgba(0,0,0,0.04)',
                 minHeight: 112,
                 boxSizing: 'border-box'
               }}
@@ -201,12 +217,12 @@ export default function BarcodeFormatSelector({
                   width: 18,
                   height: 18,
                   borderRadius: '50%',
-                  background: 'var(--accent-primary, #D6003D)',
+                  background: 'var(--accent-primary, #D60036)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#FFFFFF',
-                  boxShadow: '0 2px 6px rgba(214,0,61,0.3)',
+                  boxShadow: '0 2px 6px rgba(214,0,54,0.3)',
                   zIndex: 4
                 }}>
                   <Check size={11} strokeWidth={3} />
@@ -219,7 +235,7 @@ export default function BarcodeFormatSelector({
                 height: 44,
                 background: '#FFFFFF',
                 borderRadius: 10,
-                border: '1px solid var(--border-color, rgba(0,0,0,0.06))',
+                border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -236,7 +252,7 @@ export default function BarcodeFormatSelector({
                 <span style={{
                   fontSize: 12,
                   fontWeight: 700,
-                  color: isSelected ? 'var(--accent-primary, #D6003D)' : 'var(--text-primary, #1C1C1E)',
+                  color: isSelected ? 'var(--accent-primary, #D60036)' : 'var(--text-primary, #FFFFFF)',
                   letterSpacing: '-0.2px'
                 }}>
                   {item.name}
@@ -253,7 +269,7 @@ export default function BarcodeFormatSelector({
                     border: 'none',
                     padding: 0,
                     cursor: 'pointer',
-                    color: 'var(--text-muted, #8E8E93)',
+                    color: isSelected ? 'var(--accent-primary, #D60036)' : 'var(--text-muted, #8E8E93)',
                     display: 'flex',
                     alignItems: 'center'
                   }}
@@ -272,7 +288,7 @@ export default function BarcodeFormatSelector({
                 title="Edit fields"
                 style={{
                   width: '100%',
-                  background: 'var(--accent-primary, #D6003D)',
+                  background: 'var(--accent-primary, #D60036)',
                   border: 'none',
                   borderRadius: 8,
                   padding: '6px 0',
@@ -282,7 +298,7 @@ export default function BarcodeFormatSelector({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 6,
-                  boxShadow: '0 2px 6px rgba(214, 0, 61, 0.25)'
+                  boxShadow: '0 2px 6px rgba(214, 0, 54, 0.25)'
                 }}
               >
                 <Pencil size={11} strokeWidth={2.5} />

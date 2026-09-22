@@ -157,7 +157,7 @@ export default function PlanManager({ isDark = false }) {
         <button
           onClick={() => handleOpenCreateOrEdit()}
           style={{
-            background: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)',
+            background: '#D60036',
             color: '#fff',
             border: 'none',
             padding: '10px 18px',
@@ -610,7 +610,7 @@ export default function PlanManager({ isDark = false }) {
                 onClick={handleSavePlanDetails}
                 disabled={isSaving}
                 style={{
-                  background: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)',
+                  background: '#D60036',
                   color: '#fff',
                   border: 'none',
                   padding: '10px 22px',
@@ -783,7 +783,7 @@ export default function PlanManager({ isDark = false }) {
                 <button
                   onClick={handleSaveFeatures}
                   disabled={isSaving}
-                  style={{ background: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)', color: '#fff', border: 'none', padding: '9px 20px', borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: isSaving ? 'not-allowed' : 'pointer' }}
+                  style={{ background: '#D60036', color: '#fff', border: 'none', padding: '9px 20px', borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: isSaving ? 'not-allowed' : 'pointer' }}
                 >
                   {isSaving ? 'Saving...' : 'Apply Features'}
                 </button>

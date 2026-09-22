@@ -208,10 +208,10 @@ function Btn({ children, onClick, variant = 'primary', size = 'md', disabled, ic
     ...style
   };
   const variants = {
-    primary: { background: 'linear-gradient(135deg, #FF4D9D 0%, #7B61FF 100%)', color: '#fff' },
+    primary: { background: 'linear-gradient(135deg, #D60036 0%, #B5002D 100%)', color: '#fff', boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)' },
     ghost:   { background: 'transparent', color: 'var(--ad-text-sec)', border: `1px solid var(--ad-border)` },
     danger:  { background: `rgba(239, 68, 68, 0.12)`,  color: '#EF4444',  border: `1px solid rgba(239, 68, 68, 0.25)` },
-    success: { background: `rgba(34, 197, 94, 0.12)`, color: '#22C55E', border: `1px solid rgba(34, 197, 94, 0.25)` },
+    success: { background: `rgba(0, 230, 118, 0.12)`, color: '#00E676', border: `1px solid rgba(0, 230, 118, 0.25)` },
   };
   return (
     <button onClick={disabled ? undefined : onClick} style={{ ...base, ...variants[variant] }}>
@@ -271,7 +271,7 @@ function Toggle({ checked, onChange, disabled }) {
       onClick={disabled ? undefined : onChange}
       style={{
         width: 44, height: 24, borderRadius: 12, border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
-        background: checked ? 'linear-gradient(135deg, #FF4D9D, #7B61FF)' : 'var(--ad-input)',
+        background: checked ? '#D60036' : 'var(--ad-input)',
         position: 'relative', transition: 'background 0.2s', flexShrink: 0,
         opacity: disabled ? 0.5 : 1,
       }}
@@ -589,9 +589,9 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                 padding: '9px 12px',
                 borderRadius: 10,
                 border: 'none',
-                background: isActive ? (isDark ? 'linear-gradient(135deg, rgba(255, 77, 157, 0.16) 0%, rgba(123, 97, 255, 0.16) 100%)' : 'linear-gradient(135deg, rgba(255, 77, 157, 0.12) 0%, rgba(123, 97, 255, 0.12) 100%)') : 'transparent',
-                borderLeft: isActive ? '3px solid #FF4D9D' : '3px solid transparent',
-                color: isActive ? (isDark ? '#FFFFFF' : '#0F172A') : (isDark ? '#8E95A9' : '#64748B'),
+                background: isActive ? (isDark ? 'linear-gradient(135deg, rgba(214, 0, 54, 0.2) 0%, rgba(181, 0, 45, 0.16) 100%)' : 'linear-gradient(135deg, rgba(214, 0, 54, 0.12) 0%, rgba(181, 0, 45, 0.08) 100%)') : 'transparent',
+                borderLeft: isActive ? '3px solid #D60036' : '3px solid transparent',
+                color: isActive ? (isDark ? '#FFFFFF' : '#0F172A') : (isDark ? '#94A3B8' : '#64748B'),
                 fontSize: 13,
                 fontWeight: isActive ? 800 : 600,
                 cursor: 'pointer',
@@ -610,11 +610,11 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
               onMouseLeave={e => {
                 if (!isActive) {
                   e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = isDark ? '#8E95A9' : '#64748B';
+                  e.currentTarget.style.color = isDark ? '#94A3B8' : '#64748B';
                 }
               }}
             >
-              <Icon size={17} color={isActive ? '#FF4D9D' : (isDark ? '#8E95A9' : '#64748B')} strokeWidth={isActive ? 2.4 : 1.9} />
+              <Icon size={17} color={isActive ? '#D60036' : (isDark ? '#94A3B8' : '#64748B')} strokeWidth={isActive ? 2.4 : 1.9} />
               <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {label}
               </span>
@@ -624,8 +624,8 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                   fontWeight: 800,
                   padding: '2px 6px',
                   borderRadius: 100,
-                  background: 'rgba(255, 77, 157, 0.2)',
-                  color: '#FF4D9D',
+                  background: 'rgba(214, 0, 54, 0.2)',
+                  color: '#D60036',
                   lineHeight: 1,
                   letterSpacing: '0.3px',
                   flexShrink: 0
@@ -698,13 +698,13 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                   fontSize: 11,
                   fontWeight: active ? 800 : 600,
                   background: active
-                    ? (isDark ? 'linear-gradient(135deg, #FF4D9D, #7B61FF)' : '#FFFFFF')
+                    ? (isDark ? '#D60036' : '#FFFFFF')
                     : 'transparent',
                   color: active
                     ? (isDark ? '#FFFFFF' : '#0F172A')
-                    : (isDark ? '#8E95A9' : '#64748B'),
+                    : (isDark ? '#94A3B8' : '#64748B'),
                   boxShadow: active
-                    ? (isDark ? '0 2px 8px rgba(255,77,157,0.35)' : '0 2px 6px rgba(15,23,42,0.08)')
+                    ? (isDark ? '0 2px 8px rgba(214,0,54,0.35)' : '0 2px 6px rgba(15,23,42,0.08)')
                     : 'none',
                   transition: 'all 0.15s ease'
                 }}
@@ -1130,7 +1130,7 @@ function Header({ section, onMenuToggle, isMobile, currentUser, isDark }) {
               <img src={currentUser.photoURL} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <div style={{
-                width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #FF4D9D, #7B61FF)',
+                width: 36, height: 36, borderRadius: '50%', background: '#D60036',
                 color: '#fff', fontWeight: 900, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
                 {(currentUser?.displayName || currentUser?.email || 'A')[0].toUpperCase()}
@@ -4782,7 +4782,7 @@ function AdminPanelInner() {
               {currentUser.photoURL ? (
                 <img src={currentUser.photoURL} alt="" style={{ width: 32, height: 32, borderRadius: '50%' }} />
               ) : (
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #FF4D9D, #7B61FF)', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#D60036', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
                   {(currentUser.displayName || currentUser.email || 'U')[0].toUpperCase()}
                 </div>
               )}
@@ -4793,12 +4793,12 @@ function AdminPanelInner() {
             </div>
           )}
 
-          {/* Bootstrap button â€” only visible to designated owner who hasn't minted claims yet */}
+          {/* Bootstrap button — only visible to designated owner who hasn't minted claims yet */}
           {currentUser && isOwnerEmail && (
             <div style={{ width: '100%' }}>
               {bootstrapState.done ? (
-                <div style={{ background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, padding: '12px 16px', color: '#22C55E', fontSize: 13, fontWeight: 700 }}>
-                  âœ“ Super Admin role activated! Reloading dashboard...
+                <div style={{ background: 'rgba(0,230,118,0.12)', border: 'none', borderRadius: 12, padding: '12px 16px', color: '#00E676', fontSize: 13, fontWeight: 700 }}>
+                  ✓ Super Admin role activated! Reloading dashboard...
                 </div>
               ) : (
                 <>
@@ -4806,11 +4806,11 @@ function AdminPanelInner() {
                     onClick={handleBootstrap}
                     disabled={bootstrapState.loading}
                     style={{
-                      background: `linear-gradient(135deg, #FF4D9D, #7B61FF)`, color: '#fff', border: 'none', padding: '13px 20px',
+                      background: '#D60036', color: '#fff', border: 'none', padding: '13px 20px',
                       borderRadius: 12, cursor: bootstrapState.loading ? 'not-allowed' : 'pointer', fontWeight: 800, fontSize: 14,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
                       fontFamily: 'inherit', opacity: bootstrapState.loading ? 0.7 : 1,
-                      boxShadow: '0 4px 16px rgba(255,77,157,0.35)'
+                      boxShadow: '0 4px 16px rgba(214,0,54,0.35)'
                     }}
                   >
                     {bootstrapState.loading ? <RefreshCw size={16} className="animate-spin" /> : <Key size={16} />}
@@ -4833,12 +4833,13 @@ function AdminPanelInner() {
             <button
               onClick={handleAdminSignIn}
               style={{
-                background: currentUser && isOwnerEmail ? 'transparent' : 'linear-gradient(135deg, #FF4D9D, #7B61FF)',
+                background: currentUser && isOwnerEmail ? 'transparent' : '#D60036',
                 color: currentUser && isOwnerEmail ? T_THEME.textSec : '#fff',
                 border: currentUser && isOwnerEmail ? `1px solid ${T_THEME.border}` : 'none',
                 padding: '12px 20px', borderRadius: 12, cursor: 'pointer', fontWeight: 800, fontSize: 14,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                boxShadow: currentUser && isOwnerEmail ? 'none' : '0 4px 14px rgba(214, 0, 54, 0.35)'
               }}
             >
               <Zap size={16} /> {currentUser ? 'Switch Account (Google)' : 'Sign In with Google'}
@@ -4950,24 +4951,28 @@ function AdminPanelInner() {
         @keyframes adSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
         .ad-theme-root {
-          --ad-bg: #F7F8FC;
+          --ad-bg: #F1F5F9;
           --ad-card: #FFFFFF;
-          --ad-input: #F1F3F9;
+          --ad-input: #F8FAFC;
           --ad-border: rgba(15, 23, 42, 0.08);
           --ad-text: #0F172A;
           --ad-text-sec: #64748B;
           --ad-text-mut: #94A3B8;
           --ad-card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+          --accent-primary: #D60036;
+          --accent-glow: rgba(214, 0, 54, 0.35);
         }
         .ad-theme-root.dark {
-          --ad-bg: #0B0E17;
-          --ad-card: #151928;
-          --ad-input: #0F1322;
+          --ad-bg: #0B0F19;
+          --ad-card: #151C2E;
+          --ad-input: #111625;
           --ad-border: rgba(255, 255, 255, 0.08);
-          --ad-text: #F8FAFC;
+          --ad-text: #FFFFFF;
           --ad-text-sec: #94A3B8;
           --ad-text-mut: #64748B;
           --ad-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+          --accent-primary: #D60036;
+          --accent-glow: rgba(214, 0, 54, 0.35);
         }
 
         /* Scrollbar */
@@ -5190,9 +5195,9 @@ function AdminPanelInner() {
                           gap: 8,
                           padding: '14px 8px',
                           borderRadius: 14,
-                          border: `1px solid ${isActive ? '#FF4D9D' : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)')}`,
-                          background: isActive ? 'linear-gradient(135deg, rgba(255,77,157,0.15), rgba(123,97,255,0.15))' : (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(15,23,42,0.02)'),
-                          color: isActive ? '#FF4D9D' : (isDark ? '#FFFFFF' : '#0F172A'),
+                          border: `1px solid ${isActive ? '#D60036' : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)')}`,
+                          background: isActive ? 'rgba(214, 0, 54, 0.12)' : (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(15,23,42,0.02)'),
+                          color: isActive ? '#D60036' : (isDark ? '#FFFFFF' : '#0F172A'),
                           cursor: 'pointer'
                         }}
                       >
@@ -5200,7 +5205,7 @@ function AdminPanelInner() {
                           width: 38,
                           height: 38,
                           borderRadius: 10,
-                          background: isActive ? 'linear-gradient(135deg, #FF4D9D, #7B61FF)' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.05)'),
+                          background: isActive ? '#D60036' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.05)'),
                           color: isActive ? '#fff' : (isDark ? '#8E95A9' : '#64748B'),
                           display: 'flex',
                           alignItems: 'center',
