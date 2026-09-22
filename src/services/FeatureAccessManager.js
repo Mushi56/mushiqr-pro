@@ -605,6 +605,32 @@ class FeatureAccessManagerService {
   }
 
   /**
+   * Directly synchronizes pro entitlement state from RevenueCat / In-App purchase events
+   */
+  setProState({ isPro, planId = 'monthly', status = 'ACTIVE', expiryDate = null, provider = 'revenuecat' }) {
+    if (isPro) {
+      this.userSubscription = {
+        userId: this.currentUser?.uid || 'local',
+        isPro: true,
+        planId,
+        status,
+        expiryDate,
+        provider,
+        lastVerifiedClientAt: Date.now()
+      };
+      try {
+        localStorage.setItem(STORAGE_KEYS.USER_SUB, JSON.stringify(this.userSubscription));
+      } catch {}
+    } else if (this.userSubscription?.provider === 'revenuecat') {
+      this.userSubscription = null;
+      try {
+        localStorage.removeItem(STORAGE_KEYS.USER_SUB);
+      } catch {}
+    }
+    this.notifyListeners();
+  }
+
+  /**
    * Quantitative Limit Evaluator
    */
   getFeatureLimit(featureId) {

@@ -31,6 +31,7 @@
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/share": "^8.0.1",
     "@capacitor/status-bar": "^8.0.2",
+    "@revenuecat/purchases-capacitor": "^13.6.0",
     "bwip-js": "^4.11.2",
     "file-saver": "^2.0.5",
     "firebase": "^12.17.0",

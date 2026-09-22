@@ -9,6 +9,8 @@ import {
   getUserSubscription,
 } from './adminDataService';
 import { FeatureAccessManager, FEATURE_REGISTRY, REASON } from './FeatureAccessManager';
+import { PaymentProvider } from './payment/PaymentProvider';
+import { RevenueCatService } from './payment/RevenueCatService';
 
 const PremiumCtx = createContext(null);
 
@@ -19,6 +21,11 @@ export function PremiumProvider({ children }) {
   const [paywallFeature, setPaywallFeature] = useState(null);
   const [loading, setLoading]               = useState(true);
 
+  // Initialize Payment Provider & RevenueCat at launch
+  useEffect(() => {
+    PaymentProvider.init().catch(e => console.warn('[PremiumProvider] PaymentProvider init notice:', e));
+  }, []);
+
   // Subscribe to real-time entitlement state changes from FeatureAccessManager
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -28,9 +35,16 @@ export function PremiumProvider({ children }) {
     return unsub;
   }, []);
 
-  // Listen to auth state
+  // Listen to auth state and link RevenueCat identity
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, u => setUser(u));
+    const unsub = onAuthStateChanged(auth, u => {
+      setUser(u);
+      if (u?.uid) {
+        RevenueCatService.identifyUser(u.uid);
+      } else {
+        RevenueCatService.logOut();
+      }
+    });
     return unsub;
   }, []);
 
