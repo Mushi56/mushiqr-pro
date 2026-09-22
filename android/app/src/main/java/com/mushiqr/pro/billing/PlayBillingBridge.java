@@ -9,12 +9,14 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.PendingPurchasesParams;
 import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.ProductDetailsResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryProductDetailsResult;
 import com.android.billingclient.api.QueryPurchasesParams;
 
 import org.json.JSONArray;
@@ -69,7 +71,12 @@ public class PlayBillingBridge implements PurchasesUpdatedListener {
     private void initBillingClient() {
         billingClient = BillingClient.newBuilder(activity)
                 .setListener(this)
-                .enablePendingPurchases()
+                .enablePendingPurchases(
+                        PendingPurchasesParams.newBuilder()
+                                .enableOneTimeProducts()
+                                .enablePrepaidPlans()
+                                .build()
+                )
                 .build();
     }
 
@@ -116,13 +123,16 @@ public class PlayBillingBridge implements PurchasesUpdatedListener {
 
         billingClient.queryProductDetailsAsync(params, new ProductDetailsResponseListener() {
             @Override
-            public void onProductDetailsResponse(@NonNull BillingResult billingResult, @NonNull List<ProductDetails> list) {
+            public void onProductDetailsResponse(@NonNull BillingResult billingResult, @NonNull QueryProductDetailsResult result) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     cachedProductDetails.clear();
-                    for (ProductDetails pd : list) {
-                        cachedProductDetails.put(pd.getProductId(), pd);
+                    List<ProductDetails> list = result.getProductDetailsList();
+                    if (list != null) {
+                        for (ProductDetails pd : list) {
+                            cachedProductDetails.put(pd.getProductId(), pd);
+                        }
+                        Log.d(TAG, "Cached " + list.size() + " product details from Play Store");
                     }
-                    Log.d(TAG, "Cached " + list.size() + " product details from Play Store");
                 }
                 if (onComplete != null) {
                     activity.runOnUiThread(onComplete);

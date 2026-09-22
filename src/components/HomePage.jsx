@@ -638,23 +638,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
               }} />
 
-              {/* Onboarding Style Orbiting Neon Light Ring Arc (4x Thicker & 40% Opacity) */}
-              <div style={{
-                position: 'absolute',
-                right: '-18px',
-                bottom: '-12px',
-                width: '135px',
-                height: '95px',
-                borderRadius: '50%',
-                border: isDark ? '12px solid rgba(255, 30, 86, 0.4)' : '12px solid rgba(214, 0, 54, 0.4)',
-                boxShadow: isDark 
-                  ? '0 0 24px rgba(255, 30, 86, 0.4), inset 0 0 16px rgba(255, 30, 86, 0.25)' 
-                  : '0 0 16px rgba(214, 0, 54, 0.25)',
-                transform: 'rotate(-25deg)',
-                pointerEvents: 'none',
-                zIndex: 1
-              }} />
-
               {/* Onboarding Style Sparkle Stars */}
               <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FF4D80', fontSize: '9px', zIndex: 2 }}>✦</span>
               <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FF2A6D', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
@@ -803,23 +786,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   ? 'radial-gradient(circle, rgba(255, 124, 0, 0.35) 0%, rgba(217, 101, 0, 0.15) 50%, transparent 70%)'
                   : 'radial-gradient(circle, rgba(255, 124, 0, 0.2) 0%, transparent 70%)',
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
-              }} />
-
-              {/* Onboarding Style Orbiting Neon Light Ring Arc (4x Thicker & 40% Opacity) */}
-              <div style={{
-                position: 'absolute',
-                right: '-18px',
-                bottom: '-12px',
-                width: '135px',
-                height: '95px',
-                borderRadius: '50%',
-                border: isDark ? '12px solid rgba(255, 124, 0, 0.4)' : '12px solid rgba(255, 124, 0, 0.4)',
-                boxShadow: isDark 
-                  ? '0 0 24px rgba(255, 124, 0, 0.4), inset 0 0 16px rgba(255, 124, 0, 0.25)' 
-                  : '0 0 16px rgba(255, 124, 0, 0.25)',
-                transform: 'rotate(20deg)',
-                pointerEvents: 'none',
-                zIndex: 1
               }} />
 
               {/* Onboarding Style Sparkle Stars */}
@@ -975,23 +941,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 ? 'radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.15) 50%, transparent 70%)'
                 : 'radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%)',
               filter: 'blur(24px)', pointerEvents: 'none', zIndex: 1
-            }} />
-
-            {/* Onboarding Style Orbiting Neon Light Ring Arc (Shifted Right with Right-Side Hidden) */}
-            <div style={{
-              position: 'absolute',
-              right: '-32px',
-              top: '50%',
-              width: '155px',
-              height: '110px',
-              borderRadius: '50%',
-              border: isDark ? '12px solid rgba(16, 185, 129, 0.4)' : '12px solid rgba(16, 185, 129, 0.4)',
-              boxShadow: isDark 
-                ? '0 0 24px rgba(16, 185, 129, 0.4), inset 0 0 16px rgba(16, 185, 129, 0.25)' 
-                : '0 0 16px rgba(16, 185, 129, 0.25)',
-              transform: 'translateY(-50%) rotate(-15deg)',
-              pointerEvents: 'none',
-              zIndex: 1
             }} />
 
             {/* Onboarding Style Sparkle Stars */}

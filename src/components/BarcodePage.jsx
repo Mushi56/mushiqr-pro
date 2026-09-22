@@ -987,7 +987,7 @@ export default function BarcodePage({
       <div style={{
         flex: 1,
         overflowY: 'auto',
-        padding: '16px 16px 90px 16px',
+        padding: '16px 16px calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 24px) 16px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -1057,63 +1057,26 @@ export default function BarcodePage({
       </div>
 
       {/* ── BOTTOM NAVIGATION (BARCODE, COLORS, DIMENSIONS, STYLE) ── */}
-      <nav className="bottom-nav" style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'var(--bg-card, #FFFFFF)',
-        borderTop: '1px solid var(--border-color, rgba(0,0,0,0.06))',
-        height: 60,
-        display: 'flex',
-        alignItems: 'center',
-        zIndex: 100,
-        boxShadow: '0 -4px 16px rgba(0,0,0,0.03)'
-      }}>
+      <nav className="bottom-nav">
         {[
-          { id: 'content', label: 'BARCODE', Icon: Barcode },
-          { id: 'color', label: 'COLORS', Icon: Palette },
-          { id: 'size', label: 'DIMENSIONS', Icon: Sliders },
-          { id: 'style', label: 'STYLE', Icon: Layers }
-        ].map(tab => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 4,
-                background: 'transparent',
-                border: 'none',
-                height: '100%',
-                cursor: 'pointer',
-                color: isActive ? 'var(--accent-primary, #D6003D)' : 'var(--text-secondary, #636366)',
-                transition: 'color 0.2s',
-                position: 'relative'
-              }}
-            >
-              {isActive && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  width: 32,
-                  height: 3,
-                  background: 'var(--accent-primary, #D6003D)',
-                  borderRadius: '0 0 4px 4px'
-                }} />
-              )}
-              <tab.Icon size={19} strokeWidth={isActive ? 2.5 : 2} />
-              <span style={{ fontSize: 10, fontWeight: isActive ? 800 : 600, letterSpacing: '0.3px' }}>
-                {tab.label}
-              </span>
-            </button>
-          );
-        })}
+          { id: 'content', label: 'BARCODE', icon: Barcode },
+          { id: 'color', label: 'COLORS', icon: Palette },
+          { id: 'size', label: 'DIMENSIONS', icon: Sliders },
+          { id: 'style', label: 'STYLE', icon: Layers }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            className={`bottom-nav-tab${activeTab === tab.id ? ' active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+            style={{ position: 'relative' }}
+          >
+            <div className="bottom-nav-highlight" />
+            <span className="bottom-nav-icon">
+              <tab.icon size={24} strokeWidth={2} />
+            </span>
+            <span className="bottom-nav-label">{tab.label}</span>
+          </button>
+        ))}
       </nav>
 
       {/* ── MODALS ── */}

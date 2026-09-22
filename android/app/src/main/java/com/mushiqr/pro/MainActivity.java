@@ -22,12 +22,6 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Enforce FLAG_SECURE window policy to block screenshots & screen recordings
-        getWindow().setFlags(
-            android.view.WindowManager.LayoutParams.FLAG_SECURE,
-            android.view.WindowManager.LayoutParams.FLAG_SECURE
-        );
-
         // Request all needed permissions at launch so they're granted
         // before the user tries to use camera or save files.
         requestAllPermissions();
