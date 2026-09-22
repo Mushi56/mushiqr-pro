@@ -105,50 +105,6 @@ export default function BarcodePreviewCard({
         />
       </div>
 
-      {/* ── Validity / Quality Pill ── */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        marginTop: 10,
-        padding: '6px 14px',
-        borderRadius: 20,
-        background: quality.bg,
-        border: `1px solid ${quality.color}33`,
-        maxWidth: 360,
-        width: '100%',
-        boxSizing: 'border-box'
-      }}>
-        {quality.status === 'excellent' ? (
-          <CheckCircle size={15} color={quality.color} strokeWidth={2.5} />
-        ) : quality.status === 'good' ? (
-          <AlertTriangle size={15} color={quality.color} strokeWidth={2.5} />
-        ) : (
-          <XCircle size={15} color={quality.color} strokeWidth={2.5} />
-        )}
-
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: quality.color, letterSpacing: '0.2px' }}>
-            {isEan13 && isDataValid && checksumResult.isValid && checksumResult.isComplete
-              ? '✓ Valid EAN-13'
-              : isUpcA && isDataValid && checksumResult.isValid && checksumResult.isComplete
-              ? '✓ Valid UPC-A'
-              : isDataValid
-              ? `✓ Valid ${currentStandard?.name || 'Barcode'}`
-              : 'Invalid Barcode Data'}
-          </span>
-          <span style={{ fontSize: 10, color: 'var(--text-secondary, #636366)', fontWeight: 500, marginTop: 1 }}>
-            {isEan13 && isDataValid && checksumResult.isComplete && checksumResult.isValid
-              ? '13 digits • Checksum OK • Scan Ready'
-              : isUpcA && isDataValid && checksumResult.isComplete && checksumResult.isValid
-              ? '12 digits • Checksum OK • Scan Ready'
-              : isDataValid
-              ? `${quality.title} • Contrast ${contrastResult.ratio}:1`
-              : (currentStandard?.errorMsg || 'Please verify data format')}
-          </span>
-        </div>
-      </div>
     </section>
   );
 }

@@ -754,18 +754,17 @@ export function renderBarcode(canvas, text, options = {}) {
     } else {
       bwipOptions.includetext = true;
       if (options.textPosition === 'above') {
-        bwipOptions.textgaps = 5;
-        bwipOptions.alttext = renderText;
+        bwipOptions.textyalign = 'above';
       }
     }
 
-    // Text Font options (OCR-B default for retail, OCR-A / monospace fallback)
+    // Text Font options
     if (options.textFont === 'monospace') {
-      bwipOptions.textfont = 'Courier';
+      bwipOptions.textfont = 'monospace';
     } else if (options.textFont === 'sans') {
-      bwipOptions.textfont = 'Helvetica';
+      bwipOptions.textfont = 'sans-serif';
     } else {
-      bwipOptions.textfont = 'OCR-B';
+      bwipOptions.textfont = 'OCR-B, monospace';
     }
 
     // For linear codes without standard guard patterns, align text
@@ -887,13 +886,13 @@ export function renderBarcodeSVG(text, options = {}) {
   } else {
     bwipOptions.includetext = true;
     if (textPosition === 'above') {
-      bwipOptions.textgaps = 5;
-      bwipOptions.alttext = renderText;
+      bwipOptions.textyalign = 'above';
     }
   }
 
-  if (textFont === 'monospace') bwipOptions.textfont = 'Courier';
-  else if (textFont === 'sans') bwipOptions.textfont = 'Helvetica';
+  if (textFont === 'monospace') bwipOptions.textfont = 'monospace';
+  else if (textFont === 'sans') bwipOptions.textfont = 'sans-serif';
+  else bwipOptions.textfont = 'OCR-B, monospace';
 
   const retailStandards = ['ean13', 'ean8', 'upca', 'upce'];
   if (!retailStandards.includes(bcid)) {

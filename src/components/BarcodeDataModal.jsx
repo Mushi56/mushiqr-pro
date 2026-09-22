@@ -373,10 +373,11 @@ const CATEGORY_META = {
 
 // ─── Form Builders per Barcode Type ─────────────────────────────────────────
 
-function EAN13Form({ fields, setFields }) {
+function EAN13Form({ fields, setFields, autoCheckDigit }) {
   const prefix = fields.countryPrefix || '';
   const mfg = fields.manufacturer || '';
   const prod = fields.productCode || '';
+  const manualCheck = fields.manualCheck || '';
   const concat = `${prefix}${mfg}${prod}`;
 
   // compute check digit
@@ -390,8 +391,8 @@ function EAN13Form({ fields, setFields }) {
   }
 
   const check = concat.length === 12 ? ean13Check(concat) : '?';
-  const full = concat.length === 12 ? concat + check : concat;
-  const isValid = /^\d{12,13}$/.test(full);
+  const full = autoCheckDigit ? (concat.length === 12 ? concat + check : concat) : (concat + manualCheck);
+  const isValid = /^\d{13}$/.test(full);
 
   return (
     <>
@@ -414,25 +415,36 @@ function EAN13Form({ fields, setFields }) {
           value={prod}
           onChange={v => setFields(f => ({ ...f, productCode: v.replace(/\D/g, '').slice(0, 4) }))}
           maxLength={4} placeholder="3393" inputMode="numeric" width={3} Icon={Tag}
-          isValid={isValid}
-          errorMsg="Need exactly 12 digits total"
+          isValid={autoCheckDigit ? (concat.length === 12) : undefined}
+          errorMsg={autoCheckDigit ? "Need exactly 12 digits total" : undefined}
         />
+        {!autoCheckDigit && (
+          <SegmentedInput
+            label="Check Digit" hint="manual"
+            value={manualCheck}
+            onChange={v => setFields(f => ({ ...f, manualCheck: v.replace(/\D/g, '').slice(0, 1) }))}
+            maxLength={1} placeholder="0" inputMode="numeric" width={1} Icon={Check}
+            isValid={isValid}
+            errorMsg="Need 1 check digit"
+          />
+        )}
       </div>
-      {concat.length === 12 && (
+      {autoCheckDigit && concat.length === 12 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'var(--accent-soft)', borderRadius: 10 }}>
           <Check size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)' }}>Auto check digit: <strong>{check}</strong> → Full barcode: <code style={{ fontFamily: 'monospace' }}>{full}</code></span>
         </div>
       )}
-      <PayloadPreview value={full} isValid={isValid} errorMsg="Need exactly 12 digits total" />
+      <PayloadPreview value={full} isValid={isValid} errorMsg="Need exactly 13 digits total" />
     </>
   );
 }
 
-function UPCAForm({ fields, setFields }) {
+function UPCAForm({ fields, setFields, autoCheckDigit }) {
   const ns = fields.numberSystem || '0';
   const mfg = fields.manufacturer || '';
   const prod = fields.productCode || '';
+  const manualCheck = fields.manualCheck || '';
   const concat = `${ns}${mfg}${prod}`;
 
   function upcaCheck(s) {
@@ -445,8 +457,8 @@ function UPCAForm({ fields, setFields }) {
   }
 
   const check = concat.length === 11 ? upcaCheck(concat) : '?';
-  const full = concat.length === 11 ? concat + check : concat;
-  const isValid = /^\d{11,12}$/.test(full);
+  const full = autoCheckDigit ? (concat.length === 11 ? concat + check : concat) : (concat + manualCheck);
+  const isValid = /^\d{12}$/.test(full);
 
   return (
     <>
@@ -480,24 +492,35 @@ function UPCAForm({ fields, setFields }) {
           value={prod}
           onChange={v => setFields(f => ({ ...f, productCode: v.replace(/\D/g, '').slice(0, 5) }))}
           maxLength={5} placeholder="67890" inputMode="numeric" width={1} Icon={Tag}
-          isValid={isValid}
-          errorMsg="Need 11 total digits"
+          isValid={autoCheckDigit ? (concat.length === 11) : undefined}
+          errorMsg={autoCheckDigit ? "Need 11 total digits" : undefined}
         />
+        {!autoCheckDigit && (
+          <SegmentedInput
+            label="Check Digit" hint="manual"
+            value={manualCheck}
+            onChange={v => setFields(f => ({ ...f, manualCheck: v.replace(/\D/g, '').slice(0, 1) }))}
+            maxLength={1} placeholder="0" inputMode="numeric" width={1} Icon={Check}
+            isValid={isValid}
+            errorMsg="Need 1 check digit"
+          />
+        )}
       </div>
-      {concat.length === 11 && (
+      {autoCheckDigit && concat.length === 11 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'var(--accent-soft)', borderRadius: 10 }}>
           <Check size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)' }}>Check: <strong>{check}</strong> → <code style={{ fontFamily: 'monospace' }}>{full}</code></span>
         </div>
       )}
-      <PayloadPreview value={full} isValid={isValid} errorMsg="Need 11 total digits" />
+      <PayloadPreview value={full} isValid={isValid} errorMsg="Need 12 total digits" />
     </>
   );
 }
 
-function EAN8Form({ fields, setFields }) {
+function EAN8Form({ fields, setFields, autoCheckDigit }) {
   const prefix = fields.countryPrefix || '';
   const prod = fields.productCode || '';
+  const manualCheck = fields.manualCheck || '';
   const concat = `${prefix}${prod}`;
 
   function ean8Check(s) {
@@ -510,8 +533,8 @@ function EAN8Form({ fields, setFields }) {
   }
 
   const check = concat.length === 7 ? ean8Check(concat) : '?';
-  const full = concat.length === 7 ? concat + check : concat;
-  const isValid = /^\d{7,8}$/.test(full);
+  const full = autoCheckDigit ? (concat.length === 7 ? concat + check : concat) : (concat + manualCheck);
+  const isValid = /^\d{8}$/.test(full);
 
   return (
     <>
@@ -528,25 +551,36 @@ function EAN8Form({ fields, setFields }) {
           value={prod}
           onChange={v => setFields(f => ({ ...f, productCode: v.replace(/\D/g, '').slice(0, 4) }))}
           maxLength={4} placeholder="2345" inputMode="numeric" width={1} Icon={Tag}
-          isValid={isValid}
-          errorMsg="Need exactly 7 digits"
+          isValid={autoCheckDigit ? (concat.length === 7) : undefined}
+          errorMsg={autoCheckDigit ? "Need exactly 7 digits" : undefined}
         />
+        {!autoCheckDigit && (
+          <SegmentedInput
+            label="Check Digit" hint="manual"
+            value={manualCheck}
+            onChange={v => setFields(f => ({ ...f, manualCheck: v.replace(/\D/g, '').slice(0, 1) }))}
+            maxLength={1} placeholder="0" inputMode="numeric" width={1} Icon={Check}
+            isValid={isValid}
+            errorMsg="Need 1 check digit"
+          />
+        )}
       </div>
-      {concat.length === 7 && (
+      {autoCheckDigit && concat.length === 7 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'var(--accent-soft)', borderRadius: 10 }}>
           <Check size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)' }}>Check: <strong>{check}</strong> → <code style={{ fontFamily: 'monospace' }}>{full}</code></span>
         </div>
       )}
-      <PayloadPreview value={full} isValid={isValid} errorMsg="Need exactly 7 digits" />
+      <PayloadPreview value={full} isValid={isValid} errorMsg="Need exactly 8 digits total" />
     </>
   );
 }
 
-function ITF14Form({ fields, setFields }) {
+function ITF14Form({ fields, setFields, autoCheckDigit }) {
   const ind = fields.indicator || '1';
   const gs1 = fields.gs1Prefix || '';
   const item = fields.itemRef || '';
+  const manualCheck = fields.manualCheck || '';
   const concat = `${ind}${gs1}${item}`;
 
   function itf14Check(s) {
@@ -559,8 +593,8 @@ function ITF14Form({ fields, setFields }) {
   }
 
   const check = concat.length === 13 ? itf14Check(concat) : '?';
-  const full = concat.length === 13 ? concat + check : concat;
-  const isValid = /^\d{13,14}$/.test(full);
+  const full = autoCheckDigit ? (concat.length === 13 ? concat + check : concat) : (concat + manualCheck);
+  const isValid = /^\d{14}$/.test(full);
 
   return (
     <>
@@ -586,17 +620,27 @@ function ITF14Form({ fields, setFields }) {
           value={item}
           onChange={v => setFields(f => ({ ...f, itemRef: v.replace(/\D/g, '').slice(0, 6) }))}
           maxLength={6} placeholder="567890" inputMode="numeric" width={1} Icon={Tag}
-          isValid={isValid}
-          errorMsg="Need exactly 13 digits total"
+          isValid={autoCheckDigit ? (concat.length === 13) : undefined}
+          errorMsg={autoCheckDigit ? "Need exactly 13 digits total" : undefined}
         />
+        {!autoCheckDigit && (
+          <SegmentedInput
+            label="Check Digit" hint="manual"
+            value={manualCheck}
+            onChange={v => setFields(f => ({ ...f, manualCheck: v.replace(/\D/g, '').slice(0, 1) }))}
+            maxLength={1} placeholder="0" inputMode="numeric" width={1} Icon={Check}
+            isValid={isValid}
+            errorMsg="Need 1 check digit"
+          />
+        )}
       </div>
-      {concat.length === 13 && (
+      {autoCheckDigit && concat.length === 13 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: 'var(--accent-soft)', borderRadius: 10 }}>
           <Check size={14} style={{ color: 'var(--accent-primary)', flexShrink: 0 }} />
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary)' }}>Check digit: <strong>{check}</strong> → <code style={{ fontFamily: 'monospace' }}>{full}</code></span>
         </div>
       )}
-      <PayloadPreview value={full} isValid={isValid} errorMsg="Need exactly 13 digits total" />
+      <PayloadPreview value={full} isValid={isValid} errorMsg="Need exactly 14 digits total" />
     </>
   );
 }
@@ -1275,6 +1319,7 @@ const BCID_CATEGORY = {
 // ─── Main Modal Component ─────────────────────────────────────────────────────
 export default function BarcodeDataModal({ isOpen, bcid, initialFields, onApply, onClose, standard }) {
   const [fields, setFields] = useState(initialFields || {});
+  const [autoCheckDigit, setAutoCheckDigit] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -1290,10 +1335,10 @@ export default function BarcodeDataModal({ isOpen, bcid, initialFields, onApply,
 
   function getCompiledValue() {
     switch (bcid) {
-      case 'ean13': return `${fields.countryPrefix || ''}${fields.manufacturer || ''}${fields.productCode || ''}`;
-      case 'upca': return `${fields.numberSystem || '0'}${fields.manufacturer || ''}${fields.productCode || ''}`;
-      case 'ean8': return `${fields.countryPrefix || ''}${fields.productCode || ''}`;
-      case 'itf14': return `${fields.indicator || '1'}${fields.gs1Prefix || ''}${fields.itemRef || ''}`;
+      case 'ean13': return `${fields.countryPrefix || ''}${fields.manufacturer || ''}${fields.productCode || ''}${!autoCheckDigit && fields.manualCheck ? fields.manualCheck : ''}`;
+      case 'upca': return `${fields.numberSystem || '0'}${fields.manufacturer || ''}${fields.productCode || ''}${!autoCheckDigit && fields.manualCheck ? fields.manualCheck : ''}`;
+      case 'ean8': return `${fields.countryPrefix || ''}${fields.productCode || ''}${!autoCheckDigit && fields.manualCheck ? fields.manualCheck : ''}`;
+      case 'itf14': return `${fields.indicator || '1'}${fields.gs1Prefix || ''}${fields.itemRef || ''}${!autoCheckDigit && fields.manualCheck ? fields.manualCheck : ''}`;
       case 'upce': return `${fields.numberSystem || '0'}${fields.body || ''}`;
       case 'codabar': return `${fields.start || 'A'}${fields.body || ''}${fields.stop || 'B'}`;
       case 'postnet':
@@ -1304,10 +1349,10 @@ export default function BarcodeDataModal({ isOpen, bcid, initialFields, onApply,
 
   const renderForm = () => {
     switch (bcid) {
-      case 'ean13': return <EAN13Form fields={fields} setFields={setFields} />;
-      case 'upca': return <UPCAForm fields={fields} setFields={setFields} />;
-      case 'ean8': return <EAN8Form fields={fields} setFields={setFields} />;
-      case 'itf14': return <ITF14Form fields={fields} setFields={setFields} />;
+      case 'ean13': return <EAN13Form fields={fields} setFields={setFields} autoCheckDigit={autoCheckDigit} />;
+      case 'upca': return <UPCAForm fields={fields} setFields={setFields} autoCheckDigit={autoCheckDigit} />;
+      case 'ean8': return <EAN8Form fields={fields} setFields={setFields} autoCheckDigit={autoCheckDigit} />;
+      case 'itf14': return <ITF14Form fields={fields} setFields={setFields} autoCheckDigit={autoCheckDigit} />;
       case 'upce': return <UPCEForm fields={fields} setFields={setFields} />;
       case 'code128': return <Code128Form fields={fields} setFields={setFields} />;
       case 'code39': return <Code39Form fields={fields} setFields={setFields} />;
@@ -1371,6 +1416,63 @@ export default function BarcodeDataModal({ isOpen, bcid, initialFields, onApply,
         {/* Scrollable Form Body */}
         <div className="modal-content" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {renderForm()}
+
+          {/* ── Auto Check Digit Toggle & Checksum Breakdown (Restored) ── */}
+          {['ean13', 'upca', 'ean8', 'itf14'].includes(bcid) && (() => {
+            const compiledVal = getCompiledValue();
+            const checkDigitInfo = standard?.getCheckDigitInfo ? standard.getCheckDigitInfo(compiledVal) : null;
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  background: 'var(--bg-card, #FFFFFF)', padding: '14px 16px', borderRadius: 18,
+                  border: '1px solid var(--border-color, rgba(0,0,0,0.08))', boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary, #1C1C1E)' }}>Auto Check Digit</span>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--accent-primary, #D6003D)', background: 'rgba(214, 0, 61, 0.08)', padding: '2px 6px', borderRadius: 6 }}>GS1</span>
+                    </div>
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary, #636366)', marginTop: 2, display: 'block' }}>
+                      {autoCheckDigit ? 'Automatically computes modulo-10 check digit' : 'Allow manual complete input'}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => setAutoCheckDigit(!autoCheckDigit)}
+                    style={{ width: 52, height: 30, borderRadius: 20, background: autoCheckDigit ? 'var(--accent-primary, #D6003D)' : 'var(--bg-hover, #E5E5EA)', border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 0.25s ease', padding: 2 }}
+                  >
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#FFFFFF', transform: autoCheckDigit ? 'translateX(22px)' : 'translateX(0px)', transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} />
+                  </button>
+                </div>
+
+                {checkDigitInfo && (
+                  <div style={{
+                    background: checkDigitInfo.isValid ? 'rgba(52, 199, 89, 0.06)' : 'rgba(255, 59, 48, 0.06)',
+                    border: `1px solid ${checkDigitInfo.isValid ? 'rgba(52, 199, 89, 0.2)' : 'rgba(255, 59, 48, 0.2)'}`,
+                    borderRadius: 16, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 6
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: checkDigitInfo.isValid ? '#34C759' : '#FF3B30' }}>Modulo-10 Checksum Analysis</span>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: checkDigitInfo.isValid ? '#34C759' : '#FF3B30' }}>{checkDigitInfo.isValid ? '✓ Valid Checksum' : '✕ Invalid Checksum'}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-secondary, #636366)' }}>
+                      <span>Calculated Check Digit:</span>
+                      <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700 }}>{checkDigitInfo.checkDigit !== null ? checkDigitInfo.checkDigit : '—'}</span>
+                    </div>
+                    {checkDigitInfo.actualDigit !== undefined && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-secondary, #636366)' }}>
+                        <span>Entered Check Digit:</span>
+                        <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, color: checkDigitInfo.actualDigit === checkDigitInfo.checkDigit ? '#34C759' : '#FF3B30' }}>
+                          {checkDigitInfo.actualDigit}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Footer Actions */}

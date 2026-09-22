@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Check, Info } from 'lucide-react';
+import { Search, Check, Info, Pencil } from 'lucide-react';
 import { BARCODE_STANDARDS, renderBarcode } from '../../utils/barcodeEngine';
 import { BARCODE_CATEGORIES, FORMAT_CATEGORY_MAP, BARCODE_SPECS } from '../../utils/barcodeStandardsExtended';
 import { FeatureAccessManager } from '../../services/FeatureAccessManager';
@@ -9,6 +9,7 @@ export default function BarcodeFormatSelector({
   selectedBcid,
   onSelectFormat,
   onOpenInfo,
+  onOpenDataModal,
   showPaywall
 }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -230,8 +231,8 @@ export default function BarcodeFormatSelector({
                 <MiniThumbnail type={item.id} defaultValue={item.defaultValue} />
               </div>
 
-              {/* Format Title and Info Icon */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              {/* Format Title and Info */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, width: '100%' }}>
                 <span style={{
                   fontSize: 12,
                   fontWeight: 700,
@@ -250,30 +251,43 @@ export default function BarcodeFormatSelector({
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    padding: 2,
+                    padding: 0,
                     cursor: 'pointer',
                     color: 'var(--text-muted, #8E8E93)',
                     display: 'flex',
                     alignItems: 'center'
                   }}
                 >
-                  <Info size={13} />
+                  <Info size={14} />
                 </button>
               </div>
-
-              {/* Short Description */}
-              <span style={{
-                fontSize: 10,
-                color: 'var(--text-muted, #8E8E93)',
-                lineHeight: 1.25,
-                marginTop: 3,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden'
-              }}>
-                {item.subtitle}
-              </span>
+              
+              {/* Edit Fields Button (Full Width) */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onOpenDataModal) onOpenDataModal(item.id);
+                }}
+                title="Edit fields"
+                style={{
+                  width: '100%',
+                  background: 'var(--accent-primary, #D6003D)',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '6px 0',
+                  cursor: 'pointer',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 6,
+                  boxShadow: '0 2px 6px rgba(214, 0, 61, 0.25)'
+                }}
+              >
+                <Pencil size={11} strokeWidth={2.5} />
+                <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Edit Fields</span>
+              </button>
             </div>
           );
         })}

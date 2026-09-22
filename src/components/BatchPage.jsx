@@ -168,14 +168,6 @@ export default function BatchPage({
 
   const isCancelledRef = useRef(false);
 
-  // Clear batch entries automatically when leaving the batch page
-  useEffect(() => {
-    return () => {
-      if (setBatchItems) {
-        setBatchItems([]);
-      }
-    };
-  }, [setBatchItems]);
 
   useEffect(() => {
     if (initialBatchType) {
@@ -1551,7 +1543,7 @@ export default function BatchPage({
                     <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>Click edit to customize the style of all QRs</div>
                   </div>
                   <button
-                    onClick={() => onEditBatchItemStyle(batchItems[0], 0)}
+                    onClick={() => onEditBatchItemStyle(batchItems[0], 0, batchType)}
                     title="Customize batch design"
                     style={{
                       width: '38px',
@@ -1602,6 +1594,25 @@ export default function BatchPage({
                       Using standard: {BARCODE_STANDARDS[batchItems[0]?.style?.bcid || 'code128']?.name || 'Code 128'}
                     </div>
                   </div>
+                  <button
+                    onClick={() => onEditBatchItemStyle(batchItems[0], 0, batchType)}
+                    title="Customize barcode format"
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '10px',
+                      background: 'var(--accent-gradient)',
+                      border: 'none',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 12px rgba(214, 0, 54, 0.2)'
+                    }}
+                  >
+                    <Edit3 size={16} />
+                  </button>
                 </div>
               )}
 
@@ -1701,58 +1712,57 @@ export default function BatchPage({
                 </div>
 
                 {/* Export Quality */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>Export Quality</div>
-                    <span style={{ 
-                      fontSize: '10px', 
-                      fontWeight: 800, 
-                      color: 'var(--accent-primary)',
-                      background: 'var(--accent-soft)',
-                      padding: '3px 8px',
-                      borderRadius: '6px',
-                      border: '1px solid rgba(214, 0, 54, 0.15)',
-                      letterSpacing: '0.5px'
-                    }}>
-                      {batchType === 'BARCODE' 
-                        ? (exportQuality === 'Low' ? '400x150' : exportQuality === 'Normal' ? '800x300' : exportQuality === 'HD' ? '1200x450' : '1600x600')
-                        : (exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'HD' ? '2048px' : '4096px')
-                      }
-                    </span>
-                  </div>
-                  <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
-                    <input
-                      type="range"
-                      min="0"
-                      max="3"
-                      step="1"
-                      value={['Low', 'Normal', 'HD', 'HQ'].indexOf(exportQuality)}
-                      onChange={(e) => {
-                        const steps = ['Low', 'Normal', 'HD', 'HQ'];
-                        const selected = steps[parseInt(e.target.value)] || 'Normal';
-                        if (selected === 'HD' || selected === 'HQ') {
-                          const access = FeatureAccessManager.canUseFeature('bulk_export_quality');
-                          if (!access.allowed) {
-                            showPaywall('bulk_export_quality');
-                            return;
-                          }
-                        }
-                        setExportQuality(selected);
-                      }}
-                      className="export-quality-slider"
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)' }}>
-                      <span>Low</span>
-                      <span>Normal</span>
-                      <span style={{ position: 'relative' }}>
-                        HD <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
-                      </span>
-                      <span style={{ position: 'relative' }}>
-                        4K <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
+                {batchType === 'QR' && (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>Export Quality</div>
+                      <span style={{ 
+                        fontSize: '10px', 
+                        fontWeight: 800, 
+                        color: 'var(--accent-primary)',
+                        background: 'var(--accent-soft)',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(214, 0, 54, 0.15)',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'HD' ? '2048px' : '4096px'}
                       </span>
                     </div>
+                    <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
+                      <input
+                        type="range"
+                        min="0"
+                        max="3"
+                        step="1"
+                        value={['Low', 'Normal', 'HD', 'HQ'].indexOf(exportQuality)}
+                        onChange={(e) => {
+                          const steps = ['Low', 'Normal', 'HD', 'HQ'];
+                          const selected = steps[parseInt(e.target.value)] || 'Normal';
+                          if (selected === 'HD' || selected === 'HQ') {
+                            const access = FeatureAccessManager.canUseFeature('bulk_export_quality');
+                            if (!access.allowed) {
+                              showPaywall('bulk_export_quality');
+                              return;
+                            }
+                          }
+                          setExportQuality(selected);
+                        }}
+                        className="export-quality-slider"
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)' }}>
+                        <span>Low</span>
+                        <span>Normal</span>
+                        <span style={{ position: 'relative' }}>
+                          HD <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
+                        </span>
+                        <span style={{ position: 'relative' }}>
+                          4K <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* ZIP Filename Input */}
                 <div>
@@ -1766,12 +1776,13 @@ export default function BatchPage({
                       width: '100%',
                       padding: '12px 14px',
                       borderRadius: '12px',
-                      border: '1px solid var(--border-color)',
-                      background: 'var(--bg-elevated)',
+                      border: '1.5px solid var(--border-color, rgba(0,0,0,0.12))',
+                      background: 'var(--bg-hover, rgba(0,0,0,0.03))',
                       color: 'var(--text-primary)',
                       fontSize: '13px',
                       outline: 'none',
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      transition: 'border-color 0.2s'
                     }}
                   />
                 </div>

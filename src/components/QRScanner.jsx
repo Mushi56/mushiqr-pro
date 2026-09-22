@@ -965,18 +965,18 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           zIndex: 100, 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          background: '#FFFFFF',
-          backgroundColor: '#FFFFFF',
+          background: 'var(--bg-card, #FFFFFF)',
+          backgroundColor: 'var(--bg-card, #FFFFFF)',
           opacity: 1,
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
           boxShadow: 'none',
-          color: '#111827'
+          color: 'var(--text-primary, #111827)'
         }}
       >
         <div className="app-logo">
           <AppIcon size={46} noBackground />
-          <div className="app-logo-text" style={{ whiteSpace: 'nowrap', color: '#111827' }}>Mushi QR <span style={{ color: 'var(--accent-primary)' }}>Pro</span></div>
+          <div className="app-logo-text" style={{ whiteSpace: 'nowrap', color: 'var(--text-primary, #111827)' }}>Mushi QR <span style={{ color: 'var(--accent-primary)' }}>Pro</span></div>
         </div>
 
         <div className="app-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

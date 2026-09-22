@@ -44,16 +44,9 @@ export function FullScreenPreviewModal({
     }
   }, [isOpen, sourceCanvasRef, template, headlineText, handleText]);
 
-  // ── Android Hardware Back Button & Browser History Back Navigation ──
+  // ── Browser History Back Navigation ──
   useEffect(() => {
     if (!isOpen) return;
-
-    let backHandlerPromise = null;
-    try {
-      backHandlerPromise = CapApp.addListener('backButton', () => {
-        onClose();
-      });
-    } catch (e) {}
 
     try {
       window.history.pushState({ modal: 'fullscreen-preview' }, '');
@@ -65,9 +58,6 @@ export function FullScreenPreviewModal({
     window.addEventListener('popstate', handlePopState);
 
     return () => {
-      if (backHandlerPromise && typeof backHandlerPromise.then === 'function') {
-        backHandlerPromise.then(handle => handle?.remove && handle.remove());
-      }
       window.removeEventListener('popstate', handlePopState);
     };
   }, [isOpen, onClose]);

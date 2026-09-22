@@ -2463,6 +2463,10 @@ export default function App() {
   const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
   backHandlerRef.current = () => {
+    if (isFullScreenPreviewOpen) {
+      setIsFullScreenPreviewOpen(false);
+      return;
+    }
     if (activePage === 'home' && !advPicker.open && !formatDropdownOpen && !isMenuOpen && !isDataModalOpen) {
       const now = Date.now();
       if (now - lastBackPress.current < 2000) {
@@ -2706,25 +2710,41 @@ export default function App() {
     return getSnapshot();
   };
   // ── Edit Batch Item Style ──
-  const handleEditBatchItemStyle = (item, idx) => {
+  const handleEditBatchItemStyle = (item, idx, passedBatchType) => {
     ignoreDirtyRef.current = true;
     generatorIsDirtyRef.current = false;
     setTimeout(() => {
       ignoreDirtyRef.current = false;
       generatorIsDirtyRef.current = false;
     }, 800);
-    applySnapshot(item.style);
-    
-    const parsed = parseRawQRText(item.data);
-    setQrType(parsed.type);
-    setQrData(parsed.data);
-    navigateTo('generator');
-    setActiveTab('color');
-    
-    // Delay setting activeBatchItemIndex to prevent route sync race condition from resetting it to null
+
     setTimeout(() => {
       setActiveBatchItemIndex(idx);
     }, 100);
+
+    // If passedBatchType is explicitly 'BARCODE', or if not specified but the item looks like a barcode
+    const isBarcode = passedBatchType === 'BARCODE' || 
+                     (!passedBatchType && (item.qrType === 'BARCODE' || !!item.style?.bcid));
+
+    if (isBarcode) {
+      setLoadedBarcodeItem({
+        id: item.id || `batch-item-${idx}`,
+        qrType: 'BARCODE',
+        bcid: item.style?.bcid || 'code128',
+        text: item.data || '',
+        displayText: item.data || '',
+        style: item.style || {}
+      });
+      navigateTo('barcode');
+    } else {
+      applySnapshot(item.style);
+      
+      const parsed = parseRawQRText(item.data);
+      setQrType(parsed.type);
+      setQrData(parsed.data);
+      navigateTo('generator');
+      setActiveTab('color');
+    }
   };
   // ── Load QR ──
   const handleLoadQR = (item) => {
@@ -4277,10 +4297,10 @@ export default function App() {
                 onClick={undo} 
                 disabled={historyIndex <= 0}
                 style={{ 
-                  width: '36px', height: '36px', borderRadius: '10px', 
+                  width: '32px', height: '32px', borderRadius: '8px', 
                   background: 'var(--bg-hover)', 
                   border: '1px solid var(--border-color)', 
-                  color: historyIndex <= 0 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
+                  color: historyIndex <= 0 ? 'var(--text-tertiary)' : 'var(--text-secondary, #636366)', 
                   display: 'flex', alignItems: 'center', justifyContent: 'center', 
                   cursor: historyIndex <= 0 ? 'default' : 'pointer',
                   transition: 'all 0.2s ease',
@@ -4288,16 +4308,16 @@ export default function App() {
                 }}
                 title="Undo"
               >
-                <Undo2 size={24} strokeWidth={2.5} />
+                <Undo2 size={16} strokeWidth={2.5} />
               </button>
               <button 
                 onClick={redo} 
                 disabled={historyIndex >= history.length - 1}
                 style={{ 
-                  width: '36px', height: '36px', borderRadius: '10px', 
+                  width: '32px', height: '32px', borderRadius: '8px', 
                   background: 'var(--bg-hover)', 
                   border: '1px solid var(--border-color)', 
-                  color: historyIndex >= history.length - 1 ? 'var(--text-tertiary)' : 'var(--accent-primary)', 
+                  color: historyIndex >= history.length - 1 ? 'var(--text-tertiary)' : 'var(--text-secondary, #636366)', 
                   display: 'flex', alignItems: 'center', justifyContent: 'center', 
                   cursor: historyIndex >= history.length - 1 ? 'default' : 'pointer',
                   transition: 'all 0.2s ease',
@@ -4305,7 +4325,7 @@ export default function App() {
                 }}
                 title="Redo"
               >
-                <Redo2 size={24} strokeWidth={2.5} />
+                <Redo2 size={16} strokeWidth={2.5} />
               </button>
             </div>
           ) : (
@@ -4330,7 +4350,7 @@ export default function App() {
                       navigateTo('batch');
                     }}
                     style={{
-                      background: 'var(--accent-gradient)',
+                      background: 'linear-gradient(135deg, #D6003D 0%, #FF2E63 100%)',
                       border: 'none',
                       color: 'white',
                       padding: '8px 12px',
@@ -4353,12 +4373,12 @@ export default function App() {
                       setBatchItems(updated);
                       generatorIsDirtyRef.current = false;
                       setActiveBatchItemIndex(null);
-                      navigateTo('batch');
+                      navigateTo('batch', 'QR');
                     }}
                     style={{
-                      background: 'var(--bg-hover)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-primary)',
+                      background: 'var(--bg-hover, #F2F2F7)',
+                      border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                      color: 'var(--text-primary, #1C1C1E)',
                       padding: '8px 12px',
                       borderRadius: '10px',
                       fontSize: '11px',
@@ -4368,6 +4388,28 @@ export default function App() {
                     }}
                   >
                     This Only
+                  </button>
+                  <button 
+                    onClick={() => {
+                      generatorIsDirtyRef.current = false;
+                      setActiveBatchItemIndex(null);
+                      navigateTo('batch', 'QR');
+                    }}
+                    style={{
+                      background: 'var(--bg-hover, rgba(0,0,0,0.04))',
+                      border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                      color: 'var(--text-secondary, #8E8E93)',
+                      width: 32,
+                      height: 32,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '10px',
+                      cursor: 'pointer'
+                    }}
+                    title="Cancel"
+                  >
+                    <X size={16} strokeWidth={2.5} />
                   </button>
                 </div>
               ) : (
@@ -4616,20 +4658,7 @@ export default function App() {
               </div>
               )}
               <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
-                {activeBatchItemIndex !== null ? (
-                  <button
-                    className="btn-menu-toggle"
-                    onClick={() => {
-                      generatorIsDirtyRef.current = false;
-                      setActiveBatchItemIndex(null);
-                      navigateTo('batch');
-                    }}
-                    aria-label="Cancel editing"
-                    title="Cancel"
-                  >
-                    <X size={20} />
-                  </button>
-                ) : (
+                {!(activeBatchItemIndex !== null && activeBatchItemIndex !== undefined) && (
                   <button
                     className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -7529,6 +7558,10 @@ export default function App() {
             theme={theme}
             setTheme={setTheme}
             effectiveTheme={effectiveTheme}
+            activeBatchItemIndex={activeBatchItemIndex}
+            batchItems={batchItems}
+            setBatchItems={setBatchItems}
+            setActiveBatchItemIndex={setActiveBatchItemIndex}
           />
         ) : activePage === 'settings' ? (
           <SettingsPage 

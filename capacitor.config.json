@@ -18,13 +18,11 @@
     }
   },
   "android": {
-    "allowMixedContent": true,
+    "allowMixedContent": false,
     "captureInput": false,
-    "webContentsDebuggingEnabled": true
+    "webContentsDebuggingEnabled": false
   },
   "server": {
-    "url": "https://mushiqr-pro.vercel.app/",
-    "androidScheme": "https",
-    "cleartext": true
+    "androidScheme": "https"
   }
 }

@@ -23,7 +23,6 @@ import { usePremium } from '../services/premiumContext';
 // Modular Subcomponents
 import BarcodeFormatSelector from './barcode/BarcodeFormatSelector';
 import BarcodePreviewCard from './barcode/BarcodePreviewCard';
-import BarcodeContentTab from './barcode/BarcodeContentTab';
 import BarcodeColorsTab from './barcode/BarcodeColorsTab';
 import BarcodeDimensionsTab from './barcode/BarcodeDimensionsTab';
 import BarcodeStyleTab from './barcode/BarcodeStyleTab';
@@ -64,7 +63,11 @@ export default function BarcodePage({
   setLoadedBarcodeItem,
   theme,
   setTheme,
-  effectiveTheme
+  effectiveTheme,
+  activeBatchItemIndex,
+  batchItems,
+  setBatchItems,
+  setActiveBatchItemIndex
 }) {
   const { showPaywall } = usePremium();
   const [, setFamTick] = useState(0);
@@ -237,6 +240,11 @@ export default function BarcodePage({
     setHistory([initial]);
     setHistoryIndex(0);
   }, []);
+
+  const getSnapshot = () => ({
+    text, bcid, barColor, bgColor, isTransparentBg, barWidth, height, margin,
+    displayValue, textPosition, textAlign, textFont, hasBorder, borderWidth
+  });
 
   const updateStateAndHistory = (updates) => {
     const cur = {
@@ -514,21 +522,19 @@ export default function BarcodePage({
         background: 'var(--bg-card, #FFFFFF)',
         borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.06))',
         padding: '0 16px',
-        height: 56,
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        height: 'var(--header-height, calc(56px + env(safe-area-inset-top, 0px)))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexShrink: 0
       }}>
         {/* Left: App Logo & Undo/Redo Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="app-logo" style={{ display: 'flex', alignItems: 'center' }}>
           <div onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            <AppIcon size={38} noBackground />
+            <AppIcon size={46} noBackground />
           </div>
-          <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary, #1C1C1E)', letterSpacing: '-0.3px', marginLeft: 4 }}>
-            Barcode Generator
-          </span>
-          <div style={{ display: 'flex', gap: 6, marginLeft: 8 }}>
+          <div style={{ display: 'flex', gap: '8px', marginLeft: '12px' }}>
             <button onClick={undo} disabled={historyIndex <= 0} title="Undo" style={undoRedoStyle(historyIndex <= 0)}>
               <Undo2 size={16} strokeWidth={2.5} />
             </button>
@@ -540,28 +546,85 @@ export default function BarcodePage({
 
         {/* Right Header Actions: Save/Export Split Button & Info/Menu */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {/* Info Icon */}
-          <button
-            onClick={() => setIsInfoModalOpen(true)}
-            title="Symbology Information"
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-              background: 'var(--bg-hover, rgba(0,0,0,0.04))',
-              color: 'var(--text-secondary, #636366)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-          >
-            <Info size={18} />
-          </button>
-
-          {/* Export Split Button */}
-          <div style={{ position: 'relative' }}>
+          
+          {activeBatchItemIndex !== null && activeBatchItemIndex !== undefined ? (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={() => {
+                  const currentStyle = getSnapshot();
+                  const updated = batchItems.map(item => ({
+                    ...item,
+                    style: currentStyle
+                  }));
+                  if (setBatchItems) setBatchItems(updated);
+                  if (setActiveBatchItemIndex) setActiveBatchItemIndex(null);
+                  if (onNavigate) onNavigate('batch', 'BARCODE');
+                }}
+                style={{
+                  background: 'linear-gradient(135deg, #D6003D 0%, #FF2E63 100%)',
+                  border: 'none',
+                  color: 'white',
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                Apply to All
+              </button>
+              <button 
+                onClick={() => {
+                  if (batchItems && setBatchItems) {
+                    const updated = [...batchItems];
+                    updated[activeBatchItemIndex] = {
+                      ...updated[activeBatchItemIndex],
+                      style: getSnapshot()
+                    };
+                    setBatchItems(updated);
+                  }
+                  if (setActiveBatchItemIndex) setActiveBatchItemIndex(null);
+                  if (onNavigate) onNavigate('batch', 'BARCODE');
+                }}
+                style={{
+                  background: 'var(--bg-hover, #F2F2F7)',
+                  border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                  color: 'var(--text-primary, #1C1C1E)',
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                This Only
+              </button>
+              <button 
+                onClick={() => {
+                  if (setActiveBatchItemIndex) setActiveBatchItemIndex(null);
+                  if (onNavigate) onNavigate('batch', 'BARCODE');
+                }}
+                style={{
+                  background: 'var(--bg-hover, rgba(0,0,0,0.04))',
+                  border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                  color: 'var(--text-secondary, #8E8E93)',
+                  width: 32,
+                  height: 32,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '10px',
+                  cursor: 'pointer'
+                }}
+                title="Cancel"
+              >
+                <X size={16} strokeWidth={2.5} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ position: 'relative' }}>
             <div
               className={`save-split-header-btn ${!isDataValid ? 'disabled' : ''} ${formatDropdownOpen ? 'active' : ''}`}
               style={{
@@ -683,75 +746,6 @@ export default function BarcodePage({
 
                 <div style={{ height: 1, background: 'var(--border-color, rgba(0,0,0,0.06))', margin: '12px 0' }} />
 
-                {/* Export Quality Section */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-tertiary, #8E8E93)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
-                      Export Quality
-                    </div>
-                    <span style={{ 
-                      fontSize: '10px', 
-                      fontWeight: 800, 
-                      color: 'var(--accent-primary, #D6003D)',
-                      background: 'rgba(214, 0, 61, 0.08)',
-                      padding: '2px 8px',
-                      borderRadius: '6px',
-                      letterSpacing: '0.4px'
-                    }}>
-                      {exportQuality === 'Low' && '512px'}
-                      {exportQuality === 'Medium' && '1024px'}
-                      {exportQuality === 'High' && '2048px'}
-                      {exportQuality === 'Ultra' && '4096px'}
-                    </span>
-                  </div>
-                  <div style={{ padding: '0 4px', marginTop: 8, marginBottom: 8 }}>
-                    <input
-                      type="range"
-                      min="0"
-                      max="3"
-                      step="1"
-                      value={['Low', 'Medium', 'High', 'Ultra'].indexOf(exportQuality)}
-                      onChange={(e) => {
-                        const steps = ['Low', 'Medium', 'High', 'Ultra'];
-                        const featMap = {
-                          'Low': 'export_quality_low',
-                          'Medium': 'export_quality_medium',
-                          'High': 'export_quality_hd',
-                          'Ultra': 'export_quality_ultra'
-                        };
-                        const selected = steps[parseInt(e.target.value)] || 'High';
-                        const targetFeat = featMap[selected];
-                        if (targetFeat) {
-                          const check = FeatureAccessManager.canUseFeature(targetFeat);
-                          if (!check.allowed) {
-                            showPaywall(targetFeat);
-                            return;
-                          }
-                        }
-                        setExportQuality(selected);
-                      }}
-                      className="export-quality-slider"
-                      style={{ width: '100%', cursor: 'pointer' }}
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 9, fontWeight: 600, color: 'var(--text-muted, #8E8E93)' }}>
-                      <span style={{ position: 'relative' }}>
-                        Low <PaidCrownBadge featureId="export_quality_low" position="floating" size={7} />
-                      </span>
-                      <span style={{ position: 'relative' }}>
-                        Normal <PaidCrownBadge featureId="export_quality_medium" position="floating" size={7} />
-                      </span>
-                      <span style={{ position: 'relative' }}>
-                        HD <PaidCrownBadge featureId="export_quality_hd" position="floating" size={7} />
-                      </span>
-                      <span style={{ position: 'relative' }}>
-                        4K <PaidCrownBadge featureId="export_quality_ultra" position="floating" size={7} />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ height: 1, background: 'var(--border-color, rgba(0,0,0,0.06))', margin: '12px 0' }} />
-
                 {/* Transparent Background Option */}
                 <div style={{
                   display: 'flex',
@@ -832,10 +826,12 @@ export default function BarcodePage({
               </div>
             )}
           </div>
+          )}
 
           {/* Navigation Menu Toggle */}
-          <div style={{ position: 'relative' }}>
-            <button
+          {!(activeBatchItemIndex !== null && activeBatchItemIndex !== undefined) && (
+            <div style={{ position: 'relative' }}>
+              <button
               className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Menu"
@@ -882,7 +878,8 @@ export default function BarcodePage({
                 </button>
               </div>
             )}
-          </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -981,74 +978,9 @@ export default function BarcodePage({
           <span>Label Sheet</span>
         </button>
 
-        {/* Batch Generator Entry Point */}
-        <button
-          onClick={() => onNavigate && onNavigate('batch', { defaultType: 'BARCODE' })}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '7px 12px',
-            borderRadius: 20,
-            border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-            background: 'var(--bg-card, #FFFFFF)',
-            color: 'var(--text-primary, #1C1C1E)',
-            fontSize: 11,
-            fontWeight: 700,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-          }}
-        >
-          <Layers size={14} color="#0055FF" />
-          <span>Batch Generator</span>
-        </button>
 
-        {/* Duplicate & Edit */}
-        <button
-          onClick={handleDuplicateAndEdit}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '7px 12px',
-            borderRadius: 20,
-            border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-            background: 'var(--bg-card, #FFFFFF)',
-            color: 'var(--text-primary, #1C1C1E)',
-            fontSize: 11,
-            fontWeight: 700,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-          }}
-        >
-          <Copy size={14} color="var(--text-secondary, #636366)" />
-          <span>Duplicate & Edit</span>
-        </button>
 
-        {/* History */}
-        <button
-          onClick={() => setIsHistoryOpen(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '7px 12px',
-            borderRadius: 20,
-            border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-            background: 'var(--bg-card, #FFFFFF)',
-            color: 'var(--text-primary, #1C1C1E)',
-            fontSize: 11,
-            fontWeight: 700,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-          }}
-        >
-          <HistoryIcon size={14} color="var(--text-secondary, #636366)" />
-          <span>History</span>
-        </button>
+
       </div>
 
       {/* ── SCROLLABLE BODY CONTENT ── */}
@@ -1063,44 +995,24 @@ export default function BarcodePage({
         width: '100%'
       }}>
         <div style={{ maxWidth: 480, width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* TAB 1: BARCODE CONTENT & FORMAT SELECTION */}
+          {/* TAB 1: FORMAT SELECTION & CONTENT */}
           {activeTab === 'content' && (
-            <>
-              {/* Content Input, GS1 Auto-check digit & Modulo breakdown */}
-              <BarcodeContentTab
-                bcid={bcid}
-                text={text}
-                onChangeText={(val) => updateStateAndHistory({ text: val })}
-                currentStandard={currentStandard}
-                spec={spec}
-                autoCheckDigit={autoCheckDigit}
-                onToggleAutoCheckDigit={() => setAutoCheckDigit(!autoCheckDigit)}
-                onOpenDataModal={() => {
-                  const fields = parseValueToFields(text, bcid);
-                  setModalInitialFields(fields);
-                  setPendingBcid(bcid);
-                  setIsDataModalOpen(true);
-                }}
-              />
-
-              <div style={{ height: 1, background: 'var(--border-color, rgba(0,0,0,0.06))', margin: '4px 0' }} />
-
-              {/* Format Selection Card */}
-              <div>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #636366)', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: 8 }}>
-                  SELECT BARCODE FORMAT
-                </label>
-                <BarcodeFormatSelector
-                  selectedBcid={bcid}
-                  onSelectFormat={handleSelectFormat}
-                  onOpenInfo={(targetId) => {
-                    setPendingBcid(targetId);
-                    setIsInfoModalOpen(true);
-                  }}
-                  showPaywall={showPaywall}
-                />
-              </div>
-            </>
+            <BarcodeFormatSelector
+              selectedBcid={bcid}
+              onSelectFormat={handleSelectFormat}
+              onOpenInfo={(targetId) => {
+                setPendingBcid(targetId);
+                setIsInfoModalOpen(true);
+              }}
+              onOpenDataModal={(targetId) => {
+                const targetText = targetId === bcid ? text : '';
+                const fields = parseValueToFields(targetText, targetId);
+                setModalInitialFields(fields);
+                setPendingBcid(targetId);
+                setIsDataModalOpen(true);
+              }}
+              showPaywall={showPaywall}
+            />
           )}
 
           {/* TAB 2: COLORS */}

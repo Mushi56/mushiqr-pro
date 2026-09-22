@@ -16,9 +16,9 @@ export default function BarcodeLabelModal({
 }) {
   if (!isOpen) return null;
 
-  const [productName, setProductName] = useState('Mushi Water 500ml');
-  const [sku, setSku] = useState('MWS500');
-  const [price, setPrice] = useState('RM 2.50');
+  const [productName, setProductName] = useState('');
+  const [sku, setSku] = useState('');
+  const [price, setPrice] = useState('');
   const [paper, setPaper] = useState('a4'); // 'a4' | 'a5' | 'letter'
   const [copies, setCopies] = useState(12); // Number of labels to generate on sheet
   const [isGenerating, setIsGenerating] = useState(false);
@@ -219,12 +219,12 @@ export default function BarcodeLabelModal({
                 boxSizing: 'border-box',
                 height: 40,
                 borderRadius: 12,
-                border: '1px solid var(--border-color, rgba(0,0,0,0.1))',
+                border: '1px solid var(--border-color, rgba(0,0,0,0.15))',
                 padding: '0 12px',
                 fontSize: 13,
                 fontWeight: 600,
                 color: 'var(--text-primary, #1C1C1E)',
-                background: 'var(--bg-input, #FFFFFF)'
+                background: 'var(--bg-hover, rgba(0,0,0,0.04))'
               }}
             />
           </div>
@@ -244,12 +244,12 @@ export default function BarcodeLabelModal({
                   boxSizing: 'border-box',
                   height: 40,
                   borderRadius: 12,
-                  border: '1px solid var(--border-color, rgba(0,0,0,0.1))',
+                  border: '1px solid var(--border-color, rgba(0,0,0,0.15))',
                   padding: '0 12px',
                   fontSize: 13,
                   fontWeight: 600,
                   color: 'var(--text-primary, #1C1C1E)',
-                  background: 'var(--bg-input, #FFFFFF)'
+                  background: 'var(--bg-hover, rgba(0,0,0,0.04))'
                 }}
               />
             </div>
@@ -267,12 +267,12 @@ export default function BarcodeLabelModal({
                   boxSizing: 'border-box',
                   height: 40,
                   borderRadius: 12,
-                  border: '1px solid var(--border-color, rgba(0,0,0,0.1))',
+                  border: '1px solid var(--border-color, rgba(0,0,0,0.15))',
                   padding: '0 12px',
                   fontSize: 13,
                   fontWeight: 600,
                   color: 'var(--text-primary, #1C1C1E)',
-                  background: 'var(--bg-input, #FFFFFF)'
+                  background: 'var(--bg-hover, rgba(0,0,0,0.04))'
                 }}
               />
             </div>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlignLeft, AlignCenter, AlignRight, Type, Square, LayoutTemplate } from 'lucide-react';
+import { BARCODE_STANDARDS } from '../../utils/barcodeEngine';
 
 export default function BarcodeStyleTab({
   bcid,
@@ -12,12 +13,14 @@ export default function BarcodeStyleTab({
   decorativeMargin,
   onChangeStyle
 }) {
-  const isMaxicode = bcid === 'maxicode';
+  const isRetail = ['ean13', 'ean8', 'upca', 'upce'].includes(bcid);
+  const currentStandard = BARCODE_STANDARDS[bcid] || BARCODE_STANDARDS.ean13;
+  const is2D = currentStandard.category?.startsWith('2d');
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* ── TEXT LABEL OPTIONS ── */}
-      {!isMaxicode && (
+      {!is2D && (
         <div style={{
           background: 'var(--bg-card, #FFFFFF)',
           borderRadius: 18,
@@ -75,22 +78,17 @@ export default function BarcodeStyleTab({
                 <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #636366)', textTransform: 'uppercase' }}>
                   Position
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                   {[
                     { id: 'below', label: 'Below' },
-                    { id: 'above', label: 'Above' },
-                    { id: 'hidden', label: 'Hidden' }
+                    { id: 'above', label: 'Above' }
                   ].map(pos => {
                     const isSelected = textPosition === pos.id;
                     return (
                       <button
                         key={pos.id}
                         onClick={() => {
-                          if (pos.id === 'hidden') {
-                            onChangeStyle({ textPosition: 'hidden', displayValue: false });
-                          } else {
-                            onChangeStyle({ textPosition: pos.id, displayValue: true });
-                          }
+                          onChangeStyle({ textPosition: pos.id, displayValue: true });
                         }}
                         style={{
                           padding: '8px 10px',
@@ -111,80 +109,46 @@ export default function BarcodeStyleTab({
                 </div>
               </div>
 
-              {/* Text Alignment: Center / Left / Right */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #636366)', textTransform: 'uppercase' }}>
-                  Alignment
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                  {[
-                    { id: 'center', label: 'Center', Icon: AlignCenter },
-                    { id: 'left', label: 'Left', Icon: AlignLeft },
-                    { id: 'right', label: 'Right', Icon: AlignRight }
-                  ].map(align => {
-                    const isSelected = textAlign === align.id;
-                    return (
-                      <button
-                        key={align.id}
-                        onClick={() => onChangeStyle({ textAlign: align.id })}
-                        style={{
-                          padding: '8px 10px',
-                          borderRadius: 12,
-                          border: isSelected ? '2px solid var(--accent-primary, #D6003D)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
-                          background: isSelected ? 'rgba(214, 0, 61, 0.06)' : 'var(--bg-elevated, #FFFFFF)',
-                          color: isSelected ? 'var(--accent-primary, #D6003D)' : 'var(--text-primary, #1C1C1E)',
-                          fontWeight: isSelected ? 700 : 600,
-                          fontSize: 12,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: 6,
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        <align.Icon size={14} />
-                        <span>{align.label}</span>
-                      </button>
-                    );
-                  })}
+              {!isRetail && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 6 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #636366)', textTransform: 'uppercase' }}>
+                    Alignment
+                  </label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                    {[
+                      { id: 'center', label: 'Center', Icon: AlignCenter },
+                      { id: 'left', label: 'Left', Icon: AlignLeft },
+                      { id: 'right', label: 'Right', Icon: AlignRight }
+                    ].map(align => {
+                      const isSelected = textAlign === align.id;
+                      return (
+                        <button
+                          key={align.id}
+                          onClick={() => onChangeStyle({ textAlign: align.id })}
+                          style={{
+                            padding: '8px 10px',
+                            borderRadius: 12,
+                            border: isSelected ? '2px solid var(--accent-primary, #D6003D)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                            background: isSelected ? 'rgba(214, 0, 61, 0.06)' : 'var(--bg-elevated, #FFFFFF)',
+                            color: isSelected ? 'var(--accent-primary, #D6003D)' : 'var(--text-primary, #1C1C1E)',
+                            fontWeight: isSelected ? 700 : 600,
+                            fontSize: 12,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 6,
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <align.Icon size={14} />
+                          <span>{align.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-
-              {/* Font: OCR-B / Sans / Monospace */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #636366)', textTransform: 'uppercase' }}>
-                  Font Symbology
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                  {[
-                    { id: 'ocrb', label: 'OCR-B' },
-                    { id: 'sans', label: 'Sans' },
-                    { id: 'monospace', label: 'Mono' }
-                  ].map(font => {
-                    const isSelected = textFont === font.id;
-                    return (
-                      <button
-                        key={font.id}
-                        onClick={() => onChangeStyle({ textFont: font.id })}
-                        style={{
-                          padding: '8px 10px',
-                          borderRadius: 12,
-                          border: isSelected ? '2px solid var(--accent-primary, #D6003D)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
-                          background: isSelected ? 'rgba(214, 0, 61, 0.06)' : 'var(--bg-elevated, #FFFFFF)',
-                          color: isSelected ? 'var(--accent-primary, #D6003D)' : 'var(--text-primary, #1C1C1E)',
-                          fontWeight: isSelected ? 700 : 600,
-                          fontSize: 12,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        {font.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              )}
             </>
           )}
         </div>
