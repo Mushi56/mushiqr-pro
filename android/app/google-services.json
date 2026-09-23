@@ -68,6 +68,14 @@
           }
         },
         {
+          "client_id": "1068457009199-u4n7kuvl7230p1r7ccqvqd0rstrvci3l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "e3799716e59e2be0d91a2b13882ac57e3b74efa9"
+          }
+        },
+        {
           "client_id": "1068457009199-eo7h1ni9ps5sre8bfg742c3eol2alslb.apps.googleusercontent.com",
           "client_type": 3
         }
