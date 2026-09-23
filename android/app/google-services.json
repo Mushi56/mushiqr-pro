@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1068457009199-bvijburf4e6n1j9n3h8lp617nv4ui2u7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.admin",
+            "certificate_hash": "e058ddbae62c63ffc2d1f81b0383d178cd7c59cf"
+          }
+        },
+        {
           "client_id": "1068457009199-eo7h1ni9ps5sre8bfg742c3eol2alslb.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -49,6 +57,14 @@
           "android_info": {
             "package_name": "com.mushiqr.pro",
             "certificate_hash": "e058ddbae62c63ffc2d1f81b0383d178cd7c59cf"
+          }
+        },
+        {
+          "client_id": "1068457009199-bf2d7c177t0s7smf3s5s606anunndk2l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "5ac268d4982577ef64c810b754a0996870277f8c"
           }
         },
         {
