@@ -697,7 +697,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         const errListener = await NativeScanner.addListener('cameraError', (res) => {
           setError(res.error || 'Camera Error'); setStatus('ERROR');
         });
-        listenersRef.current.push(scanListener, errListener);
+        const zoomListener = await NativeScanner.addListener('zoomChanged', (res) => {
+          setZoom(res.ratio);
+        });
+        listenersRef.current.push(scanListener, errListener, zoomListener);
 
         const viewport = document.getElementById('qr-scanner-viewport');
         let bounds = {};
@@ -719,7 +722,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           const caps = await NativeScanner.getZoomCapabilities();
           if (caps && caps.max > 1) {
             setHasHardwareZoom(true);
-            setZoomCapabilities({ min: caps.min || 1, max: caps.max || 10, step: 0.1 });
+            setZoomCapabilities({ min: caps.min || 1, max: caps.max, step: 0.1 });
             setZoom(caps.current || 1);
           } else {
             setHasHardwareZoom(false);

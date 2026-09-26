@@ -20,10 +20,15 @@ import androidx.camera.core.MeteringPoint;
 import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.core.UseCaseGroup;
+import androidx.camera.core.ViewPort;
+import android.util.Rational;
+import android.view.Surface;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
-
+import androidx.camera.core.resolutionselector.ResolutionSelector;
+import androidx.camera.core.resolutionselector.AspectRatioStrategy;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
@@ -57,6 +62,7 @@ public class NativeScanner {
     public interface ScanListener {
         void onScanResult(JSONObject result);
         void onError(String error);
+        void onZoomChanged(float ratio);
     }
     
     private ScanListener scanListener;
@@ -135,16 +141,58 @@ public class NativeScanner {
                 .requireLensFacing(lensFacing)
                 .build();
 
-        Preview preview = new Preview.Builder().build();
+        ResolutionSelector resolutionSelector = new ResolutionSelector.Builder()
+                .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+                .build();
+        Log.d(TAG, "Configuring ResolutionSelector with RATIO_4_3_FALLBACK_AUTO_STRATEGY");
+
+        Preview preview = new Preview.Builder()
+                .setResolutionSelector(resolutionSelector)
+                .build();
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                .setResolutionSelector(resolutionSelector)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build();
 
         imageAnalysis.setAnalyzer(cameraExecutor, this::analyzeImage);
 
-        camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis);
+        Rational aspectRatio;
+        int width = containerView.getLayoutParams().width;
+        int height = containerView.getLayoutParams().height;
+        if (width > 0 && height > 0) {
+            aspectRatio = new Rational(width, height);
+            Log.d(TAG, "Creating ViewPort with aspect ratio from container bounds: " + width + "x" + height);
+        } else {
+            aspectRatio = new Rational(3, 4);
+            Log.d(TAG, "Creating ViewPort with fallback portrait 3:4 aspect ratio");
+        }
+
+        int rotation = previewView.getDisplay() != null ? previewView.getDisplay().getRotation() : Surface.ROTATION_0;
+
+        ViewPort viewPort = new ViewPort.Builder(aspectRatio, rotation)
+                .setScaleType(ViewPort.FILL_CENTER)
+                .build();
+
+        UseCaseGroup useCaseGroup = new UseCaseGroup.Builder()
+                .addUseCase(preview)
+                .addUseCase(imageAnalysis)
+                .setViewPort(viewPort)
+                .build();
+
+        try {
+            camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup);
+            Log.d(TAG, "Camera bound to lifecycle with UseCaseGroup and ViewPort.");
+            
+            camera.getCameraInfo().getZoomState().observe(lifecycleOwner, zoomState -> {
+                if (scanListener != null && zoomState != null) {
+                    scanListener.onZoomChanged(zoomState.getZoomRatio());
+                }
+            });
+        } catch(Exception e) {
+            Log.e(TAG, "Use case binding failed", e);
+        }
     }
 
     private ZoomSuggestionOptions.ZoomCallback zoomCallback = zoomRatio -> {
@@ -204,6 +252,7 @@ public class NativeScanner {
         
         isScanning = false;
         camera = null;
+        Log.d(TAG, "Scanner stopped and resources released.");
     }
 
     public void setZoom(float ratio) {
@@ -217,9 +266,13 @@ public class NativeScanner {
         try {
             if (camera != null) {
                 CameraInfo info = camera.getCameraInfo();
-                result.put("min", info.getZoomState().getValue().getMinZoomRatio());
-                result.put("max", info.getZoomState().getValue().getMaxZoomRatio());
-                result.put("current", info.getZoomState().getValue().getZoomRatio());
+                float minZoom = info.getZoomState().getValue().getMinZoomRatio();
+                float maxZoom = info.getZoomState().getValue().getMaxZoomRatio();
+                float currentZoom = info.getZoomState().getValue().getZoomRatio();
+                result.put("min", minZoom);
+                result.put("max", maxZoom);
+                result.put("current", currentZoom);
+                Log.d(TAG, "Zoom capabilities - Min: " + minZoom + ", Max: " + maxZoom + ", Current: " + currentZoom);
             }
         } catch (Exception e) {
             Log.e(TAG, "Error getting zoom capabilities", e);
@@ -235,12 +288,15 @@ public class NativeScanner {
 
     public void focus(float x, float y) {
         if (camera != null && previewView != null) {
+            float pxX = x * previewView.getWidth();
+            float pxY = y * previewView.getHeight();
             MeteringPointFactory factory = previewView.getMeteringPointFactory();
-            MeteringPoint point = factory.createPoint(x, y);
+            MeteringPoint point = factory.createPoint(pxX, pxY);
             FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
                     .setAutoCancelDuration(3, java.util.concurrent.TimeUnit.SECONDS)
                     .build();
             camera.getCameraControl().startFocusAndMetering(action);
+            Log.d(TAG, "Triggered tap to focus at normalized " + x + ", " + y + " -> pixels " + pxX + ", " + pxY);
         }
     }
 

@@ -51,6 +51,13 @@ public class NativeScannerPlugin extends Plugin {
                 ret.put("error", error);
                 notifyListeners("cameraError", ret);
             }
+
+            @Override
+            public void onZoomChanged(float ratio) {
+                JSObject ret = new JSObject();
+                ret.put("ratio", ratio);
+                notifyListeners("zoomChanged", ret);
+            }
         });
     }
 
