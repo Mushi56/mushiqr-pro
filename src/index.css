@@ -5035,8 +5035,8 @@ input[type="range"]::-moz-range-thumb {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #0B0F19;
-  /* Always dark background for camera */
+  background: var(--nav-bg, #111625);
+  /* Matching indigo dark background */
   z-index: 8000; /* Stacks above app-header (z-index 6000) */
   display: flex;
   flex-direction: column;
@@ -5054,27 +5054,44 @@ input[type="range"]::-moz-range-thumb {
   justify-content: space-between !important;
   padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
   box-sizing: border-box !important;
-  background: #FFFFFF !important;
-  background-color: #FFFFFF !important;
+  background: var(--nav-bg, #111625) !important;
+  background-color: var(--nav-bg, #111625) !important;
   opacity: 1 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
-  color: #111827 !important;
+  color: var(--text-primary, #FFFFFF) !important;
   position: relative !important;
   z-index: 100 !important;
   flex-shrink: 0 !important;
   width: 100% !important;
 }
 
-.scanner-page .scanner-upper-navbar .app-logo-text {
+[data-theme="light"] .scanner-page .scanner-upper-navbar,
+[data-theme="light"] .scanner-upper-navbar {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
   color: #111827 !important;
+}
+
+.scanner-page .scanner-upper-navbar .app-logo-text {
+  color: var(--text-primary, #FFFFFF) !important;
   font-weight: 800 !important;
 }
 
+[data-theme="light"] .scanner-page .scanner-upper-navbar .app-logo-text {
+  color: #111827 !important;
+}
+
 .scanner-page .scanner-upper-navbar .btn-menu-toggle {
+  color: var(--text-primary, #FFFFFF) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="light"] .scanner-page .scanner-upper-navbar .btn-menu-toggle {
   color: #111827 !important;
   background: rgba(0, 0, 0, 0.06) !important;
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
@@ -6279,6 +6296,32 @@ video {
   /* Laser sweep uses this to fill the frame without top layout */
   --laser-sweep-distance: 100cqh;
   container-type: size;
+}
+
+/* ── Native CameraX Transparency Through WebView ── */
+body.scanner-active,
+body.scanner-active html,
+body.scanner-active #root,
+body.scanner-active .app,
+body.scanner-active .scanner-page,
+body.scanner-active .qrs,
+body.scanner-active .qrs-body,
+body.scanner-active .qrs-frame,
+body.scanner-active .qrs-viewport {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+body.scanner-active .scanner-upper-navbar {
+  background: var(--nav-bg, #111625) !important;
+  background-color: var(--nav-bg, #111625) !important;
+  color: var(--text-primary, #FFFFFF) !important;
+}
+
+[data-theme="light"] body.scanner-active .scanner-upper-navbar {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
 }
 
 .qrs-viewport {

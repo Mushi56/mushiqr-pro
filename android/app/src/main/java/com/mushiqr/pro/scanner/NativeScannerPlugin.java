@@ -1,6 +1,8 @@
 package com.mushiqr.pro.scanner;
 
 import android.graphics.Color;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -23,6 +25,8 @@ import com.getcapacitor.annotation.PermissionCallback;
 )
 public class NativeScannerPlugin extends Plugin {
 
+    private static final String TAG = "MushiCamera";
+
     private NativeScanner nativeScanner;
     private FrameLayout containerView;
 
@@ -32,7 +36,10 @@ public class NativeScannerPlugin extends Plugin {
         containerView.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        
+        // Ensure container is visible
+        containerView.setVisibility(View.VISIBLE);
+        containerView.setAlpha(1f);
+
         nativeScanner = new NativeScanner(getContext(), getActivity(), containerView);
         nativeScanner.setScanListener(new NativeScanner.ScanListener() {
             @Override
@@ -41,7 +48,7 @@ public class NativeScannerPlugin extends Plugin {
                     JSObject ret = JSObject.fromJSONObject(result);
                     notifyListeners("scanResult", ret);
                 } catch (org.json.JSONException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "Failed to convert scan result to JSObject", e);
                 }
             }
 
@@ -57,6 +64,16 @@ public class NativeScannerPlugin extends Plugin {
                 JSObject ret = new JSObject();
                 ret.put("ratio", ratio);
                 notifyListeners("zoomChanged", ret);
+            }
+
+            @Override
+            public void onCameraReady(org.json.JSONObject info) {
+                try {
+                    JSObject ret = JSObject.fromJSONObject(info);
+                    notifyListeners("cameraReady", ret);
+                } catch (org.json.JSONException e) {
+                    notifyListeners("cameraReady", new JSObject());
+                }
             }
         });
     }
@@ -75,7 +92,7 @@ public class NativeScannerPlugin extends Plugin {
         if (getPermissionState("camera") == com.getcapacitor.PermissionState.GRANTED) {
             startCamera(call);
         } else {
-            call.reject("Permission is required to take a picture");
+            call.reject("Camera permission denied. Please allow camera access in Settings.");
         }
     }
 
@@ -87,28 +104,96 @@ public class NativeScannerPlugin extends Plugin {
             Integer height = call.getInt("height");
 
             float density = getActivity().getResources().getDisplayMetrics().density;
+
+            // Convert CSS coordinates to physical pixels
+            // Account for WebView position on screen
+            int[] webViewLoc = new int[2];
+            bridge.getWebView().getLocationOnScreen(webViewLoc);
+
             int pxX = x != null ? Math.round(x * density) : 0;
             int pxY = y != null ? Math.round(y * density) : 0;
-            int pxW = width != null ? Math.round(width * density) : ViewGroup.LayoutParams.MATCH_PARENT;
-            int pxH = height != null ? Math.round(height * density) : ViewGroup.LayoutParams.MATCH_PARENT;
+            int pxW = (width != null && width > 0) ? Math.round(width * density) : ViewGroup.LayoutParams.MATCH_PARENT;
+            int pxH = (height != null && height > 0) ? Math.round(height * density) : ViewGroup.LayoutParams.MATCH_PARENT;
 
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(pxW, pxH);
-            params.leftMargin = pxX;
-            params.topMargin = pxY;
+            Log.d(TAG, "PLUGIN_START_CAMERA:");
+            Log.d(TAG, "  CSS_BOUNDS: x=" + x + " y=" + y + " w=" + width + " h=" + height);
+            Log.d(TAG, "  DENSITY: " + density);
+            Log.d(TAG, "  PX_BOUNDS: x=" + pxX + " y=" + pxY + " w=" + pxW + " h=" + pxH);
+            Log.d(TAG, "  WEBVIEW_SCREEN_LOC: x=" + webViewLoc[0] + " y=" + webViewLoc[1]);
+            Log.d(TAG, "  WEBVIEW_SIZE: w=" + bridge.getWebView().getWidth() + " h=" + bridge.getWebView().getHeight());
+
+            ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
+
+            // Set layout params according to parent ViewGroup type
+            ViewGroup.LayoutParams params;
+            if (parent instanceof androidx.coordinatorlayout.widget.CoordinatorLayout) {
+                androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams cParams =
+                        new androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams(pxW, pxH);
+                cParams.leftMargin = pxX;
+                cParams.topMargin = pxY;
+                params = cParams;
+            } else if (parent instanceof FrameLayout) {
+                FrameLayout.LayoutParams fParams = new FrameLayout.LayoutParams(pxW, pxH);
+                fParams.leftMargin = pxX;
+                fParams.topMargin = pxY;
+                params = fParams;
+            } else {
+                ViewGroup.MarginLayoutParams mParams = new ViewGroup.MarginLayoutParams(pxW, pxH);
+                mParams.leftMargin = pxX;
+                mParams.topMargin = pxY;
+                params = mParams;
+            }
             containerView.setLayoutParams(params);
 
+            // Make WebView transparent so native camera shows through
             bridge.getWebView().setBackgroundColor(Color.TRANSPARENT);
-            ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
-            if (containerView.getParent() == null) {
-                parent.addView(containerView, 0); // Add behind webview
+
+            // Set parent background to matching indigo camera dark
+            if (parent != null) {
+                parent.setBackgroundColor(Color.parseColor("#111625"));
             }
-            
+
+            // Add container behind WebView
+            if (containerView.getParent() != null) {
+                ((ViewGroup) containerView.getParent()).removeView(containerView);
+            }
+            if (parent != null) {
+                parent.addView(containerView, 0); // Index 0 = behind WebView
+            }
+
+            // Verify container is positioned correctly
+            containerView.post(() -> {
+                int[] containerLoc = new int[2];
+                containerView.getLocationOnScreen(containerLoc);
+                Log.d(TAG, "  CONTAINER_SCREEN_LOC: x=" + containerLoc[0] + " y=" + containerLoc[1]);
+                Log.d(TAG, "  CONTAINER_SIZE: w=" + containerView.getWidth() + " h=" + containerView.getHeight());
+                Log.d(TAG, "  CONTAINER_VISIBLE: " + (containerView.getVisibility() == View.VISIBLE));
+                Log.d(TAG, "  CONTAINER_ALPHA: " + containerView.getAlpha());
+            });
+
             nativeScanner.startScanner(
+                    // onReady
                     () -> {
-                        notifyListeners("cameraReady", new JSObject());
-                        call.resolve();
+                        JSObject ret = new JSObject();
+                        ret.put("started", true);
+                        ret.put("flashSupported", nativeScanner.hasFlash());
+                        call.resolve(ret);
                     },
-                    () -> call.reject("Failed to start camera")
+                    // onError
+                    (String errorMsg) -> {
+                        Log.e(TAG, "PLUGIN: Camera startup failed: " + errorMsg);
+                        // Remove container from parent on failure
+                        getActivity().runOnUiThread(() -> {
+                            bridge.getWebView().setBackgroundColor(Color.WHITE);
+                            if (parent != null) {
+                                parent.setBackgroundColor(Color.TRANSPARENT);
+                            }
+                            if (containerView.getParent() != null) {
+                                ((ViewGroup) containerView.getParent()).removeView(containerView);
+                            }
+                        });
+                        call.reject("Camera startup failed: " + errorMsg);
+                    }
             );
         });
     }
@@ -119,8 +204,11 @@ public class NativeScannerPlugin extends Plugin {
             nativeScanner.stopScanner();
             bridge.getWebView().setBackgroundColor(Color.WHITE);
             ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
+            if (parent != null) {
+                parent.setBackgroundColor(Color.TRANSPARENT);
+            }
             if (containerView.getParent() != null) {
-                parent.removeView(containerView);
+                ((ViewGroup) containerView.getParent()).removeView(containerView);
             }
             call.resolve();
         });
@@ -130,7 +218,7 @@ public class NativeScannerPlugin extends Plugin {
     public void setZoom(PluginCall call) {
         Float ratio = call.getFloat("ratio");
         if (ratio != null) {
-            nativeScanner.setZoom(ratio);
+            getActivity().runOnUiThread(() -> nativeScanner.setZoom(ratio));
         }
         call.resolve();
     }
@@ -149,7 +237,7 @@ public class NativeScannerPlugin extends Plugin {
     public void setTorch(PluginCall call) {
         Boolean enabled = call.getBoolean("enabled");
         if (enabled != null) {
-            nativeScanner.setTorch(enabled);
+            getActivity().runOnUiThread(() -> nativeScanner.setTorch(enabled));
         }
         call.resolve();
     }
@@ -159,14 +247,18 @@ public class NativeScannerPlugin extends Plugin {
         Float x = call.getFloat("x");
         Float y = call.getFloat("y");
         if (x != null && y != null) {
-            nativeScanner.focus(x, y);
+            getActivity().runOnUiThread(() -> nativeScanner.focus(x, y));
         }
         call.resolve();
     }
 
     @PluginMethod
     public void switchCamera(PluginCall call) {
-        nativeScanner.switchCamera();
-        call.resolve();
+        getActivity().runOnUiThread(() -> {
+            nativeScanner.switchCamera(
+                    () -> call.resolve(),
+                    (String errorMsg) -> call.reject("Switch camera failed: " + errorMsg)
+            );
+        });
     }
 }

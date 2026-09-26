@@ -488,7 +488,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     if (zoomCapabilities) {
       val = Math.min(Math.max(newVal, zoomCapabilities.min), zoomCapabilities.max);
     } else {
-      val = Math.min(Math.max(newVal, 1), 4);
+      val = Math.min(Math.max(newVal, 1), 10);
     }
     applyZoom(val);
     if (Capacitor.isNativePlatform()) {
@@ -500,16 +500,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const dialDragRef = useRef({ startX: 0, startY: 0, startZoom: 1, isDraggingDial: false, hasSwiped: false });
 
   const getPresets = useCallback(() => {
-    const defaultPresets = [1.0, 2.0, 4.0];
-    if (zoomCapabilities && zoomCapabilities.max > 1) {
-      const max = zoomCapabilities.max;
-      const presets = defaultPresets.filter(p => p <= max);
-      if (max > presets[presets.length - 1]) {
-        presets.push(parseFloat(max.toFixed(1)));
+    const basePresets = [1.0, 2.0, 4.0];
+    if (zoomCapabilities) {
+      const min = zoomCapabilities.min || 1.0;
+      const max = zoomCapabilities.max || 4.0;
+      let presets = [...basePresets];
+      if (min <= 0.6) {
+        presets = [0.5, ...basePresets];
       }
-      return presets;
+      return presets.filter(p => p >= min && p <= max);
     }
-    return defaultPresets;
+    return basePresets;
   }, [zoomCapabilities]);
 
   const handleDialTouchStart = (e) => {
@@ -695,29 +696,55 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           handleScanResult(res.text, { result: { format: { format: res.format } } });
         });
         const errListener = await NativeScanner.addListener('cameraError', (res) => {
-          setError(res.error || 'Camera Error'); setStatus('ERROR');
+          if (mountedRef.current) {
+            setError(res.error || 'Camera Error'); setStatus('ERROR');
+          }
         });
         const zoomListener = await NativeScanner.addListener('zoomChanged', (res) => {
           setZoom(res.ratio);
         });
-        listenersRef.current.push(scanListener, errListener, zoomListener);
+        const readyListener = await NativeScanner.addListener('cameraReady', (info) => {
+          if (mountedRef.current) {
+            // Authoritative readiness — camera is actually streaming
+            setVideoPlaying(true);
+            if (info && info.flashSupported !== undefined) {
+              setFlashSupported(!!info.flashSupported);
+            }
+            if (info && info.maxZoom > 1) {
+              setHasHardwareZoom(true);
+              setZoomCapabilities({ min: info.minZoom || 1, max: info.maxZoom, step: 0.1 });
+              setZoom(info.currentZoom || 1);
+            }
+          }
+        });
+        listenersRef.current.push(scanListener, errListener, zoomListener, readyListener);
 
+        // Ensure DOM layout is flushed before measuring
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
         const viewport = document.getElementById('qr-scanner-viewport');
         let bounds = {};
         if (viewport) {
           const rect = viewport.getBoundingClientRect();
-          bounds = {
-            x: Math.round(rect.left),
-            y: Math.round(rect.top),
-            width: Math.round(rect.width),
-            height: Math.round(rect.height)
-          };
+          if (rect.width > 0 && rect.height > 0) {
+            bounds = {
+              x: Math.round(rect.left),
+              y: Math.round(rect.top),
+              width: Math.round(rect.width),
+              height: Math.round(rect.height)
+            };
+          }
         }
 
-        await NativeScanner.startScanner(bounds);
-        setVideoPlaying(true);
+        // startScanner now REJECTS on failure — the catch block below handles it
+        const result = await NativeScanner.startScanner(bounds);
         if (!mountedRef.current) { busyRef.current = false; return; }
-        
+
+        // Use flash capability from the native resolve response
+        if (result && result.flashSupported !== undefined) {
+          setFlashSupported(!!result.flashSupported);
+        }
+
+        // Get zoom capabilities from native
         try {
           const caps = await NativeScanner.getZoomCapabilities();
           if (caps && caps.max > 1) {
@@ -726,11 +753,14 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             setZoom(caps.current || 1);
           } else {
             setHasHardwareZoom(false);
-            setZoomCapabilities({ min: 1, max: 4, step: 0.1 });
+            setZoomCapabilities(null);
           }
-          setFlashSupported(true);
-        } catch (e) {}
+        } catch (e) {
+          console.warn('Failed to get zoom capabilities:', e);
+        }
 
+        // Camera startup succeeded — native confirmed streaming
+        setVideoPlaying(true);
         busyRef.current = false;
         setStatus('SCANNING');
         return;
@@ -1049,21 +1079,32 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   useEffect(() => {
     if (Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED')) {
+      document.body.classList.add('scanner-active');
+      document.documentElement.classList.add('scanner-active');
       document.body.style.setProperty('background', 'transparent', 'important');
       document.documentElement.style.setProperty('background', 'transparent', 'important');
     } else {
+      document.body.classList.remove('scanner-active');
+      document.documentElement.classList.remove('scanner-active');
       document.body.style.removeProperty('background');
       document.documentElement.style.removeProperty('background');
     }
     return () => {
+      document.body.classList.remove('scanner-active');
+      document.documentElement.classList.remove('scanner-active');
       document.body.style.removeProperty('background');
       document.documentElement.style.removeProperty('background');
     };
   }, [status]);
 
+  const isNativeScanning = Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED');
+
   return (
-    <div className="scanner-page scanner-page-enter" style={Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED') ? { background: 'transparent' } : {}}>
-      {/* Upper Navbar (#FFFFFF with 100% opacity + safe area) */}
+    <div 
+      className={`scanner-page ${Capacitor.isNativePlatform() ? '' : 'scanner-page-enter'}`} 
+      style={isNativeScanning ? { background: 'transparent', backgroundColor: 'transparent' } : {}}
+    >
+      {/* Upper Navbar */}
       <header 
         className="scanner-upper-navbar" 
         style={{ 
@@ -1082,18 +1123,12 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           zIndex: 100, 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          background: 'var(--bg-card, #FFFFFF)',
-          backgroundColor: 'var(--bg-card, #FFFFFF)',
-          opacity: 1,
-          backdropFilter: 'none',
-          WebkitBackdropFilter: 'none',
-          boxShadow: 'none',
-          color: 'var(--text-primary, #111827)'
+          boxShadow: 'none'
         }}
       >
         <div className="app-logo">
           <AppIcon size={46} noBackground />
-          <div className="app-logo-text" style={{ whiteSpace: 'nowrap', color: 'var(--text-primary, #111827)' }}>Mushi QR <span style={{ color: 'var(--accent-primary)' }}>Pro</span></div>
+          <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span style={{ color: 'var(--accent-primary)' }}>Pro</span></div>
         </div>
 
         <div className="app-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1146,11 +1181,6 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
-              style={{
-                color: '#111827',
-                background: 'rgba(0, 0, 0, 0.05)',
-                border: '1px solid rgba(0, 0, 0, 0.08)'
-              }}
             >
               <Menu size={20} />
             </button>
@@ -1208,9 +1238,18 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         </div>
       </header>
 
-      <div className="qrs">
+      <div className="qrs" style={isNativeScanning ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
         {/* Body */}
-        <div className="qrs-body" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} style={{ justifyContent: 'flex-end', paddingBottom: '24px' }}>
+        <div 
+          className="qrs-body" 
+          onTouchStart={handleTouchStart} 
+          onTouchMove={handleTouchMove} 
+          style={{ 
+            justifyContent: 'flex-end', 
+            paddingBottom: '24px', 
+            ...(isNativeScanning ? { background: 'transparent', backgroundColor: 'transparent' } : {}) 
+          }}
+        >
           {/* Error - QR Not Found (illustrated) */}
           {status === 'ERROR' && error && error.toLowerCase().includes('no qr') ? (
             <div 
@@ -1246,8 +1285,16 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
 
           {/* Scanner Frame */}
-          <div className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`}>
-            <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} onClick={handleViewportClick} />
+          <div 
+            className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`}
+            style={isNativeScanning ? { background: 'transparent', backgroundColor: 'transparent' } : {}}
+          >
+            <div 
+              id="qr-scanner-viewport" 
+              className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} 
+              onClick={handleViewportClick} 
+              style={isNativeScanning ? { background: 'transparent', backgroundColor: 'transparent' } : {}}
+            />
 
 
 
