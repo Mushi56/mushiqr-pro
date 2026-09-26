@@ -5054,8 +5054,8 @@ input[type="range"]::-moz-range-thumb {
   justify-content: space-between !important;
   padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
   box-sizing: border-box !important;
-  background: #0B0F19 !important;
-  background-color: #0B0F19 !important;
+  background: #111625 !important;
+  background-color: #111625 !important;
   opacity: 1 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -5093,7 +5093,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   padding: 0;
   /* Padding moved to inner container */
-  background: #0B0F19;
+  background: #111625;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
