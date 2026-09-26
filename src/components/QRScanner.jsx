@@ -16,6 +16,7 @@ import { generateQRMatrix, renderQR } from '../utils/qrEngine';
 import qrNotFoundSvg from '../assets/qr-not-found.svg';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import { renderBarcode } from '../utils/barcodeEngine';
+import NativeScanner from '../plugins/NativeScanner';
 import AppIcon from './AppIcon';
 import UserAvatar from './UserAvatar';
 import { FeatureAccessManager } from '../services/FeatureAccessManager';
@@ -73,6 +74,19 @@ const FORMAT_NAME_MAP = {
   [Html5QrcodeSupportedFormats.ITF]:         'ITF / I2of5',
   [Html5QrcodeSupportedFormats.CODABAR]:     'Codabar',
   [Html5QrcodeSupportedFormats.MAXICODE]:    'MaxiCode',
+  256: 'QR Code',
+  4096: 'Aztec',
+  16: 'Data Matrix',
+  2048: 'PDF417',
+  1: 'Code 128',
+  2: 'Code 39',
+  4: 'Code 93',
+  8: 'Codabar',
+  32: 'EAN-13',
+  64: 'EAN-8',
+  128: 'ITF / I2of5',
+  512: 'UPC-A',
+  1024: 'UPC-E',
 };
 
 const parseQRData = (text) => {
@@ -243,6 +257,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const scanHandledRef = useRef(false);
   const touchStateRef = useRef({ distance: 0, initialZoom: 1 });
   const capTimersRef = useRef([]);
+  const listenersRef = useRef([]);
   const zoomRafRef = useRef(null);
 
   const handleEditResult = () => {
@@ -376,21 +391,31 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   const stopScanner = useCallback(async () => {
     busyRef.current = false;
-    const scanner = qrScannerRef.current;
-    if (scanner) {
-      try {
-        if (scanner.isScanning) {
-          await scanner.stop();
-        }
-      } catch (e) {
-        console.warn('Error stopping scanner:', e);
+    
+    if (Capacitor.isNativePlatform()) {
+      try { await NativeScanner.stopScanner(); } catch (e) { console.warn(e); }
+      if (listenersRef.current) {
+        listenersRef.current.forEach(l => l.remove());
+        listenersRef.current = [];
       }
-      qrScannerRef.current = null;
+    } else {
+      const scanner = qrScannerRef.current;
+      if (scanner) {
+        try {
+          if (scanner.isScanning) {
+            await scanner.stop();
+          }
+        } catch (e) {
+          console.warn('Error stopping scanner:', e);
+        }
+        qrScannerRef.current = null;
+      }
+      const container = document.getElementById("qr-scanner-viewport");
+      if (container) {
+        container.innerHTML = "";
+      }
     }
-    const container = document.getElementById("qr-scanner-viewport");
-    if (container) {
-      container.innerHTML = "";
-    }
+    
     setZoomCapabilities(null);
     setFlashOn(false);
     setFlashSupported(false);
@@ -414,6 +439,16 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   const applyZoom = useCallback(async (value) => {
     try {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await NativeScanner.setZoom({ ratio: value });
+          setZoom(value);
+        } catch (err) {
+          console.warn('Native zoom failed:', err);
+        }
+        return;
+      }
+      
       const videoElement = document.querySelector("#qr-scanner-viewport video");
       const stream = videoElement?.srcObject;
       const track = stream?.getVideoTracks()?.[0];
@@ -531,6 +566,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const toggleFlash = useCallback(async () => {
     triggerHapticFeedback();
     try {
+      if (Capacitor.isNativePlatform()) {
+        const next = !flashOn;
+        try {
+          await NativeScanner.setTorch({ enabled: next });
+          setFlashOn(next);
+        } catch (err) {
+          console.error('Native torch toggle error:', err);
+        }
+        return;
+      }
+      
       const videoElement = document.querySelector("#qr-scanner-viewport video");
       const stream = videoElement?.srcObject;
       const track = stream?.getVideoTracks()?.[0];
@@ -643,6 +689,49 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     try {
       await stopScanner();
       if (!mountedRef.current) { busyRef.current = false; return; }
+
+      if (Capacitor.isNativePlatform()) {
+        const scanListener = await NativeScanner.addListener('scanResult', (res) => {
+          handleScanResult(res.text, { result: { format: { format: res.format } } });
+        });
+        const errListener = await NativeScanner.addListener('cameraError', (res) => {
+          setError(res.error || 'Camera Error'); setStatus('ERROR');
+        });
+        listenersRef.current.push(scanListener, errListener);
+
+        const viewport = document.getElementById('qr-scanner-viewport');
+        let bounds = {};
+        if (viewport) {
+          const rect = viewport.getBoundingClientRect();
+          bounds = {
+            x: Math.round(rect.left),
+            y: Math.round(rect.top),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height)
+          };
+        }
+
+        await NativeScanner.startScanner(bounds);
+        setVideoPlaying(true);
+        if (!mountedRef.current) { busyRef.current = false; return; }
+        
+        try {
+          const caps = await NativeScanner.getZoomCapabilities();
+          if (caps && caps.max > 1) {
+            setHasHardwareZoom(true);
+            setZoomCapabilities({ min: caps.min || 1, max: caps.max || 10, step: 0.1 });
+            setZoom(caps.current || 1);
+          } else {
+            setHasHardwareZoom(false);
+            setZoomCapabilities({ min: 1, max: 4, step: 0.1 });
+          }
+          setFlashSupported(true);
+        } catch (e) {}
+
+        busyRef.current = false;
+        setStatus('SCANNING');
+        return;
+      }
 
       const scanner = new Html5Qrcode("qr-scanner-viewport");
       qrScannerRef.current = scanner;
@@ -941,11 +1030,36 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     }
   };
 
+  const handleViewportClick = useCallback((e) => {
+    if (Capacitor.isNativePlatform() && status === 'SCANNING') {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      try {
+        NativeScanner.focus({ x, y });
+      } catch (err) {}
+    }
+  }, [status]);
+
   const ActionIcon = qrTypeData?.actionIcon || ExternalLink;
   const TypeIcon = qrTypeData?.icon || FileText;
 
+  useEffect(() => {
+    if (Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED')) {
+      document.body.style.setProperty('background', 'transparent', 'important');
+      document.documentElement.style.setProperty('background', 'transparent', 'important');
+    } else {
+      document.body.style.removeProperty('background');
+      document.documentElement.style.removeProperty('background');
+    }
+    return () => {
+      document.body.style.removeProperty('background');
+      document.documentElement.style.removeProperty('background');
+    };
+  }, [status]);
+
   return (
-    <div className="scanner-page scanner-page-enter">
+    <div className="scanner-page scanner-page-enter" style={Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED') ? { background: 'transparent' } : {}}>
       {/* Upper Navbar (#FFFFFF with 100% opacity + safe area) */}
       <header 
         className="scanner-upper-navbar" 
@@ -1130,7 +1244,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
           {/* Scanner Frame */}
           <div className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`}>
-            <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} />
+            <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} onClick={handleViewportClick} />
 
 
 

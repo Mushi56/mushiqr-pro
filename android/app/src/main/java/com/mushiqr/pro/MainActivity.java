@@ -20,6 +20,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(com.mushiqr.pro.scanner.NativeScannerPlugin.class);
         super.onCreate(savedInstanceState);
 
         // showSignatureToast(); // Commented out for production!
