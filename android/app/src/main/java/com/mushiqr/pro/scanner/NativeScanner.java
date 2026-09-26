@@ -45,7 +45,13 @@ import java.util.concurrent.Executors;
 
 public class NativeScanner {
 
-    private static final String TAG = "NativeScanner";
+    private static final String TAG = "MushiCamera";
+    
+    private long t0, t1, t2, t3, t4, t5;
+    private int startCount = 0;
+    private int stopCount = 0;
+    private boolean firstFrameReceived = false;
+    private boolean firstScanReceived = false;
     private final Context context;
     private final LifecycleOwner lifecycleOwner;
     private final FrameLayout containerView;
@@ -83,6 +89,12 @@ public class NativeScanner {
             return;
         }
 
+        t0 = System.currentTimeMillis();
+        startCount++;
+        Log.d(TAG, "START_COUNT: " + startCount);
+        firstFrameReceived = false;
+        firstScanReceived = false;
+
         cameraExecutor = Executors.newSingleThreadExecutor();
 
         // Configure ML Kit
@@ -107,6 +119,8 @@ public class NativeScanner {
                 )
                 .build();
         barcodeScanner = BarcodeScanning.getClient(options);
+        t4 = System.currentTimeMillis();
+        Log.d(TAG, "ML_KIT_READY_TIME: " + (t4 - t0) + "ms");
 
         // Setup PreviewView
         previewView = new PreviewView(context);
@@ -114,6 +128,9 @@ public class NativeScanner {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         previewView.setScaleType(PreviewView.ScaleType.FILL_CENTER);
+        
+        t1 = System.currentTimeMillis();
+        Log.d(TAG, "PREVIEW_VIEW_READY_TIME: " + (t1 - t0) + "ms");
 
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(context);
         cameraProviderFuture.addListener(() -> {
@@ -140,6 +157,7 @@ public class NativeScanner {
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(lensFacing)
                 .build();
+        Log.d(TAG, "LENS_FACING: " + lensFacing);
 
         ResolutionSelector resolutionSelector = new ResolutionSelector.Builder()
                 .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
@@ -183,7 +201,32 @@ public class NativeScanner {
 
         try {
             camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup);
-            Log.d(TAG, "Camera bound to lifecycle with UseCaseGroup and ViewPort.");
+            t2 = System.currentTimeMillis();
+            Log.d(TAG, "CAMERA_BIND_TIME: " + (t2 - t0) + "ms");
+            
+            Log.d(TAG, "PREVIEW_VIEW_WIDTH: " + width);
+            Log.d(TAG, "PREVIEW_VIEW_HEIGHT: " + height);
+            if (width > 0 && height > 0) {
+                Log.d(TAG, "VIEWPORT_ASPECT_RATIO: " + ((float)width / height));
+            }
+
+            if (preview.getResolutionInfo() != null) {
+                Log.d(TAG, "PREVIEW_RESOLUTION: " + preview.getResolutionInfo().getResolution());
+                Log.d(TAG, "SENSOR_ORIENTATION: " + preview.getResolutionInfo().getRotationDegrees());
+            }
+            if (imageAnalysis.getResolutionInfo() != null) {
+                Log.d(TAG, "ANALYSIS_RESOLUTION: " + imageAnalysis.getResolutionInfo().getResolution());
+            }
+            
+            CameraInfo info = camera.getCameraInfo();
+            Log.d(TAG, "AF_SUPPORTED: " + info.isFocusMeteringSupported(new FocusMeteringAction.Builder(new MeteringPointFactory() {
+                @NonNull
+                @Override
+                protected android.graphics.PointF convertPoint(float x, float y) {
+                    return new android.graphics.PointF(x, y);
+                }
+            }.createPoint(0.5f, 0.5f)).build()));
+            Log.d(TAG, "FLASH_SUPPORTED: " + info.hasFlashUnit());
             
             camera.getCameraInfo().getZoomState().observe(lifecycleOwner, zoomState -> {
                 if (scanListener != null && zoomState != null) {
@@ -191,7 +234,7 @@ public class NativeScanner {
                 }
             });
         } catch(Exception e) {
-            Log.e(TAG, "Use case binding failed", e);
+            Log.e(TAG, "CAMERA_ERRORS: Use case binding failed", e);
         }
     }
 
@@ -205,6 +248,12 @@ public class NativeScanner {
 
     @SuppressLint("UnsafeOptInUsageError")
     private void analyzeImage(@NonNull ImageProxy imageProxy) {
+        if (!firstFrameReceived) {
+            firstFrameReceived = true;
+            t3 = System.currentTimeMillis();
+            Log.d(TAG, "FIRST_FRAME_TIME: " + (t3 - t0) + "ms");
+        }
+
         if (imageProxy.getImage() == null) {
             imageProxy.close();
             return;
@@ -216,6 +265,11 @@ public class NativeScanner {
                     for (Barcode barcode : barcodes) {
                         if (scanListener != null) {
                             try {
+                                if (!firstScanReceived) {
+                                    firstScanReceived = true;
+                                    t5 = System.currentTimeMillis();
+                                    Log.d(TAG, "FIRST_SCAN_TIME: " + (t5 - t0) + "ms");
+                                }
                                 JSONObject result = new JSONObject();
                                 result.put("text", barcode.getRawValue());
                                 result.put("format", barcode.getFormat());
@@ -252,6 +306,8 @@ public class NativeScanner {
         
         isScanning = false;
         camera = null;
+        stopCount++;
+        Log.d(TAG, "STOP_COUNT: " + stopCount);
         Log.d(TAG, "Scanner stopped and resources released.");
     }
 
