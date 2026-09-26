@@ -16,76 +16,45 @@ export const PaymentProvider = {
 
   async init() {
     if (this.isNativeAndroid()) {
-      try {
-        const rcRes = await RevenueCatService.init();
-        if (rcRes?.ok) {
-          return rcRes;
-        }
-      } catch (err) {
-        console.warn('[PaymentProvider] RevenueCat init failed, falling back to GooglePlayBillingService:', err);
+      const rcRes = await RevenueCatService.init();
+      if (rcRes?.ok) {
+        return rcRes;
       }
-      return GooglePlayBillingService.init();
+      throw new Error('RevenueCat initialization failed: ' + (rcRes?.error || 'Unknown error'));
     }
     return WebPaymentService.init();
   },
 
   async getProducts() {
     if (this.isNativeAndroid()) {
-      try {
-        const offerings = await RevenueCatService.getOfferings();
-        if (offerings?.current?.availablePackages?.length > 0) {
-          return offerings.current.availablePackages.map(pkg => ({
-            id: pkg.identifier,
-            productId: pkg.product?.identifier,
-            name: pkg.product?.title || pkg.identifier,
-            price: pkg.product?.priceString,
-            type: 'subs',
-            pkg
-          }));
-        }
-      } catch (err) {
-        console.warn('[PaymentProvider] RevenueCat getOfferings error:', err);
+      const offerings = await RevenueCatService.getOfferings();
+      if (offerings?.current?.availablePackages?.length > 0) {
+        return offerings.current.availablePackages.map(pkg => ({
+          id: pkg.identifier,
+          productId: pkg.product?.identifier,
+          name: pkg.product?.title || pkg.identifier,
+          price: pkg.product?.priceString,
+          type: 'subs',
+          pkg
+        }));
       }
-      return GooglePlayBillingService.getProducts();
+      throw new Error('No products available in RevenueCat offerings.');
     }
     return WebPaymentService.getProducts();
   },
 
   async purchase(plan, options = {}) {
     if (this.isNativeAndroid()) {
-      // 1. Prioritize RevenueCat purchase flow
-      try {
-        console.log('[PaymentProvider] Attempting purchase via RevenueCat...');
-        return await RevenueCatService.purchase(plan, options);
-      } catch (rcErr) {
-        console.warn('[PaymentProvider] RevenueCat purchase error:', rcErr.message);
-        // If user cancelled, do not fallback to another provider
-        if (rcErr.message?.toLowerCase().includes('cancel')) {
-          throw rcErr;
-        }
-        // Fallback to direct Google Play Billing Service if configured
-        if (GooglePlayBillingService.isNativeAndroid()) {
-          console.log('[PaymentProvider] Falling back to direct GooglePlayBillingService...');
-          return await GooglePlayBillingService.purchase(plan, options);
-        }
-        throw rcErr;
-      }
+      console.log('[PaymentProvider] Attempting purchase via RevenueCat...');
+      return await RevenueCatService.purchase(plan, options);
     }
     return WebPaymentService.purchase(plan, options);
   },
 
   async restorePurchases() {
     if (this.isNativeAndroid()) {
-      try {
-        console.log('[PaymentProvider] Restoring purchases via RevenueCat...');
-        const res = await RevenueCatService.restorePurchases();
-        if (res.restored) {
-          return res;
-        }
-      } catch (err) {
-        console.warn('[PaymentProvider] RevenueCat restore notice:', err.message);
-      }
-      return GooglePlayBillingService.restorePurchases();
+      console.log('[PaymentProvider] Restoring purchases via RevenueCat...');
+      return await RevenueCatService.restorePurchases();
     }
     return WebPaymentService.restorePurchases();
   }

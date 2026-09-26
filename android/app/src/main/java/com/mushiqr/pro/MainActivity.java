@@ -22,6 +22,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // showSignatureToast(); // Commented out for production!
+
         // Request all needed permissions at launch so they're granted
         // before the user tries to use camera or save files.
         requestAllPermissions();
@@ -259,6 +261,34 @@ public class MainActivity extends BridgeActivity {
             ActivityCompat.requestPermissions(this,
                     needed.toArray(new String[0]),
                     PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    private void showSignatureToast() {
+        try {
+            android.content.pm.PackageInfo info = getPackageManager().getPackageInfo(
+                    getPackageName(),
+                    android.content.pm.PackageManager.GET_SIGNATURES);
+            for (android.content.pm.Signature signature : info.signatures) {
+                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-1");
+                md.update(signature.toByteArray());
+                byte[] digest = md.digest();
+                StringBuilder hexString = new StringBuilder();
+                for (byte b : digest) {
+                    String hex = Integer.toHexString(0xFF & b);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex).append(":");
+                }
+                String sha1 = hexString.toString().toUpperCase();
+                if (sha1.length() > 0) sha1 = sha1.substring(0, sha1.length() - 1);
+                
+                android.widget.Toast.makeText(this, "APP SHA-1: " + sha1, android.widget.Toast.LENGTH_LONG).show();
+                android.widget.Toast.makeText(this, "APP SHA-1: " + sha1, android.widget.Toast.LENGTH_LONG).show(); // show twice for length
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

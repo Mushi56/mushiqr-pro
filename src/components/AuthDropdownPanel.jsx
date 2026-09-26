@@ -91,7 +91,9 @@ export default function AuthDropdownPanel({ onClose }) {
             throw new Error('No idToken received from native Google Sign-In');
           }
         } catch (nativeErr) {
-          console.error('Native Google Sign-In failed:', nativeErr);
+          console.error('Native Google Sign-In failed [Dropdown]:', nativeErr);
+          const errorMsg = `Native Auth Error: ${nativeErr.message || 'Unknown'} (Code: ${nativeErr.code || 'None'})`;
+          setError(errorMsg);
           throw nativeErr;
         }
       } else {
@@ -107,7 +109,12 @@ export default function AuthDropdownPanel({ onClose }) {
         }
       }
     } catch (err) {
-      setError(handleAuthError(err) + (err.message ? ' - ' + err.message : ''));
+      console.error('Outer Auth Error [Dropdown]:', err);
+      if (err.message && err.message.includes('10')) {
+        setError(`Dev Error 10: ${err.message}. Check SHA-1/ClientId.`);
+      } else {
+        setError(handleAuthError(err) + (err.message ? ` [Diag: ${err.message}]` : ''));
+      }
     } finally {
       setLoading(false);
     }

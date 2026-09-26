@@ -130,22 +130,32 @@ export default function LoginPage({ onNavigate, onSuccess, isFirstLaunch, theme,
     setGoogleLoading(true);
     try {
       if (Capacitor.isNativePlatform()) {
-        const result = await FirebaseAuthentication.signInWithGoogle({
-          useCredentialManager: false,
-        });
-        if (result.credential?.idToken) {
-          const credential = GoogleAuthProvider.credential(result.credential.idToken);
-          await signInWithCredential(auth, credential);
-          try {
-            localStorage.setItem('mushi_onboarding_completed', 'true');
-          } catch {}
-          if (onSuccess) {
-            onSuccess();
+        try {
+          const result = await FirebaseAuthentication.signInWithGoogle({
+            useCredentialManager: false,
+          });
+          if (result.credential?.idToken) {
+            const credential = GoogleAuthProvider.credential(result.credential.idToken);
+            await signInWithCredential(auth, credential);
+            try {
+              localStorage.setItem('mushi_onboarding_completed', 'true');
+            } catch {}
+            if (onSuccess) {
+              onSuccess();
+            } else {
+              onNavigate('home');
+            }
           } else {
-            onNavigate('home');
+            throw new Error('No ID token received from Google sign in');
           }
-        } else {
-          throw new Error('No ID token received from Google sign in');
+        } catch (nativeErr) {
+          console.error('Native Google Sign-In Error [LoginPage]:', nativeErr);
+          // Extract specific properties for diagnostic display
+          const errorMsg = `Native Auth Error: ${nativeErr.message || 'Unknown'} (Code: ${nativeErr.code || 'None'})`;
+          setError(errorMsg);
+          // Rethrow so the outer catch doesn't overwrite it with generic auth error if we don't want it to
+          // Wait, the outer catch might overwrite it. Let's return here after setting error to prevent outer catch from running, or just throw it and handle it in the outer catch.
+          throw nativeErr;
         }
       } else {
         try {
@@ -169,7 +179,13 @@ export default function LoginPage({ onNavigate, onSuccess, isFirstLaunch, theme,
         }
       }
     } catch (err) {
-      setError(handleAuthError(err));
+      console.error('Outer Auth Error [LoginPage]:', err);
+      // If the error came from our native catch, display its message directly
+      if (err.message && err.message.includes('10')) {
+        setError(`Dev Error 10: ${err.message}. Check SHA-1/ClientId.`);
+      } else {
+        setError(handleAuthError(err) + (err.message ? ` [Diag: ${err.message}]` : ''));
+      }
     } finally {
       setGoogleLoading(false);
     }
