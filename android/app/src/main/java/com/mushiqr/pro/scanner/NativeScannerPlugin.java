@@ -110,10 +110,10 @@ public class NativeScannerPlugin extends Plugin {
             int[] webViewLoc = new int[2];
             bridge.getWebView().getLocationOnScreen(webViewLoc);
 
-            int pxX = x != null ? Math.round(x * density) : 0;
-            int pxY = y != null ? Math.round(y * density) : 0;
-            int pxW = (width != null && width > 0) ? Math.round(width * density) : ViewGroup.LayoutParams.MATCH_PARENT;
-            int pxH = (height != null && height > 0) ? Math.round(height * density) : ViewGroup.LayoutParams.MATCH_PARENT;
+            int pxX = 0;
+            int pxY = 0;
+            int pxW = ViewGroup.LayoutParams.MATCH_PARENT;
+            int pxH = ViewGroup.LayoutParams.MATCH_PARENT;
 
             Log.d(TAG, "PLUGIN_START_CAMERA:");
             Log.d(TAG, "  CSS_BOUNDS: x=" + x + " y=" + y + " w=" + width + " h=" + height);
