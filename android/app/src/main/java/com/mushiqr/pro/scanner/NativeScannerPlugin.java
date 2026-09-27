@@ -46,9 +46,16 @@ public class NativeScannerPlugin extends Plugin {
             }
 
             @Override
-            public void onError(String error) {
+            public void onError(String error, org.json.JSONObject details) {
                 JSObject ret = new JSObject();
                 ret.put("error", error);
+                if (details != null) {
+                    try {
+                        ret.put("details", JSObject.fromJSONObject(details));
+                    } catch (org.json.JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
                 notifyListeners("cameraError", ret);
             }
 
@@ -86,22 +93,27 @@ public class NativeScannerPlugin extends Plugin {
             Integer width = call.getInt("width");
             Integer height = call.getInt("height");
 
+            int[] webViewLocation = new int[2];
+            bridge.getWebView().getLocationOnScreen(webViewLocation);
+
             float density = getActivity().getResources().getDisplayMetrics().density;
-            int pxX = x != null ? Math.round(x * density) : 0;
-            int pxY = y != null ? Math.round(y * density) : 0;
             int pxW = width != null ? Math.round(width * density) : ViewGroup.LayoutParams.MATCH_PARENT;
             int pxH = height != null ? Math.round(height * density) : ViewGroup.LayoutParams.MATCH_PARENT;
+            
+            int pxX = x != null ? Math.round(x * density) : 0;
+            int pxY = y != null ? Math.round(y * density) : 0;
 
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(pxW, pxH);
-            params.leftMargin = pxX;
+            params.leftMargin = pxX; // WebView is usually full screen but let's just apply density for now. In case of issues we add webViewLocation.
             params.topMargin = pxY;
             containerView.setLayoutParams(params);
 
             bridge.getWebView().setBackgroundColor(Color.TRANSPARENT);
             ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
-            if (containerView.getParent() == null) {
-                parent.addView(containerView, 0); // Add behind webview
+            if (containerView.getParent() != null) {
+                ((ViewGroup)containerView.getParent()).removeView(containerView);
             }
+            parent.addView(containerView, 0); // Add behind webview
             
             nativeScanner.startScanner(
                     () -> {

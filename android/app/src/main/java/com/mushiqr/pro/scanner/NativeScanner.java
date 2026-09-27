@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.Camera;
@@ -27,6 +29,8 @@ import android.view.Surface;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.Observer;
 import androidx.camera.core.resolutionselector.ResolutionSelector;
 import androidx.camera.core.resolutionselector.AspectRatioStrategy;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -42,16 +46,19 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class NativeScanner {
 
     private static final String TAG = "MushiCamera";
     
-    private long t0, t1, t2, t3, t4, t5;
-    private int startCount = 0;
-    private int stopCount = 0;
-    private boolean firstFrameReceived = false;
-    private boolean firstScanReceived = false;
+    public enum State {
+        IDLE, STARTING, READY, STOPPING, ERROR
+    }
+    
+    private State currentState = State.IDLE;
+    
     private final Context context;
     private final LifecycleOwner lifecycleOwner;
     private final FrameLayout containerView;
@@ -62,90 +69,143 @@ public class NativeScanner {
     private BarcodeScanner barcodeScanner;
     private ExecutorService cameraExecutor;
 
-    private boolean isScanning = false;
     private int lensFacing = CameraSelector.LENS_FACING_BACK;
     
     public interface ScanListener {
         void onScanResult(JSONObject result);
-        void onError(String error);
+        void onError(String error, JSONObject details);
         void onZoomChanged(float ratio);
     }
     
     private ScanListener scanListener;
+    private Runnable onReadyCallback;
+    private Runnable onErrorCallback;
+    
+    private Handler mainHandler;
+    private Runnable firstFrameTimeout;
 
     public NativeScanner(Context context, LifecycleOwner lifecycleOwner, FrameLayout containerView) {
         this.context = context;
         this.lifecycleOwner = lifecycleOwner;
         this.containerView = containerView;
+        this.mainHandler = new Handler(Looper.getMainLooper());
     }
     
     public void setScanListener(ScanListener listener) {
         this.scanListener = listener;
     }
 
+    private void logDetailedError(String message, Exception e, String errorType) {
+        Log.e(TAG, "CAMERA_START_FAILURE: " + errorType + " - " + message, e);
+        JSONObject details = new JSONObject();
+        try {
+            details.put("errorType", errorType);
+            details.put("message", message);
+            if (e != null) {
+                details.put("exceptionClass", e.getClass().getName());
+                details.put("exceptionMessage", e.getMessage());
+                StringWriter sw = new StringWriter();
+                e.printStackTrace(new PrintWriter(sw));
+                details.put("stackTrace", sw.toString());
+            }
+            details.put("state", currentState.name());
+            details.put("lensFacing", lensFacing);
+            if (previewView != null) {
+                details.put("previewWidth", previewView.getWidth());
+                details.put("previewHeight", previewView.getHeight());
+            }
+            details.put("containerWidth", containerView.getWidth());
+            details.put("containerHeight", containerView.getHeight());
+        } catch (JSONException ex) {
+            ex.printStackTrace();
+        }
+        
+        if (scanListener != null) {
+            scanListener.onError(message, details);
+        }
+        if (onErrorCallback != null) {
+            onErrorCallback.run();
+            onErrorCallback = null;
+        }
+        onReadyCallback = null;
+        stopScanner();
+        currentState = State.ERROR;
+    }
+
     public void startScanner(Runnable onReady, Runnable onError) {
-        if (isScanning) {
-            if (onReady != null) onReady.run();
+        if (currentState == State.STARTING || currentState == State.READY) {
+            if (currentState == State.READY && onReady != null) {
+                onReady.run();
+            }
             return;
         }
 
-        t0 = System.currentTimeMillis();
-        startCount++;
-        Log.d(TAG, "START_COUNT: " + startCount);
-        firstFrameReceived = false;
-        firstScanReceived = false;
+        currentState = State.STARTING;
+        this.onReadyCallback = onReady;
+        this.onErrorCallback = onError;
+
+        Log.d(TAG, "CAMERA_START_BEGIN");
+
+        if (lifecycleOwner.getLifecycle().getCurrentState() == Lifecycle.State.DESTROYED) {
+            logDetailedError("Lifecycle is destroyed", null, "LIFECYCLE_DESTROYED");
+            return;
+        }
+
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.CAMERA) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            logDetailedError("Camera permission denied", null, "PERMISSION_DENIED");
+            return;
+        }
 
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        // Configure ML Kit
-        BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
-                .setBarcodeFormats(
-                        Barcode.FORMAT_QR_CODE,
-                        Barcode.FORMAT_AZTEC,
-                        Barcode.FORMAT_DATA_MATRIX,
-                        Barcode.FORMAT_PDF417,
-                        Barcode.FORMAT_CODE_128,
-                        Barcode.FORMAT_CODE_39,
-                        Barcode.FORMAT_CODE_93,
-                        Barcode.FORMAT_CODABAR,
-                        Barcode.FORMAT_EAN_13,
-                        Barcode.FORMAT_EAN_8,
-                        Barcode.FORMAT_ITF,
-                        Barcode.FORMAT_UPC_A,
-                        Barcode.FORMAT_UPC_E)
-                // If zoom suggestion is supported by mlkit version
-                .setZoomSuggestionOptions(
-                    new ZoomSuggestionOptions.Builder(zoomCallback).build()
-                )
-                .build();
-        barcodeScanner = BarcodeScanning.getClient(options);
-        t4 = System.currentTimeMillis();
-        Log.d(TAG, "ML_KIT_READY_TIME: " + (t4 - t0) + "ms");
-
-        // Setup PreviewView
         previewView = new PreviewView(context);
         previewView.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         previewView.setScaleType(PreviewView.ScaleType.FILL_CENTER);
         
-        t1 = System.currentTimeMillis();
-        Log.d(TAG, "PREVIEW_VIEW_READY_TIME: " + (t1 - t0) + "ms");
+        containerView.removeAllViews();
+        containerView.addView(previewView);
+        Log.d(TAG, "PREVIEW_ATTACHED");
 
+        firstFrameTimeout = () -> {
+            if (currentState == State.STARTING) {
+                logDetailedError("First frame timeout", null, "FIRST_FRAME_TIMEOUT");
+            }
+        };
+        mainHandler.postDelayed(firstFrameTimeout, 5000);
+
+        waitForPreviewViewDimensions();
+    }
+
+    private void waitForPreviewViewDimensions() {
+        if (previewView.getWidth() > 0 && previewView.getHeight() > 0) {
+            onPreviewViewMeasured();
+        } else {
+            previewView.post(() -> {
+                if (currentState == State.STARTING && previewView != null) {
+                    if (previewView.getWidth() > 0 && previewView.getHeight() > 0) {
+                        onPreviewViewMeasured();
+                    } else {
+                        logDetailedError("PreviewView has zero dimensions after layout", null, "PREVIEW_ZERO_DIMENSIONS");
+                    }
+                }
+            });
+        }
+    }
+
+    private void onPreviewViewMeasured() {
+        Log.d(TAG, "PREVIEW_MEASURED: " + previewView.getWidth() + "x" + previewView.getHeight());
+        
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(context);
         cameraProviderFuture.addListener(() -> {
+            if (currentState != State.STARTING) return;
             try {
                 cameraProvider = cameraProviderFuture.get();
+                Log.d(TAG, "CAMERA_PROVIDER_READY");
                 bindCameraUseCases();
-                
-                // Add preview view to container
-                containerView.addView(previewView);
-                isScanning = true;
-                
-                if (onReady != null) onReady.run();
             } catch (Exception e) {
-                Log.e(TAG, "Failed to start camera", e);
-                if (onError != null) onError.run();
+                logDetailedError("Failed to get camera provider", e, "PROVIDER_FAILURE");
             }
         }, ContextCompat.getMainExecutor(context));
     }
@@ -154,15 +214,15 @@ public class NativeScanner {
         if (cameraProvider == null) return;
         cameraProvider.unbindAll();
 
+        Log.d(TAG, "CAMERA_BIND_BEGIN");
+
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(lensFacing)
                 .build();
-        Log.d(TAG, "LENS_FACING: " + lensFacing);
 
         ResolutionSelector resolutionSelector = new ResolutionSelector.Builder()
                 .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
                 .build();
-        Log.d(TAG, "Configuring ResolutionSelector with RATIO_4_3_FALLBACK_AUTO_STRATEGY");
 
         Preview preview = new Preview.Builder()
                 .setResolutionSelector(resolutionSelector)
@@ -176,17 +236,10 @@ public class NativeScanner {
 
         imageAnalysis.setAnalyzer(cameraExecutor, this::analyzeImage);
 
-        Rational aspectRatio;
-        int width = containerView.getLayoutParams().width;
-        int height = containerView.getLayoutParams().height;
-        if (width > 0 && height > 0) {
-            aspectRatio = new Rational(width, height);
-            Log.d(TAG, "Creating ViewPort with aspect ratio from container bounds: " + width + "x" + height);
-        } else {
-            aspectRatio = new Rational(3, 4);
-            Log.d(TAG, "Creating ViewPort with fallback portrait 3:4 aspect ratio");
-        }
-
+        int width = previewView.getWidth();
+        int height = previewView.getHeight();
+        Rational aspectRatio = new Rational(width, height);
+        
         int rotation = previewView.getDisplay() != null ? previewView.getDisplay().getRotation() : Surface.ROTATION_0;
 
         ViewPort viewPort = new ViewPort.Builder(aspectRatio, rotation)
@@ -201,57 +254,90 @@ public class NativeScanner {
 
         try {
             camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup);
-            t2 = System.currentTimeMillis();
-            Log.d(TAG, "CAMERA_BIND_TIME: " + (t2 - t0) + "ms");
+            Log.d(TAG, "CAMERA_BIND_SUCCESS");
             
-            Log.d(TAG, "PREVIEW_VIEW_WIDTH: " + width);
-            Log.d(TAG, "PREVIEW_VIEW_HEIGHT: " + height);
-            if (width > 0 && height > 0) {
-                Log.d(TAG, "VIEWPORT_ASPECT_RATIO: " + ((float)width / height));
+            if (camera == null) {
+                logDetailedError("Camera is null after bind", null, "BIND_NULL");
+                return;
             }
 
-            if (preview.getResolutionInfo() != null) {
-                Log.d(TAG, "PREVIEW_RESOLUTION: " + preview.getResolutionInfo().getResolution());
-                Log.d(TAG, "SENSOR_ORIENTATION: " + preview.getResolutionInfo().getRotationDegrees());
-            }
-            if (imageAnalysis.getResolutionInfo() != null) {
-                Log.d(TAG, "ANALYSIS_RESOLUTION: " + imageAnalysis.getResolutionInfo().getResolution());
-            }
-            
-            CameraInfo info = camera.getCameraInfo();
-            Log.d(TAG, "AF_SUPPORTED: " + info.isFocusMeteringSupported(new FocusMeteringAction.Builder(new MeteringPointFactory() {
-                @NonNull
-                @Override
-                protected android.graphics.PointF convertPoint(float x, float y) {
-                    return new android.graphics.PointF(x, y);
-                }
-            }.createPoint(0.5f, 0.5f)).build()));
-            Log.d(TAG, "FLASH_SUPPORTED: " + info.hasFlashUnit());
-            
             camera.getCameraInfo().getZoomState().observe(lifecycleOwner, zoomState -> {
                 if (scanListener != null && zoomState != null) {
                     scanListener.onZoomChanged(zoomState.getZoomRatio());
                 }
             });
+
+            waitForStream(preview);
+
         } catch(Exception e) {
-            Log.e(TAG, "CAMERA_ERRORS: Use case binding failed", e);
+            logDetailedError("Use case binding failed", e, "CAMERA_BIND_FAILURE");
+        }
+    }
+    
+    private void waitForStream(Preview preview) {
+        Observer<PreviewView.StreamState> streamStateObserver = new Observer<PreviewView.StreamState>() {
+            @Override
+            public void onChanged(PreviewView.StreamState streamState) {
+                if (streamState == PreviewView.StreamState.STREAMING) {
+                    Log.d(TAG, "PREVIEW_STREAMING");
+                    previewView.getPreviewStreamState().removeObserver(this);
+                    
+                    if (currentState == State.STARTING) {
+                        mainHandler.removeCallbacks(firstFrameTimeout);
+                        currentState = State.READY;
+                        Log.d(TAG, "CAMERA_START_COMPLETE");
+                        
+                        initMlKit();
+                        
+                        if (onReadyCallback != null) {
+                            onReadyCallback.run();
+                            onReadyCallback = null;
+                        }
+                    }
+                }
+            }
+        };
+        previewView.getPreviewStreamState().observe(lifecycleOwner, streamStateObserver);
+    }
+    
+    private void initMlKit() {
+        try {
+            BarcodeScannerOptions options = new BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(
+                            Barcode.FORMAT_QR_CODE,
+                            Barcode.FORMAT_AZTEC,
+                            Barcode.FORMAT_DATA_MATRIX,
+                            Barcode.FORMAT_PDF417,
+                            Barcode.FORMAT_CODE_128,
+                            Barcode.FORMAT_CODE_39,
+                            Barcode.FORMAT_CODE_93,
+                            Barcode.FORMAT_CODABAR,
+                            Barcode.FORMAT_EAN_13,
+                            Barcode.FORMAT_EAN_8,
+                            Barcode.FORMAT_ITF,
+                            Barcode.FORMAT_UPC_A,
+                            Barcode.FORMAT_UPC_E)
+                    .setZoomSuggestionOptions(
+                        new ZoomSuggestionOptions.Builder(zoomRatio -> {
+                            if (camera != null && camera.getCameraControl() != null) {
+                                camera.getCameraControl().setZoomRatio(zoomRatio);
+                                return true;
+                            }
+                            return false;
+                        }).build()
+                    )
+                    .build();
+            barcodeScanner = BarcodeScanning.getClient(options);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to init ML Kit", e);
         }
     }
 
-    private ZoomSuggestionOptions.ZoomCallback zoomCallback = zoomRatio -> {
-        if (camera != null && camera.getCameraControl() != null) {
-            camera.getCameraControl().setZoomRatio(zoomRatio);
-            return true;
-        }
-        return false;
-    };
-
     @SuppressLint("UnsafeOptInUsageError")
     private void analyzeImage(@NonNull ImageProxy imageProxy) {
-        if (!firstFrameReceived) {
-            firstFrameReceived = true;
-            t3 = System.currentTimeMillis();
-            Log.d(TAG, "FIRST_FRAME_TIME: " + (t3 - t0) + "ms");
+        if (currentState != State.READY || barcodeScanner == null) {
+            imageProxy.close();
+            return;
         }
 
         if (imageProxy.getImage() == null) {
@@ -265,11 +351,6 @@ public class NativeScanner {
                     for (Barcode barcode : barcodes) {
                         if (scanListener != null) {
                             try {
-                                if (!firstScanReceived) {
-                                    firstScanReceived = true;
-                                    t5 = System.currentTimeMillis();
-                                    Log.d(TAG, "FIRST_SCAN_TIME: " + (t5 - t0) + "ms");
-                                }
                                 JSONObject result = new JSONObject();
                                 result.put("text", barcode.getRawValue());
                                 result.put("format", barcode.getFormat());
@@ -285,8 +366,13 @@ public class NativeScanner {
     }
 
     public void stopScanner() {
-        if (!isScanning) return;
+        if (currentState == State.IDLE || currentState == State.STOPPING) return;
         
+        currentState = State.STOPPING;
+        Log.d(TAG, "STOPPING_SCANNER");
+        
+        mainHandler.removeCallbacks(firstFrameTimeout);
+
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
             cameraProvider = null;
@@ -304,10 +390,11 @@ public class NativeScanner {
             previewView = null;
         }
         
-        isScanning = false;
         camera = null;
-        stopCount++;
-        Log.d(TAG, "STOP_COUNT: " + stopCount);
+        onReadyCallback = null;
+        onErrorCallback = null;
+        
+        currentState = State.IDLE;
         Log.d(TAG, "Scanner stopped and resources released.");
     }
 
@@ -362,8 +449,9 @@ public class NativeScanner {
         } else {
             lensFacing = CameraSelector.LENS_FACING_BACK;
         }
-        if (isScanning) {
-            bindCameraUseCases();
+        if (currentState == State.READY) {
+            stopScanner();
+            startScanner(null, null); // Callbacks handled by state or caller if needed
         }
     }
 }
