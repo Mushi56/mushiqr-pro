@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.os.Handler;
 import android.os.Looper;
@@ -159,6 +160,7 @@ public class NativeScanner {
         cameraExecutor = Executors.newSingleThreadExecutor();
 
         previewView = new PreviewView(context);
+        previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
         previewView.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -179,19 +181,52 @@ public class NativeScanner {
     }
 
     private void waitForPreviewViewDimensions() {
-        if (previewView.getWidth() > 0 && previewView.getHeight() > 0) {
+        // Check immediately in case layout already happened
+        if (containerView.getWidth() > 0 && containerView.getHeight() > 0
+                && previewView.getWidth() > 0 && previewView.getHeight() > 0) {
+            logDimensions("IMMEDIATE");
             onPreviewViewMeasured();
-        } else {
-            previewView.post(() -> {
-                if (currentState == State.STARTING && previewView != null) {
-                    if (previewView.getWidth() > 0 && previewView.getHeight() > 0) {
-                        onPreviewViewMeasured();
-                    } else {
-                        logDetailedError("PreviewView has zero dimensions after layout", null, "PREVIEW_ZERO_DIMENSIONS");
-                    }
-                }
-            });
+            return;
         }
+
+        // Use a real layout listener — the single post() was not reliable
+        ViewTreeObserver.OnGlobalLayoutListener layoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (currentState != State.STARTING || previewView == null) {
+                    previewView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    return;
+                }
+                if (containerView.getWidth() > 0 && containerView.getHeight() > 0
+                        && previewView.getWidth() > 0 && previewView.getHeight() > 0) {
+                    previewView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    logDimensions("LAYOUT_LISTENER");
+                    onPreviewViewMeasured();
+                }
+            }
+        };
+        previewView.getViewTreeObserver().addOnGlobalLayoutListener(layoutListener);
+
+        // Safety timeout — if dimensions never arrive, fail cleanly
+        mainHandler.postDelayed(() -> {
+            if (currentState == State.STARTING && previewView != null
+                    && (previewView.getWidth() == 0 || previewView.getHeight() == 0)) {
+                previewView.getViewTreeObserver().removeOnGlobalLayoutListener(layoutListener);
+                logDetailedError("PreviewView has zero dimensions after layout timeout", null, "PREVIEW_ZERO_DIMENSIONS");
+            }
+        }, 3000);
+    }
+
+    private void logDimensions(String source) {
+        int[] containerLoc = new int[2];
+        containerView.getLocationOnScreen(containerLoc);
+        int[] previewLoc = new int[2];
+        previewView.getLocationOnScreen(previewLoc);
+        Log.d(TAG, "DIMENSIONS_SOURCE: " + source);
+        Log.d(TAG, "CONTAINER_SIZE: " + containerView.getWidth() + "x" + containerView.getHeight());
+        Log.d(TAG, "CONTAINER_SCREEN_POS: " + containerLoc[0] + ", " + containerLoc[1]);
+        Log.d(TAG, "PREVIEW_SIZE: " + previewView.getWidth() + "x" + previewView.getHeight());
+        Log.d(TAG, "PREVIEW_SCREEN_POS: " + previewLoc[0] + ", " + previewLoc[1]);
     }
 
     private void onPreviewViewMeasured() {
@@ -236,24 +271,8 @@ public class NativeScanner {
 
         imageAnalysis.setAnalyzer(cameraExecutor, this::analyzeImage);
 
-        int width = previewView.getWidth();
-        int height = previewView.getHeight();
-        Rational aspectRatio = new Rational(width, height);
-        
-        int rotation = previewView.getDisplay() != null ? previewView.getDisplay().getRotation() : Surface.ROTATION_0;
-
-        ViewPort viewPort = new ViewPort.Builder(aspectRatio, rotation)
-                .setScaleType(ViewPort.FILL_CENTER)
-                .build();
-
-        UseCaseGroup useCaseGroup = new UseCaseGroup.Builder()
-                .addUseCase(preview)
-                .addUseCase(imageAnalysis)
-                .setViewPort(viewPort)
-                .build();
-
         try {
-            camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, useCaseGroup);
+            camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis);
             Log.d(TAG, "CAMERA_BIND_SUCCESS");
             
             if (camera == null) {
@@ -430,16 +449,26 @@ public class NativeScanner {
     }
 
     public void focus(float x, float y) {
-        if (camera != null && previewView != null) {
-            float pxX = x * previewView.getWidth();
-            float pxY = y * previewView.getHeight();
-            MeteringPointFactory factory = previewView.getMeteringPointFactory();
-            MeteringPoint point = factory.createPoint(pxX, pxY);
-            FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
-                    .setAutoCancelDuration(3, java.util.concurrent.TimeUnit.SECONDS)
-                    .build();
-            camera.getCameraControl().startFocusAndMetering(action);
-            Log.d(TAG, "Triggered tap to focus at normalized " + x + ", " + y + " -> pixels " + pxX + ", " + pxY);
+        try {
+            if (camera != null && previewView != null && previewView.getWidth() > 0 && previewView.getHeight() > 0) {
+                float clampedX = Math.max(0.05f, Math.min(0.95f, x));
+                float clampedY = Math.max(0.05f, Math.min(0.95f, y));
+                float pxX = clampedX * previewView.getWidth();
+                float pxY = clampedY * previewView.getHeight();
+                MeteringPointFactory factory = previewView.getMeteringPointFactory();
+                MeteringPoint point = factory.createPoint(pxX, pxY);
+                FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF | FocusMeteringAction.FLAG_AE)
+                        .setAutoCancelDuration(3, java.util.concurrent.TimeUnit.SECONDS)
+                        .build();
+                if (camera.getCameraInfo().isFocusMeteringSupported(action)) {
+                    camera.getCameraControl().startFocusAndMetering(action);
+                    Log.d(TAG, "Triggered tap to focus at normalized " + clampedX + ", " + clampedY + " -> pixels " + pxX + ", " + pxY);
+                } else {
+                    Log.w(TAG, "Focus and metering action is not supported by current camera");
+                }
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "Error performing tap-to-focus", t);
         }
     }
 

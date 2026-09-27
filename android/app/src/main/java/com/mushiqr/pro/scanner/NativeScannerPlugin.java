@@ -88,30 +88,31 @@ public class NativeScannerPlugin extends Plugin {
 
     private void startCamera(PluginCall call) {
         getActivity().runOnUiThread(() -> {
-            Integer x = call.getInt("x");
-            Integer y = call.getInt("y");
-            Integer width = call.getInt("width");
-            Integer height = call.getInt("height");
+            ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
 
-            int[] webViewLocation = new int[2];
-            bridge.getWebView().getLocationOnScreen(webViewLocation);
-
-            float density = getActivity().getResources().getDisplayMetrics().density;
-            int pxW = width != null ? Math.round(width * density) : ViewGroup.LayoutParams.MATCH_PARENT;
-            int pxH = height != null ? Math.round(height * density) : ViewGroup.LayoutParams.MATCH_PARENT;
-            
-            int pxX = x != null ? Math.round(x * density) : 0;
-            int pxY = y != null ? Math.round(y * density) : 0;
-
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(pxW, pxH);
-            params.leftMargin = pxX; // WebView is usually full screen but let's just apply density for now. In case of issues we add webViewLocation.
-            params.topMargin = pxY;
+            // Sizing containerView to MATCH_PARENT x MATCH_PARENT so the camera preview
+            // fills the entire view behind the WebView without margin/offset clipping.
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            );
             containerView.setLayoutParams(params);
 
+            // Ensure window, parent layout, and webview are completely transparent
+            getActivity().getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+            if (parent != null) {
+                parent.setBackgroundColor(Color.TRANSPARENT);
+            }
+            android.view.View content = getActivity().findViewById(android.R.id.content);
+            if (content != null) {
+                content.setBackgroundColor(Color.TRANSPARENT);
+            }
             bridge.getWebView().setBackgroundColor(Color.TRANSPARENT);
-            ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
+            bridge.getWebView().setLayerType(android.view.View.LAYER_TYPE_NONE, null);
+            containerView.setBackgroundColor(Color.TRANSPARENT);
+
             if (containerView.getParent() != null) {
-                ((ViewGroup)containerView.getParent()).removeView(containerView);
+                ((ViewGroup) containerView.getParent()).removeView(containerView);
             }
             parent.addView(containerView, 0); // Add behind webview
             
@@ -129,7 +130,7 @@ public class NativeScannerPlugin extends Plugin {
     public void stopScanner(PluginCall call) {
         getActivity().runOnUiThread(() -> {
             nativeScanner.stopScanner();
-            bridge.getWebView().setBackgroundColor(Color.WHITE);
+            bridge.getWebView().setBackgroundColor(Color.TRANSPARENT);
             ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
             if (containerView.getParent() != null) {
                 parent.removeView(containerView);
@@ -171,7 +172,13 @@ public class NativeScannerPlugin extends Plugin {
         Float x = call.getFloat("x");
         Float y = call.getFloat("y");
         if (x != null && y != null) {
-            nativeScanner.focus(x, y);
+            getActivity().runOnUiThread(() -> {
+                try {
+                    nativeScanner.focus(x, y);
+                } catch (Throwable t) {
+                    android.util.Log.e("MushiCamera", "Failed to focus", t);
+                }
+            });
         }
         call.resolve();
     }

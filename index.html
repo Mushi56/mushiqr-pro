@@ -26,6 +26,28 @@
         background-color: #030305; /* Match --bg-primary */
         font-family: 'Inter', -apple-system, sans-serif;
       }
+      html.native-scanner-active,
+      body.native-scanner-active,
+      .native-scanner-active body,
+      .native-scanner-active html,
+      .native-scanner-active #root,
+      .native-scanner-active .app,
+      .native-scanner-active .app-main-redesigned,
+      .native-scanner-active main,
+      .native-scanner-active .scanner-page,
+      .native-scanner-active .qrs,
+      .native-scanner-active .qrs-body,
+      .native-scanner-active .qrs-frame,
+      .native-scanner-active .qrs-viewport {
+        background: transparent !important;
+        background-color: transparent !important;
+        background-image: none !important;
+      }
+      html.native-scanner-active #initial-loader,
+      body.native-scanner-active #initial-loader,
+      .native-scanner-active #initial-loader {
+        display: none !important;
+      }
       #initial-loader {
         position: fixed; inset: 0; display: flex; flex-direction: column;
         align-items: center; justify-content: center; background-color: #030305; z-index: 999999;

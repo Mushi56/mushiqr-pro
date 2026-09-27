@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Share } from '@capacitor/share';
 import { App as CapApp } from '@capacitor/app';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import {
   ArrowLeft, Zap, ZapOff, Image, CheckCircle2,
   Copy, ExternalLink, Share2, Star, Wifi, Mail,
@@ -214,6 +215,32 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     }
   });
 
+  const effectiveTheme = useMemo(() => {
+    if (theme === 'auto') {
+      return (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    return theme;
+  }, [theme]);
+
+  // Synchronize Android Status Bar text/icons with the current theme in the scanner
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      const applyStatusBar = async () => {
+        try {
+          await StatusBar.show();
+          await StatusBar.setOverlaysWebView({ overlay: true });
+          if (effectiveTheme === 'light') {
+            await StatusBar.setStyle({ style: Style.Light }); // Dark text/icons for light white navbar
+          } else {
+            await StatusBar.setStyle({ style: Style.Dark }); // White text/icons for dark navbar
+          }
+          await StatusBar.setBackgroundColor({ color: '#00000000' });
+        } catch (e) {}
+      };
+      applyStatusBar();
+    }
+  }, [effectiveTheme]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -394,6 +421,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     
     if (Capacitor.isNativePlatform()) {
       try { await NativeScanner.stopScanner(); } catch (e) { console.warn(e); }
+      document.documentElement.classList.remove('native-scanner-active');
+      document.body.classList.remove('native-scanner-active');
+      document.body.style.removeProperty('background');
+      document.documentElement.style.removeProperty('background');
       if (listenersRef.current) {
         listenersRef.current.forEach(l => l.remove());
         listenersRef.current = [];
@@ -695,6 +726,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           handleScanResult(res.text, { result: { format: { format: res.format } } });
         });
         const errListener = await NativeScanner.addListener('cameraError', (res) => {
+          document.documentElement.classList.remove('native-scanner-active');
+          document.body.classList.remove('native-scanner-active');
           setError(res.error || 'Camera Error'); setStatus('ERROR');
         });
         const zoomListener = await NativeScanner.addListener('zoomChanged', (res) => {
@@ -713,6 +746,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             height: Math.round(rect.height)
           };
         }
+
+        // Make all layers transparent so native PreviewView is visible through WebView
+        document.documentElement.classList.add('native-scanner-active');
+        document.body.classList.add('native-scanner-active');
 
         await NativeScanner.startScanner(bounds);
         setVideoPlaying(true);
@@ -1035,11 +1072,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   const handleViewportClick = useCallback((e) => {
     if (Capacitor.isNativePlatform() && status === 'SCANNING') {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
       try {
-        NativeScanner.focus({ x, y });
+        const rect = e.currentTarget.getBoundingClientRect();
+        if (rect && rect.width > 0 && rect.height > 0) {
+          const rawX = (e.clientX - rect.left) / rect.width;
+          const rawY = (e.clientY - rect.top) / rect.height;
+          if (!isNaN(rawX) && !isNaN(rawY) && isFinite(rawX) && isFinite(rawY)) {
+            const x = Math.max(0.05, Math.min(0.95, rawX));
+            const y = Math.max(0.05, Math.min(0.95, rawY));
+            NativeScanner.focus({ x, y }).catch(() => {});
+          }
+        }
       } catch (err) {}
     }
   }, [status]);
@@ -1048,28 +1091,34 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const TypeIcon = qrTypeData?.icon || FileText;
 
   useEffect(() => {
-    if (Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED')) {
+    if (Capacitor.isNativePlatform() && (status === 'STARTING' || status === 'SCANNING' || status === 'DETECTED')) {
       document.body.style.setProperty('background', 'transparent', 'important');
       document.documentElement.style.setProperty('background', 'transparent', 'important');
+      document.documentElement.classList.add('native-scanner-active');
+      document.body.classList.add('native-scanner-active');
     } else {
       document.body.style.removeProperty('background');
       document.documentElement.style.removeProperty('background');
+      document.documentElement.classList.remove('native-scanner-active');
+      document.body.classList.remove('native-scanner-active');
     }
     return () => {
       document.body.style.removeProperty('background');
       document.documentElement.style.removeProperty('background');
+      document.documentElement.classList.remove('native-scanner-active');
+      document.body.classList.remove('native-scanner-active');
     };
   }, [status]);
 
   return (
-    <div className="scanner-page scanner-page-enter" style={Capacitor.isNativePlatform() && (status === 'SCANNING' || status === 'DETECTED') ? { background: 'transparent' } : {}}>
-      {/* Upper Navbar (#FFFFFF with 100% opacity + safe area) */}
+    <div className={`scanner-page ${Capacitor.isNativePlatform() ? '' : 'scanner-page-enter'}`} style={Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent', transform: 'none', animation: 'none' } : {}}>
+      {/* Upper Navbar (Theme-aware: White in light mode, dark in dark mode) */}
       <header 
         className="scanner-upper-navbar" 
         style={{ 
           position: 'relative', 
           border: 'none',
-          borderBottom: 'none', 
+          borderBottom: effectiveTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.06)', 
           display: 'flex', 
           width: '100%', 
           height: 'calc(64px + env(safe-area-inset-top, 0px))',
@@ -1082,18 +1131,18 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           zIndex: 100, 
           justifyContent: 'space-between', 
           alignItems: 'center',
-          background: '#111625',
-          backgroundColor: '#111625',
+          background: effectiveTheme === 'light' ? '#FFFFFF' : '#111625',
+          backgroundColor: effectiveTheme === 'light' ? '#FFFFFF' : '#111625',
           opacity: 1,
           backdropFilter: 'none',
           WebkitBackdropFilter: 'none',
-          boxShadow: 'none',
-          color: '#FFFFFF'
+          boxShadow: effectiveTheme === 'light' ? '0 1px 3px rgba(0, 0, 0, 0.05)' : 'none',
+          color: effectiveTheme === 'light' ? '#0F172A' : '#FFFFFF'
         }}
       >
         <div className="app-logo">
           <AppIcon size={46} noBackground />
-          <div className="app-logo-text" style={{ whiteSpace: 'nowrap', color: '#FFFFFF' }}>Mushi QR <span style={{ color: 'var(--accent-primary)' }}>Pro</span></div>
+          <div className="app-logo-text" style={{ whiteSpace: 'nowrap', color: effectiveTheme === 'light' ? '#0F172A' : '#FFFFFF' }}>Mushi QR <span style={{ color: 'var(--accent-primary)' }}>Pro</span></div>
         </div>
 
         <div className="app-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1147,9 +1196,9 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"
               style={{
-                color: '#111827',
-                background: 'rgba(0, 0, 0, 0.05)',
-                border: '1px solid rgba(0, 0, 0, 0.08)'
+                color: effectiveTheme === 'light' ? '#0F172A' : '#FFFFFF',
+                background: effectiveTheme === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.08)',
+                border: effectiveTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.12)'
               }}
             >
               <Menu size={20} />
@@ -1176,6 +1225,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                       savePreferences({ ...prefs, theme: next });
                       const eff = next === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : next;
                       document.documentElement.setAttribute('data-theme', eff);
+                      window.dispatchEvent(new Event('preferences-sync'));
                     }}
                   >
                     {theme === 'dark' ? (
@@ -1208,9 +1258,9 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         </div>
       </header>
 
-      <div className="qrs">
+      <div className="qrs" style={Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
         {/* Body */}
-        <div className="qrs-body" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} style={{ justifyContent: 'flex-end', paddingBottom: '24px' }}>
+        <div className="qrs-body" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} style={{ justifyContent: 'flex-end', paddingBottom: '12px', background: 'transparent', backgroundColor: 'transparent' }}>
           {/* Error - QR Not Found (illustrated) */}
           {status === 'ERROR' && error && error.toLowerCase().includes('no qr') ? (
             <div 
@@ -1246,8 +1296,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
 
           {/* Scanner Frame */}
-          <div className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`}>
-            <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} onClick={handleViewportClick} />
+          <div className={`qrs-frame ${status === 'DETECTED' ? 'detected' : ''}`} style={Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
+            <div id="qr-scanner-viewport" className={`qrs-viewport ${status === 'DETECTED' ? 'blur' : ''}`} style={Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}} onClick={handleViewportClick} />
 
 
 

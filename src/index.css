@@ -5035,8 +5035,8 @@ input[type="range"]::-moz-range-thumb {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #0B0F19;
-  /* Always dark background for camera */
+  background: transparent;
+  /* Transparent for camera preview */
   z-index: 8000; /* Stacks above app-header (z-index 6000) */
   display: flex;
   flex-direction: column;
@@ -5054,15 +5054,15 @@ input[type="range"]::-moz-range-thumb {
   justify-content: space-between !important;
   padding: env(safe-area-inset-top, 0px) 16px 0 16px !important;
   box-sizing: border-box !important;
-  background: #111625 !important;
-  background-color: #111625 !important;
+  background: var(--nav-bg, #111625) !important;
+  background-color: var(--nav-bg, #111625) !important;
   opacity: 1 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   border: none !important;
-  border-bottom: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
   box-shadow: none !important;
-  color: #FFFFFF !important;
+  color: var(--text-primary, #FFFFFF) !important;
   position: relative !important;
   z-index: 100 !important;
   flex-shrink: 0 !important;
@@ -5080,10 +5080,24 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
+/* ── Light Mode Scanner Navbar (White Header) ── */
+[data-theme="light"] .scanner-page .scanner-upper-navbar,
+[data-theme="light"] .scanner-upper-navbar {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .scanner-page .scanner-upper-navbar .app-logo-text {
+  color: #0F172A !important;
+}
+
 [data-theme="light"] .scanner-page .scanner-upper-navbar .btn-menu-toggle {
-  color: #FFFFFF !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #0F172A !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 .scanner-nav-header {
@@ -5939,7 +5953,7 @@ video {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--nav-bg);
+  background: transparent;
   font-family: 'Inter', sans-serif;
   overflow: hidden;
 }
@@ -5958,8 +5972,8 @@ video {
 
 .qrs-flash-viewport-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 8px;
+  right: 10px;
   z-index: 25;
   background: transparent;
   border: none;
@@ -5968,7 +5982,7 @@ video {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 6px;
   transition: opacity 0.2s, color 0.2s, transform 0.2s;
 }
 
@@ -6055,7 +6069,7 @@ video {
   min-height: 0;
   padding: 0;
   margin: 0;
-  background: var(--nav-bg);
+  background: transparent;
   /* Prevent browser touch delay on pinch-zoom gestures */
   touch-action: pan-y;
 }
@@ -6280,16 +6294,11 @@ video {
   width: 100%;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: var(--nav-bg);
+  background: transparent;
   /* Only transition opacity-related props, not layout */
   transition: opacity 0.3s ease;
   margin: 0 auto;
-  /* Promote to GPU compositor layer */
-  transform: translateZ(0);
-  will-change: opacity;
-  /* Laser sweep uses this to fill the frame without top layout */
   --laser-sweep-distance: 100cqh;
-  container-type: size;
 }
 
 .qrs-viewport {
@@ -6298,9 +6307,7 @@ video {
   width: 100% !important;
   height: 100% !important;
   z-index: 1;
-  /* Ensure video is on its own GPU layer */
-  transform: translateZ(0);
-  will-change: transform;
+  background: transparent !important;
 }
 
 .qrs-viewport > div {
@@ -6446,7 +6453,7 @@ video {
 
 .qrs-zoom {
   position: absolute;
-  bottom: 24px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -6461,7 +6468,7 @@ video {
   padding: 10px 18px;
   width: calc(100% - 48px);
   max-width: 340px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
 }
 
 .qrs-zoom button {
@@ -8072,20 +8079,20 @@ video::-webkit-media-controls {
 /* ── iPhone-style Zoom Dials ── */
 .qrs-zoom-ios-container {
   position: absolute;
-  bottom: 24px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(10, 10, 15, 0.25);
+  background: rgba(10, 10, 15, 0.35);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   padding: 4px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   pointer-events: auto;
 }
 
@@ -9033,5 +9040,62 @@ video::-webkit-media-controls {
   pointer-events: none;
   z-index: 5;
   user-select: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NATIVE SCANNER TRANSPARENCY OVERRIDES
+   Active ONLY when the Android CameraX scanner is running behind the WebView.
+   The class "native-scanner-active" is toggled on <html> by QRScanner.jsx.
+   ══════════════════════════════════════════════════════════════ */
+
+html.native-scanner-active,
+body.native-scanner-active,
+.native-scanner-active,
+.native-scanner-active html,
+.native-scanner-active body,
+.native-scanner-active #root,
+.native-scanner-active .app,
+.native-scanner-active .app.redesigned,
+.native-scanner-active main,
+.native-scanner-active .app-main,
+.native-scanner-active .app-main-redesigned,
+.native-scanner-active .scanner-page,
+.native-scanner-active .scanner-page-enter,
+.native-scanner-active .qrs,
+.native-scanner-active .qrs-body,
+.native-scanner-active .qrs-frame,
+.native-scanner-active .qrs-viewport,
+.native-scanner-active .qrs-viewport > div {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.native-scanner-active #initial-loader {
+  display: none !important;
+}
+
+.native-scanner-active .app-header {
+  display: none !important;
+}
+
+.native-scanner-active .app-main-redesigned {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  overflow: hidden !important;
+}
+
+/* Ensure no persistent composited GPU transform locks an opaque layer */
+.native-scanner-active .scanner-page,
+.native-scanner-active .scanner-page-enter,
+.native-scanner-active .qrs,
+.native-scanner-active .qrs-body,
+.native-scanner-active .qrs-frame,
+.native-scanner-active .qrs-viewport {
+  transform: none !important;
+  animation: none !important;
+  will-change: auto !important;
+  contain: none !important;
 }
 

@@ -4191,7 +4191,7 @@ export default function App() {
     logoCrop
   };
   return (
-    <div className="app redesigned">
+    <div className={`app redesigned ${activePage === 'scanner' ? 'native-scanner-active' : ''}`} style={activePage === 'scanner' && Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
       {/* ── Blocked User Overlay ── */}
       {isBlocked && (
         <div style={{
@@ -4265,7 +4265,7 @@ export default function App() {
       {/* ── Header ── */}
       <header 
         className={`app-header ${['home', 'saved', 'history', 'you', 'settings'].includes(activePage) ? 'header-home' : ''} ${activePage === 'home' && !isHomeScrolled ? 'header-home-banner' : ''}`}
-        style={{ display: ['barcode', 'onboarding', 'login', 'signup', 'forgot-password'].includes(activePage) ? 'none' : 'flex' }}
+        style={{ display: ['barcode', 'scanner', 'onboarding', 'login', 'signup', 'forgot-password'].includes(activePage) ? 'none' : 'flex' }}
       >
         <div className="app-logo">
           {activePage === 'scanner' && (
@@ -5004,7 +5004,7 @@ export default function App() {
         </div>
       </header>
       {/* ── Main Content Area ── */}
-      <main className="app-main-redesigned">
+      <main className={`app-main-redesigned ${activePage === 'scanner' ? 'native-scanner-active' : ''}`} style={activePage === 'scanner' && Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
         {activePage === 'generator' ? (
           <>
             {/* ── QR Preview Card (always visible) ── */}
