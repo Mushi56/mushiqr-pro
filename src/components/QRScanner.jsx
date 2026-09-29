@@ -1651,7 +1651,15 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             {/* Upper Navbar */}
             <header 
               className={`app-header ${!isResultScrolled ? 'header-home-banner' : 'header-home'}`}
-              style={{ position: 'sticky', top: 0, zIndex: 100, display: 'flex' }}
+              style={{ 
+                position: 'sticky', 
+                top: 0, 
+                zIndex: 100, 
+                display: 'flex',
+                background: !isResultScrolled ? '#F01A4E' : undefined,
+                backgroundColor: !isResultScrolled ? '#F01A4E' : undefined,
+                transition: 'background-color 0.3s ease, background 0.3s ease'
+              }}
             >
               <div className="app-logo">
                 <AppIcon size={46} noBackground />
