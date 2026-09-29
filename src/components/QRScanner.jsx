@@ -206,6 +206,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isResultScrolled, setIsResultScrolled] = useState(false);
   const menuRef = useRef(null);
   const [theme, setTheme] = useState(() => {
     try {
@@ -1596,29 +1597,20 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
         {/* Full-Screen Detection Result */}
         {status === 'DETECTED' && qrTypeData && (
-          <div className="qrs-result-fullscreen">
-            {/* Banner Header */}
-            <div className="qrs-result-banner">
-              <div className="qrs-result-banner-header">
-                <button className="qrs-result-banner-btn" onClick={resumeScanning} aria-label="Go Back">
-                  <ArrowLeft size={20} />
-                </button>
-                <h3 className="qrs-result-banner-title">Scan Result</h3>
-                <div style={{ width: 36 }} />
+          <div className="qrs-result-fullscreen" onScroll={(e) => {
+            const scrolled = e.currentTarget.scrollTop > 20;
+            if (scrolled !== isResultScrolled) setIsResultScrolled(scrolled);
+          }}>
+            {/* Upper Navbar */}
+            <header 
+              className={`app-header ${!isResultScrolled ? 'header-home-banner' : 'header-home'}`}
+              style={{ position: 'sticky', top: 0, zIndex: 100, display: 'flex' }}
+            >
+              <div className="app-logo">
+                <AppIcon size={46} noBackground />
+                <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
               </div>
-
-              <div className="qrs-result-success-badge-container">
-                <div className="qrs-result-success-badge">
-                  <CheckCircle2 size={36} style={{ color: 'var(--accent-primary)' }} />
-                </div>
-                <div className="qrs-result-success-stars">
-                  <Sparkles size={16} style={{ position: 'absolute', left: '-5px', top: '10px', color: '#ffeb3b' }} />
-                  <Sparkles size={12} style={{ position: 'absolute', right: '-8px', top: '12px', color: '#ffeb3b' }} />
-                  <Sparkles size={14} style={{ position: 'absolute', left: '10px', bottom: '-8px', color: '#ffeb3b' }} />
-                </div>
-              </div>
-
-            </div>
+            </header>
 
             {/* Central Card Body */}
             <div className="qrs-result-body">
