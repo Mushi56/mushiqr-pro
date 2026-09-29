@@ -279,7 +279,6 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const qrScannerRef = useRef(null);
   const fileInputRef = useRef(null);
   const previewCanvasRef = useRef(null);
-  const animCanvasRef = useRef(null);
   const mountedRef = useRef(true);
   const busyRef = useRef(false);
   const scanHandledRef = useRef(false);
@@ -376,7 +375,6 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       };
 
       if (previewCanvasRef.current) drawToCanvas(previewCanvasRef.current);
-      if (animCanvasRef.current) drawToCanvas(animCanvasRef.current);
     }
   }, [status, result, detectedFormatName]);
 
@@ -1390,8 +1388,15 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             {/* Apple-style Detection Animation Overlay */}
             {status === 'ANIMATING' && qrTypeData && (
               <div className="qrs-animating-overlay">
-                <div className="qrs-animating-canvas-wrapper">
-                   <canvas ref={animCanvasRef} width="200" height="200" />
+                <div className="qrs-apple-reticle">
+                  <div className="reticle-corner top-left" />
+                  <div className="reticle-corner top-right" />
+                  <div className="reticle-corner bottom-left" />
+                  <div className="reticle-corner bottom-right" />
+                </div>
+                <div className="qrs-apple-chip">
+                  <TypeIcon size={16} />
+                  <span>{qrTypeData.type}</span>
                 </div>
               </div>
             )}
