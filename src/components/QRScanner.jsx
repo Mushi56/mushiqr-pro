@@ -279,6 +279,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const qrScannerRef = useRef(null);
   const fileInputRef = useRef(null);
   const previewCanvasRef = useRef(null);
+  const animCanvasRef = useRef(null);
   const mountedRef = useRef(true);
   const busyRef = useRef(false);
   const scanHandledRef = useRef(false);
@@ -286,6 +287,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const capTimersRef = useRef([]);
   const listenersRef = useRef([]);
   const zoomRafRef = useRef(null);
+  const capturingRef = useRef(false);
 
   const handleEditResult = () => {
     triggerHapticFeedback();
@@ -321,29 +323,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   };
 
   useEffect(() => {
-    if (status === 'DETECTED' && result && previewCanvasRef.current) {
-      const canvas = previewCanvasRef.current;
-      const bcid = mapFormatToBcid(detectedFormatName);
-      
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      if (bcid && bcid !== 'qrcode') {
-        try {
-          renderBarcode(canvas, result, {
-            bcid: bcid,
-            barColor: '#000000',
-            bgColor: '#ffffff',
-            barWidth: 2,
-            height: 80,
-            margin: 10,
-            displayValue: false
-          });
-        } catch (e) {
-          console.error("Failed to render preview barcode:", e);
+    if ((status === 'DETECTED' || status === 'ANIMATING') && result) {
+      const drawToCanvas = (canvas) => {
+        if (!canvas) return;
+        const bcid = mapFormatToBcid(detectedFormatName);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (bcid && bcid !== 'qrcode') {
           try {
-            renderBarcode(canvas, "1234567890", {
-              bcid: 'code128',
+            renderBarcode(canvas, result, {
+              bcid: bcid,
               barColor: '#000000',
               bgColor: '#ffffff',
               barWidth: 2,
@@ -351,26 +341,42 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               margin: 10,
               displayValue: false
             });
-          } catch (err) {}
+          } catch (e) {
+            console.error("Failed to render preview barcode:", e);
+            try {
+              renderBarcode(canvas, "1234567890", {
+                bcid: 'code128',
+                barColor: '#000000',
+                bgColor: '#ffffff',
+                barWidth: 2,
+                height: 80,
+                margin: 10,
+                displayValue: false
+              });
+            } catch (err) {}
+          }
+        } else {
+          try {
+            const matrixInfo = generateQRMatrix(result, 'M');
+            renderQR(canvas, {
+              ...matrixInfo,
+              size: 200,
+              bgColor: '#ffffff',
+              qrColor: '#000000',
+              eyeColor: '#000000',
+              eyeOuterColor: '#000000',
+              dotStyle: 'rounded',
+              eyeStyle: 'rounded',
+              quietZone: 0
+            });
+          } catch (e) {
+            console.error("Failed to render preview QR:", e);
+          }
         }
-      } else {
-        try {
-          const matrixInfo = generateQRMatrix(result, 'M');
-          renderQR(canvas, {
-            ...matrixInfo,
-            size: 200,
-            bgColor: '#ffffff',
-            qrColor: '#000000',
-            eyeColor: '#000000',
-            eyeOuterColor: '#000000',
-            dotStyle: 'rounded',
-            eyeStyle: 'rounded',
-            quietZone: 0
-          });
-        } catch (e) {
-          console.error("Failed to render preview QR:", e);
-        }
-      }
+      };
+
+      if (previewCanvasRef.current) drawToCanvas(previewCanvasRef.current);
+      if (animCanvasRef.current) drawToCanvas(animCanvasRef.current);
     }
   }, [status, result, detectedFormatName]);
 
@@ -701,8 +707,28 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       });
     });
 
-    // Always transition to DETECTED state so the result card stays visible on screen
-    setStatus('DETECTED');
+    try {
+      const prefs = getPreferences();
+      if (prefs.autoOpenUrl !== false && parsed.type === 'Website') {
+        const t = decodedText.trim();
+        if (!/^(javascript|data|vbscript):/i.test(t)) {
+          const url = /^https?:\/\//i.test(t) ? t : 'https://' + t;
+          if (Capacitor.isNativePlatform()) {
+            Browser.open({ url, windowName: '_system' }).catch(() => {});
+          } else {
+            window.open(url, '_blank', 'noopener,noreferrer');
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to auto-open URL:', e);
+    }
+
+    // Show animation overlay first, then transition to full result screen
+    setStatus('ANIMATING');
+    setTimeout(() => {
+      setStatus('DETECTED');
+    }, 800);
   }, [playBeep]);
 
   const startScanner = useCallback(async () => {
@@ -890,8 +916,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const handleFileUpload = async (file) => {
     if (!file) return;
     await stopScanner(); setStatus('LOADING'); setResult(null); setQrTypeData(null); setError(null);
+    scanHandledRef.current = false;
+    let scanner = null;
     try {
-      const scanner = new Html5Qrcode("qr-scanner-viewport", false);
+      scanner = new Html5Qrcode("qr-scanner-viewport", false);
       const scanRes = await scanner.scanFile(file, true);
       
       let text = '';
@@ -906,6 +934,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       if (mountedRef.current) handleScanResult(text, rawResult);
     } catch (err) {
       if (mountedRef.current) { setError('No QR code or barcode found in this image.'); setStatus('ERROR'); }
+    } finally {
+      if (scanner) {
+        try {
+          scanner.clear();
+        } catch (e) {
+          // ignore
+        }
+      }
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -1013,9 +1052,40 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   };
 
   const captureImage = useCallback(async () => {
+    if (capturingRef.current) return;
+    capturingRef.current = true;
     triggerHapticFeedback();
+
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const res = await NativeScanner.capture();
+        if (res && res.found && res.text) {
+          handleScanResult(res.text, { result: { format: { format: res.format } } });
+        } else {
+          await stopScanner();
+          if (mountedRef.current) {
+            setError(res?.error || 'No QR code or barcode found in the captured image.');
+            setStatus('ERROR');
+          }
+        }
+      } catch (err) {
+        console.warn('Native capture failed:', err);
+        await stopScanner();
+        if (mountedRef.current) {
+          setError('No QR code or barcode found in the captured image.');
+          setStatus('ERROR');
+        }
+      } finally {
+        capturingRef.current = false;
+      }
+      return;
+    }
+
     const video = document.querySelector("#qr-scanner-viewport video");
-    if (!video) return;
+    if (!video) {
+      capturingRef.current = false;
+      return;
+    }
     try {
       const canvas = document.createElement('canvas');
       canvas.width = video.videoWidth || video.clientWidth || 640;
@@ -1026,29 +1096,34 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       await stopScanner();
 
       canvas.toBlob(async (blob) => {
-        if (!blob) {
-          setError('Failed to capture image.');
-          setStatus('ERROR');
-          return;
-        }
-        const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
         try {
-          const scanner = new Html5Qrcode("qr-scanner-viewport", false);
-          const decodedText = await scanner.scanFile(file, true);
-          if (mountedRef.current) {
-            handleScanResult(decodedText);
-          }
-        } catch {
-          if (mountedRef.current) {
-            setError('No QR code or barcode found in the captured image.');
+          if (!blob) {
+            setError('Failed to capture image.');
             setStatus('ERROR');
+            return;
           }
+          const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
+          try {
+            const scanner = new Html5Qrcode("qr-scanner-viewport", false);
+            const decodedText = await scanner.scanFile(file, true);
+            if (mountedRef.current) {
+              handleScanResult(decodedText);
+            }
+          } catch {
+            if (mountedRef.current) {
+              setError('No QR code or barcode found in the captured image.');
+              setStatus('ERROR');
+            }
+          }
+        } finally {
+          capturingRef.current = false;
         }
       }, 'image/jpeg', 0.95);
     } catch (err) {
       console.error('Capture failed:', err);
       setError('Failed to capture camera frame.');
       setStatus('ERROR');
+      capturingRef.current = false;
     }
   }, [stopScanner, handleScanResult, triggerHapticFeedback]);
 
@@ -1302,15 +1377,24 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
 
             {/* Flashlight button inside camera */}
-            {flashSupported && (
+            {flashSupported && status === 'SCANNING' && (
               <button className={`qrs-flash-viewport-btn ${flashOn ? 'on' : ''}`} onClick={toggleFlash} aria-label="Toggle flash">
-                {flashOn ? <Zap size={22} /> : <ZapOff size={22} />}
+                {flashOn ? <Zap size={20} /> : <ZapOff size={20} />}
               </button>
             )}
 
             {/* Laser Scanning Line */}
             {status === 'SCANNING' && <div className="qrs-laser" />}
             {status === 'DETECTED' && <div className="qrs-laser frozen" />}
+
+            {/* Apple-style Detection Animation Overlay */}
+            {status === 'ANIMATING' && qrTypeData && (
+              <div className="qrs-animating-overlay">
+                <div className="qrs-animating-canvas-wrapper">
+                   <canvas ref={animCanvasRef} width="200" height="200" />
+                </div>
+              </div>
+            )}
 
             {/* iPhone-style Premium Zoom Dials & Jog Wheel */}
             {status === 'SCANNING' && (
@@ -1467,11 +1551,19 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
         {/* Bottom Controls */}
         <div className="qrs-controls">
-          <button className="qrs-side-btn" onClick={() => { triggerHapticFeedback(); stopScanner(); if (navigateTo) navigateTo('history', 'Scanned'); else if (onBack) onBack(); }} aria-label="History">
+          <button 
+            className="qrs-side-btn" 
+            onClick={() => { triggerHapticFeedback(); stopScanner(); if (navigateTo) navigateTo('history', 'Scanned'); else if (onBack) onBack(); }} 
+            aria-label="History"
+          >
             <Clock size={22} />
           </button>
 
-          <button className="qrs-shutter-btn" onClick={status === 'DETECTED' ? resumeScanning : captureImage} aria-label="Shutter Button">
+          <button 
+            className="qrs-shutter-btn" 
+            onClick={status === 'DETECTED' ? resumeScanning : status === 'ERROR' ? startScanner : captureImage} 
+            aria-label="Shutter Button"
+          >
             <div className="qrs-shutter-btn-inner" style={{ background: status === 'DETECTED' ? '#ef4444' : '#fff' }} />
           </button>
 

@@ -2467,6 +2467,11 @@ export default function App() {
       setIsFullScreenPreviewOpen(false);
       return;
     }
+    const scannerResultBtn = document.querySelector('.qrs-result-banner-btn');
+    if (scannerResultBtn) {
+      scannerResultBtn.click();
+      return;
+    }
     if (activePage === 'home' && !advPicker.open && !formatDropdownOpen && !isMenuOpen && !isDataModalOpen) {
       const now = Date.now();
       if (now - lastBackPress.current < 2000) {

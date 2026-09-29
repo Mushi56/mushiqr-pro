@@ -188,4 +188,27 @@ public class NativeScannerPlugin extends Plugin {
         nativeScanner.switchCamera();
         call.resolve();
     }
+
+    @PluginMethod
+    public void capture(PluginCall call) {
+        if (nativeScanner == null) {
+            JSObject ret = new JSObject();
+            ret.put("found", false);
+            ret.put("error", "No QR code or barcode found in the captured image.");
+            call.resolve(ret);
+            return;
+        }
+
+        nativeScanner.capture((found, text, format, error) -> {
+            JSObject ret = new JSObject();
+            ret.put("found", found);
+            if (found) {
+                ret.put("text", text);
+                ret.put("format", format);
+            } else {
+                ret.put("error", error != null ? error : "No QR code or barcode found in the captured image.");
+            }
+            call.resolve(ret);
+        });
+    }
 }

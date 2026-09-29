@@ -2,6 +2,7 @@ package com.mushiqr.pro.scanner;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -71,16 +72,24 @@ public class NativeScanner {
     private ExecutorService cameraExecutor;
 
     private int lensFacing = CameraSelector.LENS_FACING_BACK;
+    private boolean manualZoomOverride = false;
     
     public interface ScanListener {
         void onScanResult(JSONObject result);
         void onError(String error, JSONObject details);
         void onZoomChanged(float ratio);
     }
+
+    public interface CaptureCallback {
+        void onResult(boolean found, String text, int format, String error);
+    }
     
     private ScanListener scanListener;
     private Runnable onReadyCallback;
     private Runnable onErrorCallback;
+    
+    private volatile Barcode latestBarcode = null;
+    private volatile long latestBarcodeTimestamp = 0;
     
     private Handler mainHandler;
     private Runnable firstFrameTimeout;
@@ -134,6 +143,7 @@ public class NativeScanner {
     }
 
     public void startScanner(Runnable onReady, Runnable onError) {
+        manualZoomOverride = false;
         if (currentState == State.STARTING || currentState == State.READY) {
             if (currentState == State.READY && onReady != null) {
                 onReady.run();
@@ -144,6 +154,8 @@ public class NativeScanner {
         currentState = State.STARTING;
         this.onReadyCallback = onReady;
         this.onErrorCallback = onError;
+        this.latestBarcode = null;
+        this.latestBarcodeTimestamp = 0;
 
         Log.d(TAG, "CAMERA_START_BEGIN");
 
@@ -338,6 +350,7 @@ public class NativeScanner {
                             Barcode.FORMAT_UPC_E)
                     .setZoomSuggestionOptions(
                         new ZoomSuggestionOptions.Builder(zoomRatio -> {
+                            if (manualZoomOverride) return false;
                             if (camera != null && camera.getCameraControl() != null) {
                                 camera.getCameraControl().setZoomRatio(zoomRatio);
                                 return true;
@@ -368,6 +381,8 @@ public class NativeScanner {
         barcodeScanner.process(image)
                 .addOnSuccessListener(barcodes -> {
                     for (Barcode barcode : barcodes) {
+                        latestBarcode = barcode;
+                        latestBarcodeTimestamp = System.currentTimeMillis();
                         if (scanListener != null) {
                             try {
                                 JSONObject result = new JSONObject();
@@ -412,12 +427,15 @@ public class NativeScanner {
         camera = null;
         onReadyCallback = null;
         onErrorCallback = null;
+        latestBarcode = null;
+        latestBarcodeTimestamp = 0;
         
         currentState = State.IDLE;
         Log.d(TAG, "Scanner stopped and resources released.");
     }
 
     public void setZoom(float ratio) {
+        manualZoomOverride = true;
         if (camera != null) {
             camera.getCameraControl().setZoomRatio(ratio);
         }
@@ -446,6 +464,76 @@ public class NativeScanner {
         if (camera != null && camera.getCameraInfo().hasFlashUnit()) {
             camera.getCameraControl().enableTorch(enabled);
         }
+    }
+
+    public void capture(CaptureCallback callback) {
+        if (callback == null) return;
+        
+        mainHandler.post(() -> {
+            if (previewView == null || currentState != State.READY) {
+                if (latestBarcode != null && (System.currentTimeMillis() - latestBarcodeTimestamp < 1500)) {
+                    callback.onResult(true, latestBarcode.getRawValue(), latestBarcode.getFormat(), null);
+                } else {
+                    callback.onResult(false, null, -1, "No QR code or barcode found in the captured image.");
+                }
+                return;
+            }
+
+            try {
+                Bitmap bitmap = previewView.getBitmap();
+                if (bitmap == null) {
+                    if (latestBarcode != null && (System.currentTimeMillis() - latestBarcodeTimestamp < 1500)) {
+                        callback.onResult(true, latestBarcode.getRawValue(), latestBarcode.getFormat(), null);
+                    } else {
+                        callback.onResult(false, null, -1, "No QR code or barcode found in the captured image.");
+                    }
+                    return;
+                }
+
+                if (barcodeScanner == null) {
+                    initMlKit();
+                }
+
+                if (barcodeScanner == null) {
+                    if (latestBarcode != null && (System.currentTimeMillis() - latestBarcodeTimestamp < 1500)) {
+                        callback.onResult(true, latestBarcode.getRawValue(), latestBarcode.getFormat(), null);
+                    } else {
+                        callback.onResult(false, null, -1, "No QR code or barcode found in the captured image.");
+                    }
+                    return;
+                }
+
+                InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+                barcodeScanner.process(inputImage)
+                        .addOnSuccessListener(barcodes -> {
+                            if (barcodes != null && !barcodes.isEmpty()) {
+                                Barcode barcode = barcodes.get(0);
+                                latestBarcode = barcode;
+                                latestBarcodeTimestamp = System.currentTimeMillis();
+                                callback.onResult(true, barcode.getRawValue(), barcode.getFormat(), null);
+                            } else if (latestBarcode != null && (System.currentTimeMillis() - latestBarcodeTimestamp < 1500)) {
+                                callback.onResult(true, latestBarcode.getRawValue(), latestBarcode.getFormat(), null);
+                            } else {
+                                callback.onResult(false, null, -1, "No QR code or barcode found in the captured image.");
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.w(TAG, "Snapshot barcode analysis failed", e);
+                            if (latestBarcode != null && (System.currentTimeMillis() - latestBarcodeTimestamp < 1500)) {
+                                callback.onResult(true, latestBarcode.getRawValue(), latestBarcode.getFormat(), null);
+                            } else {
+                                callback.onResult(false, null, -1, "No QR code or barcode found in the captured image.");
+                            }
+                        });
+            } catch (Throwable t) {
+                Log.e(TAG, "Capture failed with exception", t);
+                if (latestBarcode != null && (System.currentTimeMillis() - latestBarcodeTimestamp < 1500)) {
+                    callback.onResult(true, latestBarcode.getRawValue(), latestBarcode.getFormat(), null);
+                } else {
+                    callback.onResult(false, null, -1, "No QR code or barcode found in the captured image.");
+                }
+            }
+        });
     }
 
     public void focus(float x, float y) {
