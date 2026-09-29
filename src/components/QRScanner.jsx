@@ -388,11 +388,16 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             renderQR(canvas, {
               ...matrixInfo,
               size: 200,
-              bgColor: '#ffffff',
-              qrColor: '#000000',
-              eyeColor: '#000000',
-              eyeOuterColor: '#000000',
-              dotStyle: 'rounded',
+              bgColor: 'transparent',
+              bgTransparent: true,
+              gradientEnabled: true,
+              gradientColor1: '#FF2A55',
+              gradientColor2: '#B3002D',
+              gradientType: 'linear',
+              qrColor: '#FF2A55',
+              eyeColor: '#B3002D',
+              eyeOuterColor: '#FF2A55',
+              dotStyle: 'fluid',
               eyeStyle: 'rounded',
               quietZone: 0
             });
@@ -713,9 +718,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             matrix: matrixInfo.matrix,
             moduleCount: matrixInfo.moduleCount,
             size: 400,
-            qrColor: '#000000',
             bgColor: '#ffffff',
-            bgTransparent: false
+            bgTransparent: false,
+            gradientEnabled: true,
+            gradientColor1: '#FF2A55',
+            gradientColor2: '#B3002D',
+            gradientType: 'linear',
+            qrColor: '#FF2A55',
+            eyeColor: '#B3002D',
+            eyeOuterColor: '#FF2A55',
+            dotStyle: 'fluid',
+            eyeStyle: 'rounded'
           });
           thumbnail = canvas.toDataURL('image/png');
         }
@@ -1018,9 +1031,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             matrix: matrixInfo.matrix,
             moduleCount: matrixInfo.moduleCount,
             size: 400,
-            qrColor: '#000000',
             bgColor: '#ffffff',
-            bgTransparent: false
+            bgTransparent: false,
+            gradientEnabled: true,
+            gradientColor1: '#FF2A55',
+            gradientColor2: '#B3002D',
+            gradientType: 'linear',
+            qrColor: '#FF2A55',
+            eyeColor: '#B3002D',
+            eyeOuterColor: '#FF2A55',
+            dotStyle: 'fluid',
+            eyeStyle: 'rounded'
           });
           thumbnail = canvas.toDataURL('image/png');
         }
