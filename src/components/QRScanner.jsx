@@ -225,22 +225,48 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   // Synchronize Android Status Bar text/icons with the current theme in the scanner
   useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      const applyStatusBar = async () => {
+    const updateStatusBar = async () => {
+      if (Capacitor.isNativePlatform()) {
         try {
           await StatusBar.show();
           await StatusBar.setOverlaysWebView({ overlay: true });
-          if (effectiveTheme === 'light') {
-            await StatusBar.setStyle({ style: Style.Light }); // Dark text/icons for light white navbar
+          
+          if (status === 'DETECTED' && !isResultScrolled) {
+            await StatusBar.setStyle({ style: Style.Dark }); // White text/icons for red hero banner
+            await StatusBar.setBackgroundColor({ color: '#00000000' });
           } else {
-            await StatusBar.setStyle({ style: Style.Dark }); // White text/icons for dark navbar
+            if (effectiveTheme === 'light') {
+              await StatusBar.setStyle({ style: Style.Light });
+            } else {
+              await StatusBar.setStyle({ style: Style.Dark });
+            }
+            await StatusBar.setBackgroundColor({ color: '#00000000' });
           }
-          await StatusBar.setBackgroundColor({ color: '#00000000' });
         } catch (e) {}
-      };
-      applyStatusBar();
-    }
-  }, [effectiveTheme]);
+      }
+
+      // PWA Browser Top Bar theme-color
+      try {
+        let targetColor;
+        if (status === 'DETECTED' && !isResultScrolled) {
+          targetColor = '#F01A4E';
+        } else {
+          targetColor = effectiveTheme === 'dark' ? '#0C0C14' : '#FFFFFF';
+        }
+        
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (metaThemeColor) {
+          metaThemeColor.setAttribute('content', targetColor);
+        } else {
+          metaThemeColor = document.createElement('meta');
+          metaThemeColor.name = 'theme-color';
+          metaThemeColor.content = targetColor;
+          document.head.appendChild(metaThemeColor);
+        }
+      } catch (e) {}
+    };
+    updateStatusBar();
+  }, [effectiveTheme, status, isResultScrolled]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
