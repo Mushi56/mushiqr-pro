@@ -1657,6 +1657,118 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                 <AppIcon size={46} noBackground />
                 <div className="app-logo-text" style={{ whiteSpace: 'nowrap' }}>Mushi QR <span>Pro</span></div>
               </div>
+              
+              <div className="app-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {/* User Profile Section */}
+                {currentUser ? (
+                  <button
+                    onClick={() => onOpenProfile ? onOpenProfile() : (navigateTo && navigateTo('you'))}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}
+                    aria-label="User Profile"
+                    title={currentUser.displayName || currentUser.email || 'Profile'}
+                  >
+                    <UserAvatar user={currentUser} size={34} border="2px solid var(--accent-primary)" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onOpenProfile ? onOpenProfile() : (navigateTo && navigateTo('login'))}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      background: 'var(--accent-gradient)',
+                      border: 'none',
+                      borderRadius: '20px',
+                      padding: '6px 12px',
+                      cursor: 'pointer',
+                      color: '#fff',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      boxShadow: '0 2px 8px rgba(214, 0, 54, 0.25)'
+                    }}
+                    title="Sign In"
+                  >
+                    <User size={14} />
+                    <span>Sign In</span>
+                  </button>
+                )}
+
+                <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
+                  <button
+                    className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Toggle menu"
+                    style={{
+                      color: effectiveTheme === 'light' ? '#0F172A' : '#FFFFFF',
+                      background: effectiveTheme === 'light' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.08)',
+                      border: effectiveTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.12)'
+                    }}
+                  >
+                    <Menu size={20} />
+                  </button>
+
+                  {isMenuOpen && (
+                    <div className="app-dropdown-menu fade-in" style={{ top: 'calc(100% + 12px)', right: 0 }}>
+                      <div className="menu-links">
+                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); navigateTo && navigateTo('home'); }}>
+                          <Home size={16} /> Home
+                        </button>
+                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); navigateTo && navigateTo('history'); }}>
+                          <History size={16} /> History
+                        </button>
+                        <button
+                          className="menu-link-btn"
+                          onClick={() => {
+                            let next;
+                            if (theme === 'dark') next = 'light';
+                            else if (theme === 'light') next = 'auto';
+                            else next = 'dark';
+                            setTheme(next);
+                            const prefs = getPreferences();
+                            savePreferences({ ...prefs, theme: next });
+                            const eff = next === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : next;
+                            document.documentElement.setAttribute('data-theme', eff);
+                            window.dispatchEvent(new Event('preferences-sync'));
+                          }}
+                        >
+                          {theme === 'dark' ? (
+                            <Moon size={16} />
+                          ) : theme === 'light' ? (
+                            <Sun size={16} />
+                          ) : (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 2v20" />
+                              <path d="M12 2a10 10 0 0 0 0 20V2z" fill="currentColor" />
+                              <circle cx="12" cy="12" r="10" />
+                            </svg>
+                          )}
+                          Theme <span style={{ textTransform: 'capitalize', marginLeft: 4, fontWeight: 'bold' }}>{theme}</span>
+                        </button>
+                        <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
+                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); window.location.hash = '#/about'; }}>
+                          <Info size={16} /> About
+                        </button>
+                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); window.location.hash = '#/privacy-policy'; }}>
+                          <Shield size={16} /> Privacy Policy
+                        </button>
+                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); window.location.hash = '#/terms'; }}>
+                          <FileText size={16} /> Terms of Service
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </header>
 
             {/* Central Card Body */}
