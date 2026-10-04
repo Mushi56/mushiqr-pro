@@ -1,0 +1,1 @@
+const fs = require('fs'); let c = fs.readFileSync('src/index.css', 'utf8'); c = c.replace('.qrs-result-header-red {', '[data-theme=\'dark\'] .app-header.qrs-result-header-red,\n[data-theme=\'light\'] .app-header.qrs-result-header-red,\n.app-header.qrs-result-header-red {\n  border: none !important;\n'); fs.writeFileSync('src/index.css', c);

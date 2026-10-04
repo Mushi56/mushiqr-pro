@@ -73,6 +73,11 @@ public class NativeScanner {
 
     private int lensFacing = CameraSelector.LENS_FACING_BACK;
     private boolean manualZoomOverride = false;
+    private boolean isPaused = false;
+
+    public void pause() { isPaused = true; }
+    public void resume() { isPaused = false; latestBarcodeTimestamp = 0; }
+
     
     public interface ScanListener {
         void onScanResult(JSONObject result);
@@ -144,6 +149,7 @@ public class NativeScanner {
 
     public void startScanner(Runnable onReady, Runnable onError) {
         manualZoomOverride = false;
+        isPaused = false;
         if (currentState == State.STARTING || currentState == State.READY) {
             if (currentState == State.READY && onReady != null) {
                 onReady.run();
@@ -367,7 +373,7 @@ public class NativeScanner {
 
     @SuppressLint("UnsafeOptInUsageError")
     private void analyzeImage(@NonNull ImageProxy imageProxy) {
-        if (currentState != State.READY || barcodeScanner == null) {
+        if (currentState != State.READY || barcodeScanner == null || isPaused) {
             imageProxy.close();
             return;
         }

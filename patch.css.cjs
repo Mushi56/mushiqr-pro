@@ -1,0 +1,1 @@
+const fs = require('fs'); let content = fs.readFileSync('src/index.css', 'utf8'); content += '\n\n.qrs-result-header-red {\n  background-color: #F01A4E !important;\n  background: linear-gradient(180deg, #F01A4E 0%, #F01A4E 100%) !important;\n}\n'; fs.writeFileSync('src/index.css', content);

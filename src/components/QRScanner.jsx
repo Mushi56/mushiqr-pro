@@ -206,6 +206,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   });
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isResultMenuOpen, setIsResultMenuOpen] = useState(false);
   const [isResultScrolled, setIsResultScrolled] = useState(false);
   const menuRef = useRef(null);
   const [theme, setTheme] = useState(() => {
@@ -231,7 +232,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           await StatusBar.show();
           await StatusBar.setOverlaysWebView({ overlay: true });
           
-          if (status === 'DETECTED' && !isResultScrolled) {
+          if (status === 'DETECTED') {
             await StatusBar.setStyle({ style: Style.Dark }); // White text/icons for red hero banner
             await StatusBar.setBackgroundColor({ color: '#00000000' });
           } else {
@@ -248,7 +249,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       // PWA Browser Top Bar theme-color
       try {
         let targetColor;
-        if (status === 'DETECTED' && !isResultScrolled) {
+        if (status === 'DETECTED') {
           targetColor = '#F01A4E';
         } else {
           targetColor = effectiveTheme === 'dark' ? '#0C0C14' : '#FFFFFF';
@@ -270,11 +271,14 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (isMenuOpen && !e.target.closest('.menu-container')) {
         setIsMenuOpen(false);
       }
+      if (isResultMenuOpen && !e.target.closest('.menu-container')) {
+        setIsResultMenuOpen(false);
+      }
     };
-    if (isMenuOpen) {
+    if (isMenuOpen || isResultMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('touchstart', handleClickOutside);
     }
@@ -282,7 +286,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, isResultMenuOpen]);
 
   useEffect(() => {
     const handlePrefSync = () => {
@@ -671,6 +675,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     const scanner = qrScannerRef.current;
     if (scanner) {
       try { scanner.pause(); } catch { }
+    } else if (Capacitor.isNativePlatform()) {
+      try { NativeScanner.pause(); } catch { }
     }
 
     const fmtId = decodedResult?.result?.format?.format
@@ -960,7 +966,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     let scanner = null;
     try {
       scanner = new Html5Qrcode("qr-scanner-viewport", false);
-      const scanRes = await scanner.scanFile(file, true);
+      const scanRes = await scanner.scanFile(file, false);
       
       let text = '';
       let rawResult = null;
@@ -1092,6 +1098,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         console.warn("Failed to resume scanner, restarting:", err);
         startScanner();
       }
+    } else if (Capacitor.isNativePlatform()) {
+      try { NativeScanner.resume(); } catch { }
     } else {
       startScanner();
     }
@@ -1214,7 +1222,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const TypeIcon = qrTypeData?.icon || FileText;
 
   useEffect(() => {
-    if (Capacitor.isNativePlatform() && (status === 'STARTING' || status === 'SCANNING' || status === 'DETECTED')) {
+    if (Capacitor.isNativePlatform() && (status === 'STARTING' || status === 'SCANNING')) {
       document.body.style.setProperty('background', 'transparent', 'important');
       document.documentElement.style.setProperty('background', 'transparent', 'important');
       document.documentElement.classList.add('native-scanner-active');
@@ -1236,13 +1244,14 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   return (
     <div className={`scanner-page ${Capacitor.isNativePlatform() ? '' : 'scanner-page-enter'}`} style={Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent', transform: 'none', animation: 'none' } : {}}>
       {/* Upper Navbar (Theme-aware: White in light mode, dark in dark mode) */}
-      <header 
-        className="scanner-upper-navbar" 
+      {status !== 'DETECTED' && (
+        <header 
+          className="scanner-upper-navbar" 
         style={{ 
           position: 'relative', 
           border: 'none',
           borderBottom: effectiveTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.06)', 
-          display: 'flex', 
+          display: status === 'DETECTED' ? 'none' : 'flex', 
           width: '100%', 
           height: 'calc(64px + env(safe-area-inset-top, 0px))',
           minHeight: 'calc(64px + env(safe-area-inset-top, 0px))',
@@ -1380,6 +1389,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           </div>
         </div>
       </header>
+      )}
 
       <div className="qrs" style={Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
         {/* Body */}
@@ -1644,20 +1654,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
         {/* Full-Screen Detection Result */}
         {status === 'DETECTED' && qrTypeData && (
-          <div className="qrs-result-fullscreen" onScroll={(e) => {
-            const scrolled = e.currentTarget.scrollTop > 20;
-            if (scrolled !== isResultScrolled) setIsResultScrolled(scrolled);
-          }}>
+          <div className="qrs-result-fullscreen">
             {/* Upper Navbar */}
             <header 
-              className={`app-header ${!isResultScrolled ? 'header-home-banner' : 'header-home'}`}
+              className="app-header header-home-banner qrs-result-header-red"
               style={{ 
                 position: 'sticky', 
                 top: 0, 
                 zIndex: 100, 
                 display: 'flex',
-                background: !isResultScrolled ? '#F01A4E' : undefined,
-                backgroundColor: !isResultScrolled ? '#F01A4E' : undefined,
+                background: '#F01A4E',
+                backgroundColor: '#F01A4E',
                 transition: 'background-color 0.3s ease, background 0.3s ease'
               }}
             >
@@ -1711,10 +1718,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                   </button>
                 )}
 
-                <div className="menu-container" ref={menuRef} style={{ position: 'relative' }}>
+                <div className="menu-container"  style={{ position: 'relative' }}>
                   <button
-                    className={`btn-menu-toggle ${isMenuOpen ? 'active' : ''}`}
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className={`btn-menu-toggle ${isResultMenuOpen ? 'active' : ''}`}
+                    onClick={() => setIsResultMenuOpen(!isResultMenuOpen)}
                     aria-label="Toggle menu"
                     style={{
                       color: effectiveTheme === 'light' ? '#0F172A' : '#FFFFFF',
@@ -1725,13 +1732,13 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                     <Menu size={20} />
                   </button>
 
-                  {isMenuOpen && (
+                  {isResultMenuOpen && (
                     <div className="app-dropdown-menu fade-in" style={{ top: 'calc(100% + 12px)', right: 0 }}>
                       <div className="menu-links">
-                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); navigateTo && navigateTo('home'); }}>
+                        <button className="menu-link-btn" onClick={() => { setIsResultMenuOpen(false); navigateTo && navigateTo('home'); }}>
                           <Home size={16} /> Home
                         </button>
-                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); navigateTo && navigateTo('history'); }}>
+                        <button className="menu-link-btn" onClick={() => { setIsResultMenuOpen(false); navigateTo && navigateTo('history'); }}>
                           <History size={16} /> History
                         </button>
                         <button
@@ -1763,13 +1770,13 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                           Theme <span style={{ textTransform: 'capitalize', marginLeft: 4, fontWeight: 'bold' }}>{theme}</span>
                         </button>
                         <div className="menu-divider" style={{ height: '1px', background: 'var(--border-color)', margin: '4px 8px' }} />
-                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); window.location.hash = '#/about'; }}>
+                        <button className="menu-link-btn" onClick={() => { setIsResultMenuOpen(false); window.location.hash = '#/about'; }}>
                           <Info size={16} /> About
                         </button>
-                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); window.location.hash = '#/privacy-policy'; }}>
+                        <button className="menu-link-btn" onClick={() => { setIsResultMenuOpen(false); window.location.hash = '#/privacy-policy'; }}>
                           <Shield size={16} /> Privacy Policy
                         </button>
-                        <button className="menu-link-btn" onClick={() => { setIsMenuOpen(false); window.location.hash = '#/terms'; }}>
+                        <button className="menu-link-btn" onClick={() => { setIsResultMenuOpen(false); window.location.hash = '#/terms'; }}>
                           <FileText size={16} /> Terms of Service
                         </button>
                       </div>
@@ -1780,20 +1787,26 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             </header>
 
             {/* Central Card Body */}
-            <div className="qrs-result-body">
+            <div className="qrs-result-body" style={{ paddingTop: 0 }} onScroll={(e) => {
+              const scrolled = e.currentTarget.scrollTop > 50;
+              if (scrolled !== isResultScrolled) setIsResultScrolled(scrolled);
+            }}>
               {/* Main Card */}
-              <div className="qrs-result-main-card">
+              <div className="qrs-result-main-card" style={{ paddingTop: 16 }}>
                 <div className="qrs-result-card-header">
                   <span className="qrs-badge">{detectedFormatName || 'QR Code'}</span>
                   <span className="qrs-card-date">{scanDate}</span>
                 </div>
                 
-                <div className="qrs-result-preview-box">
-                  <canvas ref={previewCanvasRef} width="200" height="120" />
-                </div>
-
-                <div className="qrs-result-value-row">
-                  <span className="qrs-result-value-text">{result}</span>
+                <div className="qrs-result-preview-box" style={{ alignItems: 'flex-start', justifyContent: 'flex-start', gap: '16px', height: 'auto', minHeight: '144px' }}>
+                  <div style={{ flexShrink: 0, width: '100px', height: '100px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                    <canvas ref={previewCanvasRef} width="100" height="100" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                  </div>
+                  <div style={{ flexGrow: 1, overflowY: 'auto', display: 'block', maxHeight: '100px', background: 'rgba(0, 0, 0, 0.04)', borderRadius: '6px', padding: '8px' }}>
+                    <span className="qrs-result-value-text" style={{ color: '#0F172A', wordBreak: 'break-word', whiteSpace: 'normal', fontSize: '14px', fontWeight: 'normal', lineHeight: '1.5', display: 'block' }}>
+                      {result}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1832,7 +1845,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                   <div className="qrs-action-icon-circle">
                     <Pencil size={16} />
                   </div>
-                  <span>Edit</span>
+                  <span>Design</span>
                 </button>
               </div>
 

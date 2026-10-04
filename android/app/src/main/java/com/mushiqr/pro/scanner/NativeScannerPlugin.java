@@ -127,6 +127,18 @@ public class NativeScannerPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void pause(PluginCall call) {
+        if (nativeScanner != null) nativeScanner.pause();
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void resume(PluginCall call) {
+        if (nativeScanner != null) nativeScanner.resume();
+        call.resolve();
+    }
+
+    @PluginMethod
     public void stopScanner(PluginCall call) {
         getActivity().runOnUiThread(() -> {
             nativeScanner.stopScanner();

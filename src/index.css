@@ -9209,3 +9209,43 @@ body.native-scanner-active,
   contain: none !important;
 }
 
+
+
+[data-theme='dark'] .app-header.qrs-result-header-red,
+[data-theme='light'] .app-header.qrs-result-header-red,
+.app-header.qrs-result-header-red {
+  border: none !important;
+
+  background-color: #F01A4E !important;
+  background: linear-gradient(180deg, #F01A4E 0%, #F01A4E 100%) !important;
+}
+
+#root .qrs-result-fullscreen .app-header,
+[data-theme="light"] #root .qrs-result-fullscreen .app-header,
+[data-theme="dark"] #root .qrs-result-fullscreen .app-header {
+    background: #F01A4E !important;
+    background-color: #F01A4E !important;
+    border: none !important;
+}
+#root .qrs-result-fullscreen .app-header .app-logo-text,
+[data-theme="light"] #root .qrs-result-fullscreen .app-header .app-logo-text,
+[data-theme="dark"] #root .qrs-result-fullscreen .app-header .app-logo-text {
+    color: #FFFFFF !important;
+}
+#root .qrs-result-fullscreen .app-header .app-logo-text span,
+[data-theme="light"] #root .qrs-result-fullscreen .app-header .app-logo-text span,
+[data-theme="dark"] #root .qrs-result-fullscreen .app-header .app-logo-text span {
+    color: #FFFFFF !important;
+}
+#root .qrs-result-fullscreen .app-header .btn-menu-toggle,
+[data-theme="light"] #root .qrs-result-fullscreen .app-header .btn-menu-toggle,
+[data-theme="dark"] #root .qrs-result-fullscreen .app-header .btn-menu-toggle {
+    color: #FFFFFF !important;
+    background: rgba(255,255,255,0.2) !important;
+    border: 1px solid rgba(255,255,255,0.4) !important;
+}
+#root .qrs-result-fullscreen .app-header .btn-menu-toggle svg,
+[data-theme="light"] #root .qrs-result-fullscreen .app-header .btn-menu-toggle svg,
+[data-theme="dark"] #root .qrs-result-fullscreen .app-header .btn-menu-toggle svg {
+    stroke: #FFFFFF !important;
+}
