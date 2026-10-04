@@ -7161,8 +7161,8 @@ export default function App() {
                                style={{ position: 'relative' }}
                              >
                                <PaidCrownBadge featureId="qr_color_dots" fallbackFeatureId="custom_colors_solid" position="floating" size={8} />
-                               <QRDotsIcon />
-                               <span>Pattern</span>
+                               <MdOutlineQrCode2 size={24} />
+                               <span>QR Color</span>
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('qr_color_bg') && (
