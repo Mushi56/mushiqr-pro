@@ -108,14 +108,13 @@ const detectFormatFromText = (text) => {
   if (/^https?:\/\//i.test(t) || /^www\./i.test(t) || /^WIFI:/i.test(t) || /^mailto:/i.test(t) || /^tel:/i.test(t) || /^sms:/i.test(t) || /^BEGIN:VCARD/i.test(t)) {
     return 'QR Code';
   }
+  // If it is purely numeric, it might be a standard 1D barcode like EAN/UPC
   if (/^\d+$/.test(t)) {
     if (t.length === 8) return 'EAN-8';
     if (t.length === 12) return 'UPC-A';
     if (t.length === 13) return 'EAN-13';
     if (t.length === 6) return 'UPC-E';
-  }
-  if (t.length < 30) {
-    return 'Code 128';
+    // Let other numeric lengths default to QR Code unless we are absolutely sure.
   }
   return 'QR Code';
 };
@@ -966,7 +965,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     let scanner = null;
     try {
       scanner = new Html5Qrcode("qr-scanner-viewport", false);
-      const scanRes = await scanner.scanFile(file, false);
+      const scanRes = await scanner.scanFileV2(file, false);
       
       let text = '';
       let rawResult = null;
@@ -1161,9 +1160,9 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           const file = new File([blob], 'capture.jpg', { type: 'image/jpeg' });
           try {
             const scanner = new Html5Qrcode("qr-scanner-viewport", false);
-            const decodedText = await scanner.scanFile(file, true);
+            const scanRes = await scanner.scanFileV2(file, true);
             if (mountedRef.current) {
-              handleScanResult(decodedText);
+              handleScanResult(scanRes.decodedText, scanRes);
             }
           } catch {
             if (mountedRef.current) {
@@ -1798,12 +1797,12 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                   <span className="qrs-card-date">{scanDate}</span>
                 </div>
                 
-                <div className="qrs-result-preview-box" style={{ alignItems: 'flex-start', justifyContent: 'flex-start', gap: '16px', height: 'auto', minHeight: '144px' }}>
-                  <div style={{ flexShrink: 0, width: '100px', height: '100px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                <div className="qrs-result-preview-box" style={{ alignItems: 'center', justifyContent: 'flex-start', gap: '16px', height: 'auto', minHeight: '144px' }}>
+                  <div style={{ flexShrink: 0, width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <canvas ref={previewCanvasRef} width="100" height="100" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                   </div>
                   <div style={{ flexGrow: 1, overflowY: 'auto', display: 'block', maxHeight: '100px', background: 'rgba(0, 0, 0, 0.04)', borderRadius: '6px', padding: '8px' }}>
-                    <span className="qrs-result-value-text" style={{ color: '#0F172A', wordBreak: 'break-word', whiteSpace: 'normal', fontSize: '14px', fontWeight: 'normal', lineHeight: '1.5', display: 'block' }}>
+                    <span className="qrs-result-value-text" style={{ color: '#0F172A', wordBreak: 'break-word', whiteSpace: 'normal', fontSize: '14px', fontWeight: 'normal', lineHeight: '1.2', display: 'block' }}>
                       {result}
                     </span>
                   </div>
