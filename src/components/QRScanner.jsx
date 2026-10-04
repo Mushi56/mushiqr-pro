@@ -365,7 +365,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             renderBarcode(canvas, result, {
               bcid: bcid,
               barColor: '#000000',
-              bgColor: '#ffffff',
+              bgColor: 'transparent',
               barWidth: 2,
               height: 80,
               margin: 10,
@@ -377,7 +377,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               renderBarcode(canvas, "1234567890", {
                 bcid: 'code128',
                 barColor: '#000000',
-                bgColor: '#ffffff',
+                bgColor: 'transparent',
                 barWidth: 2,
                 height: 80,
                 margin: 10,
@@ -707,7 +707,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         renderBarcode(canvas, decodedText, {
           bcid: finalBcid,
           barColor: '#000000',
-          bgColor: '#ffffff',
+          bgColor: 'transparent',
           barWidth: 3,
           height: 160,
           margin: 20,
@@ -1020,7 +1020,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         renderBarcode(canvas, result, {
           bcid: bcid,
           barColor: '#000000',
-          bgColor: '#ffffff',
+          bgColor: 'transparent',
           barWidth: 3,
           height: 160,
           margin: 20,
@@ -1452,7 +1452,13 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                   <div className="reticle-corner top-right" />
                   <div className="reticle-corner bottom-left" />
                   <div className="reticle-corner bottom-right" />
-                  <canvas className="qrs-anim-pop-canvas" ref={animCanvasRef} width="160" height="160" />
+                  <canvas 
+                    className="qrs-anim-pop-canvas" 
+                    ref={animCanvasRef} 
+                    width="160" 
+                    height="160" 
+                    style={{ padding: '10px', objectFit: 'contain', width: '100%', height: '100%' }}
+                  />
                 </div>
                 <div className="qrs-apple-chip">
                   <TypeIcon size={16} />
@@ -1801,7 +1807,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                   <div style={{ flexShrink: 0, width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <canvas ref={previewCanvasRef} width="100" height="100" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
                   </div>
-                  <div style={{ flexGrow: 1, overflowY: 'auto', display: 'block', maxHeight: '100px', background: 'rgba(0, 0, 0, 0.04)', borderRadius: '6px', padding: '8px' }}>
+                  <div style={{ flexGrow: 1, overflowY: 'auto', display: 'block', maxHeight: '100px' }}>
                     <span className="qrs-result-value-text" style={{ color: '#0F172A', wordBreak: 'break-word', whiteSpace: 'normal', fontSize: '14px', fontWeight: 'normal', lineHeight: '1.2', display: 'block' }}>
                       {result}
                     </span>
