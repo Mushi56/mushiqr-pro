@@ -242,8 +242,8 @@ const QR_CARD_SHAPES = [
   { id: 'leaf', label: 'Leaf Shape' },
   { id: 'circle', label: 'Circle Box' }
 ];
-/* ── Color Presets ── */
-/* ── Color Presets (Expanded to 50) ── */
+/* â”€â”€ Color Presets â”€â”€ */
+/* â”€â”€ Color Presets (Expanded to 50) â”€â”€ */
 const COLOR_PRESETS = [
   { name: 'Classic', qr: '#000000', bg: '#FFFFFF' },
   { name: 'Midnight', qr: '#FFFFFF', bg: '#030305' },
@@ -298,7 +298,7 @@ const COLOR_PRESETS = [
   { name: 'Warm Amber', qr: '#FFAB00', bg: '#FFF8E1' },
   { name: 'Deep Purple', qr: '#6200EA', bg: '#EDE7F6' },
 ];
-/* ── Gradient Presets (Expanded to 50) ── */
+/* â”€â”€ Gradient Presets (Expanded to 50) â”€â”€ */
 const GRADIENT_PRESETS = [
   { name: 'Sunset', c1: '#FF512F', c2: '#DD2476' },
   { name: 'Ocean', c1: '#2193b0', c2: '#6dd5ed' },
@@ -720,10 +720,10 @@ const FRAME_OPTIONS = [
     )
   },
 ];
-/* ── Error Correction Levels ── */
+/* â”€â”€ Error Correction Levels â”€â”€ */
 const EC_LEVELS = [
   { key: 'L', label: 'L', pct: '7%', width: 25, desc: 'Low error correction. Best for simple QR codes with clean printing and close-range scanning.' },
-  { key: 'M', label: 'M', pct: '15%', width: 50, desc: 'Medium error correction. Good balance for most use cases — recommended as default.' },
+  { key: 'M', label: 'M', pct: '15%', width: 50, desc: 'Medium error correction. Good balance for most use cases â€” recommended as default.' },
   { key: 'Q', label: 'Q', pct: '25%', width: 75, desc: 'Quartile error correction. Recommended when adding a logo or for medium-range scanning.' },
   { key: 'H', label: 'H', pct: '30%', width: 100, desc: 'High error correction. Best for complex logos, small print sizes, or harsh environments.' },
 ];
@@ -759,7 +759,7 @@ const FONT_OPTIONS = [
   { id: 'Quicksand', label: 'Quicksand' },
   { id: 'Satisfy', label: 'Satisfy' },
 ];
-/* ── Error Boundary ── */
+/* â”€â”€ Error Boundary â”€â”€ */
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
   static getDerivedStateFromError() { return { hasError: true }; }
@@ -946,7 +946,7 @@ function parseRawQRText(text) {
 export default function App() {
   const [isBlocked, setIsBlocked] = useState(false);
   const { showPaywall } = usePremium();
-  // ── Tab & Theme ──
+  // â”€â”€ Tab & Theme â”€â”€
   const location = useLocation();
   const navigate = useNavigate();
   const getPageFromPath = (path) => {
@@ -1189,7 +1189,7 @@ export default function App() {
         navigateTo('home');
       }
     } else if (activePage === 'generator') {
-      // ── IMPROVED CREATOR NAVIGATION ──
+      // â”€â”€ IMPROVED CREATOR NAVIGATION â”€â”€
       // If we have tab history, go back to previous tab
       if (tabHistory.length > 0) {
         const lastTab = tabHistory[tabHistory.length - 1];
@@ -1218,7 +1218,7 @@ export default function App() {
       setEffectiveTheme(theme);
     }
   }, [theme]);
-  // ── Admin Settings (read from Super Admin Panel) ──────────────────────────
+  // â”€â”€ Admin Settings (read from Super Admin Panel) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [adminSettings, setAdminSettings]   = useState(null);
   const [adminAnnouncement, setAdminAnnouncement] = useState(null);
   const [featureFlags, setFeatureFlags]     = useState(null);
@@ -1280,9 +1280,9 @@ export default function App() {
   }, []);
   // Maintenance mode flag (used in render)
   const isMaintenanceMode = !!adminSettings?.maintenanceMode;
-  // ─── All templates (built-in + custom) ─────────────────────────────────────
+  // â”€â”€â”€ All templates (built-in + custom) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const ALL_TEMPLATES = [...QR_TEMPLATES, ...customTemplates];
-  // ── QR Content ──
+  // â”€â”€ QR Content â”€â”€
   const [qrType, setQrType] = useState(() => location.state?.qrType || QR_TYPES.URL);
   const [qrData, setQrData] = useState(() => location.state?.qrData || { url: 'https://example.com' });
   const [errorLevel, setErrorLevel] = useState('M');
@@ -1292,10 +1292,10 @@ export default function App() {
   // Tracks whether the user has meaningfully changed the QR generator since it was last reset/loaded
   const generatorIsDirtyRef = useRef(false);
   const ignoreDirtyRef = useRef(false);
-  // ── Batch QR ──
+  // â”€â”€ Batch QR â”€â”€
   const [batchItems, setBatchItems] = useState([]);
   const [activeBatchItemIndex, setActiveBatchItemIndex] = useState(null);
-  // ── Colors ──
+  // â”€â”€ Colors â”€â”€
   const [qrColor, setQrColor] = useState('#000000');
   const [bgColor, setBgColor] = useState('#ffffff');
   const [bgTransparent, setBgTransparent] = useState(false);
@@ -1389,17 +1389,17 @@ export default function App() {
       }
     }
   };
-  // ── Gradient ──
+  // â”€â”€ Gradient â”€â”€
   const [gradientEnabled, setGradientEnabled] = useState(false);
   const [gradientColor1, setGradientColor1] = useState('#6c5ce7');
   const [gradientColor2, setGradientColor2] = useState('#a78bfa');
   const [gradientType, setGradientType] = useState('linear');
   
-  // ── QR Texture ──
+  // â”€â”€ QR Texture â”€â”€
   const [qrTextureEnabled, setQrTextureEnabled] = useState(false);
   const [qrTexture, setQrTexture] = useState(null); // { src, image, name }
   const [qrTextureSyncEyes, setQrTextureSyncEyes] = useState(true);
-  // ── QR Background Image ──
+  // â”€â”€ QR Background Image â”€â”€
   const [qrBgImageEnabled, setQrBgImageEnabled] = useState(false);
   const [qrBgImage, setQrBgImage] = useState(null); // { src, image, name }
   const [qrBgImageOpacity, setQrBgImageOpacity] = useState(1.0);
@@ -1415,12 +1415,12 @@ export default function App() {
   const [qrSizeScale, setQrSizeScale] = useState(1.0);
   const [qrPosX, setQrPosX] = useState(0.5);
   const [qrPosY, setQrPosY] = useState(0.5);
-  // ── Shapes ──
+  // â”€â”€ Shapes â”€â”€
   const [dotStyle, setDotStyle] = useState(DOT_STYLES.DENSO);
   const [eyeStyle, setEyeStyle] = useState(EYE_STYLES.SQUARE);
   const [dotPadding, setDotPadding] = useState(12);
   const [eyePadding, setEyePadding] = useState(0);
-  // ── Logo ──
+  // â”€â”€ Logo â”€â”€
   const [logo, setLogo] = useState(null);
   const [logoWidth, setLogoWidth] = useState(0.18);
   const [logoHeight, setLogoHeight] = useState(0.18);
@@ -1451,7 +1451,7 @@ export default function App() {
   const [logoTexture, setLogoTexture] = useState('none');
   const [logoCrop, setLogoCrop] = useState({ x: 0, y: 0, w: 1, h: 1 });
   const [logoAspectRatioLocked, setLogoAspectRatioLocked] = useState(true);
-  // ── Frame ──
+  // â”€â”€ Frame â”€â”€
   const [frameStyle, setFrameStyle] = useState('none');
   const [frameText, setFrameText] = useState('SCAN ME');
   const [frameColor, setFrameColor] = useState('');
@@ -1484,7 +1484,7 @@ export default function App() {
   const [textCenterRotation, setTextCenterRotation] = useState(0);
   const [textCenterWidth, setTextCenterWidth] = useState(null); // null means auto
   const [textCenterHeight, setTextCenterHeight] = useState(null); // null means auto
-  // ── Multiple Custom Text Layers ──
+  // â”€â”€ Multiple Custom Text Layers â”€â”€
   const [customTexts, setCustomTexts] = useState([]);
 
   const addCustomText = (initialProps = {}) => {
@@ -1538,7 +1538,7 @@ export default function App() {
 
   const [colorPopup, setColorPopup] = useState(null);
   const [shapePopup, setShapePopup] = useState(null);
-  // ── References ──
+  // â”€â”€ References â”€â”€
   const canvasRef = useRef(null);
   const latestThumbnailRef = useRef(null);
   const loupeCanvasRef = useRef(null);
@@ -1569,7 +1569,7 @@ export default function App() {
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity
   ]);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
-  // ── Advanced Picker State ──
+  // â”€â”€ Advanced Picker State â”€â”€
   const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
   const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
   const [selectedFormat, setSelectedFormat] = useState('PNG');
@@ -1720,7 +1720,7 @@ export default function App() {
       }
     }
   };
-  // ── Native App Actions / Deep Links (from Widget or quick settings tile) ──
+  // â”€â”€ Native App Actions / Deep Links (from Widget or quick settings tile) â”€â”€
   useEffect(() => {
     // 1. Check cold boot action via Android Javascript Interface or stored initial action
     try {
@@ -2314,12 +2314,12 @@ export default function App() {
     // Reset input so same file can be uploaded again if needed
     e.target.value = '';
   };
-  // ── Menu ──
+  // â”€â”€ Menu â”€â”€
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  // ── Bottom Nav Toggle ──
+  // â”€â”€ Bottom Nav Toggle â”€â”€
   const [isNavExpanded, setIsNavExpanded] = useState(false);
-  // ── Mobile App Fixes (Capacitor) ──
+  // â”€â”€ Mobile App Fixes (Capacitor) â”€â”€
   useEffect(() => {
     const updateStatusBar = async () => {
       // 1. Native Capacitor StatusBar
@@ -2371,14 +2371,14 @@ export default function App() {
     };
     updateStatusBar();
   }, [effectiveTheme, activePage, isHomeScrolled]);
-  // ── Sync Eyes color with dots color when syncEyes is ON ──
+  // â”€â”€ Sync Eyes color with dots color when syncEyes is ON â”€â”€
   useEffect(() => {
     if (syncEyes) {
       setEyeColor(qrColor);
       setEyeOuterColor(qrColor);
     }
   }, [syncEyes, qrColor]);
-  // ── Auto Theme Logic ──
+  // â”€â”€ Auto Theme Logic â”€â”€
   useEffect(() => {
     const applyTheme = () => {
       const prefs = getPreferences();
@@ -2404,13 +2404,13 @@ export default function App() {
       window.removeEventListener('preferences-sync', applyTheme);
     };
   }, []);
-  // ── Helper: build a human-readable display name from qrType + qrData ──
+  // â”€â”€ Helper: build a human-readable display name from qrType + qrData â”€â”€
   const getQRDisplayName = (type, data) => {
     const subtitle = getQRItemSubtitle({ qrType: type, qrData: data });
     const title = getQRItemTitle({ qrType: type, qrData: data });
     return subtitle || title || 'QR Code';
   };
-  // ── Unsaved Changes Modal Actions ──
+  // â”€â”€ Unsaved Changes Modal Actions â”€â”€
   const handleSaveAndExit = () => {
     const dataString = formatQRData(qrType, qrData);
     if (dataString) {
@@ -2451,7 +2451,7 @@ export default function App() {
   const handleCancelExit = () => {
     setUnsavedChangesModal({ isOpen: false, nextPage: null });
   };
-  // ── Auto-upgrade error correction when logo is present ──
+  // â”€â”€ Auto-upgrade error correction when logo is present â”€â”€
   useEffect(() => {
     if (logo) {
       setErrorLevel(prev => (prev === 'L' || prev === 'M') ? 'H' : prev);
@@ -2459,7 +2459,7 @@ export default function App() {
       setErrorLevel(prev => prev === 'H' ? 'M' : prev);
     }
   }, [logo]);
-  // ── Back Button Handling (Centralized) ──
+  // â”€â”€ Back Button Handling (Centralized) â”€â”€
   const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
   backHandlerRef.current = () => {
@@ -2500,11 +2500,11 @@ export default function App() {
       listenerPromise.then(l => l.remove());
     };
   }, []); // Run once on mount
-  // ── Update body theme ──
+  // â”€â”€ Update body theme â”€â”€
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', effectiveTheme);
   }, [effectiveTheme]);
-  // ── Close dropdown/menu on outside click ──
+  // â”€â”€ Close dropdown/menu on outside click â”€â”€
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (downloadBtnRef.current && !downloadBtnRef.current.contains(e.target)) {
@@ -2521,12 +2521,12 @@ export default function App() {
       document.removeEventListener('touchstart', handleClickOutside);
     };
   }, []);
-  // ── Toast ──
+  // â”€â”€ Toast â”€â”€
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
-  // ── Copy to Clipboard ──
+  // â”€â”€ Copy to Clipboard â”€â”€
   const handleCopyToClipboard = () => {
     if (!canvasRef.current) return;
     canvasRef.current.toBlob(async (blob) => {
@@ -2540,7 +2540,7 @@ export default function App() {
       }
     });
   };
-  // ── Share ──
+  // â”€â”€ Share â”€â”€
   const handleShare = () => {
     if (!canvasRef.current) return;
     canvasRef.current.toBlob(async (blob) => {
@@ -2570,7 +2570,7 @@ export default function App() {
       }
     });
   };
-  // ── Download ──
+  // â”€â”€ Download â”€â”€
   const FORMAT_MAP = { PNG: downloadPNG, SVG: downloadSVG, PDF: downloadPDF, JPG: downloadJPG };
   const QUALITY_SIZES = {
     'Low': 512,
@@ -2690,7 +2690,7 @@ export default function App() {
       setTimeout(() => setDownloadingFormat(null), 800);
     }
   };
-  // ── Save to Saved ──
+  // â”€â”€ Save to Saved â”€â”€
   const handleSave = () => {
     if (!canvasRef.current) return;
     const dataString = formatQRData(qrType, qrData);
@@ -2714,7 +2714,7 @@ export default function App() {
   const getActiveStyle = () => {
     return getSnapshot();
   };
-  // ── Edit Batch Item Style ──
+  // â”€â”€ Edit Batch Item Style â”€â”€
   const handleEditBatchItemStyle = (item, idx, passedBatchType) => {
     ignoreDirtyRef.current = true;
     generatorIsDirtyRef.current = false;
@@ -2751,7 +2751,7 @@ export default function App() {
       setActiveTab('color');
     }
   };
-  // ── Load QR ──
+  // â”€â”€ Load QR â”€â”€
   const handleLoadQR = (item) => {
     if (!item) return;
     
@@ -2827,7 +2827,7 @@ export default function App() {
     navigateTo('generator');
     showToast('Template loaded');
   };
-  // ── Generate QR Matrix ──
+  // â”€â”€ Generate QR Matrix â”€â”€
   const regenerateMatrix = useCallback(() => {
     const dataString = formatQRData(qrType, qrData);
     if (!dataString) return;
@@ -2839,12 +2839,12 @@ export default function App() {
     }
   }, [qrType, qrData, errorLevel]);
   useEffect(() => { regenerateMatrix(); }, [regenerateMatrix]);
-  // ── Device Capability Detection ──
+  // â”€â”€ Device Capability Detection â”€â”€
   const isLowEndDevice = typeof navigator !== 'undefined' && 
     ((navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || 
      (navigator.deviceMemory && navigator.deviceMemory <= 4));
   const RENDER_DELAY = isLowEndDevice ? 60 : 0; // Throttle low-end to ~16fps, High-end uses native requestAnimationFrame (60-120fps)
-  // ── Render Canvas ──
+  // â”€â”€ Render Canvas â”€â”€
   const renderCanvas = useCallback(() => {
     if (!qrMatrixInfo || !canvasRef.current) return;
     
@@ -3002,8 +3002,8 @@ export default function App() {
     }
     return { contentX, contentY, contentSize };
   }, [frameStyle]);
-  // ── Pipette Handling ──
-  // ── Pipette Handling ──
+  // â”€â”€ Pipette Handling â”€â”€
+  // â”€â”€ Pipette Handling â”€â”€
   const sampleCanvasColor = useCallback((clientX, clientY) => {
     if (!canvasRef.current) return null;
     const canvas = canvasRef.current;
@@ -3140,7 +3140,7 @@ export default function App() {
     }
     if (e.cancelable) e.preventDefault();
   }, [hoverColor, pipetteTarget]);
-  // ── Canvas Interaction (Drag to Position) ──
+  // â”€â”€ Canvas Interaction (Drag to Position) â”€â”€
   const handleCanvasInteraction = useCallback((e) => {
     if (!canvasRef.current || !qrMatrixInfo) return;
     const canvas = canvasRef.current;
@@ -4088,7 +4088,7 @@ export default function App() {
       window.removeEventListener('touchend', stopCanvasDrag);
     };
   }, [isDraggingCanvas, handleCanvasMove, stopCanvasDrag]);
-  // ── Tab definitions (Dynamically filtered by FeatureAccessManager) ──
+  // â”€â”€ Tab definitions (Dynamically filtered by FeatureAccessManager) â”€â”€
   const ALL_TABS = [
     { id: 'content',  label: 'Content',  icon: Pencil,      featId: 'qr_tab_content' },
     { id: 'color',    label: 'Color',    icon: Palette,     featId: 'qr_tab_color' },
@@ -4107,7 +4107,7 @@ export default function App() {
     }
   }, [TABS, activeTab]);
 
-  // ── Get the frame CSS class for the preview wrapper ──
+  // â”€â”€ Get the frame CSS class for the preview wrapper â”€â”€
   const getFrameClass = () => {
     switch (frameStyle) {
       case FRAME_STYLES.BOX: return 'frame-simple-border';
@@ -4197,7 +4197,7 @@ export default function App() {
   };
   return (
     <div className={`app redesigned ${activePage === 'scanner' ? 'native-scanner-active' : ''}`} style={activePage === 'scanner' && Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
-      {/* ── Blocked User Overlay ── */}
+      {/* â”€â”€ Blocked User Overlay â”€â”€ */}
       {isBlocked && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 99999,
@@ -4233,7 +4233,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── Maintenance Mode Overlay ── */}
+      {/* â”€â”€ Maintenance Mode Overlay â”€â”€ */}
       {isMaintenanceMode && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 99999,
@@ -4241,7 +4241,7 @@ export default function App() {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24,
           fontFamily: "'Outfit','Inter',sans-serif", color: '#fff', textAlign: 'center', padding: 32,
         }}>
-          <div style={{ fontSize: 56 }}>🔧</div>
+          <div style={{ fontSize: 56 }}>ðŸ”§</div>
           <div style={{ fontSize: 22, fontWeight: 800 }}>Under Maintenance</div>
           <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', maxWidth: 380, lineHeight: 1.7 }}>
             {adminSettings?.maintenanceMessage || 'We are performing scheduled maintenance. Please check back soon.'}
@@ -4249,9 +4249,9 @@ export default function App() {
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Mushi QR Pro</div>
         </div>
       )}
-      {/* ── Premium Paywall Modal ── */}
+      {/* â”€â”€ Premium Paywall Modal â”€â”€ */}
       <PremiumModal />
-      {/* ── Admin Announcement Banner ── */}
+      {/* â”€â”€ Admin Announcement Banner â”€â”€ */}
       {adminAnnouncement?.active && adminAnnouncement?.message && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9000,
@@ -4264,10 +4264,10 @@ export default function App() {
         }}>
           <span>{adminAnnouncement.title && <strong>{adminAnnouncement.title}: </strong>}{adminAnnouncement.message}</span>
           <button onClick={() => setAdminAnnouncement(null)}
-            style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 4px' }}>✕</button>
+            style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 18, lineHeight: 1, padding: '0 4px' }}>âœ•</button>
         </div>
       )}
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <header 
         className={`app-header ${['home', 'saved', 'history', 'you', 'settings'].includes(activePage) ? 'header-home' : ''} ${activePage === 'home' && !isHomeScrolled ? 'header-home-banner' : ''}`}
         style={{ display: ['barcode', 'scanner', 'onboarding', 'login', 'signup', 'forgot-password'].includes(activePage) ? 'none' : 'flex' }}
@@ -4737,7 +4737,7 @@ export default function App() {
               </div>
             </>
           )}
-          {/* ── Auth Avatar / Sign-In Button (always visible in header) ── */}
+          {/* â”€â”€ Auth Avatar / Sign-In Button (always visible in header) â”€â”€ */}
           {!['generator'].includes(activePage) && (
             <div style={{ position: 'relative' }} ref={authDropdownRef}>
               {currentUser ? (
@@ -5008,11 +5008,11 @@ export default function App() {
           )}
         </div>
       </header>
-      {/* ── Main Content Area ── */}
+      {/* â”€â”€ Main Content Area â”€â”€ */}
       <main className={`app-main-redesigned ${activePage === 'scanner' ? 'native-scanner-active' : ''}`} style={activePage === 'scanner' && Capacitor.isNativePlatform() ? { background: 'transparent', backgroundColor: 'transparent' } : {}}>
         {activePage === 'generator' ? (
           <>
-            {/* ── QR Preview Card (always visible) ── */}
+            {/* â”€â”€ QR Preview Card (always visible) â”€â”€ */}
             <ErrorBoundary>
               <section className="qr-preview-card" style={{ position: 'relative' }}>
                 {qrMatrixInfo && (
@@ -5078,7 +5078,7 @@ export default function App() {
                 </div>
               </section>
             </ErrorBoundary>
-            {/* ── Tab Panel Content ── */}
+            {/* â”€â”€ Tab Panel Content â”€â”€ */}
             <section className="tab-panel-area">
               {/* Content Tab */}
               {activeTab === 'content' && (
@@ -5151,7 +5151,7 @@ export default function App() {
                 </div>
               )}
             </section>
-            {/* ─── Shared Unified Expandable Toolbar (Centralized Bottom Layer) ─── */}
+            {/* â”€â”€â”€ Shared Unified Expandable Toolbar (Centralized Bottom Layer) â”€â”€â”€ */}
             {((activeTab === 'logo' && logo) || activeTab === 'text' || activeTab === 'color' || activeTab === 'shapes') && (
               <div className="logo-toolbar-container">
                 <div className="unified-toolbar-card">
@@ -5960,7 +5960,7 @@ export default function App() {
                                   className={`font-btn ${isFontActive ? 'active' : ''}`} 
                                   style={{ fontFamily: font.id }}
                                 >
-                                  {font.label} ★
+                                  {font.label} â˜…
                                 </button>
                               );
                             })}
@@ -6468,74 +6468,66 @@ export default function App() {
                           )}
                         </div>
                       )}
-                      {colorPopup === 'dots' && (
-                        <div className="fade-in">
-                          {renderColorOrGradientPicker("Dots Color", qrColor, (c) => {
-                            setQrColor(c);
-                            setQrTexture(null);
-                            setQrTextureEnabled(false);
-                          }, handleOpenAdv)}
-                        </div>
-                      )}
-                      {colorPopup === 'bg' && (
-                        <div className="fade-in">
-                          {renderColorOrGradientPicker("Background Color", bgColor, (c) => { 
-                            setBgColor(c); 
-                            setLogoBgColor(c); 
-                            setBgTransparent(false); 
-                            setQrBgImage(null);
-                            setQrBgImageEnabled(false);
-                          }, handleOpenAdv)}
-                        </div>
-                      )}
-                      {colorPopup === 'eyes' && (
+                      {colorPopup === 'pattern' && (
                         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                          <Toggle label="Sync Eyes with Dots" checked={syncEyes} onChange={setSyncEyes} />
-                          {!syncEyes && (
-                            <>
-                              <Toggle label="Sync Inner & Outer Eye Colors" checked={syncInnerOuterEyes} onChange={(val) => {
-                                setSyncInnerOuterEyes(val);
-                                if (val) {
-                                  setEyeOuterColor(eyeColor || qrColor);
-                                }
-                              }} />
-                              
-                              {syncInnerOuterEyes ? (
-                                <div className="fade-in">
-                                  {renderColorOrGradientPicker("Eyes Color", eyeColor || qrColor, (c) => { setEyeColor(c); setEyeOuterColor(c); }, handleOpenAdv)}
-                                </div>
-                              ) : (
-                                <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Eyes Section</div>
-                                    <div style={{ display: 'flex', background: 'var(--bg-elevated)', borderRadius: '12px', padding: '4px' }}>
-                                      <button 
-                                        onClick={() => setEyeColorTab('inner')}
-                                        style={{ border: 'none', background: eyeColorTab === 'inner' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'inner' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                      >
-                                        Inner
-                                      </button>
-                                      <button 
-                                        onClick={() => setEyeColorTab('outer')}
-                                        style={{ border: 'none', background: eyeColorTab === 'outer' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'outer' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                      >
-                                        Outer
-                                      </button>
-                                    </div>
+                          <div className="fade-in">
+                            {renderColorOrGradientPicker("Dots Color", qrColor, (c) => {
+                              setQrColor(c);
+                              setQrTexture(null);
+                              setQrTextureEnabled(false);
+                            }, handleOpenAdv)}
+                          </div>
+                          
+                          <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
+                          
+                          <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                            <Toggle label="Sync Eyes with Dots Color" checked={syncEyes} onChange={setSyncEyes} />
+                            {!syncEyes && (
+                              <>
+                                <Toggle label="Sync Inner & Outer Eye Colors" checked={syncInnerOuterEyes} onChange={(val) => {
+                                  setSyncInnerOuterEyes(val);
+                                  if (val) {
+                                    setEyeOuterColor(eyeColor || qrColor);
+                                  }
+                                }} />
+                                
+                                {syncInnerOuterEyes ? (
+                                  <div className="fade-in">
+                                    {renderColorOrGradientPicker("Eyes Color", eyeColor || qrColor, (c) => { setEyeColor(c); setEyeOuterColor(c); }, handleOpenAdv)}
                                   </div>
-                                  {eyeColorTab === 'inner' ? (
-                                    <div className="fade-in">
-                                      {renderColorOrGradientPicker("Inner Eyes Color", eyeColor || qrColor, setEyeColor, handleOpenAdv)}
+                                ) : (
+                                  <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Eyes Section</div>
+                                      <div style={{ display: 'flex', background: 'var(--bg-elevated)', borderRadius: '12px', padding: '4px' }}>
+                                        <button 
+                                          onClick={() => setEyeColorTab('inner')}
+                                          style={{ border: 'none', background: eyeColorTab === 'inner' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'inner' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                        >
+                                          Inner
+                                        </button>
+                                        <button 
+                                          onClick={() => setEyeColorTab('outer')}
+                                          style={{ border: 'none', background: eyeColorTab === 'outer' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'outer' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                        >
+                                          Outer
+                                        </button>
+                                      </div>
                                     </div>
-                                  ) : (
-                                    <div className="fade-in">
-                                      {renderColorOrGradientPicker("Outer Eyes Color", eyeOuterColor || qrColor, setEyeOuterColor, handleOpenAdv)}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </>
-                          )}
+                                    {eyeColorTab === 'inner' ? (
+                                      <div className="fade-in">
+                                        {renderColorOrGradientPicker("Inner Eyes Color", eyeColor || qrColor, setEyeColor, handleOpenAdv)}
+                                      </div>
+                                    ) : (
+                                      <div className="fade-in">
+                                        {renderColorOrGradientPicker("Outer Eyes Color", eyeOuterColor || qrColor, setEyeOuterColor, handleOpenAdv)}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
                         </div>
                       )}
                       {colorPopup === 'bg-image' && (
@@ -6651,7 +6643,7 @@ export default function App() {
                           {qrBgImage && qrBgImageEnabled && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '4px' }} className="fade-in">
                               
-                              {/* ── AI ILLUSTRATION ART QR SYNTHESIS CARD ── */}
+                              {/* â”€â”€ AI ILLUSTRATION ART QR SYNTHESIS CARD â”€â”€ */}
                               <div style={{
                                 background: aiArtQrEnabled 
                                   ? 'linear-gradient(135deg, rgba(214,0,54,0.12) 0%, rgba(139,92,246,0.12) 100%)' 
@@ -6974,16 +6966,19 @@ export default function App() {
                           </div>
                         </div>
                       )}
-                       {shapePopup === 'dots' && (
-                         <div className="fade-in">
-                           <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
-                         </div>
-                       )}
-                       {shapePopup === 'eyes' && (
-                         <div className="fade-in">
-                           <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} qrParams={qrParams} />
-                         </div>
-                       )}
+                       {shapePopup === 'pattern' && (
+                           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                             <div>
+                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>
+                               <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
+                             </div>
+                             <div style={{ height: '1px', background: 'var(--border-color)' }} />
+                             <div>
+                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Eye Shape</div>
+                               <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} qrParams={qrParams} />
+                             </div>
+                           </div>
+                         )}
                         {shapePopup === 'background' && (
                           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
@@ -7157,34 +7152,17 @@ export default function App() {
                                <span>Presets</span>
                              </button>
                            )}
-                           {FeatureAccessManager.isFeatureEnabled('qr_color_dots') && (
+                           {(FeatureAccessManager.isFeatureEnabled('qr_color_dots') || FeatureAccessManager.isFeatureEnabled('qr_color_eyes')) && (
                              <button 
-                               className={`text-toolbar-btn${colorPopup === 'dots' ? ' active' : ''}`} 
+                               className={`text-toolbar-btn${colorPopup === 'pattern' ? ' active' : ''}`} 
                                onClick={() => {
-                                 const access = FeatureAccessManager.canUseFeature('qr_color_dots');
-                                 if (!access.allowed) { showPaywall('qr_color_dots'); return; }
-                                 startEditing('color', 'dots');
+                                 startEditing('color', 'pattern');
                                }}
                                style={{ position: 'relative' }}
                              >
                                <PaidCrownBadge featureId="qr_color_dots" fallbackFeatureId="custom_colors_solid" position="floating" size={8} />
                                <QRDotsIcon />
-                               <span>Dots</span>
-                             </button>
-                           )}
-                           {FeatureAccessManager.isFeatureEnabled('qr_color_eyes') && (
-                             <button 
-                               className={`text-toolbar-btn${colorPopup === 'eyes' ? ' active' : ''}`} 
-                               onClick={() => {
-                                 const access = FeatureAccessManager.canUseFeature('qr_color_eyes');
-                                 if (!access.allowed) { showPaywall('qr_color_eyes'); return; }
-                                 startEditing('color', 'eyes');
-                               }}
-                               style={{ position: 'relative' }}
-                             >
-                               <PaidCrownBadge featureId="qr_color_eyes" fallbackFeatureId="qr_color_eyes_custom" position="floating" size={8} />
-                               <QREyesIcon />
-                               <span>Eyes</span>
+                               <span>Pattern</span>
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('qr_color_bg') && (
@@ -7236,16 +7214,10 @@ export default function App() {
                        )}
                        {activeTab === 'shapes' && (
                          <>
-                           {FeatureAccessManager.isFeatureEnabled('custom_dot_styles') && (
-                             <button className={`text-toolbar-btn${shapePopup === 'dots' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'dots')} style={{ position: 'relative' }}>
-                               <PaidCrownBadge featureId="custom_dot_styles" position="floating" size={8} />
-                               <QRDotsIcon /><span>Dots</span>
-                             </button>
-                           )}
-                           {FeatureAccessManager.isFeatureEnabled('custom_eye_styles') && (
-                             <button className={`text-toolbar-btn${shapePopup === 'eyes' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'eyes')} style={{ position: 'relative' }}>
-                               <PaidCrownBadge featureId="custom_eye_styles" position="floating" size={8} />
-                               <QREyesIcon /><span>Eyes</span>
+                           {(FeatureAccessManager.isFeatureEnabled('custom_dot_styles') || FeatureAccessManager.isFeatureEnabled('custom_eye_styles')) && (
+                             <button className={`text-toolbar-btn${shapePopup === 'pattern' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'pattern')} style={{ position: 'relative' }}>
+                               <PaidCrownBadge featureId="custom_dot_styles" fallbackFeatureId="custom_eye_styles" position="floating" size={8} />
+                               <QRDotsIcon /><span>Pattern</span>
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('custom_background_shapes') && (
@@ -7634,7 +7606,7 @@ export default function App() {
         )}
       </main>
 
-      {/* ── Bottom Navigation Bar (Only for Generator) ── */}
+      {/* â”€â”€ Bottom Navigation Bar (Only for Generator) â”€â”€ */}
       {activePage === 'generator' && (
         <nav className="bottom-nav">
           {TABS.filter(tab => activeBatchItemIndex === null || tab.id !== 'content').map(tab => (
@@ -7654,7 +7626,7 @@ export default function App() {
           ))}
         </nav>
       )}
-      {/* ── Main App Navigation ── */}
+      {/* â”€â”€ Main App Navigation â”€â”€ */}
       {(['home', 'saved', 'history', 'you', 'settings'].includes(activePage)) && (
         <nav className="bottom-nav">
           <button 
@@ -7728,7 +7700,7 @@ export default function App() {
           </button>
         </nav>
       )}
-      {/* ── QR Data Modal ── */}
+      {/* â”€â”€ QR Data Modal â”€â”€ */}
       {isDataModalOpen && (
         <div className="modal-overlay" onClick={() => setIsDataModalOpen(false)}>
           <div className="modal-container glass-panel" onClick={e => e.stopPropagation()}>
@@ -7750,7 +7722,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── Template Text Modal (Popup style matching QR Data Modal) ── */}
+      {/* â”€â”€ Template Text Modal (Popup style matching QR Data Modal) â”€â”€ */}
       {isTemplateTextModalOpen && (
         <div className="modal-overlay" onClick={() => setIsTemplateTextModalOpen(false)}>
           <div className="modal-container glass-panel" onClick={e => e.stopPropagation()}>
@@ -8001,7 +7973,7 @@ export default function App() {
             </div>
 
             <h3 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
-              Export Complete! 🎉
+              Export Complete! ðŸŽ‰
             </h3>
 
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 16px 0', lineHeight: 1.5 }}>
@@ -8240,7 +8212,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── Unsaved Changes Modal ── */}
+      {/* â”€â”€ Unsaved Changes Modal â”€â”€ */}
       {unsavedChangesModal.isOpen && (
         <div className="modal-overlay" onClick={handleCancelExit}>
           <div className="modal-container glass-panel" style={{ position: 'relative', maxWidth: '360px', padding: '24px' }} onClick={e => e.stopPropagation()}>
@@ -8307,7 +8279,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── My Profile Modal ── */}
+      {/* â”€â”€ My Profile Modal â”€â”€ */}
       {isProfileModalOpen && (
         <div className="modal-overlay" style={{ zIndex: 10000 }} onClick={() => setIsProfileModalOpen(false)}>
           <div className="modal-container" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '24px', width: '90%', maxWidth: '400px', padding: '24px', color: '#0F172A', boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }} onClick={e => e.stopPropagation()}>
@@ -8417,7 +8389,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── Security & Login Modal ── */}
+      {/* â”€â”€ Security & Login Modal â”€â”€ */}
       {isSecurityModalOpen && (
         <div className="modal-overlay" style={{ zIndex: 10000 }} onClick={() => setIsSecurityModalOpen(false)}>
           <div className="modal-container" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '24px', width: '90%', maxWidth: '400px', padding: '24px', color: '#0F172A', boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }} onClick={e => e.stopPropagation()}>
@@ -8452,7 +8424,7 @@ export default function App() {
                     type="password" 
                     value={newPassword} 
                     onChange={e => setNewPassword(e.target.value)} 
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1px solid #CBD5E1', outline: 'none', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
@@ -8462,7 +8434,7 @@ export default function App() {
                     type="password" 
                     value={confirmPassword} 
                     onChange={e => setConfirmPassword(e.target.value)} 
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     style={{ width: '100%', padding: '10px 14px', borderRadius: '12px', border: '1px solid #CBD5E1', outline: 'none', fontSize: '14px', boxSizing: 'border-box' }}
                   />
                 </div>
@@ -8507,7 +8479,7 @@ export default function App() {
           </div>
         </div>
       )}
-      {/* ── Complete Cloud Sync, Restore & Data Management Modal ── */}
+      {/* â”€â”€ Complete Cloud Sync, Restore & Data Management Modal â”€â”€ */}
       {isCloudSyncModalOpen && (
         <div className="modal-overlay" style={{ zIndex: 10000 }} onClick={() => !isSyncing && setIsCloudSyncModalOpen(false)}>
           <div 
@@ -8622,7 +8594,7 @@ export default function App() {
               </button>
             </div>
 
-            {/* ── TAB 1: BACKUP / SYNC ── */}
+            {/* â”€â”€ TAB 1: BACKUP / SYNC â”€â”€ */}
             {cloudSyncTab === 'sync' && (
               <div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
@@ -8787,7 +8759,7 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 2: RESTORE FROM CLOUD ── */}
+            {/* â”€â”€ TAB 2: RESTORE FROM CLOUD â”€â”€ */}
             {cloudSyncTab === 'restore' && (
               <div>
                 <p style={{ fontSize: '12px', color: 'var(--text-secondary, #94A3B8)', margin: '0 0 12px', lineHeight: 1.4 }}>
@@ -8951,7 +8923,7 @@ export default function App() {
               </div>
             )}
 
-            {/* ── TAB 3: CLEAR CLOUD DATA ── */}
+            {/* â”€â”€ TAB 3: CLEAR CLOUD DATA â”€â”€ */}
             {cloudSyncTab === 'clear' && (
               <div>
                 <div style={{
@@ -8964,7 +8936,7 @@ export default function App() {
                   color: '#EF4444',
                   lineHeight: 1.4
                 }}>
-                  ⚠️ <strong>Notice:</strong> This deletes backup data from the cloud server. Your local items on this device will NOT be affected.
+                  âš ï¸ <strong>Notice:</strong> This deletes backup data from the cloud server. Your local items on this device will NOT be affected.
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
@@ -9176,7 +9148,7 @@ export default function App() {
               borderTop: '1px solid var(--border-color, #1E293B)',
               paddingTop: '12px'
             }}>
-              🔒 Settings, Theme &amp; Device preferences are 100% private to this device and are never uploaded or altered.
+              ðŸ”’ Settings, Theme &amp; Device preferences are 100% private to this device and are never uploaded or altered.
             </div>
           </div>
         </div>
