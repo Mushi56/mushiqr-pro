@@ -1538,6 +1538,7 @@ export default function App() {
 
   const [colorPopup, setColorPopup] = useState(null);
   const [shapePopup, setShapePopup] = useState(null);
+  const [patternTab, setPatternTab] = useState('dots');
   // â”€â”€ References â”€â”€
   const canvasRef = useRef(null);
   const latestThumbnailRef = useRef(null);
@@ -5157,10 +5158,59 @@ export default function App() {
                 <div className="unified-toolbar-card">
                   {(logoPopup || textPopup || colorPopup || shapePopup) ? (
                     <div className="toolbar-editing-view fade-in">
-                      <div className="toolbar-editing-header">
+                      <div className="toolbar-editing-header" style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <button className="toolbar-cancel-btn" onClick={cancelEditing}>
                           <X size={20} />
                         </button>
+                        
+                        {(colorPopup === 'pattern' || shapePopup === 'pattern') && (
+                          <div style={{ 
+                            position: 'absolute', 
+                            left: '50%', 
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            background: 'var(--bg-elevated)',
+                            borderRadius: '12px',
+                            padding: '4px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                          }}>
+                            <button
+                              onClick={() => setPatternTab('dots')}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                border: 'none',
+                                background: patternTab === 'dots' ? 'var(--accent-primary)' : 'transparent',
+                                color: patternTab === 'dots' ? '#fff' : 'var(--text-secondary)',
+                                padding: '6px 16px',
+                                borderRadius: '8px',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                            >
+                              <QRDotsIcon size={16} /> Dots
+                            </button>
+                            <button
+                              onClick={() => setPatternTab('eyes')}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                border: 'none',
+                                background: patternTab === 'eyes' ? 'var(--accent-primary)' : 'transparent',
+                                color: patternTab === 'eyes' ? '#fff' : 'var(--text-secondary)',
+                                padding: '6px 16px',
+                                borderRadius: '8px',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                            >
+                              <QREyesIcon size={16} /> Eyes
+                            </button>
+                          </div>
+                        )}
+
                         <button className="toolbar-apply-btn" onClick={applyEditing}>
                           <Check size={20} />
                         </button>
@@ -6470,64 +6520,75 @@ export default function App() {
                       )}
                       {colorPopup === 'pattern' && (
                         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                          <div className="fade-in">
-                            {renderColorOrGradientPicker("Dots Color", qrColor, (c) => {
-                              setQrColor(c);
-                              setQrTexture(null);
-                              setQrTextureEnabled(false);
-                            }, handleOpenAdv)}
-                          </div>
-                          
-                          <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
-                          
-                          <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                            <Toggle label="Sync Eyes with Dots Color" checked={syncEyes} onChange={setSyncEyes} />
-                            {!syncEyes && (
-                              <>
-                                <Toggle label="Sync Inner & Outer Eye Colors" checked={syncInnerOuterEyes} onChange={(val) => {
-                                  setSyncInnerOuterEyes(val);
-                                  if (val) {
-                                    setEyeOuterColor(eyeColor || qrColor);
-                                  }
-                                }} />
-                                
-                                {syncInnerOuterEyes ? (
-                                  <div className="fade-in">
-                                    {renderColorOrGradientPicker("Eyes Color", eyeColor || qrColor, (c) => { setEyeColor(c); setEyeOuterColor(c); }, handleOpenAdv)}
-                                  </div>
-                                ) : (
-                                  <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Eyes Section</div>
-                                      <div style={{ display: 'flex', background: 'var(--bg-elevated)', borderRadius: '12px', padding: '4px' }}>
-                                        <button 
-                                          onClick={() => setEyeColorTab('inner')}
-                                          style={{ border: 'none', background: eyeColorTab === 'inner' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'inner' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                        >
-                                          Inner
-                                        </button>
-                                        <button 
-                                          onClick={() => setEyeColorTab('outer')}
-                                          style={{ border: 'none', background: eyeColorTab === 'outer' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'outer' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                        >
-                                          Outer
-                                        </button>
-                                      </div>
+                          {patternTab === 'dots' ? (
+                            <div className="fade-in">
+                              {renderColorOrGradientPicker("Dots Color", qrColor, (c) => {
+                                setQrColor(c);
+                                setQrTexture(null);
+                                setQrTextureEnabled(false);
+                              }, handleOpenAdv)}
+                            </div>
+                          ) : (
+                            <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                              <Toggle label="Sync Eyes with Dots Color" checked={syncEyes} onChange={setSyncEyes} />
+                              {!syncEyes && (
+                                <>
+                                  <Toggle label="Sync Inner & Outer Eye Colors" checked={syncInnerOuterEyes} onChange={(val) => {
+                                    setSyncInnerOuterEyes(val);
+                                    if (val) {
+                                      setEyeOuterColor(eyeColor || qrColor);
+                                    }
+                                  }} />
+                                  
+                                  {syncInnerOuterEyes ? (
+                                    <div className="fade-in">
+                                      {renderColorOrGradientPicker("Eyes Color", eyeColor || qrColor, (c) => { setEyeColor(c); setEyeOuterColor(c); }, handleOpenAdv)}
                                     </div>
-                                    {eyeColorTab === 'inner' ? (
-                                      <div className="fade-in">
-                                        {renderColorOrGradientPicker("Inner Eyes Color", eyeColor || qrColor, setEyeColor, handleOpenAdv)}
+                                  ) : (
+                                    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>Eyes Section</div>
+                                        <div style={{ display: 'flex', background: 'var(--bg-elevated)', borderRadius: '12px', padding: '4px' }}>
+                                          <button 
+                                            onClick={() => setEyeColorTab('inner')}
+                                            style={{ border: 'none', background: eyeColorTab === 'inner' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'inner' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                          >
+                                            Inner
+                                          </button>
+                                          <button 
+                                            onClick={() => setEyeColorTab('outer')}
+                                            style={{ border: 'none', background: eyeColorTab === 'outer' ? 'var(--accent-primary)' : 'transparent', color: eyeColorTab === 'outer' ? '#fff' : 'var(--text-primary)', fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                          >
+                                            Outer
+                                          </button>
+                                        </div>
                                       </div>
-                                    ) : (
-                                      <div className="fade-in">
-                                        {renderColorOrGradientPicker("Outer Eyes Color", eyeOuterColor || qrColor, setEyeOuterColor, handleOpenAdv)}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
+                                      {eyeColorTab === 'inner' ? (
+                                        <div className="fade-in">
+                                          {renderColorOrGradientPicker("Inner Eyes Color", eyeColor || qrColor, setEyeColor, handleOpenAdv)}
+                                        </div>
+                                      ) : (
+                                        <div className="fade-in">
+                                          {renderColorOrGradientPicker("Outer Eyes Color", eyeOuterColor || qrColor, setEyeOuterColor, handleOpenAdv)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {colorPopup === 'bg' && (
+                        <div className="fade-in">
+                          {renderColorOrGradientPicker("Background Color", bgColor, (c) => { 
+                            setBgColor(c); 
+                            setLogoBgColor(c); 
+                            setBgTransparent(false); 
+                            setQrBgImage(null);
+                            setQrBgImageEnabled(false);
+                          }, handleOpenAdv)}
                         </div>
                       )}
                       {colorPopup === 'bg-image' && (
@@ -6968,15 +7029,17 @@ export default function App() {
                       )}
                        {shapePopup === 'pattern' && (
                            <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                             <div>
-                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>
-                               <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
-                             </div>
-                             <div style={{ height: '1px', background: 'var(--border-color)' }} />
-                             <div>
-                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Eye Shape</div>
-                               <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} qrParams={qrParams} />
-                             </div>
+                             {patternTab === 'dots' ? (
+                               <div>
+                                 <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>
+                                 <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
+                               </div>
+                             ) : (
+                               <div>
+                                 <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Eye Shape</div>
+                                 <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} qrParams={qrParams} />
+                               </div>
+                             )}
                            </div>
                          )}
                         {shapePopup === 'background' && (
@@ -7217,7 +7280,7 @@ export default function App() {
                            {(FeatureAccessManager.isFeatureEnabled('custom_dot_styles') || FeatureAccessManager.isFeatureEnabled('custom_eye_styles')) && (
                              <button className={`text-toolbar-btn${shapePopup === 'pattern' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'pattern')} style={{ position: 'relative' }}>
                                <PaidCrownBadge featureId="custom_dot_styles" fallbackFeatureId="custom_eye_styles" position="floating" size={8} />
-                               <QRDotsIcon /><span>Pattern</span>
+                               <MdOutlineQrCode2 size={24} /><span>QR Pattern</span>
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('custom_background_shapes') && (
