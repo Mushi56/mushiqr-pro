@@ -1,3 +1,4 @@
+import { nativeGoogleSignIn } from '../utils/nativeGoogleSignIn';
 import React, { useState } from 'react';
 import { User, Mail, Lock, Loader2, X } from 'lucide-react';
 import { auth, googleProvider } from '../services/firebase';
@@ -80,9 +81,7 @@ export default function AuthDropdownPanel({ onClose }) {
     try {
       if (Capacitor.isNativePlatform()) {
         try {
-          const result = await FirebaseAuthentication.signInWithGoogle({
-            useCredentialManager: false,
-          });
+          const result = await nativeGoogleSignIn();
           if (result.credential?.idToken) {
             const credential = GoogleAuthProvider.credential(result.credential.idToken);
             await signInWithCredential(auth, credential);

@@ -10,10 +10,12 @@ import { BRAND_TEMPLATES }          from './brandTemplates';
 import { VCARD_TEMPLATES }          from './vcardTemplates';
 import { FRAME_TEMPLATES }          from './frameTemplates';
 import { NETWORK_TEMPLATES }        from './networkTemplates';
+import { ANIMAL_TEMPLATES }         from './animalTemplates';
 
 export const TEMPLATE_CATEGORIES = [
   'All',
   'Scan Me Frames',
+  'Cute Animals',
   'Social Media',
   'Business',
   'Communication',
@@ -165,6 +167,7 @@ for (const [key, group] of platformGroups.entries()) {
 
 export const ALL_TEMPLATES_REGISTRY = [
   ...FRAME_TEMPLATES,
+  ...ANIMAL_TEMPLATES,
   ...groupedStandardTemplates,
   ...VCARD_TEMPLATES
 ];
@@ -196,6 +199,7 @@ export function searchTemplates(query = '', category = 'All') {
 
 export {
   FRAME_TEMPLATES,
+  ANIMAL_TEMPLATES,
   NETWORK_TEMPLATES,
   SOCIAL_TEMPLATES,
   BUSINESS_TEMPLATES,

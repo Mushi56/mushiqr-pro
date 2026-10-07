@@ -1,5 +1,5 @@
 import { ALL_50_TEMPLATES, getTemplateById } from '../data/qrTemplates';
-import { drawTemplateBackground, drawVCardTemplate, drawFrameTemplate } from '../components/qr-templates/TemplateRenderer';
+import { drawTemplateBackground, drawVCardTemplate, drawFrameTemplate, getSvgImage } from '../components/qr-templates/TemplateRenderer';
 import { getTemplateStylingPreset } from '../data/qrTemplates/templateStylingConfig';
 
 const VCARD_HEIGHT_RATIO = 600 / 1050; // ≈ 0.5714 — landscape 1050×600
@@ -7,6 +7,43 @@ const VCARD_HEIGHT_RATIO = 600 / 1050; // ≈ 0.5714 — landscape 1050×600
 // Convert the structured templates into the App engine's template format
 export const QR_TEMPLATES = ALL_50_TEMPLATES.map(tpl => {
   const isVCard = tpl.styleFamily === 'vcard';
+
+  if (tpl.styleFamily === 'image') {
+    return {
+      id: tpl.id,
+      name: tpl.name,
+      category: tpl.category,
+      styleFamily: 'image',
+      dimensions: tpl.dimensions || '1080 x 1080 px',
+      heightRatio: tpl.heightRatio || 1.0,
+      qrSize: tpl.qrSize || 0.4,
+      qrX: tpl.qrX || 0.5,
+      qrY: tpl.qrY || 0.5,
+      preset: tpl.preset || {},
+      bgImage: tpl.bgImage,
+      thumbImage: tpl.thumbImage,
+      drawBackground(ctx, w, h, options) {
+        if (!tpl.bgImage) return;
+        const img = getSvgImage(tpl.bgImage);
+        if (img && img.complete && img.naturalWidth !== 0) {
+          ctx.drawImage(img, 0, 0, w, h);
+          return;
+        }
+        // Full image not ready yet: draw the (already cached) thumbnail instantly
+        const thumb = tpl.thumbImage ? getSvgImage(tpl.thumbImage) : null;
+        if (thumb && thumb.complete && thumb.naturalWidth !== 0) {
+          ctx.drawImage(thumb, 0, 0, w, h);
+        }
+        if (img) {
+          if (options?.onAssetPending) options.onAssetPending(tpl.bgImage);
+          img.addEventListener('load', () => {
+            if (options?.onAssetLoaded) options.onAssetLoaded();
+          }, { once: true });
+        }
+      },
+      drawForeground: () => {}
+    };
+  }
 
   if (isVCard) {
     // ── vCard landscape template ─────────────────────────────────────────────
@@ -147,6 +184,22 @@ export const QR_TEMPLATES = ALL_50_TEMPLATES.map(tpl => {
     drawForeground: () => {}
   };
 });
+
+// Preload every image template (thumb first, then full) during idle time so the
+// editor canvas can draw them instantly when a template is selected.
+if (typeof window !== 'undefined') {
+  const preload = () => {
+    QR_TEMPLATES.forEach(t => {
+      if (t.styleFamily !== 'image') return;
+      if (t.thumbImage) getSvgImage(t.thumbImage);
+    });
+    QR_TEMPLATES.forEach(t => {
+      if (t.styleFamily === 'image' && t.bgImage) getSvgImage(t.bgImage);
+    });
+  };
+  if ('requestIdleCallback' in window) window.requestIdleCallback(preload, { timeout: 1500 });
+  else setTimeout(preload, 300);
+}
 
 
 // ─── Cloud/Custom Templates Integration ─────────────────────────────────────

@@ -61,7 +61,7 @@ function MiniQRCanvas({ qrParams, overrideParams }) {
       style={{ 
         width: '100%', 
         height: '100%', 
-        borderRadius: '6px',
+        borderRadius: '10px',
         objectFit: 'cover',
         display: 'block'
       }} 
@@ -131,7 +131,7 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
       style={{ 
         width: '100%', 
         height: '100%', 
-        borderRadius: '6px',
+        borderRadius: '10px',
         objectFit: 'cover',
         display: 'block'
       }} 
@@ -169,7 +169,7 @@ function MiniEyeCanvas({ eyeStyle, qrParams }) {
       style={{ 
         width: '100%', 
         height: '100%', 
-        borderRadius: '6px',
+        borderRadius: '10px',
         objectFit: 'cover',
         display: 'block'
       }} 

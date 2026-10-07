@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Heart } from 'lucide-react';
-import { drawTemplateBackground, drawVCardTemplate, drawFrameTemplate } from './TemplateRenderer';
+import { drawTemplateBackground, drawVCardTemplate, drawFrameTemplate, getSvgImage } from './TemplateRenderer';
 import { generateQRMatrix, renderQR } from '../../utils/qrEngine';
 import { getTemplateStylingPreset } from '../../data/qrTemplates/templateStylingConfig';
 import { LOGO_PRESETS } from '../../data/logoPresets';
@@ -8,6 +8,7 @@ import PaidCrownBadge from '../PaidCrownBadge';
 
 const isVCard = (t) => t?.styleFamily === 'vcard';
 const isFrame = (t) => t?.styleFamily === 'frame';
+const isImage = (t) => t?.styleFamily === 'image';
 
 // Reusable shared static demo matrix for ultra-fast thumbnail generation without recomputing
 const DEMO_MATRIX = generateQRMatrix('https://mushiqr.pro', 'M');
@@ -165,6 +166,48 @@ export const TemplateCard = React.memo(function TemplateCard({
           coords.qrBoxSize - margin * 2,
           coords.qrBoxSize - margin * 2
         );
+        ctx.restore();
+      }
+    } else if (isImage(template)) {
+      const w = 260;
+      const h = 260 * (template.heightRatio || 1.0);
+      canvas.width = w;
+      canvas.height = h;
+
+      const thumbSrc = template.thumbImage || template.bgImage;
+      if (thumbSrc) {
+        const img = getSvgImage(thumbSrc);
+        if (img && img.complete && img.naturalWidth !== 0) {
+          ctx.drawImage(img, 0, 0, w, h);
+        } else if (img) {
+          onAssetPending(thumbSrc);
+          img.addEventListener('load', () => onAssetLoaded(), { once: true });
+          img.addEventListener('error', () => onAssetLoaded(), { once: true });
+        }
+      }
+
+      if (activeMatrix && qrTempCanvas) {
+        const qrSizeRatio = template.qrSize || 0.4;
+        const qrSizePx = w * qrSizeRatio;
+        const qrX = w * (template.qrX || 0.5) - qrSizePx / 2;
+        const qrY = h * (template.qrY || 0.5) - qrSizePx / 2;
+        
+        renderQR(qrTempCanvas, {
+          ...activeMatrix,
+          size: 160,
+          qrColor: template.preset?.qrColor || '#000000',
+          bgColor: 'transparent',
+          bgTransparent: true,
+          dotStyle: template.preset?.dotStyle || 'fluid',
+          eyeStyle: template.preset?.eyeStyle || 'rounded',
+          eyeColor: template.preset?.eyeColor || template.preset?.qrColor || '#000000',
+          eyeOuterColor: template.preset?.eyeOuterColor || template.preset?.qrColor || '#000000',
+          syncEyes: true,
+          quietZone: 2
+        });
+        
+        ctx.save();
+        ctx.drawImage(qrTempCanvas, qrX, qrY, qrSizePx, qrSizePx);
         ctx.restore();
       }
     } else {

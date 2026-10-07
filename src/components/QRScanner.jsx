@@ -229,12 +229,13 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       if (Capacitor.isNativePlatform()) {
         try {
           await StatusBar.show();
-          await StatusBar.setOverlaysWebView({ overlay: true });
           
           if (status === 'DETECTED') {
+            await StatusBar.setOverlaysWebView({ overlay: false });
             await StatusBar.setStyle({ style: Style.Dark }); // White text/icons for red hero banner
-            await StatusBar.setBackgroundColor({ color: '#00000000' });
+            await StatusBar.setBackgroundColor({ color: '#F01A4E' });
           } else {
+            await StatusBar.setOverlaysWebView({ overlay: true });
             if (effectiveTheme === 'light') {
               await StatusBar.setStyle({ style: Style.Light });
             } else {
@@ -671,12 +672,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     if (Capacitor.isNativePlatform()) { Haptics.impact({ style: ImpactStyle.Heavy }).catch(() => { }); }
     else if (navigator.vibrate) { navigator.vibrate(200); }
 
-    const scanner = qrScannerRef.current;
-    if (scanner) {
-      try { scanner.pause(); } catch { }
-    } else if (Capacitor.isNativePlatform()) {
-      try { NativeScanner.pause(); } catch { }
-    }
+    // Fully release the camera (avoids lag + stale-state bugs on "Scan Again")
+    stopScanner();
 
     const fmtId = decodedResult?.result?.format?.format
       ?? decodedResult?.decodedResult?.result?.format?.format
@@ -774,7 +771,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     setTimeout(() => {
       setStatus('DETECTED');
     }, 800);
-  }, [playBeep]);
+  }, [playBeep, stopScanner]);
 
   const startScanner = useCallback(async () => {
     if (busyRef.current) return;
@@ -790,6 +787,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     setResult(null); setQrTypeData(null); setDetectedFormatId(null); setDetectedFormatName(null); setError(null); setStatus('SCANNING'); setZoom(1); setVideoPlaying(false);
     try {
       await stopScanner();
+      busyRef.current = true; // stopScanner resets this; re-lock during startup
       if (!mountedRef.current) { busyRef.current = false; return; }
 
       if (Capacitor.isNativePlatform()) {
@@ -850,7 +848,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       await scanner.start(
         { facingMode: "environment" },
         {
-          fps: 25,
+          fps: 15,
           qrbox: (width, height) => {
             return { width: Math.min(width, height) * 0.85, height: Math.min(width, height) * 0.55 };
           },
@@ -858,8 +856,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           experimentalFeatures: { useBarCodeDetectorIfSupported: true },
           videoConstraints: {
             facingMode: "environment",
-            width: { ideal: 1920 },
-            height: { ideal: 1080 }
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
           }
         },
         (decodedText, decodedResult) => {
@@ -962,31 +960,51 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     if (!file) return;
     await stopScanner(); setStatus('LOADING'); setResult(null); setQrTypeData(null); setError(null);
     scanHandledRef.current = false;
-    let scanner = null;
+    
     try {
-      scanner = new Html5Qrcode("qr-scanner-viewport", false);
-      const scanRes = await scanner.scanFileV2(file, false);
-      
-      let text = '';
+      let text = null;
       let rawResult = null;
-      if (scanRes && typeof scanRes === 'object') {
-        text = scanRes.decodedText;
-        rawResult = scanRes;
-      } else {
-        text = scanRes;
+      
+      // 1. Try Native BarcodeDetector (Extremely fast and accurate for gallery images on Android/Chrome)
+      if ('BarcodeDetector' in window) {
+        try {
+          // eslint-disable-next-line no-undef
+          const barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'itf', 'data_matrix', 'pdf417'] });
+          const img = await createImageBitmap(file);
+          const barcodes = await barcodeDetector.detect(img);
+          if (barcodes && barcodes.length > 0) {
+            text = barcodes[0].rawValue;
+            rawResult = barcodes[0];
+          }
+        } catch (e) {
+          console.warn('BarcodeDetector failed, falling back', e);
+        }
       }
       
-      if (mountedRef.current) handleScanResult(text, rawResult);
+      // 2. Fallback to Html5Qrcode
+      if (!text) {
+        const scanner = new Html5Qrcode("qr-scanner-viewport", false);
+        try {
+          const scanRes = await scanner.scanFileV2(file, false);
+          if (scanRes && typeof scanRes === 'object') {
+            text = scanRes.decodedText;
+            rawResult = scanRes;
+          } else {
+            text = scanRes;
+          }
+        } finally {
+          try { scanner.clear(); } catch(e) {}
+        }
+      }
+      
+      if (text) {
+        if (mountedRef.current) handleScanResult(text, rawResult);
+      } else {
+        throw new Error("No code found");
+      }
     } catch (err) {
       if (mountedRef.current) { setError('No QR code or barcode found in this image.'); setStatus('ERROR'); }
     } finally {
-      if (scanner) {
-        try {
-          scanner.clear();
-        } catch (e) {
-          // ignore
-        }
-      }
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -1087,23 +1105,14 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     } catch (err) { console.error('Action failed:', err); }
   };
 
-  const resumeScanning = () => {
+  const resumeScanning = async () => {
     triggerHapticFeedback();
-    const scanner = qrScannerRef.current;
-    if (scanner) {
-      try {
-        scanner.resume();
-      } catch (err) {
-        console.warn("Failed to resume scanner, restarting:", err);
-        startScanner();
-      }
-    } else if (Capacitor.isNativePlatform()) {
-      try { NativeScanner.resume(); } catch { }
-    } else {
-      startScanner();
-    }
     scanHandledRef.current = false;
     setResult(null); setQrTypeData(null); setDetectedFormatId(null); setDetectedFormatName(null); setStatus('SCANNING');
+    // Always do a clean restart; wait a frame so the viewport is back in the DOM
+    await stopScanner();
+    await new Promise(r => setTimeout(r, 120));
+    if (mountedRef.current) startScanner();
   };
 
   const captureImage = useCallback(async () => {
@@ -1670,7 +1679,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                 display: 'flex',
                 background: '#F01A4E',
                 backgroundColor: '#F01A4E',
-                transition: 'background-color 0.3s ease, background 0.3s ease'
+                transition: 'background-color 0.3s ease, background 0.3s ease',
+                paddingTop: 'env(safe-area-inset-top, 0px)',
+                height: 'calc(64px + env(safe-area-inset-top, 0px))',
+                boxSizing: 'border-box'
               }}
             >
               <div className="app-logo">

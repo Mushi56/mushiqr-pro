@@ -1,3 +1,4 @@
+import { nativeGoogleSignIn } from '../../utils/nativeGoogleSignIn';
 import React, { useState, useEffect } from 'react';
 import {
   Mail,
@@ -131,9 +132,7 @@ export default function LoginPage({ onNavigate, onSuccess, isFirstLaunch, theme,
     try {
       if (Capacitor.isNativePlatform()) {
         try {
-          const result = await FirebaseAuthentication.signInWithGoogle({
-            useCredentialManager: false,
-          });
+          const result = await nativeGoogleSignIn();
           if (result.credential?.idToken) {
             const credential = GoogleAuthProvider.credential(result.credential.idToken);
             await signInWithCredential(auth, credential);

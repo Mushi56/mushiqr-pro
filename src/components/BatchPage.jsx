@@ -180,8 +180,8 @@ export default function BatchPage({
   const QUALITY_SIZES = {
     'Low': 512,
     'Normal': 1024,
-    'HD': 2048,
-    'HQ': 4096
+    'High': 2048,
+    'Ultra': 4096
   };
 
   const handleModeSwitch = async (newType) => {
@@ -479,7 +479,15 @@ export default function BatchPage({
     }
 
     const zip = new JSZip();
-    const exportSize = QUALITY_SIZES[exportQuality] || 1024;
+    let exportSize = QUALITY_SIZES[exportQuality] || 1024;
+    
+    if (exportQuality === 'Ultra' && selectedTemplate?.dimensions) {
+      const match = selectedTemplate.dimensions.match(/^(\d+)/);
+      if (match) {
+        exportSize = parseInt(match[1], 10);
+      }
+    }
+
     const zipFilenameMap = new Map();
 
     // ── Chunked processing to prevent memory exhaustion on large batches ──
@@ -517,7 +525,7 @@ export default function BatchPage({
         const tempCanvas = document.createElement('canvas');
 
         if (batchType === 'BARCODE') {
-          const scale = exportQuality === 'Low' ? 1 : exportQuality === 'Normal' ? 2 : exportQuality === 'HD' ? 3 : 4;
+          const scale = exportQuality === 'Low' ? 1 : exportQuality === 'Normal' ? 2 : exportQuality === 'High' ? 3 : 4;
           tempCanvas.width = 400 * scale;
           tempCanvas.height = 150 * scale;
 
@@ -581,7 +589,7 @@ export default function BatchPage({
       // 3. SVG (wraps the PNG)
       if (selectedFormat === 'ALL' || selectedFormat === 'SVG') {
         const sw = exportSize;
-        const sh = batchType === 'BARCODE' ? Math.round(150 * (exportQuality === 'Low' ? 1 : exportQuality === 'Normal' ? 2 : exportQuality === 'HD' ? 3 : 4)) : exportSize;
+        const sh = batchType === 'BARCODE' ? Math.round(150 * (exportQuality === 'Low' ? 1 : exportQuality === 'Normal' ? 2 : exportQuality === 'High' ? 3 : 4)) : exportSize;
         const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      width="${sw}" height="${sh}"
@@ -1726,7 +1734,7 @@ export default function BatchPage({
                         border: '1px solid rgba(214, 0, 54, 0.15)',
                         letterSpacing: '0.5px'
                       }}>
-                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'HD' ? '2048px' : '4096px'}
+                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '4096px')}
                       </span>
                     </div>
                     <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
@@ -1735,11 +1743,11 @@ export default function BatchPage({
                         min="0"
                         max="3"
                         step="1"
-                        value={['Low', 'Normal', 'HD', 'HQ'].indexOf(exportQuality)}
+                        value={['Low', 'Normal', 'High', 'Ultra'].indexOf(exportQuality)}
                         onChange={(e) => {
-                          const steps = ['Low', 'Normal', 'HD', 'HQ'];
+                          const steps = ['Low', 'Normal', 'High', 'Ultra'];
                           const selected = steps[parseInt(e.target.value)] || 'Normal';
-                          if (selected === 'HD' || selected === 'HQ') {
+                          if (selected === 'High' || selected === 'Ultra') {
                             const access = FeatureAccessManager.canUseFeature('bulk_export_quality');
                             if (!access.allowed) {
                               showPaywall('bulk_export_quality');
@@ -1754,10 +1762,10 @@ export default function BatchPage({
                         <span>Low</span>
                         <span>Normal</span>
                         <span style={{ position: 'relative' }}>
-                          HD <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
+                          High <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
                         </span>
                         <span style={{ position: 'relative' }}>
-                          4K <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
+                          Ultra <PaidCrownBadge featureId="bulk_export_quality" position="floating" size={7} />
                         </span>
                       </div>
                     </div>
@@ -2237,7 +2245,7 @@ export default function BatchPage({
             </div>
 
             <h3 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
-              Export Complete! 🎉
+              Export Complete
             </h3>
 
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 16px 0', lineHeight: 1.5 }}>

@@ -57,8 +57,8 @@ const PRO_FEATURES = [
   },
   {
     icon: Image,
-    title: 'HD & 4K Vector Export (SVG & PDF)',
-    desc: 'Ultra-HD 2048px, 4K 4096px, and scalable SVG/PDF',
+    title: 'High & Ultra Vector Export (SVG & PDF)',
+    desc: 'High 2048px, Ultra 4096px, and scalable SVG/PDF',
   },
   {
     icon: Shapes,

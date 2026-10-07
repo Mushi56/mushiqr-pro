@@ -130,7 +130,7 @@ import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 import { usePremium } from './services/premiumContext';
 import { FeatureAccessManager } from './services/FeatureAccessManager';
 import UserAvatar from './components/UserAvatar';
-import { MdOutlineQrCode2, MdQrCodeScanner } from 'react-icons/md';
+import { MdQrCodeScanner } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TemplateGallery } from './components/qr-templates/TemplateGallery';
 import { TemplateCustomizer } from './components/qr-templates/TemplateCustomizer';
@@ -1571,6 +1571,70 @@ export default function App() {
   ]);
   const [downloadingFormat, setDownloadingFormat] = useState(null);
   // â”€â”€ Advanced Picker State â”€â”€
+  // ── Template Sheet Swipe/Drag Expansion State ──
+  const [templateSheetHeight, setTemplateSheetHeight] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return Math.round(window.innerHeight * 0.46);
+    }
+    return 360;
+  });
+  const isDraggingSheetRef = useRef(false);
+  const dragStartYRef = useRef(0);
+  const dragStartHeightRef = useRef(0);
+  const [isSheetDragging, setIsSheetDragging] = useState(false);
+
+  const getTemplateMinMaxHeights = useCallback(() => {
+    const bottomNavH = 64;
+    const topSafe = 56;
+    const winH = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const maxH = winH - topSafe - bottomNavH;
+    const minH = Math.round(winH * 0.30);
+    const defaultH = Math.round(winH * 0.46);
+    return { minH, maxH, defaultH, winH };
+  }, []);
+
+  const handleSheetDragStart = useCallback((e) => {
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    isDraggingSheetRef.current = true;
+    dragStartYRef.current = clientY;
+    dragStartHeightRef.current = templateSheetHeight;
+    setIsSheetDragging(true);
+  }, [templateSheetHeight]);
+
+  useEffect(() => {
+    const onMove = (e) => {
+      if (!isDraggingSheetRef.current) return;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const deltaY = dragStartYRef.current - clientY;
+      const { minH, maxH } = getTemplateMinMaxHeights();
+      const newH = Math.max(minH, Math.min(maxH, dragStartHeightRef.current + deltaY));
+      setTemplateSheetHeight(newH);
+    };
+
+    const onEnd = (e) => {
+      if (!isDraggingSheetRef.current) return;
+      isDraggingSheetRef.current = false;
+      setIsSheetDragging(false);
+
+      const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+      if (Math.abs(clientY - dragStartYRef.current) < 8) {
+        const { defaultH, maxH } = getTemplateMinMaxHeights();
+        setTemplateSheetHeight(prev => (prev > defaultH + 40 ? defaultH : maxH));
+      }
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchmove', onMove, { passive: true });
+    window.addEventListener('touchend', onEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onEnd);
+      window.removeEventListener('touchmove', onMove);
+      window.removeEventListener('touchend', onEnd);
+    };
+  }, [getTemplateMinMaxHeights]);
   const [advPicker, setAdvPicker] = useState({ open: false, color: '#000000', setter: null });
   const handleOpenAdv = (color, setter) => setAdvPicker({ open: true, color, setter });
   const [selectedFormat, setSelectedFormat] = useState('PNG');
@@ -2664,7 +2728,15 @@ export default function App() {
     if (!canvasRef.current) return;
     setDownloadingFormat(format);
     try {
-      const exportSize = QUALITY_SIZES[exportQuality] || 2048;
+      let exportSize = QUALITY_SIZES[exportQuality] || 2048;
+      
+      if (exportQuality === 'Ultra' && selectedTemplate?.dimensions) {
+        const match = selectedTemplate.dimensions.match(/^(\d+)/);
+        if (match) {
+          exportSize = parseInt(match[1], 10);
+        }
+      }
+      
       const exportCanvas = generateExportCanvas(exportSize);
       
       // Generate a unique filename using timestamp to avoid overwriting previous saves
@@ -4095,7 +4167,7 @@ export default function App() {
     { id: 'color',    label: 'Color',    icon: Palette,     featId: 'qr_tab_color' },
     { id: 'shapes',   label: 'Style',    icon: QRStyleIcon, featId: 'qr_tab_style' },
     { id: 'logo',     label: 'Logo',     icon: ImageIcon,   featId: 'qr_tab_logo' },
-    { id: 'template', label: 'Template', icon: Sparkles,    featId: 'qr_tab_template' },
+    { id: 'template', label: 'Templates', icon: Sparkles,    featId: 'qr_tab_template' },
     // { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
     { id: 'text',     label: 'Text',     icon: Type,        featId: 'qr_tab_text' },
   ];
@@ -4242,7 +4314,7 @@ export default function App() {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24,
           fontFamily: "'Outfit','Inter',sans-serif", color: '#fff', textAlign: 'center', padding: 32,
         }}>
-          <div style={{ fontSize: 56 }}>ðŸ”§</div>
+          <div style={{ fontSize: 56 }}>🔧</div>
           <div style={{ fontSize: 22, fontWeight: 800 }}>Under Maintenance</div>
           <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', maxWidth: 380, lineHeight: 1.7 }}>
             {adminSettings?.maintenanceMessage || 'We are performing scheduled maintenance. Please check back soon.'}
@@ -4552,7 +4624,7 @@ export default function App() {
                           {exportQuality === 'Low' && '512px'}
                           {exportQuality === 'Medium' && '1024px'}
                           {exportQuality === 'High' && '2048px'}
-                          {exportQuality === 'Ultra' && '4096px'}
+                          {exportQuality === 'Ultra' && (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '4096px')}
                         </span>
                       </div>
                       <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
@@ -4591,10 +4663,10 @@ export default function App() {
                             Normal <PaidCrownBadge featureId="export_quality_medium" position="floating" size={7} />
                           </span>
                           <span style={{ position: 'relative' }}>
-                            HD <PaidCrownBadge featureId="export_quality_hd" position="floating" size={7} />
+                            High <PaidCrownBadge featureId="export_quality_hd" position="floating" size={7} />
                           </span>
                           <span style={{ position: 'relative' }}>
-                            4K <PaidCrownBadge featureId="export_quality_ultra" position="floating" size={7} />
+                            Ultra <PaidCrownBadge featureId="export_quality_ultra" position="floating" size={7} />
                           </span>
                         </div>
                       </div>
@@ -5084,7 +5156,7 @@ export default function App() {
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '16px 20px 100px 20px', display: 'flex', flexDirection: 'column' }}>
+                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '6px 20px 60px 20px', display: 'flex', flexDirection: 'column' }}>
                     <QRTypeSelector
                       activeType={qrType}
                       onTypeChange={(type) => {
@@ -5105,7 +5177,7 @@ export default function App() {
               {/* Logo Tab */}
               {activeTab === 'logo' && (
                 <div className="tab-panel fade-in" id="panel-logo">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '16px 20px 100px 20px' }}>
+                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '6px 20px 70px 20px' }}>
                     {/* 1. Presets Section */}
                     <LogoPresets 
                       logo={logo} 
@@ -5135,18 +5207,37 @@ export default function App() {
               )}
               {/* Template Tab */}
               {activeTab === 'template' && (
-                <div className="tab-panel fade-in" id="panel-template">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '16px 20px 100px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    
-                    {/* Template Gallery */}
+                <div 
+                  className="tab-panel fade-in template-sheet" 
+                  id="panel-template"
+                  style={{
+                    height: `${templateSheetHeight}px`,
+                    transition: isSheetDragging ? 'none' : 'height 0.28s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }}
+                >
+                  <div 
+                    className="panel-scroll-area" 
+                    style={{ 
+                      flex: '1', 
+                      overflowY: 'auto', 
+                      padding: '0 16px 80px 16px', 
+                      display: 'flex', 
+                      flexDirection: 'column'
+                    }}
+                  >
+                    {/* Template Gallery with Integrated Sticky Pill & Categories */}
                     <TemplateGallery
                       templates={ALL_TEMPLATES}
                       selectedTemplate={selectedTemplate}
-                      onSelectTemplate={applyTemplate}
+                      onSelectTemplate={(tpl) => {
+                        applyTemplate(tpl);
+                      }}
                       qrMatrixInfo={qrMatrixInfo}
                       currentQrOptions={galleryQrOptions}
                       headlineText={templateHeadlineText}
                       handleText={templateHandleText}
+                      onDragStart={handleSheetDragStart}
+                      isSheetDragging={isSheetDragging}
                     />
                   </div>
                 </div>
@@ -7224,7 +7315,7 @@ export default function App() {
                                style={{ position: 'relative' }}
                              >
                                <PaidCrownBadge featureId="qr_color_dots" fallbackFeatureId="custom_colors_solid" position="floating" size={8} />
-                               <MdOutlineQrCode2 size={24} />
+                               <QrCode size={24} />
                                <span>QR Color</span>
                              </button>
                            )}
@@ -7280,7 +7371,7 @@ export default function App() {
                            {(FeatureAccessManager.isFeatureEnabled('custom_dot_styles') || FeatureAccessManager.isFeatureEnabled('custom_eye_styles')) && (
                              <button className={`text-toolbar-btn${shapePopup === 'pattern' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'pattern')} style={{ position: 'relative' }}>
                                <PaidCrownBadge featureId="custom_dot_styles" fallbackFeatureId="custom_eye_styles" position="floating" size={8} />
-                               <MdOutlineQrCode2 size={24} /><span>QR Pattern</span>
+                               <QrCode size={24} /><span>QR Pattern</span>
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('custom_background_shapes') && (
@@ -8036,7 +8127,7 @@ export default function App() {
             </div>
 
             <h3 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--text-primary)' }}>
-              Export Complete! ðŸŽ‰
+              Export Complete
             </h3>
 
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 16px 0', lineHeight: 1.5 }}>
@@ -9211,7 +9302,7 @@ export default function App() {
               borderTop: '1px solid var(--border-color, #1E293B)',
               paddingTop: '12px'
             }}>
-              ðŸ”’ Settings, Theme &amp; Device preferences are 100% private to this device and are never uploaded or altered.
+              🔒 Settings, Theme &amp; Device preferences are 100% private to this device and are never uploaded or altered.
             </div>
           </div>
         </div>
