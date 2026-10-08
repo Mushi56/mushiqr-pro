@@ -5225,8 +5225,8 @@ export default function App() {
               {/* Template Tab */}
               {activeTab === 'template' && (
                 <DraggableSheet isOpen={true}>
-                  <div className="tab-panel fade-in" id="panel-template">
-                    <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '0px 20px 100px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div className="tab-panel fade-in" id="panel-template" style={{ overflow: 'visible' }}>
+                    <div style={{ padding: '0px 20px 20px 20px', display: 'flex', flexDirection: 'column' }}>
                       <TemplateGallery
                         templates={ALL_TEMPLATES}
                         selectedTemplate={selectedTemplate}

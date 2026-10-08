@@ -114,11 +114,15 @@ export const TemplateGallery = React.memo(function TemplateGallery({
         display: 'flex',
         alignItems: 'center',
         background: 'var(--bg-elevated)',
-        padding: '6px 8px',
-        borderRadius: '16px',
-        border: '1px solid var(--border-color)',
+        padding: '10px 20px',
+        margin: '0 -20px',
+        borderBottom: '1px solid var(--border-color)',
+        borderTop: '1px solid var(--border-color)',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-        gap: '6px'
+        gap: '6px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10
       }}>
         <div style={{
           display: 'flex',

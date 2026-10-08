@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export function DraggableSheet({ children, isOpen, initialHeight = 300, expandedHeight = window.innerHeight * 0.85, onClose }) {
+export function DraggableSheet({ children, isOpen, initialHeight = 220, expandedHeight = window.innerHeight * 0.85, onClose }) {
   const [height, setHeight] = useState(initialHeight);
   const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
@@ -80,9 +80,10 @@ export function DraggableSheet({ children, isOpen, initialHeight = 300, expanded
       >
         <div style={{
           width: '40px',
-          height: '5px',
-          background: 'var(--border-color, #333)',
-          borderRadius: '3px'
+          height: '6px',
+          background: 'var(--text-muted, rgba(255, 255, 255, 0.3))',
+          borderRadius: '4px',
+          margin: '0 auto'
         }} />
       </div>
 
