@@ -941,7 +941,9 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           // App returned to foreground: restart the camera if we were scanning
           if (isScanningRef.current) {
             setTimeout(() => {
-              startScanner();
+              if (isScanningRef.current) {
+                startScanner();
+              }
             }, 300);
           }
         }
@@ -958,7 +960,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
 
   const handleFileUpload = async (file) => {
     if (!file) return;
-    await stopScanner(); setStatus('LOADING'); setResult(null); setQrTypeData(null); setError(null);
+    setStatus('LOADING'); setResult(null); setQrTypeData(null); setError(null);
+    await stopScanner();
     scanHandledRef.current = false;
     
     try {
@@ -1859,7 +1862,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               if (scrolled !== isResultScrolled) setIsResultScrolled(scrolled);
             }}>
               {/* Main Card */}
-              <div className="qrs-result-main-card" style={{ paddingTop: 16 }}>
+              <div className="qrs-result-main-card" style={{ paddingTop: 'calc(env(safe-area-inset-top, 32px) + 16px)' }}>
                 <div className="qrs-result-card-header">
                   <span className="qrs-badge">{detectedFormatName || 'QR Code'}</span>
                   <span className="qrs-card-date">{scanDate}</span>
