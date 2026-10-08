@@ -1383,6 +1383,7 @@ export default function App() {
     }
 
     if (tpl.preset) {
+      if (tpl.preset.ecLevel) setErrorLevel(tpl.preset.ecLevel);
       if (tpl.preset.qrColor) setQrColor(tpl.preset.qrColor);
       if (tpl.preset.bgColor) setBgColor(tpl.preset.bgColor);
       if (tpl.preset.dotStyle) setDotStyle(tpl.preset.dotStyle);
@@ -1399,9 +1400,38 @@ export default function App() {
       }
       if (tpl.preset.logoBgShape) setLogoBgShape(tpl.preset.logoBgShape);
       if (tpl.preset.logo) {
-        applyLogoBySlug(tpl.preset.logo);
+        if (typeof tpl.preset.logo === 'object') {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            setLogo({
+              image: img,
+              width: tpl.preset.logo.width || 0.18,
+              height: tpl.preset.logo.height || 0.18,
+              slug: 'custom_template_logo',
+              name: 'Template Logo',
+              url: tpl.preset.logo.image
+            });
+            setLogoWidth(tpl.preset.logo.width || 0.18);
+            setLogoHeight(tpl.preset.logo.height || 0.18);
+            if (tpl.preset.logo.background !== undefined) {
+              setLogoBackground(tpl.preset.logo.background);
+            }
+          };
+          img.src = tpl.preset.logo.image;
+        } else {
+          applyLogoBySlug(tpl.preset.logo);
+        }
       } else {
         setLogo(null);
+      }
+      // Apply logo shadow from template preset
+      if (tpl.preset.logoShadowEnabled !== undefined) {
+        setLogoShadowEnabled(tpl.preset.logoShadowEnabled);
+        if (tpl.preset.logoShadowColor) setLogoShadowColor(tpl.preset.logoShadowColor);
+        if (tpl.preset.logoShadowBlur !== undefined) setLogoShadowBlur(tpl.preset.logoShadowBlur);
+        if (tpl.preset.logoShadowOffsetX !== undefined) setLogoShadowOffsetX(tpl.preset.logoShadowOffsetX);
+        if (tpl.preset.logoShadowOffsetY !== undefined) setLogoShadowOffsetY(tpl.preset.logoShadowOffsetY);
       }
     }
   };
@@ -2715,7 +2745,7 @@ export default function App() {
       logo: logo?.image, logoWidth, logoHeight, logoPadding,
       logoBackground, logoBgColor, logoBgShape,
       logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-      quietZone: 2, frameStyle, frameText, frameColor, frameFont,
+      quietZone: (selectedTemplate?.quietZone !== undefined ? selectedTemplate.quietZone : 2), frameStyle, frameText, frameColor, frameFont,
       frameSize,
       frameStrokeEnabled,
       frameStrokeWidth,
@@ -2997,7 +3027,7 @@ export default function App() {
         logo: logo?.image, logoWidth, logoHeight, logoPadding,
         logoBackground, logoBgColor, logoBgShape,
         logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
-        quietZone: 2, frameStyle, frameText, frameColor, frameFont,
+        quietZone: (selectedTemplate?.quietZone !== undefined ? selectedTemplate.quietZone : 2), frameStyle, frameText, frameColor, frameFont,
         frameSize,
         frameStrokeEnabled,
         frameStrokeWidth,
@@ -9437,7 +9467,12 @@ function TemplatePreviewCanvas({ template, theme, qrMatrixInfo, currentQrOptions
         logoOutlineColor: currentQrOptions?.logoOutlineColor || '#000000',
         logoOutlineWidth: currentQrOptions?.logoOutlineWidth || 3,
         logoOutlineOpacity: currentQrOptions?.logoOutlineOpacity || 1,
-        quietZone: 2,
+        logoShadowEnabled: currentQrOptions?.logoShadowEnabled || false,
+        logoShadowColor: currentQrOptions?.logoShadowColor || 'rgba(0,0,0,0.5)',
+        logoShadowBlur: currentQrOptions?.logoShadowBlur || 10,
+        logoShadowOffsetX: currentQrOptions?.logoShadowOffsetX || 0,
+        logoShadowOffsetY: currentQrOptions?.logoShadowOffsetY || 4,
+        quietZone: template.quietZone !== undefined ? template.quietZone : 2,
       };
 
       renderQR(qrTempCanvas, optionsForQR);

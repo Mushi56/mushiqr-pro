@@ -1,5 +1,38 @@
 export const ANIMAL_TEMPLATES = [
   {
+    "id": "template-mask-exploding",
+    "name": "Mask Exploding Template",
+    "category": "AI Magic",
+    "styleFamily": "image",
+    "bgImage": "/templates/mask-template.avif",
+    "thumbImage": "/templates/mask-template.avif",
+    "dimensions": "1024 x 1024 px",
+    "heightRatio": 1.0,
+    "qrSize": 0.60,
+    "qrX": 0.50,
+    "qrY": 0.50,
+    "quietZone": 0,
+    "preset": {
+      "qrColor": "#000000",
+      "bgColor": "transparent",
+      "bgTransparent": true,
+      "dotStyle": "denso",
+      "eyeStyle": "denso",
+      "ecLevel": "H",
+      "logo": {
+         "image": "/templates/mask-overlay.avif",
+         "width": 0.90,
+         "height": 0.90,
+         "background": false
+      },
+      "logoShadowEnabled": true,
+      "logoShadowColor": "rgba(0,0,0,0.45)",
+      "logoShadowBlur": 28,
+      "logoShadowOffsetX": 0,
+      "logoShadowOffsetY": 8
+    }
+  },
+  {
     "id": "template-bunny",
     "name": "Bunny Template",
     "category": "Cute Animals",
