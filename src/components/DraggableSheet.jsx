@@ -3,13 +3,22 @@ import React, { useState, useRef, useEffect } from 'react';
 export function DraggableSheet({ children, isOpen, initialHeight = 220, expandedHeight = window.innerHeight * 0.85, onClose }) {
   const [height, setHeight] = useState(initialHeight);
   const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+  const baseHeight = useRef(initialHeight);
   const startY = useRef(0);
   const startHeight = useRef(initialHeight);
 
-  // When isOpen changes, reset to initialHeight
+  // When isOpen changes, reset to initialHeight or container height
   useEffect(() => {
     if (isOpen) {
-      setHeight(initialHeight);
+      if (containerRef.current && containerRef.current.parentElement) {
+        const h = containerRef.current.parentElement.clientHeight;
+        baseHeight.current = h;
+        setHeight(h);
+      } else {
+        baseHeight.current = initialHeight;
+        setHeight(initialHeight);
+      }
     }
   }, [isOpen, initialHeight]);
 
@@ -33,14 +42,15 @@ export function DraggableSheet({ children, isOpen, initialHeight = 220, expanded
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+    const snapBase = baseHeight.current;
     // Snap logic
-    if (height < initialHeight * 0.5) {
+    if (height < snapBase * 0.5) {
       if (onClose) onClose();
-      setHeight(initialHeight);
-    } else if (height > initialHeight * 1.5) {
+      setHeight(snapBase);
+    } else if (height > snapBase + 100) { // Snaps up if dragged more than 100px
       setHeight(expandedHeight);
     } else {
-      setHeight(initialHeight);
+      setHeight(snapBase);
     }
   };
 
@@ -48,9 +58,10 @@ export function DraggableSheet({ children, isOpen, initialHeight = 220, expanded
 
   return (
     <div 
+      ref={containerRef}
       style={{
-        position: 'fixed',
-        bottom: 'calc(64px + env(safe-area-inset-bottom))',
+        position: 'absolute',
+        bottom: 0,
         left: 0,
         right: 0,
         height: `${height}px`,

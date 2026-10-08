@@ -5100,10 +5100,7 @@ export default function App() {
             {/* â”€â”€ QR Preview Card (always visible) â”€â”€ */}
             <ErrorBoundary>
               <section className="qr-preview-card" style={{ 
-                position: 'relative',
-                paddingBottom: activeTab === 'template' ? '0px' : undefined,
-                borderBottom: activeTab === 'template' ? 'none' : undefined,
-                gap: activeTab === 'template' ? '0px' : undefined
+                position: 'relative'
               }}>
                 {qrMatrixInfo && (
                   <button
@@ -5169,7 +5166,7 @@ export default function App() {
               </section>
             </ErrorBoundary>
             {/* â”€â”€ Tab Panel Content â”€â”€ */}
-            <section className="tab-panel-area">
+            <section className="tab-panel-area" style={{ overflow: activeTab === 'template' ? 'visible' : 'hidden' }}>
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
