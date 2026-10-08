@@ -570,7 +570,7 @@ export function ImageCropShapeModal({
                 strokeWidth="2.5" 
                 strokeLinejoin="round"
                 strokeLinecap="round"
-                style={{ filter: 'drop-shadow(0 0 6px rgba(214, 0, 54, 0.5))' }}
+                style={{ filter: 'none' }}
               />
               <path 
                 d={currentShapePath} 
@@ -826,3 +826,5 @@ export function ImageCropShapeModal({
     : modalContent;
 }
 export default ImageCropShapeModal;
+
+

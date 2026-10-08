@@ -175,7 +175,7 @@ export default function LogoPresets({ logo, onLogoChange, onLogoRemove }) {
                     }} 
                   />
                   {logo?.src === p.url && (
-                    <X size={18} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+                    <X size={18} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'none' }} />
                   )}
                 </div>
               </button>
@@ -198,3 +198,5 @@ export default function LogoPresets({ logo, onLogoChange, onLogoRemove }) {
     </>
   );
 }
+
+

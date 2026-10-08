@@ -343,7 +343,7 @@ export default function HistoryPage({ onLoadQR, onNavigate, initialFilter = 'All
                 <path d="M4 18.533C4 16.3239 5.79086 14.5147 8 14.5147H56C58.2091 14.5147 60 16.3239 60 18.533V44C60 46.2091 58.2091 48 56 48H8C5.79086 48 4 46.2091 4 44V18.533Z" fill="#FFC2D6" />
 
                 {/* Glow/Heart circle icon at bottom right */}
-                <circle cx="52" cy="40" r="11" fill="#FFFFFF" filter="drop-shadow(0px 2px 4px rgba(255, 77, 109, 0.2))" />
+                <circle cx="52" cy="40" r="11" fill="#FFFFFF" filter=")" />
                 <circle cx="52" cy="40" r="9" fill="#FFF0F3" stroke="#FF85A1" strokeWidth="1" />
                 {/* Heart path */}
                 <path d="M52 43C52 43 48.5 41.2 48.5 39.2C48.5 38 49.3 37.2 50.3 37.2C51.1 37.2 51.7 37.7 52 38.3C52.3 37.7 52.9 37.2 53.7 37.2C54.7 37.2 55.5 38 55.5 39.2C55.5 41.2 52 43 52 43Z" fill="#FF4D6D" />
@@ -656,3 +656,4 @@ export default function HistoryPage({ onLoadQR, onNavigate, initialFilter = 'All
     </div>
   );
 }
+

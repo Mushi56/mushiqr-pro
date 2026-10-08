@@ -519,7 +519,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     flexShrink: 0
                   }}
                 >
-                  <ImageIcon size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <ImageIcon size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'left', lineHeight: 1.2 }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>Add Logo</span>
@@ -561,7 +561,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     color: '#FFFFFF'
                   }}
                 >
-                  <Palette size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <Palette size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'center', lineHeight: 1.15 }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>Custom</span>
@@ -603,7 +603,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     color: '#FFFFFF'
                   }}
                 >
-                  <Grid size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <Grid size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'center', lineHeight: 1.15 }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>Templates</span>
@@ -648,7 +648,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     fontFamily: 'serif'
                   }}
                 >
-                  <span style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }}>Tt</span>
+                  <span style={{ filter: 'none' }}>Tt</span>
                 </div>
                 <div style={{ textAlign: 'center', lineHeight: 1.15 }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>Colors &amp;</span>
@@ -964,7 +964,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     flexShrink: 0
                   }}
                 >
-                  <Scan size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <Scan size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'left', lineHeight: 1.2 }}>
                   <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>Live Scanner</span>
@@ -1006,7 +1006,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     color: '#FFFFFF'
                   }}
                 >
-                  <BarcodeIcon size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <BarcodeIcon size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'center', lineHeight: 1.15 }}>
                   <span style={{ fontSize: '10.5px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>30+ Formats</span>
@@ -1049,7 +1049,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     color: '#FFFFFF'
                   }}
                 >
-                  <QrCode size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <QrCode size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'center', lineHeight: 1.15 }}>
                   <span style={{ fontSize: '10.5px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>1D &amp; 2D</span>
@@ -1092,7 +1092,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                     color: '#FFFFFF'
                   }}
                 >
-                  <ShieldCheck size={22} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.35))' }} />
+                  <ShieldCheck size={22} strokeWidth={2.4} style={{ filter: 'none' }} />
                 </div>
                 <div style={{ textAlign: 'center', lineHeight: 1.15 }}>
                   <span style={{ fontSize: '10.5px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', display: 'block', letterSpacing: '-0.2px' }}>High Quality</span>
@@ -1293,7 +1293,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                       flexShrink: 0
                     }}
                   >
-                    <FileSpreadsheet size={18} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.35))' }} />
+                    <FileSpreadsheet size={18} strokeWidth={2.4} style={{ filter: 'none' }} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', lineHeight: 1.15 }}>CSV / Excel Import</span>
@@ -1324,7 +1324,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                       flexShrink: 0
                     }}
                   >
-                    <Layers size={18} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.35))' }} />
+                    <Layers size={18} strokeWidth={2.4} style={{ filter: 'none' }} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', lineHeight: 1.15 }}>Multi-Format</span>
@@ -1355,7 +1355,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                       flexShrink: 0
                     }}
                   >
-                    <Zap size={18} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.35))' }} />
+                    <Zap size={18} strokeWidth={2.4} style={{ filter: 'none' }} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', lineHeight: 1.15 }}>Bulk Engine</span>
@@ -1386,7 +1386,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                       flexShrink: 0
                     }}
                   >
-                    <FileText size={18} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.35))' }} />
+                    <FileText size={18} strokeWidth={2.4} style={{ filter: 'none' }} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', lineHeight: 1.15 }}>ZIP Export</span>
@@ -1417,7 +1417,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                       flexShrink: 0
                     }}
                   >
-                    <RefreshCw size={18} strokeWidth={2.4} style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.35))' }} />
+                    <RefreshCw size={18} strokeWidth={2.4} style={{ filter: 'none' }} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                     <span style={{ fontSize: '11px', fontWeight: 800, color: isLight ? '#0F172A' : '#FFFFFF', lineHeight: 1.15 }}>Bulk Sync</span>
@@ -2125,3 +2125,5 @@ function OrbitBadge({ icon: Icon, label, desc, top, bottom, left, right, color, 
     </div>
   );
 }
+
+

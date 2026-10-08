@@ -36,7 +36,7 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
         }}
         onClick={handlePreviewClick}
       >
-        {Icon && <Icon size={20} color="white" style={{ opacity: 0.9, filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.4))' }} />}
+        {Icon && <Icon size={20} color="white" style={{ opacity: 0.9, filter: 'none' }} />}
         {!disabled && (
           <input
             ref={nativeInputRef}
@@ -86,3 +86,5 @@ export default function ColorPicker({ label, value, onChange, onOpenAdvanced, cl
     </div>
   );
 }
+
+

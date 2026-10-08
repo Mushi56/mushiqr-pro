@@ -6797,7 +6797,7 @@ export default function App() {
                                         style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: isActive ? 0.3 : 1, transition: 'opacity 0.2s' }} 
                                       />
                                       {isActive && (
-                                        <X size={24} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+                                        <X size={24} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'none' }} />
                                       )}
                                     </div>
                                   </button>
@@ -7120,7 +7120,7 @@ export default function App() {
                                             style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: isActive ? 0.3 : 1, transition: 'opacity 0.2s' }} 
                                           />
                                           {isActive && (
-                                            <X size={24} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+                                            <X size={24} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--accent-primary)', filter: 'none' }} />
                                           )}
                                         </div>
                                       </button>
@@ -9451,3 +9451,5 @@ function TemplatePreviewCanvas({ template, theme, qrMatrixInfo, currentQrOptions
 
   return <canvas ref={ref} style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '14px', display: 'block' }} />;
 }
+
+

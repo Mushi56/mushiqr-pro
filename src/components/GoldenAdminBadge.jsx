@@ -11,7 +11,7 @@ export default function GoldenAdminBadge({ size = 16, style = {} }) {
         flexShrink: 0,
         display: 'inline-block',
         verticalAlign: 'middle',
-        filter: 'drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4))',
+        filter: 'none',
         ...style
       }}
     >
@@ -40,3 +40,5 @@ export default function GoldenAdminBadge({ size = 16, style = {} }) {
     </svg>
   );
 }
+
+

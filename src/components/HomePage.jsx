@@ -657,8 +657,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   pointerEvents: 'none',
                   opacity: 0.98,
                   filter: isDark 
-                    ? 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 16px rgba(255, 30, 86, 0.5))'
-                    : 'drop-shadow(0 8px 16px rgba(214, 0, 54, 0.25))'
+                    ? ') )'
+                    : ')'
                 }} 
               />
 
@@ -807,8 +807,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   pointerEvents: 'none',
                   opacity: 0.98,
                   filter: isDark 
-                    ? 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 16px rgba(255, 124, 0, 0.5))'
-                    : 'drop-shadow(0 8px 16px rgba(255, 124, 0, 0.25))'
+                    ? ') )'
+                    : ')'
                 }} 
               />
 
@@ -963,8 +963,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 pointerEvents: 'none',
                 opacity: 0.98,
                 filter: isDark 
-                  ? 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 18px rgba(16, 185, 129, 0.5))'
-                  : 'drop-shadow(0 8px 16px rgba(16, 185, 129, 0.25))'
+                  ? ') )'
+                  : ')'
               }} 
             />
 
@@ -1316,7 +1316,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     <path d="M4 18.533C4 16.3239 5.79086 14.5147 8 14.5147H56C58.2091 14.5147 60 16.3239 60 18.533V44C60 46.2091 58.2091 48 56 48H8C5.79086 48 4 46.2091 4 44V18.533Z" fill="#FFC2D6" />
 
                     {/* Glow/Heart circle icon at bottom right */}
-                    <circle cx="52" cy="40" r="11" fill="#FFFFFF" filter="drop-shadow(0px 2px 4px rgba(255, 77, 109, 0.2))" />
+                    <circle cx="52" cy="40" r="11" fill="#FFFFFF" filter=")" />
                     <circle cx="52" cy="40" r="9" fill="#FFF0F3" stroke="#FF85A1" strokeWidth="1" />
                     {/* Heart path */}
                     <path d="M52 43C52 43 48.5 41.2 48.5 39.2C48.5 38 49.3 37.2 50.3 37.2C51.1 37.2 51.7 37.7 52 38.3C52.3 37.7 52.9 37.2 53.7 37.2C54.7 37.2 55.5 38 55.5 39.2C55.5 41.2 52 43 52 43Z" fill="#FF4D6D" />
@@ -1351,3 +1351,4 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
 
   );
 }
+
