@@ -5176,7 +5176,7 @@ export default function App() {
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
-                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '4px 20px 60px 20px', display: 'flex', flexDirection: 'column' }}>
+                  <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '2px 20px 60px 20px', display: 'flex', flexDirection: 'column' }}>
                     <QRTypeSelector
                       activeType={qrType}
                       onTypeChange={(type) => {
