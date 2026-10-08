@@ -981,7 +981,17 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             canvas.toBlob((blob) => {
-              resolve(blob ? new window.File([blob], file.name, { type: 'image/jpeg' }) : file);
+              if (blob) {
+                try {
+                  resolve(new window.File([blob], file.name || 'image.jpg', { type: 'image/jpeg' }));
+                } catch (e) {
+                  blob.name = file.name || 'image.jpg';
+                  blob.lastModified = new Date().getTime();
+                  resolve(blob);
+                }
+              } else {
+                resolve(file);
+              }
             }, 'image/jpeg', 0.85);
           } else {
             resolve(file);
