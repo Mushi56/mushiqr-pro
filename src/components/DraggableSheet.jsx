@@ -64,10 +64,13 @@ export function DraggableSheet({ children, isOpen, initialHeight = 220, expanded
         bottom: 0,
         left: 0,
         right: 0,
+        width: '100%',
         height: `${height}px`,
         background: 'var(--bg-elevated, #1A1A24)',
-        borderTopLeftRadius: '24px',
-        borderTopRightRadius: '24px',
+        borderTopLeftRadius: '0px',
+        borderTopRightRadius: '0px',
+        borderRadius: '0px',
+        borderTop: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
         boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
         display: 'flex',
         flexDirection: 'column',
@@ -82,24 +85,31 @@ export function DraggableSheet({ children, isOpen, initialHeight = 220, expanded
         onTouchEnd={handleTouchEnd}
         style={{
           width: '100%',
-          padding: '12px 0',
+          padding: '12px 0 10px 0',
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
           cursor: 'grab',
-          flexShrink: 0
+          flexShrink: 0,
+          background: 'var(--bg-elevated, #1A1A24)'
         }}
       >
         <div style={{
-          width: '40px',
-          height: '6px',
-          background: 'var(--text-muted, rgba(255, 255, 255, 0.3))',
-          borderRadius: '4px',
+          width: '42px',
+          height: '5px',
+          background: 'var(--text-muted, rgba(255, 255, 255, 0.35))',
+          borderRadius: '999px',
           margin: '0 auto'
         }} />
       </div>
 
       {/* Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+      <div style={{ 
+        flex: 1, 
+        overflowY: 'auto', 
+        paddingBottom: 'calc(80px + max(16px, env(safe-area-inset-bottom, 0px)))',
+        WebkitOverflowScrolling: 'touch'
+      }}>
         {children}
       </div>
     </div>
