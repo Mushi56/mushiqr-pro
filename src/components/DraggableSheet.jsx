@@ -71,7 +71,7 @@ export function DraggableSheet({ children, isOpen, initialHeight = 220, expanded
         boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 9999,
+        zIndex: 1500,
         transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'
       }}
     >
@@ -99,7 +99,7 @@ export function DraggableSheet({ children, isOpen, initialHeight = 220, expanded
       </div>
 
       {/* Content Area */}
-      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
         {children}
       </div>
     </div>

@@ -15,7 +15,8 @@ export const TemplateGallery = React.memo(function TemplateGallery({
   headlineText,
   handleText,
   onDragStart,
-  isSheetDragging
+  isSheetDragging,
+  isDesktop = false
 }) {
   const { showPaywall } = usePremium();
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -116,6 +117,8 @@ export const TemplateGallery = React.memo(function TemplateGallery({
         background: 'var(--bg-elevated)',
         padding: '10px 20px',
         margin: '0 -20px',
+        borderRadius: '0px',
+        border: 'none',
         borderBottom: '1px solid var(--border-color)',
         borderTop: '1px solid var(--border-color)',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',

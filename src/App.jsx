@@ -950,6 +950,12 @@ export default function App() {
   // â”€â”€ Tab & Theme â”€â”€
   const location = useLocation();
   const navigate = useNavigate();
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const getPageFromPath = (path) => {
     if (path === '/onboarding') return 'onboarding';
     if (path === '/login') return 'login';
@@ -5166,7 +5172,7 @@ export default function App() {
               </section>
             </ErrorBoundary>
             {/* â”€â”€ Tab Panel Content â”€â”€ */}
-            <section className="tab-panel-area" style={{ overflow: activeTab === 'template' ? 'visible' : 'hidden' }}>
+            <section className="tab-panel-area" style={{ overflow: (activeTab === 'template' && !isDesktop) ? 'visible' : 'hidden' }}>
               {/* Content Tab */}
               {activeTab === 'content' && (
                 <div className="tab-panel fade-in" id="panel-content">
@@ -5221,9 +5227,9 @@ export default function App() {
               )}
               {/* Template Tab */}
               {activeTab === 'template' && (
-                <DraggableSheet isOpen={true}>
-                  <div className="tab-panel fade-in" id="panel-template" style={{ overflow: 'visible' }}>
-                    <div style={{ padding: '0px 20px 20px 20px', display: 'flex', flexDirection: 'column' }}>
+                isDesktop ? (
+                  <div className="tab-panel fade-in" id="panel-template">
+                    <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '0px 20px 100px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       <TemplateGallery
                         templates={ALL_TEMPLATES}
                         selectedTemplate={selectedTemplate}
@@ -5232,12 +5238,29 @@ export default function App() {
                         currentQrOptions={galleryQrOptions}
                         headlineText={templateHeadlineText}
                         handleText={templateHandleText}
+                        isDesktop={isDesktop}
                       />
                     </div>
                   </div>
-                </DraggableSheet>
+                ) : (
+                  <DraggableSheet isOpen={true}>
+                    <div className="tab-panel fade-in" id="panel-template" style={{ overflow: 'visible' }}>
+                      <div style={{ padding: '0px 20px 20px 20px', display: 'flex', flexDirection: 'column' }}>
+                        <TemplateGallery
+                          templates={ALL_TEMPLATES}
+                          selectedTemplate={selectedTemplate}
+                          onSelectTemplate={stableApplyTemplate}
+                          qrMatrixInfo={qrMatrixInfo}
+                          currentQrOptions={galleryQrOptions}
+                          headlineText={templateHeadlineText}
+                          handleText={templateHandleText}
+                          isDesktop={isDesktop}
+                        />
+                      </div>
+                    </div>
+                  </DraggableSheet>
+                )
               )}
-            </section>
             {/* â”€â”€â”€ Shared Unified Expandable Toolbar (Centralized Bottom Layer) â”€â”€â”€ */}
             {((activeTab === 'logo' && logo) || activeTab === 'text' || activeTab === 'color' || activeTab === 'shapes') && (
               <div className="logo-toolbar-container">
@@ -7486,6 +7509,7 @@ export default function App() {
                 </div>
               </div>
             )}
+            </section>
           </>
         ) : activePage === 'scanner' ? (
           <QRScanner

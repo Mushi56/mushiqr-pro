@@ -4105,7 +4105,7 @@ input[type="range"]::-moz-range-thumb {
   margin: 0;
 }
 
-/* Ã¢â€ â‚¬Ã¢â€ â‚¬ Desktop / Tablet: Wider Layout Ã¢â€ â‚¬Ã¢â€ â‚¬ */
+/* ── Desktop / Tablet: Responsive Workstation Layout ── */
 @media (min-width: 768px) {
   .app.redesigned .app-header {
     height: var(--header-height);
@@ -4113,32 +4113,41 @@ input[type="range"]::-moz-range-thumb {
 
   .app-main-redesigned {
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     overflow: hidden;
   }
 
   .qr-preview-card {
     width: 50%;
     border-bottom: none;
-    border-right: 1px solid var(--border-color);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
     padding: 32px 24px;
     overflow-y: auto;
-    height: calc(100dvh - var(--header-height) - 64px);
+    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height, 64px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.015) 0%, transparent 80%);
+  }
+
+  [data-theme="light"] .qr-preview-card {
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.01) 0%, transparent 80%);
   }
 
   .qr-preview-wrapper {
-    max-width: 420px;
-    /* Increased from 340px */
+    max-width: 440px;
     padding: 0;
   }
 
-
   .tab-panel-area {
     width: 50%;
-    height: calc(100dvh - 64px - 64px);
+    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height, 64px));
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
   }
 
   .tab-panel {
@@ -4150,9 +4159,146 @@ input[type="range"]::-moz-range-thumb {
     padding: 0;
   }
 
+  /* Expanded editing panels on desktop/tablet */
+  .toolbar-properties-panel-full {
+    max-height: calc(100dvh - var(--header-height) - var(--bottom-nav-height, 64px) - 70px) !important;
+    padding: 22px 26px 26px 26px;
+  }
+
+  .toolbar-properties-panel {
+    max-height: calc(100dvh - var(--header-height) - var(--bottom-nav-height, 64px) - 70px) !important;
+    padding: 22px 26px 20px 26px;
+  }
+
+  .toolbar-tabs-row {
+    padding: 2px 4px;
+  }
+
+  .text-toolbar-btn {
+    height: 64px;
+    font-size: 11px;
+    border-radius: 8px;
+    margin: 0 1px;
+  }
+
+  .text-toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+  }
+
+  [data-theme="light"] .text-toolbar-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  /* Desktop Bottom Navigation Bar Polish */
+  .bottom-nav {
+    height: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+    padding-left: 20px;
+    padding-right: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  [data-theme="light"] .bottom-nav {
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .bottom-nav-tab {
+    margin: 4px 6px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bottom-nav-tab:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+  }
+
+  .bottom-nav-tab.active {
+    background: var(--accent-soft);
+  }
+
+  .bottom-nav-label {
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .bottom-nav-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Sleek custom scrollbars for desktop */
+  .panel-scroll-area::-webkit-scrollbar,
+  .toolbar-properties-panel-full::-webkit-scrollbar,
+  .toolbar-properties-panel::-webkit-scrollbar,
+  .qr-preview-card::-webkit-scrollbar,
+  .templates-scroll-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .panel-scroll-area::-webkit-scrollbar-track,
+  .toolbar-properties-panel-full::-webkit-scrollbar-track,
+  .toolbar-properties-panel::-webkit-scrollbar-track,
+  .qr-preview-card::-webkit-scrollbar-track,
+  .templates-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .panel-scroll-area::-webkit-scrollbar-thumb,
+  .toolbar-properties-panel-full::-webkit-scrollbar-thumb,
+  .toolbar-properties-panel::-webkit-scrollbar-thumb,
+  .qr-preview-card::-webkit-scrollbar-thumb,
+  .templates-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 4px;
+  }
+
+  [data-theme="light"] .panel-scroll-area::-webkit-scrollbar-thumb,
+  [data-theme="light"] .toolbar-properties-panel-full::-webkit-scrollbar-thumb,
+  [data-theme="light"] .toolbar-properties-panel::-webkit-scrollbar-thumb,
+  [data-theme="light"] .qr-preview-card::-webkit-scrollbar-thumb,
+  [data-theme="light"] .templates-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.16);
+  }
+
+  .panel-scroll-area::-webkit-scrollbar-thumb:hover,
+  .toolbar-properties-panel-full::-webkit-scrollbar-thumb:hover,
+  .toolbar-properties-panel::-webkit-scrollbar-thumb:hover,
+  .qr-preview-card::-webkit-scrollbar-thumb:hover,
+  .templates-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary);
+  }
+
+  /* Saved Items responsive grid */
+  .saved-items-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  /* Desktop modal enhancements */
+  .modal-container {
+    max-width: 500px;
+    border-radius: 28px;
+  }
+
+  .modal-overlay {
+    align-items: center;
+    padding: 40px 20px;
+  }
+
   .qr-action-row,
   .qr-preview-card .save-split-wrapper {
-    max-width: 400px;
+    max-width: 420px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .saved-items-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 18px !important;
   }
 }
 
@@ -4162,19 +4308,25 @@ input[type="range"]::-moz-range-thumb {
   }
 
   .qr-preview-card {
-    width: 55%;
+    width: 52%;
+    padding: 36px 32px;
   }
 
   .tab-panel-area {
-    width: 45%;
+    width: 48%;
   }
 
   .qr-preview-wrapper {
-    max-width: 500px;
-    /* Increased from 400px */
-    padding: 40px;
+    max-width: 480px;
+    padding: 0;
   }
+}
 
+@media (min-width: 1400px) {
+  .saved-items-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 20px !important;
+  }
 }
 
 /* Ã¢â€â‚¬Ã¢â€â‚¬ Header Menu Ã¢â€â‚¬Ã¢â€â‚¬ */
@@ -7387,7 +7539,7 @@ video {
 /* ── Unified Expandable Toolbar (New System) ── */
 .unified-toolbar-card {
   width: 100%;
-  max-width: 440px;
+  max-width: none;
   background: var(--bg-dropdown-solid);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
@@ -7603,7 +7755,7 @@ video {
 .logo-toolbar-container {
   padding: 0;
   position: absolute;
-  bottom: 64px; /* Attach to top of navbar */
+  bottom: 0; /* Attach to bottom of tab-panel-area, which is right above navbar */
   left: 0;
   right: 0;
   background: transparent;

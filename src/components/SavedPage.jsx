@@ -397,7 +397,7 @@ export default function SavedPage({ onLoadQR, onNavigate }) {
             No matching saved QR codes found.
           </div>
         ) : (
-          <div style={{ 
+          <div className="saved-items-grid" style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(2, 1fr)', 
             gap: '12px',
