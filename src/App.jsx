@@ -2431,7 +2431,12 @@ export default function App() {
 
       // 2. PWA Browser Top Bar & Safe Area Theme-Color Synchronization
       try {
-        let targetColor = effectiveTheme === 'light' ? '#FFFFFF' : '#0B0F19';
+        let targetColor = '#F01A4E';
+        if (activePage === 'home' && !isHomeScrolled) {
+          targetColor = '#F01A4E';
+        } else {
+          targetColor = effectiveTheme === 'light' ? '#FFFFFF' : '#0B0F19';
+        }
 
         let metaThemeColor = document.querySelector('meta[name="theme-color"]:not([media])');
         if (!metaThemeColor) {

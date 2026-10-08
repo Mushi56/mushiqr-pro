@@ -3659,52 +3659,29 @@ input[type="range"]::-moz-range-thumb {
   max-width: 360px;
 }
 
-/* Bottom Navigation — Fully Edge-to-Edge with PWA Safe Area Protection */
+/* Bottom Navigation */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100%;
-  margin: 0;
-  height: calc(var(--bottom-nav-height, 64px) + max(env(safe-area-inset-bottom, 0px), 0px));
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
-  background: var(--bg-elevated);
+  height: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: transparent;
   border: none !important;
   border-top: none !important;
   display: flex;
   align-items: stretch;
   justify-content: space-around;
-  padding-left: max(4px, env(safe-area-inset-left, 0px));
-  padding-right: max(4px, env(safe-area-inset-right, 0px));
+  padding-left: 4px;
+  padding-right: 4px;
   z-index: 2000;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25);
-  box-sizing: border-box;
 }
 
 [data-theme="light"] .bottom-nav {
-  background: #FFFFFF;
+  background: transparent;
   border: none !important;
   border-top: none !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-}
-
-/* PWA Standalone & Fullscreen Mode: Guarantees safe area cushion over the OS gesture navigation pill */
-@media (display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui) {
-  .bottom-nav {
-    height: calc(var(--bottom-nav-height, 64px) + max(16px, env(safe-area-inset-bottom, 16px)));
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
-  }
-}
-
-/* iOS Safari PWA Standalone: Home Indicator Pill Protection */
-@supports (-webkit-touch-callout: none) {
-  @media (display-mode: standalone), (display-mode: fullscreen) {
-    .bottom-nav {
-      height: calc(var(--bottom-nav-height, 64px) + max(20px, env(safe-area-inset-bottom, 20px)));
-      padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
-    }
-  }
 }
 
 .bottom-nav-tab {
@@ -4213,10 +4190,9 @@ input[type="range"]::-moz-range-thumb {
 
   /* Desktop Bottom Navigation Bar Polish */
   .bottom-nav {
-    height: calc(var(--bottom-nav-height, 64px) + max(env(safe-area-inset-bottom, 0px), 0px));
-    padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
-    padding-left: max(20px, env(safe-area-inset-left, 0px));
-    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    height: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+    padding-left: 20px;
+    padding-right: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
 
@@ -7791,10 +7767,9 @@ video {
 @media (max-width: 768px) {
   .logo-toolbar-container {
     position: fixed;
-    bottom: calc(var(--bottom-nav-height, 64px) + max(env(safe-area-inset-bottom, 0px), 0px)); /* Flush with bottom nav */
+    bottom: calc(64px + env(safe-area-inset-bottom)); /* Perfectly flush with the 64px generator navbar */
     left: 0;
     right: 0;
-    width: 100%;
     padding: 0;
     margin: 0;
     z-index: 7500; /* Positioned above app-header (z-index 6000) */
@@ -7804,20 +7779,6 @@ video {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     border-bottom: none !important;
     box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
-  }
-}
-
-@media (display-mode: standalone) and (max-width: 768px) {
-  .logo-toolbar-container {
-    bottom: calc(var(--bottom-nav-height, 64px) + max(16px, env(safe-area-inset-bottom, 16px)));
-  }
-}
-
-@supports (-webkit-touch-callout: none) {
-  @media (display-mode: standalone) and (max-width: 768px) {
-    .logo-toolbar-container {
-      bottom: calc(var(--bottom-nav-height, 64px) + max(20px, env(safe-area-inset-bottom, 20px)));
-    }
   }
 }
 
@@ -9445,12 +9406,11 @@ body.native-scanner-active,
     position: fixed !important;
     left: 0 !important;
     right: 0 !important;
-    bottom: calc(var(--bottom-nav-height, 64px) + max(env(safe-area-inset-bottom, 0px), 0px)) !important;
+    bottom: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px)) !important;
     z-index: 5200 !important;
     background: var(--bg-primary, #0B0E14) !important;
-    border-top-left-radius: 0px !important;
-    border-top-right-radius: 0px !important;
-    border-radius: 0px !important;
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
     border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.12)) !important;
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5) !important;
     display: flex !important;
@@ -9467,8 +9427,7 @@ body.native-scanner-active,
 
 @media (min-width: 900px) {
   #panel-template.template-sheet {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-radius: 0px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
   }
 }

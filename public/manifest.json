@@ -12,10 +12,9 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "display_override": ["standalone", "browser"],
   "orientation": "any",
-  "theme_color": "#0B0F19",
-  "background_color": "#0B0F19",
+  "theme_color": "#030305",
+  "background_color": "#030305",
   "categories": [
     "utilities",
     "productivity"
