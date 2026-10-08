@@ -108,62 +108,23 @@ export const TemplateGallery = React.memo(function TemplateGallery({
   const categories = useMemo(() => ['All', 'Favorites', 'Recent', ...TEMPLATE_CATEGORIES.filter(c => c !== 'All')], []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-      {/* Sticky Categories Bar with Integrated Center Pill Handle (Zero Gap) */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+      {/* Category Toolbar Style Container */}
       <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 40,
-        background: 'var(--bg-primary, #0B0F19)',
-        margin: '0 -16px',
-        padding: '4px 16px 6px 16px',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
         display: 'flex',
-        flexDirection: 'column',
-        gap: 0,
-        boxShadow: '0 1px 0 var(--border-color, rgba(255, 255, 255, 0.06))'
+        alignItems: 'center',
+        background: 'var(--bg-elevated)',
+        padding: '6px 8px',
+        borderRadius: '16px',
+        border: '1px solid var(--border-color)',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+        gap: '6px'
       }}>
-        {/* Centered Scrollable/Draggable Pill Handle */}
-        {onDragStart && (
-          <div
-            onMouseDown={onDragStart}
-            onTouchStart={onDragStart}
-            style={{
-              width: '100%',
-              padding: '2px 0 3px 0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: isSheetDragging ? 'grabbing' : 'grab',
-              touchAction: 'none',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              background: 'transparent',
-              flexShrink: 0
-            }}
-            title="Drag up or down to resize templates"
-          >
-            <div
-              style={{
-                width: '42px',
-                height: '4px',
-                borderRadius: '999px',
-                background: 'var(--text-tertiary, rgba(255, 255, 255, 0.38))',
-                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.25)',
-                transition: isSheetDragging ? 'none' : 'transform 0.2s ease, background 0.2s ease',
-                transform: isSheetDragging ? 'scale(1.12)' : 'scale(1)'
-              }}
-            />
-          </div>
-        )}
-
-        {/* Horizontal Category Chips Row */}
         <div style={{
           display: 'flex',
-          gap: '8px',
+          gap: '6px',
           overflowX: 'auto',
-          padding: '2px 0 2px 0',
+          padding: '2px 0',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           flex: 1
@@ -176,10 +137,10 @@ export const TemplateGallery = React.memo(function TemplateGallery({
                 onClick={() => setSelectedCategory(cat)}
                 style={{
                   flex: '0 0 auto',
-                  padding: '7px 15px',
-                  borderRadius: '20px',
-                  border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border-color, rgba(255, 255, 255, 0.1))',
-                  background: isSelected ? 'var(--accent-primary)' : 'var(--bg-elevated, rgba(255, 255, 255, 0.06))',
+                  padding: '7px 14px',
+                  borderRadius: '12px',
+                  border: isSelected ? '1px solid var(--accent-primary)' : '1px solid transparent',
+                  background: isSelected ? 'var(--accent-primary)' : 'transparent',
                   color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
                   fontSize: '12.5px',
                   fontWeight: isSelected ? 800 : 600,
@@ -188,8 +149,7 @@ export const TemplateGallery = React.memo(function TemplateGallery({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  whiteSpace: 'nowrap',
-                  boxShadow: isSelected ? '0 2px 10px rgba(255, 42, 85, 0.35)' : 'none'
+                  whiteSpace: 'nowrap'
                 }}
               >
                 {cat === 'Favorites' && <Heart size={13} fill={isSelected ? '#fff' : 'none'} />}

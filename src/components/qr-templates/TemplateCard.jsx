@@ -81,19 +81,21 @@ export const TemplateCard = React.memo(function TemplateCard({
       return;
     }
 
-    const canvas = canvasRef.current || (typeof document !== 'undefined' ? document.createElement('canvas') : null);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    // Debounce generation to prevent blocking the main thread during fast scrolling
+    const timer = setTimeout(() => {
+      const canvas = canvasRef.current || (typeof document !== 'undefined' ? document.createElement('canvas') : null);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    let hasPendingAssets = false;
-    const onAssetPending = () => { hasPendingAssets = true; };
-    const onAssetLoaded = () => setLocalTick(t => t + 1);
+      let hasPendingAssets = false;
+      const onAssetPending = () => { hasPendingAssets = true; };
+      const onAssetLoaded = () => setLocalTick(t => t + 1);
 
-    const qrTempCanvas = getSharedThumbCanvas();
-    const activeMatrix = DEMO_MATRIX;
+      const qrTempCanvas = getSharedThumbCanvas();
+      const activeMatrix = DEMO_MATRIX;
 
-    if (isVCard(template)) {
+      if (isVCard(template)) {
       // ── vCard 16:9 thumbnail ─────────────────────────────────────────────
       const W = 525;
       const H = 300;
@@ -287,6 +289,9 @@ export const TemplateCard = React.memo(function TemplateCard({
         // Fallback to active canvas
       }
     }
+    }, 120); // 120ms debounce prevents rendering if user scrolls past quickly
+
+    return () => clearTimeout(timer);
   }, [template, headlineText, handleText, isVisible, localTick]);
 
   const vcardCard = isVCard(template);

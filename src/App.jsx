@@ -133,6 +133,7 @@ import UserAvatar from './components/UserAvatar';
 import { MdQrCodeScanner } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TemplateGallery } from './components/qr-templates/TemplateGallery';
+import { DraggableSheet } from './components/DraggableSheet';
 import { TemplateCustomizer } from './components/qr-templates/TemplateCustomizer';
 import { FullScreenPreviewModal } from './components/FullScreenPreviewModal';
 import ImageCropShapeModal, { SHAPE_OPTIONS } from './components/ImageCropShapeModal';
@@ -1340,6 +1341,15 @@ export default function App() {
       setLogo(null);
     }
   };
+  
+  const applyTemplateRef = useRef();
+  applyTemplateRef.current = (tpl) => {
+    // This will be defined below
+  };
+  const stableApplyTemplate = useCallback((tpl) => {
+    if (applyTemplateRef.current) applyTemplateRef.current(tpl);
+  }, []);
+
   const applyTemplate = (tpl) => {
     if (!tpl) {
       setSelectedTemplate(null);
@@ -1389,6 +1399,8 @@ export default function App() {
       }
     }
   };
+  
+  applyTemplateRef.current = applyTemplate;
   // â”€â”€ Gradient â”€â”€
   const [gradientEnabled, setGradientEnabled] = useState(false);
   const [gradientColor1, setGradientColor1] = useState('#6c5ce7');
@@ -5087,7 +5099,12 @@ export default function App() {
           <>
             {/* â”€â”€ QR Preview Card (always visible) â”€â”€ */}
             <ErrorBoundary>
-              <section className="qr-preview-card" style={{ position: 'relative' }}>
+              <section className="qr-preview-card" style={{ 
+                position: 'relative',
+                paddingBottom: activeTab === 'template' ? '0px' : undefined,
+                borderBottom: activeTab === 'template' ? 'none' : undefined,
+                gap: activeTab === 'template' ? '0px' : undefined
+              }}>
                 {qrMatrixInfo && (
                   <button
                     type="button"
@@ -5207,40 +5224,21 @@ export default function App() {
               )}
               {/* Template Tab */}
               {activeTab === 'template' && (
-                <div 
-                  className="tab-panel fade-in template-sheet" 
-                  id="panel-template"
-                  style={{
-                    height: `${templateSheetHeight}px`,
-                    transition: isSheetDragging ? 'none' : 'height 0.28s cubic-bezier(0.16, 1, 0.3, 1)'
-                  }}
-                >
-                  <div 
-                    className="panel-scroll-area" 
-                    style={{ 
-                      flex: '1', 
-                      overflowY: 'auto', 
-                      padding: '0 16px 80px 16px', 
-                      display: 'flex', 
-                      flexDirection: 'column'
-                    }}
-                  >
-                    {/* Template Gallery with Integrated Sticky Pill & Categories */}
-                    <TemplateGallery
-                      templates={ALL_TEMPLATES}
-                      selectedTemplate={selectedTemplate}
-                      onSelectTemplate={(tpl) => {
-                        applyTemplate(tpl);
-                      }}
-                      qrMatrixInfo={qrMatrixInfo}
-                      currentQrOptions={galleryQrOptions}
-                      headlineText={templateHeadlineText}
-                      handleText={templateHandleText}
-                      onDragStart={handleSheetDragStart}
-                      isSheetDragging={isSheetDragging}
-                    />
+                <DraggableSheet isOpen={true}>
+                  <div className="tab-panel fade-in" id="panel-template">
+                    <div className="panel-scroll-area" style={{ flex: '1', overflowY: 'auto', padding: '0px 20px 100px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <TemplateGallery
+                        templates={ALL_TEMPLATES}
+                        selectedTemplate={selectedTemplate}
+                        onSelectTemplate={stableApplyTemplate}
+                        qrMatrixInfo={qrMatrixInfo}
+                        currentQrOptions={galleryQrOptions}
+                        headlineText={templateHeadlineText}
+                        handleText={templateHandleText}
+                      />
+                    </div>
                   </div>
-                </div>
+                </DraggableSheet>
               )}
             </section>
             {/* â”€â”€â”€ Shared Unified Expandable Toolbar (Centralized Bottom Layer) â”€â”€â”€ */}

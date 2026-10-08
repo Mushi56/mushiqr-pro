@@ -3607,7 +3607,7 @@ function drawBackgroundShape(ctx, shape, x, y, w, h, color, sizeMultiplier = 1) 
     ctx.restore();
     const w = size;
     const h = options.template?.heightRatio ? Math.round(size * options.template.heightRatio) : size;
-    options.template.drawForeground(ctx, w, h);
+    options.template.drawForeground(ctx, w, h, options);
   }
 }
 

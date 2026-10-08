@@ -962,6 +962,38 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     scanHandledRef.current = false;
     
     try {
+      // Downscale image to prevent OOM crashes on Android WebView
+      const safeFile = await new Promise((resolve) => {
+        const img = new window.Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          const MAX_DIM = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+              resolve(blob ? new window.File([blob], file.name, { type: 'image/jpeg' }) : file);
+            }, 'image/jpeg', 0.85);
+          } else {
+            resolve(file);
+          }
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          resolve(file);
+        };
+        img.src = url;
+      });
+
       let text = null;
       let rawResult = null;
       
@@ -970,8 +1002,16 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
         try {
           // eslint-disable-next-line no-undef
           const barcodeDetector = new BarcodeDetector({ formats: ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'itf', 'data_matrix', 'pdf417'] });
-          const img = await createImageBitmap(file);
-          const barcodes = await barcodeDetector.detect(img);
+          // Use the HTMLImageElement to avoid createImageBitmap native crash
+          const imgElement = new window.Image();
+          imgElement.src = URL.createObjectURL(safeFile);
+          await new Promise((resolve, reject) => {
+            imgElement.onload = resolve;
+            imgElement.onerror = reject;
+          });
+          const barcodes = await barcodeDetector.detect(imgElement);
+          URL.revokeObjectURL(imgElement.src);
+          
           if (barcodes && barcodes.length > 0) {
             text = barcodes[0].rawValue;
             rawResult = barcodes[0];
@@ -985,7 +1025,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       if (!text) {
         const scanner = new Html5Qrcode("qr-scanner-viewport", false);
         try {
-          const scanRes = await scanner.scanFileV2(file, false);
+          const scanRes = await scanner.scanFileV2(safeFile, false);
           if (scanRes && typeof scanRes === 'object') {
             text = scanRes.decodedText;
             rawResult = scanRes;
