@@ -109,13 +109,13 @@ export const TemplateGallery = React.memo(function TemplateGallery({
   const categories = useMemo(() => ['All', 'Favorites', 'Recent', ...TEMPLATE_CATEGORIES.filter(c => c !== 'All')], []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
       {/* Category Toolbar Style Container */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         background: 'var(--bg-elevated)',
-        padding: '10px 20px',
+        padding: '6px 20px',
         margin: '0 -20px',
         borderRadius: '0px',
         border: 'none',
@@ -208,7 +208,7 @@ export const TemplateGallery = React.memo(function TemplateGallery({
           </div>
         ) : (
           // For other categories (e.g. All, Favorites, Social, Business)
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {/* 1. Standard Square Templates */}
             {standards.length > 0 && (
               <div>
