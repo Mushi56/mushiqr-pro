@@ -185,6 +185,7 @@ export const TemplateCard = React.memo(function TemplateCard({
           onAssetPending(thumbSrc);
           img.addEventListener('load', () => onAssetLoaded(), { once: true });
           img.addEventListener('error', () => onAssetLoaded(), { once: true });
+          return; // wait for background
         }
       }
 
@@ -194,6 +195,18 @@ export const TemplateCard = React.memo(function TemplateCard({
         const qrX = w * (template.qrX || 0.5) - qrSizePx / 2;
         const qrY = h * (template.qrY || 0.5) - qrSizePx / 2;
         
+        let logoImageObj = null;
+        if (template.preset?.logo?.image) {
+          const lImg = getSvgImage(template.preset.logo.image);
+          if (lImg && lImg.complete && lImg.naturalWidth !== 0) {
+            logoImageObj = lImg;
+          } else if (lImg) {
+            onAssetPending(template.preset.logo.image);
+            lImg.addEventListener('load', () => onAssetLoaded(), { once: true });
+            return; // wait for logo
+          }
+        }
+
         renderQR(qrTempCanvas, {
           ...activeMatrix,
           size: 160,
@@ -205,7 +218,17 @@ export const TemplateCard = React.memo(function TemplateCard({
           eyeColor: template.preset?.eyeColor || template.preset?.qrColor || '#000000',
           eyeOuterColor: template.preset?.eyeOuterColor || template.preset?.qrColor || '#000000',
           syncEyes: true,
-          quietZone: 2
+          quietZone: 2,
+          logo: logoImageObj,
+          logoWidth: template.preset?.logo?.width || 0.20,
+          logoHeight: template.preset?.logo?.height || 0.20,
+          logoBackground: template.preset?.logo?.background || false,
+          logoBgColor: template.preset?.logo?.bgColor || '#FFFFFF',
+          logoShadowEnabled: template.preset?.logoShadowEnabled,
+          logoShadowColor: template.preset?.logoShadowColor,
+          logoShadowBlur: template.preset?.logoShadowBlur,
+          logoShadowOffsetX: template.preset?.logoShadowOffsetX,
+          logoShadowOffsetY: template.preset?.logoShadowOffsetY,
         });
         
         ctx.save();
@@ -252,7 +275,7 @@ export const TemplateCard = React.memo(function TemplateCard({
           eyeColor: stylePreset?.eyeColor || stylePreset?.qrColor || '#1877F2',
           eyeOuterColor: stylePreset?.eyeOuterColor || stylePreset?.qrColor || '#1877F2',
           syncEyes: true,
-          logoImage: logoImageObj,
+          logo: logoImageObj,
           logoWidth: 0.20,
           logoHeight: 0.20,
           logoBackground: Boolean(stylePreset?.logoBgColor),

@@ -100,7 +100,7 @@ export default function LogoPresets({ logo, onLogoChange, onLogoRemove }) {
           }}
           hidden
         />
-        <div className="logo-presets-grid">
+        <div className="logo-presets-grid" style={{ opacity: logo?.locked ? 0.5 : 1, pointerEvents: logo?.locked ? 'none' : 'auto' }}>
           {/* Upload Tile */}
           {FeatureAccessManager.isFeatureEnabled('custom_logo_upload') && (
             <button
@@ -112,8 +112,8 @@ export default function LogoPresets({ logo, onLogoChange, onLogoRemove }) {
               <PaidCrownBadge featureId="custom_logo_upload" position="corner" size={9} />
               {logo && !LOGO_PRESETS.some(p => p.url === logo.src) ? (
                 <div className="logo-preset-icon" style={{ position: 'relative' }}>
-                  <img src={logo.src} alt="Custom" style={{ opacity: 0.5 }} />
-                  <X size={16} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--error)' }} />
+                  <img src={logo.src} alt="Custom" style={{ opacity: logo?.locked ? 1 : 0.5 }} />
+                  {!logo?.locked && <X size={16} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'var(--error)' }} />}
                 </div>
               ) : (
                 <UploadCloud size={24} color="var(--accent-primary)" />

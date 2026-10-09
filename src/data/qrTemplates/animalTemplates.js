@@ -21,9 +21,10 @@ export const ANIMAL_TEMPLATES = [
       "ecLevel": "H",
       "logo": {
          "image": "/templates/mask-overlay.avif",
-         "width": 0.90,
-         "height": 0.90,
-         "background": false
+         "width": 0.70,
+         "height": 0.70,
+         "background": false,
+         "locked": true
       },
       "logoShadowEnabled": true,
       "logoShadowColor": "rgba(0,0,0,0.45)",

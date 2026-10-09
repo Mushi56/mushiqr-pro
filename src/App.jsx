@@ -101,6 +101,7 @@ import {
   handleLogoutClear
 } from './utils/storage';
 import { QR_TEMPLATES, getAllTemplates, getUserTemplates, getAppTemplateById } from './utils/qrTemplates';
+import { drawTemplateBackground, drawVCardTemplate, getSvgImage } from './components/qr-templates/TemplateRenderer';
 import QRScanner from './components/QRScanner';
 import HistoryPage from './components/HistoryPage';
 import HomePage from './components/HomePage';
@@ -1441,6 +1442,7 @@ export default function App() {
     setQrBgImageEnabled(false);
     setQrTexture(null);
     setQrTextureEnabled(false);
+    setCanvasSelection(null);
     
     // Switch QR type if template specifically maps to a native type
     if (tpl.qrType && tpl.qrType !== qrType) {
@@ -1466,16 +1468,17 @@ export default function App() {
       if (tpl.preset.logoBgShape) setLogoBgShape(tpl.preset.logoBgShape);
       if (tpl.preset.logo) {
         if (typeof tpl.preset.logo === 'object') {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
+          const lImg = getSvgImage(tpl.preset.logo.image);
+          const applyLogoState = (imgObj) => {
             setLogo({
-              image: img,
+              image: imgObj,
               width: tpl.preset.logo.width || 0.18,
               height: tpl.preset.logo.height || 0.18,
               slug: 'custom_template_logo',
               name: 'Template Logo',
-              url: tpl.preset.logo.image
+              url: tpl.preset.logo.image,
+              src: tpl.preset.logo.image,
+              locked: tpl.preset.logo.locked
             });
             setLogoWidth(tpl.preset.logo.width || 0.18);
             setLogoHeight(tpl.preset.logo.height || 0.18);
@@ -1483,7 +1486,13 @@ export default function App() {
               setLogoBackground(tpl.preset.logo.background);
             }
           };
-          img.src = tpl.preset.logo.image;
+
+          if (lImg && lImg.complete && lImg.naturalWidth !== 0) {
+            applyLogoState(lImg);
+          } else if (lImg) {
+            applyLogoState(lImg); // apply immediately to get it in state
+            lImg.addEventListener('load', () => applyLogoState(lImg), { once: true });
+          }
         } else {
           applyLogoBySlug(tpl.preset.logo);
         }
@@ -1833,7 +1842,11 @@ export default function App() {
           setTextEditMode('center');
         }
       } else if (tabId === 'logo') {
-        setCanvasSelection('logo');
+        if (logo?.locked) {
+          setCanvasSelection(null);
+        } else {
+          setCanvasSelection('logo');
+        }
       } else {
         setCanvasSelection(null);
       }
@@ -3352,7 +3365,7 @@ export default function App() {
       return px >= rx - pad && px <= rx + rw + pad && py >= ry - pad && py <= ry + rh + pad;
     };
     // 1. Check Logo
-    if (logo?.image) {
+    if (logo?.image && !logo?.locked) {
       const lw = contentSize * logoWidth;
       const lh = contentSize * logoHeight;
       const rawLx = contentX + (contentSize - lw) * logoPosX;

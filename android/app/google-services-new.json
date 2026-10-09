@@ -1,0 +1,117 @@
+{
+  "project_info": {
+    "project_number": "1068457009199",
+    "firebase_url": "https://mushi-qr-pro-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mushi-qr-pro",
+    "storage_bucket": "mushi-qr-pro.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068457009199:android:57179a55e6075d5f8966da",
+        "android_client_info": {
+          "package_name": "com.mushiqr.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1068457009199-bvijburf4e6n1j9n3h8lp617nv4ui2u7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.admin",
+            "certificate_hash": "e058ddbae62c63ffc2d1f81b0383d178cd7c59cf"
+          }
+        },
+        {
+          "client_id": "1068457009199-eo7h1ni9ps5sre8bfg742c3eol2alslb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiPYCHNzlAfLoC60P8sMgKkY9bH8DNzG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1068457009199-eo7h1ni9ps5sre8bfg742c3eol2alslb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068457009199:android:20b09e8d6963c6288966da",
+        "android_client_info": {
+          "package_name": "com.mushiqr.pro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1068457009199-3snu5e86q4q2u932oviq8r7mp2afasc0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "e058ddbae62c63ffc2d1f81b0383d178cd7c59cf"
+          }
+        },
+        {
+          "client_id": "1068457009199-bf2d7c177t0s7smf3s5s606anunndk2l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "5ac268d4982577ef64c810b754a0996870277f8c"
+          }
+        },
+        {
+          "client_id": "1068457009199-i404jco34mqn5075arg3aap7esto3bgj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "eeca653c43dd7b2fcb2b8aa297486e74ba951e14"
+          }
+        },
+        {
+          "client_id": "1068457009199-reg5u9cehtds8fsrks3glq2l1eguemht.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "688ff51926be9bc7e1c1c7ec2519f68876e31435"
+          }
+        },
+        {
+          "client_id": "1068457009199-u4n7kuvl7230p1r7ccqvqd0rstrvci3l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mushiqr.pro",
+            "certificate_hash": "e3799716e59e2be0d91a2b13882ac57e3b74efa9"
+          }
+        },
+        {
+          "client_id": "1068457009199-eo7h1ni9ps5sre8bfg742c3eol2alslb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiPYCHNzlAfLoC60P8sMgKkY9bH8DNzG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1068457009199-eo7h1ni9ps5sre8bfg742c3eol2alslb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
