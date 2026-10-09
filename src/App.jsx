@@ -179,6 +179,20 @@ const QRStyleIcon = ({ size = 24 }) => (
     <circle cx="19.5" cy="20" r="1.5" style={{ fill: 'currentColor', fillOpacity: 1, stroke: 'none' }} />
   </svg>
 );
+const QRPatternIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-style-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+    <rect x="3" y="3" width="7" height="7" rx="2" fill="currentColor" fillOpacity=".16"/>
+    <circle cx="17.5" cy="6.5" r="3.5" fill="currentColor" fillOpacity=".16"/>
+    <path d="M6.5 14l3.5 3.5L6.5 21 3 17.5z" fill="currentColor" fillOpacity=".16"/>
+    <path d="M6.5 6.5h.01M17.5 6.5h.01M6.5 17.5h.01"/>
+    <g fill="currentColor" strokeWidth=".8">
+      <circle cx="15" cy="15" r="1.3"/>
+      <rect x="18.3" y="13.8" width="2.4" height="2.4" rx=".5"/>
+      <path d="M15 17.6l1.65 1.65L15 20.9l-1.65-1.65z"/>
+      <path d="M19.50 18.10H20.60V19.20A1.1 1.1 0 0 1 19.50 20.30H18.40V19.20A1.1 1.1 0 0 1 19.50 18.10z"/>
+    </g>
+  </svg>
+);
 const QRGradientIcon = ({ size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <defs>
@@ -191,16 +205,67 @@ const QRGradientIcon = ({ size = 24 }) => (
   </svg>
 );
 const QRSizeIcon = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-size-expand">
-    <path d="M15 3h6v6" />
-    <path d="M21 3l-7 7" />
-    <path d="M9 21H3v-6" />
-    <path d="M3 21l7-7" />
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-size-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+    <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2.4" fill="currentColor" fillOpacity=".16" strokeWidth="1.6"/>
+    <g strokeWidth="1.5">
+      <rect x="7.4" y="7.4" width="3.2" height="3.2" rx=".7"/>
+      <rect x="13.4" y="7.4" width="3.2" height="3.2" rx=".7"/>
+      <rect x="7.4" y="13.4" width="3.2" height="3.2" rx=".7"/>
+    </g>
+    <path d="M14.4 14.4h.01M17 14.4h.01M14.4 17h.01M17 17h.01" strokeWidth="1.8"/>
+    <rect x="1.7" y="1.7" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
+    <rect x="18.9" y="1.7" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
+    <rect x="1.7" y="18.9" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
+    <rect x="18.9" y="18.9" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
   </svg>
 );
 const QRBgIcon = ({ size = 24 }) => (
   <svg width={size} height={size} viewBox="2 2 20 20" fill="currentColor" className="shape-square">
     <rect x="3" y="3" width="18" height="18" rx="4" style={{ fill: 'currentColor', fillOpacity: 1 }} />
+  </svg>
+);
+const QRBgColorIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className="qr-bg-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+    <defs>
+      <mask id="bf" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+        <rect width="24" height="24" fill="#fff"/>
+        <g transform="translate(5.6 5.5) scale(0.78)" fill="#000" stroke="#000" strokeWidth="6.41">
+          <path d="m14.622 17.897-10.68-2.913"/>
+          <path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/>
+          <path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15"/>
+        </g>
+      </mask>
+    </defs>
+    <rect x="2" y="2" width="16.5" height="16.5" rx="3" fill="currentColor" mask="url(#bf)"/>
+    <g transform="translate(5.6 5.5) scale(0.78)" stroke="currentColor" strokeWidth="2.56" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/>
+      <path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15" fill="currentColor" fillOpacity=".68" stroke="none"/>
+    </g>
+  </svg>
+);
+const QRLogoIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-logo-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+    <rect x="3" y="3" width="5" height="5" rx="1"/>
+    <rect x="16" y="3" width="5" height="5" rx="1"/>
+    <rect x="3" y="16" width="5" height="5" rx="1"/>
+    <path d="M12 3h.01M3 12h.01M7 12h.01M12 7h.01"/>
+    <rect x="11" y="11" width="10" height="10" rx="1" fill="currentColor" fillOpacity=".16"/>
+    <path d="M15 14.5h.01"/>
+    <path d="M12.5 19.5l3-3 4 4"/>
+  </svg>
+);
+const QRColorIcon = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-color-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+    <rect width="5" height="5" x="3" y="3" rx="1"/>
+    <rect width="5" height="5" x="16" y="3" rx="1"/>
+    <rect width="5" height="5" x="3" y="16" rx="1"/>
+    <path d="M12 7v3a2 2 0 0 1-2 2H7"/>
+    <path d="M3 12h.01"/>
+    <path d="M12 3h.01"/>
+    <g transform="translate(8.93 9.18) scale(0.62)" strokeWidth="3.06">
+      <path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/>
+      <path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15" fill="currentColor" fillOpacity=".68"/>
+    </g>
   </svg>
 );
 const TEXT_SHAPES = [
@@ -4214,7 +4279,7 @@ export default function App() {
     { id: 'content',  label: 'Content',  icon: Pencil,      featId: 'qr_tab_content' },
     { id: 'color',    label: 'Color',    icon: Palette,     featId: 'qr_tab_color' },
     { id: 'shapes',   label: 'Style',    icon: QRStyleIcon, featId: 'qr_tab_style' },
-    { id: 'logo',     label: 'Logo',     icon: ImageIcon,   featId: 'qr_tab_logo' },
+    { id: 'logo',     label: 'Logo',     icon: QRLogoIcon,  featId: 'qr_tab_logo' },
     { id: 'template', label: 'Templates', icon: Sparkles,    featId: 'qr_tab_template' },
     // { id: 'frame',   label: 'Frame',   icon: LayoutGrid },
     { id: 'text',     label: 'Text',     icon: Type,        featId: 'qr_tab_text' },
@@ -7363,7 +7428,7 @@ export default function App() {
                                style={{ position: 'relative' }}
                              >
                                <PaidCrownBadge featureId="qr_color_dots" fallbackFeatureId="custom_colors_solid" position="floating" size={8} />
-                               <QrCode size={24} />
+                               <QRColorIcon size={24} />
                                <span>QR Color</span>
                              </button>
                            )}
@@ -7378,7 +7443,7 @@ export default function App() {
                                style={{ position: 'relative' }}
                              >
                                <PaidCrownBadge featureId="qr_color_bg" position="floating" size={8} />
-                               <Paintbrush size={24} />
+                               <QRBgColorIcon size={24} />
                                <span>BG Color</span>
                              </button>
                            )}
@@ -7419,7 +7484,7 @@ export default function App() {
                            {(FeatureAccessManager.isFeatureEnabled('custom_dot_styles') || FeatureAccessManager.isFeatureEnabled('custom_eye_styles')) && (
                              <button className={`text-toolbar-btn${shapePopup === 'pattern' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'pattern')} style={{ position: 'relative' }}>
                                <PaidCrownBadge featureId="custom_dot_styles" fallbackFeatureId="custom_eye_styles" position="floating" size={8} />
-                               <QrCode size={24} /><span>QR Pattern</span>
+                               <QRPatternIcon size={24} /><span>QR Pattern</span>
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('custom_background_shapes') && (
