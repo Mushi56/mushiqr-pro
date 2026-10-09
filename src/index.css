@@ -3698,7 +3698,7 @@ input[type="range"]::-moz-range-thumb {
   border: none;
   cursor: pointer;
   position: relative;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   transition: color var(--transition-fast), transform 0.2s ease;
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
@@ -4203,11 +4203,11 @@ input[type="range"]::-moz-range-thumb {
     height: calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px));
     padding-left: 20px;
     padding-right: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-top: none !important;
   }
 
   [data-theme="light"] .bottom-nav {
-    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-top: none !important;
   }
 
   .bottom-nav-tab {
@@ -7712,7 +7712,7 @@ video {
   border-radius: 0;
   border: none;
   background: transparent;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   font-size: 10px;
   font-weight: 700;
   cursor: pointer;
