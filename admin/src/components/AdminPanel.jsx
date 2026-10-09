@@ -3952,17 +3952,23 @@ function UsersPanel({ isDark = false }) {
                   variant={selectedUser.isPro ? 'ghost' : 'primary'}
                   onClick={async () => {
                     setActionLoading(true);
-                    if (selectedUser.isPro) {
-                      await DS.revokeUserProAccess(selectedUser.uid);
-                      toast?.('Pro access revoked', 'info');
-                      setSelectedUser({ ...selectedUser, isPro: false, planId: 'free' });
-                    } else {
-                      await DS.grantUserProAccess(selectedUser.uid, 'pro_monthly');
-                      toast?.('Pro access granted!', 'success');
-                      setSelectedUser({ ...selectedUser, isPro: true, planId: 'pro_monthly' });
+                    try {
+                      if (selectedUser.isPro) {
+                        await DS.revokeUserProAccess(selectedUser.uid);
+                        toast?.('Pro access revoked', 'info');
+                        setSelectedUser({ ...selectedUser, isPro: false, planId: 'free' });
+                      } else {
+                        await DS.grantUserProAccess(selectedUser.uid, 'pro_monthly');
+                        toast?.('Pro access granted!', 'success');
+                        setSelectedUser({ ...selectedUser, isPro: true, planId: 'pro_monthly' });
+                      }
+                    } catch (err) {
+                      console.error('Grant pro error:', err);
+                      toast?.(err.message || 'Error updating access', 'error');
+                    } finally {
+                      setActionLoading(false);
+                      refresh();
                     }
-                    setActionLoading(false);
-                    refresh();
                   }}
                   disabled={actionLoading}
                   icon={<Zap size={13} />}

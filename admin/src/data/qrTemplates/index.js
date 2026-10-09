@@ -15,6 +15,7 @@ import { ANIMAL_TEMPLATES }         from './animalTemplates';
 export const TEMPLATE_CATEGORIES = [
   'All',
   'Scan Me Frames',
+  'AI Magic',
   'Cute Animals',
   'Social Media',
   'Business',

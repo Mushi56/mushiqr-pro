@@ -45,17 +45,17 @@ export async function getAppStats() {
     const cloudTemplates = await getCloudTemplates();
 
     return {
-      totalUsers: usersSnap.size || 2450,
-      activeSubs: subsSnap.size || 180,
-      totalPlans: plansSnap.size || 4,
+      totalUsers: usersSnap.size || 0,
+      activeSubs: subsSnap.size || 0,
+      totalPlans: plansSnap.size || 0,
       cloudTemplates: cloudTemplates.length,
-      historyCount: 15420,
-      qrCount: 12340,
-      barcodeCount: 3080,
+      historyCount: 0,
+      qrCount: 0,
+      barcodeCount: 0,
     };
   } catch (e) {
     console.error('[AdminDataService] getAppStats error:', e);
-    return { totalUsers: 2450, activeSubs: 180, totalPlans: 4, cloudTemplates: 0, historyCount: 15420, qrCount: 12340, barcodeCount: 3080 };
+    return { totalUsers: 0, activeSubs: 0, totalPlans: 0, cloudTemplates: 0, historyCount: 0, qrCount: 0, barcodeCount: 0 };
   }
 }
 
@@ -66,9 +66,7 @@ export async function getActivityChartData(days = 7) {
     d.setDate(d.getDate() - i);
     const ds = d.toISOString().slice(0, 10);
     const label = d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-    const qr = Math.floor(Math.random() * 40) + 20;
-    const barcode = Math.floor(Math.random() * 20) + 5;
-    result.push({ label, ds, qr, barcode, total: qr + barcode });
+    result.push({ label, ds, qr: 0, barcode: 0, total: 0 });
   }
   return result;
 }
@@ -308,7 +306,7 @@ export async function getAllAppUsers() {
   try {
     const snap = await getDocs(collection(db, 'app_users'));
     const list = [];
-    snap.forEach(d => list.push({ ...d.data(), id: d.id }));
+    snap.forEach(d => list.push({ uid: d.id, ...d.data(), id: d.id }));
     return list;
   } catch (e) {
     console.error('[DS] getAllAppUsers:', e?.code, e?.message);
@@ -318,10 +316,10 @@ export async function getAllAppUsers() {
 
 export async function getRevenueAnalytics() {
   return {
-    totalRevenue: 28450,
-    mrr: 4890,
-    arr: 58680,
-    subscribersCount: 184,
+    totalRevenue: 0,
+    mrr: 0,
+    arr: 0,
+    subscribersCount: 0,
   };
 }
 
@@ -660,10 +658,10 @@ export async function getAllVisitors() {
 
 export async function getUserActivityStats(uid) {
   return {
-    qrCreated: 42,
-    barcodesCreated: 18,
-    scansCount: 105,
-    lastActive: new Date().toISOString(),
+    qrCreated: 0,
+    barcodesCreated: 0,
+    scansCount: 0,
+    lastActive: null,
   };
 }
 
