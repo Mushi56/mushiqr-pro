@@ -3698,22 +3698,29 @@ input[type="range"]::-moz-range-thumb {
   border: none;
   cursor: pointer;
   position: relative;
-  color: var(--text-tertiary);
+  color: var(--text-primary);
   transition: color var(--transition-fast), transform 0.2s ease;
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
 }
 
-[data-theme="light"] .bottom-nav-tab {
-  color: rgba(0, 0, 0, 0.55);
+.bottom-nav-tab:hover {
+  color: var(--accent-primary);
 }
 
-.bottom-nav-tab:hover {
-  color: var(--text-secondary);
+.bottom-nav-tab:hover .bottom-nav-icon {
+  transform: scale(1.15) translateY(-1px);
+  color: var(--accent-primary);
+}
+
+.bottom-nav-tab:hover .bottom-nav-icon svg {
+  stroke: var(--accent-primary);
+  fill: var(--accent-primary);
+  fill-opacity: 0.4;
 }
 
 [data-theme="light"] .bottom-nav-tab:hover {
-  color: var(--text-primary);
+  color: var(--accent-primary);
 }
 
 .bottom-nav-tab.active {
@@ -3729,7 +3736,8 @@ input[type="range"]::-moz-range-thumb {
 .bottom-nav-tab.active .bottom-nav-icon svg {
   color: var(--accent-primary);
   stroke: var(--accent-primary);
-  fill: none !important;
+  fill: var(--accent-primary) !important;
+  fill-opacity: 0.4 !important;
 }
 
 .bottom-nav-tab.active .bottom-nav-label {
@@ -7704,7 +7712,7 @@ video {
   border-radius: 0;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-primary);
   font-size: 10px;
   font-weight: 700;
   cursor: pointer;
@@ -7728,13 +7736,22 @@ video {
 .text-toolbar-btn.active svg {
   transform: scale(1.2);
   stroke-width: 2.5;
+  stroke: var(--accent-primary);
   fill: var(--accent-primary);
-  fill-opacity: 0.15;
+  fill-opacity: 0.4;
 }
 
 .text-toolbar-btn:not(.active):hover {
-  color: var(--text-primary);
+  color: var(--accent-primary);
   background: rgba(255, 255, 255, 0.03);
+}
+
+.text-toolbar-btn:not(.active):hover svg {
+  transform: scale(1.2);
+  stroke-width: 2.5;
+  stroke: var(--accent-primary);
+  fill: var(--accent-primary);
+  fill-opacity: 0.4;
 }
 
 .text-toolbar-btn:active {

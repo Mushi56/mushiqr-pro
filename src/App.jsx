@@ -180,7 +180,7 @@ const QRStyleIcon = ({ size = 24 }) => (
   </svg>
 );
 const QRPatternIcon = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-style-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="qr-style-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
     <rect x="3" y="3" width="7" height="7" rx="2" fill="currentColor" fillOpacity=".16"/>
     <circle cx="17.5" cy="6.5" r="3.5" fill="currentColor" fillOpacity=".16"/>
     <path d="M6.5 14l3.5 3.5L6.5 21 3 17.5z" fill="currentColor" fillOpacity=".16"/>
@@ -205,14 +205,14 @@ const QRGradientIcon = ({ size = 24 }) => (
   </svg>
 );
 const QRSizeIcon = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-size-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
-    <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2.4" fill="currentColor" fillOpacity=".16" strokeWidth="1.6"/>
-    <g strokeWidth="1.5">
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="qr-size-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+    <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2.4" fill="currentColor" fillOpacity=".16" strokeWidth="1.3"/>
+    <g strokeWidth="1.2">
       <rect x="7.4" y="7.4" width="3.2" height="3.2" rx=".7"/>
       <rect x="13.4" y="7.4" width="3.2" height="3.2" rx=".7"/>
       <rect x="7.4" y="13.4" width="3.2" height="3.2" rx=".7"/>
     </g>
-    <path d="M14.4 14.4h.01M17 14.4h.01M14.4 17h.01M17 17h.01" strokeWidth="1.8"/>
+    <path d="M14.4 14.4h.01M17 14.4h.01M14.4 17h.01M17 17h.01" strokeWidth="1.5"/>
     <rect x="1.7" y="1.7" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
     <rect x="18.9" y="1.7" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
     <rect x="1.7" y="18.9" width="3.4" height="3.4" rx="1" fill="currentColor" stroke="none"/>
@@ -236,15 +236,15 @@ const QRBgColorIcon = ({ size = 24 }) => (
         </g>
       </mask>
     </defs>
-    <rect x="2" y="2" width="16.5" height="16.5" rx="3" fill="currentColor" mask="url(#bf)"/>
-    <g transform="translate(5.6 5.5) scale(0.78)" stroke="currentColor" strokeWidth="2.56" strokeLinecap="round" strokeLinejoin="round" fill="none">
+    <rect x="2" y="2" width="16.5" height="16.5" rx="3" fill="none" stroke="currentColor" strokeWidth="1.6" mask="url(#bf)"/>
+    <g transform="translate(5.6 5.5) scale(0.78)" stroke="currentColor" strokeWidth="2.13" strokeLinecap="round" strokeLinejoin="round" fill="none">
       <path d="M18.376 2.622a1 1 0 1 1 3.002 3.002L17.36 9.643a.5.5 0 0 0 0 .707l.944.944a2.41 2.41 0 0 1 0 3.408l-.944.944a.5.5 0 0 1-.707 0L8.354 7.348a.5.5 0 0 1 0-.707l.944-.944a2.41 2.41 0 0 1 3.408 0l.944.944a.5.5 0 0 0 .707 0z"/>
       <path d="M9 8c-1.804 2.71-3.97 3.46-6.583 3.948a.507.507 0 0 0-.302.819l7.32 8.883a1 1 0 0 0 1.185.204C12.735 20.405 16 16.792 16 15" fill="currentColor" fillOpacity=".68" stroke="none"/>
     </g>
   </svg>
 );
 const QRLogoIcon = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-logo-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="qr-logo-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
     <rect x="3" y="3" width="5" height="5" rx="1"/>
     <rect x="16" y="3" width="5" height="5" rx="1"/>
     <rect x="3" y="16" width="5" height="5" rx="1"/>
@@ -255,7 +255,7 @@ const QRLogoIcon = ({ size = 24 }) => (
   </svg>
 );
 const QRColorIcon = ({ size = 24 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="qr-color-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="qr-color-icon" style={{ transform: 'scale(1.2)', overflow: 'visible' }}>
     <rect width="5" height="5" x="3" y="3" rx="1"/>
     <rect width="5" height="5" x="16" y="3" rx="1"/>
     <rect width="5" height="5" x="3" y="16" rx="1"/>
