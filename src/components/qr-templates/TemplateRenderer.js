@@ -6,6 +6,11 @@ import { TEMPLATE_ICONS } from '../../data/qrTemplates/templateIcons';
 
 const svgImageCache = {};
 
+const SINGLE_WEIGHT_FONTS = new Set([
+  'Anton', 'Bebas Neue', 'Courgette', 'Fredoka One', 'Great Vibes',
+  'Lobster', 'Luckiest Guy', 'Pacifico', 'Permanent Marker', 'Righteous', 'Satisfy'
+]);
+
 let _sharedOffscreenCanvas = null;
 function getSharedOffscreen(w, h) {
   if (typeof document === 'undefined') return null;
@@ -407,7 +412,9 @@ export function drawTemplateBackground(ctx, w, h, template, options = {}) {
   const headlineText = (options.templateHeadline !== undefined ? options.templateHeadline : (template.headline || '')).toUpperCase();
 
   ctx.save();
-  ctx.font = `${typography.headlineWeight} ${headlineFontSize}px ${options.templateFont ? `'${options.templateFont}', ` : ''}${typography.headlineFont}`;
+  const templateFontClean = options.templateFont ? options.templateFont.replace(/['"]/g, '').trim() : null;
+  const headlineWeight = (templateFontClean && SINGLE_WEIGHT_FONTS.has(templateFontClean)) ? 'normal' : typography.headlineWeight;
+  ctx.font = `${headlineWeight} ${headlineFontSize}px ${templateFontClean ? `"${templateFontClean}", ` : ''}${typography.headlineFont}`;
 
   const needsDarkText = isLightBackground(template.background);
   ctx.fillStyle = needsDarkText ? '#111111' : '#FFFFFF';
@@ -452,7 +459,8 @@ export function drawTemplateBackground(ctx, w, h, template, options = {}) {
 
   ctx.save();
   ctx.fillStyle = needsDarkText ? '#111111' : '#FFFFFF';
-  ctx.font = `${typography.handleWeight} ${subtitleFontSize}px ${options.templateFont ? `'${options.templateFont}', ` : ''}${typography.handleFont}`;
+  const handleWeight = (templateFontClean && SINGLE_WEIGHT_FONTS.has(templateFontClean)) ? 'normal' : typography.handleWeight;
+  ctx.font = `${handleWeight} ${subtitleFontSize}px ${templateFontClean ? `"${templateFontClean}", ` : ''}${typography.handleFont}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.letterSpacing = `${Math.round(w * 0.0012)}px`;
@@ -995,8 +1003,10 @@ export function drawFrameTemplate(ctx, w, h, template, options = {}) {
 
   // Draw Labels / Badges (pill, bubble, banner, flag, tag, corner, side, script)
   ctx.save();
+  const templateFontClean = options.templateFont ? options.templateFont.replace(/['"]/g, '').trim() : null;
+  const labelWeight = (templateFontClean && SINGLE_WEIGHT_FONTS.has(templateFontClean)) ? 'normal' : '800';
   const labelFontSize = Math.round(w * 0.036);
-  ctx.font = `800 ${labelFontSize}px ${options.templateFont ? `'${options.templateFont}', ` : ''}'Inter', sans-serif`;
+  ctx.font = `${labelWeight} ${labelFontSize}px ${templateFontClean ? `"${templateFontClean}", ` : ''}'Inter', sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
@@ -1079,7 +1089,7 @@ export function drawFrameTemplate(ctx, w, h, template, options = {}) {
     const ribbonH = h * 0.06;
     ctx.fillRect(-ribbonW / 2, -ribbonH / 2, ribbonW, ribbonH);
     ctx.fillStyle = fgBadgeText;
-    ctx.font = `800 ${Math.round(w * 0.028)}px ${options.templateFont ? `'${options.templateFont}', ` : ''}'Inter', sans-serif`;
+    ctx.font = `${labelWeight} ${Math.round(w * 0.028)}px ${templateFontClean ? `"${templateFontClean}", ` : ''}'Inter', sans-serif`;
     ctx.fillText(labelText === 'SCAN ME' ? 'SCAN' : labelText, 0, 0);
     ctx.restore();
   } else if (labelType === 'side') {
@@ -1094,14 +1104,14 @@ export function drawFrameTemplate(ctx, w, h, template, options = {}) {
     ctx.translate(sideX + sideW / 2, sideY + sideH / 2);
     ctx.rotate(Math.PI / 2);
     ctx.fillStyle = fgBadgeText;
-    ctx.font = `800 ${Math.round(w * 0.028)}px 'Inter', sans-serif`;
+    ctx.font = `${labelWeight} ${Math.round(w * 0.028)}px ${templateFontClean ? `"${templateFontClean}", ` : ''}'Inter', sans-serif`;
     ctx.fillText(labelText, 0, 0);
     ctx.restore();
   } else if (labelType === 'script') {
     // ── Script / Neon Callout typography label ─────────────────────────────
     const scriptY = frameY + frameHeight + h * 0.045;
     ctx.save();
-    ctx.font = `700 italic ${Math.round(w * 0.042)}px 'Outfit', 'Montserrat', 'Inter', cursive, sans-serif`;
+    ctx.font = `${templateFontClean ? labelWeight : '700 italic'} ${Math.round(w * 0.042)}px ${templateFontClean ? `"${templateFontClean}", ` : ''}'Outfit', 'Montserrat', 'Inter', cursive, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     

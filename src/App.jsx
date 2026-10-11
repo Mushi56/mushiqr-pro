@@ -78,7 +78,7 @@ import { LOGO_PRESETS } from './data/logoPresets';
 import QRTypeSelector from './components/QRTypeSelector';
 import QRDataInput from './components/QRDataInput';
 import { DotStyleSelector, EyeStyleSelector } from './components/StyleSelectors';
-import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData, constrainToSafeZone, getQRItemTitle, getQRItemSubtitle } from './utils/qrEngine';
+import { generateQRMatrix, renderQR, QR_TYPES, DOT_STYLES, EYE_STYLES, FRAME_STYLES, formatQRData, constrainToSafeZone, getQRItemTitle, getQRItemSubtitle, getCanvasFont } from './utils/qrEngine';
 import { downloadPNG, downloadSVG, downloadPDF, downloadJPG } from './utils/exportUtils';
 import {
   saveToHistory,
@@ -1599,7 +1599,7 @@ export default function App() {
   const [frameText, setFrameText] = useState('SCAN ME');
   const [frameColor, setFrameColor] = useState('');
   const [frameFont, setFrameFont] = useState('Inter');
-  const [frameSize, setFrameSize] = useState(0.12);
+  const [frameSize, setFrameSize] = useState(0.055);
   const [frameStrokeEnabled, setFrameStrokeEnabled] = useState(false);
   const [frameStrokeWidth, setFrameStrokeWidth] = useState(5);
   const [frameStrokeColor, setFrameStrokeColor] = useState('#ffffff');
@@ -1809,9 +1809,17 @@ export default function App() {
       setCanvasSelection('logo');
     } else if (type === 'text') {
       setTextPopup(val);
-      if (canvasSelection !== 'text' && canvasSelection !== 'frame-text') {
-        setCanvasSelection('text');
-        setTextEditMode('center');
+      if (!canvasSelection || (canvasSelection !== 'text' && canvasSelection !== 'frame-text' && !canvasSelection.startsWith('custom-text-') && !canvasSelection.startsWith('template-'))) {
+        if (frameStyle !== 'none' && !textCenterEnabled) {
+          setCanvasSelection('frame-text');
+          setTextEditMode('frame');
+        } else if (selectedTemplate && !textCenterEnabled && frameStyle === 'none') {
+          setCanvasSelection('template-headline');
+          setTextEditMode('template-top');
+        } else {
+          setCanvasSelection('text');
+          setTextEditMode('center');
+        }
       }
     } else if (type === 'color') {
       setColorPopup(val);
@@ -2432,7 +2440,7 @@ export default function App() {
       frameText: 'SCAN ME',
       frameColor: '',
       frameFont: 'Outfit',
-      frameSize: 1,
+      frameSize: 0.055,
       frameStrokeEnabled: false,
       frameShadowEnabled: false,
       framePosition: 'bottom',
@@ -2524,7 +2532,17 @@ export default function App() {
         
         const newFont = { id: fontName, label: file.name.split('.')[0], isCustom: true };
         setCustomFonts(prev => [...prev, newFont]);
-        setTextCenterFont(fontName);
+        if (activeCustomText) {
+          updateCustomText(activeCustomText.id, { font: fontName });
+        } else if (textEditMode === 'frame') {
+          setFrameFont(fontName);
+          if (frameStyle === 'none') setFrameStyle('text');
+        } else if (textEditMode === 'template-top' || textEditMode === 'template-bottom' || selectedTemplate) {
+          setTemplateFont(fontName);
+        } else {
+          setTextCenterFont(fontName);
+        }
+        renderCanvas();
         showToast(`Font "${file.name}" installed successfully!`, 'success');
       } catch (err) {
         console.error('Font load error:', err);
@@ -3134,11 +3152,27 @@ export default function App() {
     const executeRender = () => {
       if (!canvasRef.current) return;
       
-      // If fonts are still loading in the background, schedule a redraw once ready without blocking instant render
-      if (document.fonts && document.fonts.status !== 'loaded') {
-        document.fonts.ready.then(() => {
-          if (canvasRef.current) executeRender();
-        }).catch(() => {});
+      // If fonts are still loading in the background, ensure they load and trigger a redraw once ready
+      if (document.fonts) {
+        const activeFonts = [
+          textCenterEnabled && textCenterFont,
+          frameStyle !== 'none' && frameFont,
+          selectedTemplate && templateFont,
+          ...(customTexts || []).map(t => t.font)
+        ].filter(Boolean);
+        const unloaded = activeFonts.filter(f => !document.fonts.check(`16px "${f}"`));
+        if (unloaded.length > 0) {
+          Promise.all(unloaded.map(f => Promise.all([
+            document.fonts.load(`16px "${f}"`).catch(() => {}),
+            document.fonts.load(`bold 16px "${f}"`).catch(() => {}),
+            document.fonts.load(`700 16px "${f}"`).catch(() => {}),
+            document.fonts.load(`400 16px "${f}"`).catch(() => {})
+          ]))).then(() => {
+            if (canvasRef.current && renderCanvasRef.current) {
+              renderCanvasRef.current();
+            }
+          });
+        }
       }
       
       // Extract vCard content fields so template preview reflects live user input
@@ -3257,6 +3291,92 @@ export default function App() {
     customTexts,
     qrData, qrType
   ]);
+
+  const renderCanvasRef = useRef(renderCanvas);
+  renderCanvasRef.current = renderCanvas;
+  useEffect(() => {
+    renderCanvasRef.current = renderCanvas;
+  });
+
+  // Pre-load all Google Fonts once on mount so single clicks apply instantly with zero lag
+  useEffect(() => {
+    if (document.fonts) {
+      FONT_OPTIONS.forEach(f => {
+        document.fonts.load(`16px "${f.id}"`).catch(() => {});
+        document.fonts.load(`400 16px "${f.id}"`).catch(() => {});
+        document.fonts.load(`bold 16px "${f.id}"`).catch(() => {});
+        document.fonts.load(`700 16px "${f.id}"`).catch(() => {});
+      });
+    }
+  }, []);
+
+  const getCurrentTargetFont = useCallback(() => {
+    if (activeCustomText) {
+      return activeCustomText.font || 'Outfit';
+    }
+    if (textEditMode === 'frame' || canvasSelection === 'frame-text') {
+      return frameFont || 'Inter';
+    }
+    if (textEditMode === 'center' || canvasSelection === 'text') {
+      return textCenterFont || 'Inter';
+    }
+    if (textEditMode === 'template-top' || textEditMode === 'template-bottom' || canvasSelection === 'template-headline' || canvasSelection === 'template-handle') {
+      return templateFont || 'Outfit';
+    }
+    if (selectedTemplate && frameStyle === 'none' && !textCenterEnabled) {
+      return templateFont || 'Outfit';
+    }
+    if (frameStyle !== 'none') {
+      return frameFont || 'Inter';
+    }
+    return textCenterFont || 'Inter';
+  }, [activeCustomText, textEditMode, canvasSelection, frameFont, textCenterFont, templateFont, selectedTemplate, frameStyle, textCenterEnabled]);
+
+  const applyFontSelection = useCallback((fontId) => {
+    if (!fontId) return;
+    generatorIsDirtyRef.current = true;
+
+    // 1. Determine active target accurately
+    if (activeCustomText) {
+      updateCustomText(activeCustomText.id, { font: fontId });
+    } else if (textEditMode === 'frame' || canvasSelection === 'frame-text') {
+      setFrameFont(fontId);
+      if (frameStyle === 'none') setFrameStyle('text');
+    } else if (textEditMode === 'template-top' || textEditMode === 'template-bottom' || canvasSelection === 'template-headline' || canvasSelection === 'template-handle') {
+      setTemplateFont(fontId);
+    } else if (textEditMode === 'center' || canvasSelection === 'text') {
+      setTextCenterFont(fontId);
+    } else if (selectedTemplate && frameStyle === 'none' && !textCenterEnabled) {
+      setTemplateFont(fontId);
+    } else if (frameStyle !== 'none') {
+      setFrameFont(fontId);
+    } else {
+      setTextCenterFont(fontId);
+    }
+
+    // 2. Pre-load font with all weight variations and re-render on resolve
+    if (document.fonts) {
+      const clean = fontId.replace(/['"]/g, '').trim();
+      Promise.all([
+        document.fonts.load(`16px "${clean}"`).catch(() => {}),
+        document.fonts.load(`bold 16px "${clean}"`).catch(() => {}),
+        document.fonts.load(`700 16px "${clean}"`).catch(() => {}),
+        document.fonts.load(`400 16px "${clean}"`).catch(() => {})
+      ]).then(() => {
+        if (renderCanvasRef.current) {
+          renderCanvasRef.current();
+        }
+      });
+    }
+
+    // 3. Schedule render on animation frame after React state commit
+    requestAnimationFrame(() => {
+      if (renderCanvasRef.current) {
+        renderCanvasRef.current();
+      }
+    });
+  }, [activeCustomText, textEditMode, canvasSelection, frameStyle, textCenterEnabled, selectedTemplate, updateCustomText]);
+
   useEffect(() => {
     renderCanvas();
     if (logo?.image && !logo.image.complete) {
@@ -3270,7 +3390,7 @@ export default function App() {
       qrTexture.image.onload = renderCanvas;
       qrTexture.image.onerror = () => showToast('Texture failed to load', 'error');
     }
-  }, [renderCanvas, logo, qrBgImage, qrTexture, activePage, selectedTemplate, templateHeadlineText, templateHandleText, templateFont, customTexts]);
+  }, [renderCanvas, logo, qrBgImage, qrTexture, activePage, selectedTemplate, templateHeadlineText, templateHandleText, templateFont, frameFont, textCenterFont, customTexts]);
   const getQRContentArea = useCallback(() => {
     const size = 512;
     const padding = size * 0.03;
@@ -3546,7 +3666,7 @@ export default function App() {
     }
     if (textCenterEnabled && textCenterText) {
       const fontSize = contentSize * textCenterSize;
-      tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+      tempCtx.current.font = getCanvasFont(textCenterFont, fontSize);
       const metrics = tempCtx.current.measureText(textCenterText);
       const tw = textCenterWidth ? (textCenterWidth * contentSize) : (metrics.width + (logoPadding || 10) * 2);
       const th = textCenterHeight ? (textCenterHeight * contentSize) : ((fontSize * 0.8) + (logoPadding || 10) * 2);
@@ -3650,10 +3770,20 @@ export default function App() {
       const labelHeight = 512 * 0.14;
       const textY = framePosition === 'top' ? (framePadding + labelHeight / 2) : (512 - framePadding - labelHeight / 2);
       
-      tempCtx.current.font = `bold ${512 * frameSize}px '${frameFont}', Outfit, sans-serif`;
-      const metrics = tempCtx.current.measureText(frameText);
+      let effectiveFontSize = 512 * (frameSize || 0.055);
+      const maxFontSize = labelHeight * 0.58;
+      if (effectiveFontSize > maxFontSize) effectiveFontSize = maxFontSize;
+      tempCtx.current.font = getCanvasFont(frameFont || 'Outfit', effectiveFontSize);
+      const labelW = (512 - 512 * 0.03 * 2) - 512 * 0.1;
+      const maxLabelTextWidth = labelW - 512 * 0.08;
+      let metrics = tempCtx.current.measureText(frameText);
+      if (maxLabelTextWidth > 0 && metrics.width > maxLabelTextWidth) {
+        effectiveFontSize = Math.max(8, effectiveFontSize * (maxLabelTextWidth / metrics.width));
+        tempCtx.current.font = getCanvasFont(frameFont || 'Outfit', effectiveFontSize);
+        metrics = tempCtx.current.measureText(frameText);
+      }
       const tw = metrics.width + 512 * 0.04;
-      const th = (512 * frameSize) * 1.2;
+      const th = effectiveFontSize * 1.3;
       const tx = 256 - tw / 2;
       const ty = textY - th / 2;
       
@@ -3723,7 +3853,7 @@ export default function App() {
         const item = customTexts[i];
         if (!item || !item.text) continue;
         const fontSize = contentSize * (item.size || 0.08);
-        tempCtx.current.font = `bold ${fontSize}px '${item.font || 'Outfit'}', sans-serif`;
+        tempCtx.current.font = getCanvasFont(item.font || 'Outfit', fontSize);
         const metrics = tempCtx.current.measureText(item.text);
         const tw = item.width ? (item.width * contentSize) : (metrics.width + 20);
         const th = item.height ? (item.height * contentSize) : ((fontSize * 0.8) + 20);
@@ -3866,7 +3996,7 @@ export default function App() {
     // 1. Check Center Text
     if (textCenterEnabled && textCenterText) {
       const fontSize = contentSize * textCenterSize;
-      tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+      tempCtx.current.font = getCanvasFont(textCenterFont, fontSize);
       const metrics = tempCtx.current.measureText(textCenterText);
       const tw = textCenterWidth ? (textCenterWidth * contentSize) : (metrics.width + (logoPadding || 10) * 2);
       const th = textCenterHeight ? (textCenterHeight * contentSize) : ((fontSize * 0.8) + (logoPadding || 10) * 2);
@@ -3907,10 +4037,20 @@ export default function App() {
       const labelHeight = 512 * 0.14;
       const textY = framePosition === 'top' ? (framePadding + labelHeight / 2) : (512 - framePadding - labelHeight / 2);
       
-      tempCtx.current.font = `bold ${512 * frameSize}px '${frameFont}', Outfit, sans-serif`;
-      const metrics = tempCtx.current.measureText(frameText);
+      let effectiveFontSize = 512 * (frameSize || 0.055);
+      const maxFontSize = labelHeight * 0.58;
+      if (effectiveFontSize > maxFontSize) effectiveFontSize = maxFontSize;
+      tempCtx.current.font = getCanvasFont(frameFont || 'Outfit', effectiveFontSize);
+      const labelW = (512 - 512 * 0.03 * 2) - 512 * 0.1;
+      const maxLabelTextWidth = labelW - 512 * 0.08;
+      let metrics = tempCtx.current.measureText(frameText);
+      if (maxLabelTextWidth > 0 && metrics.width > maxLabelTextWidth) {
+        effectiveFontSize = Math.max(8, effectiveFontSize * (maxLabelTextWidth / metrics.width));
+        tempCtx.current.font = getCanvasFont(frameFont || 'Outfit', effectiveFontSize);
+        metrics = tempCtx.current.measureText(frameText);
+      }
       const tw = metrics.width + 512 * 0.04;
-      const th = (512 * frameSize) * 1.2;
+      const th = effectiveFontSize * 1.3;
       const tx = 256 - tw / 2;
       const ty = textY - th / 2;
       
@@ -3977,7 +4117,7 @@ export default function App() {
         setLogoRotation(Math.round(normalizedRot));
     } else if (dragType.current === 'rotate-text') {
         const fontSize = contentSize * textCenterSize;
-        tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+        tempCtx.current.font = getCanvasFont(textCenterFont, fontSize);
         const metrics = tempCtx.current.measureText(textCenterText);
         const tw = textCenterWidth ? (textCenterWidth * contentSize) : (metrics.width + (logoPadding || 10) * 2);
         const th = textCenterHeight ? (textCenterHeight * contentSize) : ((fontSize * 0.8) + (logoPadding || 10) * 2);
@@ -4126,7 +4266,7 @@ export default function App() {
         setLogoPosY(Math.round(newPosY * 1000) / 1000);
     } else if (dragType.current && dragType.current.startsWith('resize-text')) {
         const fontSize = contentSize * textCenterSize;
-        tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+        tempCtx.current.font = getCanvasFont(textCenterFont, fontSize);
         const metrics = tempCtx.current.measureText(textCenterText);
         const tw = textCenterWidth ? (textCenterWidth * contentSize) : (metrics.width + (logoPadding || 10) * 2);
         const th = textCenterHeight ? (textCenterHeight * contentSize) : ((fontSize * 0.8) + (logoPadding || 10) * 2);
@@ -4239,7 +4379,7 @@ export default function App() {
         setLogoPosY(Math.round(valY * 1000) / 1000);
     } else if (dragType.current === 'text') {
       const fontSize = contentSize * textCenterSize;
-      tempCtx.current.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+      tempCtx.current.font = getCanvasFont(textCenterFont, fontSize);
       const metrics = tempCtx.current.measureText(textCenterText);
       const tw = textCenterWidth ? (textCenterWidth * contentSize) : (metrics.width + (logoPadding || 10) * 2);
       const th = textCenterHeight ? (textCenterHeight * contentSize) : ((fontSize * 0.8) + (logoPadding || 10) * 2);
@@ -4265,7 +4405,7 @@ export default function App() {
       const item = customTexts.find(t => t.id === id);
       if (item) {
         const fontSize = contentSize * (item.size || 0.08);
-        tempCtx.current.font = `bold ${fontSize}px '${item.font || 'Outfit'}', sans-serif`;
+        tempCtx.current.font = getCanvasFont(item.font || 'Outfit', fontSize);
         const metrics = tempCtx.current.measureText(item.text);
         const tw = item.width ? (item.width * contentSize) : (metrics.width + 20);
         const th = item.height ? (item.height * contentSize) : ((fontSize * 0.8) + 20);
@@ -4291,7 +4431,7 @@ export default function App() {
       const item = customTexts.find(t => t.id === id);
       if (item) {
         const fontSize = contentSize * (item.size || 0.08);
-        tempCtx.current.font = `bold ${fontSize}px '${item.font || 'Outfit'}', sans-serif`;
+        tempCtx.current.font = getCanvasFont(item.font || 'Outfit', fontSize);
         const metrics = tempCtx.current.measureText(item.text);
         const tw = item.width ? (item.width * contentSize) : (metrics.width + 20);
         const th = item.height ? (item.height * contentSize) : ((fontSize * 0.8) + 20);
@@ -4333,7 +4473,7 @@ export default function App() {
       const item = customTexts.find(t => t.id === id);
       if (item) {
         const fontSize = contentSize * (item.size || 0.08);
-        tempCtx.current.font = `bold ${fontSize}px '${item.font || 'Outfit'}', sans-serif`;
+        tempCtx.current.font = getCanvasFont(item.font || 'Outfit', fontSize);
         const metrics = tempCtx.current.measureText(item.text);
         const tw = item.width ? (item.width * contentSize) : (metrics.width + 20);
         const th = item.height ? (item.height * contentSize) : ((fontSize * 0.8) + 20);
@@ -6106,6 +6246,10 @@ export default function App() {
                                 maxLength={60} 
                                 value={activeCustomText.text || ''} 
                                 onChange={(e) => updateCustomText(activeCustomText.id, { text: e.target.value, width: null, height: null })} 
+                                onFocus={() => {
+                                  setTextEditMode('custom-' + activeCustomText.id);
+                                  setCanvasSelection('custom-text-' + activeCustomText.id);
+                                }}
                                 placeholder="Type your text..." 
                                 className="text-input-premium" 
                                 style={{ width: '100%', borderColor: 'var(--accent-primary)' }} 
@@ -6135,6 +6279,10 @@ export default function App() {
                                 maxLength={40}
                                 value={templateHeadlineText}
                                 onChange={(e) => setTemplateHeadlineText(e.target.value)}
+                                onFocus={() => {
+                                  setTextEditMode('template-top');
+                                  setCanvasSelection('template-headline');
+                                }}
                                 placeholder={selectedTemplate.headline || selectedTemplate.defaultHeadline || selectedTemplate.labelText || 'Type top headline...'}
                                 className="text-input-premium"
                                 style={{ width: '100%', textTransform: 'uppercase' }}
@@ -6164,6 +6312,10 @@ export default function App() {
                                 maxLength={40}
                                 value={templateHandleText}
                                 onChange={(e) => setTemplateHandleText(e.target.value)}
+                                onFocus={() => {
+                                  setTextEditMode('template-bottom');
+                                  setCanvasSelection('template-handle');
+                                }}
                                 placeholder={selectedTemplate.subtitle || selectedTemplate.defaultHandle || selectedTemplate.handle || 'Type bottom subtitle/handle...'}
                                 className="text-input-premium"
                                 style={{ width: '100%' }}
@@ -6288,30 +6440,15 @@ export default function App() {
                           <input type="file" ref={fontInputRef} style={{ display: 'none' }} accept=".ttf,.otf,.woff,.woff2" onChange={handleFontUpload} />
                           <div className="fonts-grid">
                             {customFonts.map(font => {
-                              const isFontActive = activeCustomText 
-                                ? activeCustomText.font === font.id 
-                                : (textEditMode === 'template-top' || textEditMode === 'template-bottom' || selectedTemplate)
-                                  ? templateFont === font.id
-                                  : (textEditMode === 'center' ? textCenterFont === font.id : frameFont === font.id);
+                              const isFontActive = getCurrentTargetFont() === font.id;
                               return (
                                 <button 
                                   key={font.id} 
-                                  onClick={() => {
-                                    if (activeCustomText) {
-                                      updateCustomText(activeCustomText.id, { font: font.id });
-                                    } else if (textEditMode === 'template-top' || textEditMode === 'template-bottom' || selectedTemplate) {
-                                      setTemplateFont(font.id);
-                                    } else if (textEditMode === 'center') {
-                                      setTextCenterFont(font.id);
-                                    } else {
-                                      setFrameFont(font.id);
-                                      if (frameStyle === 'none') setFrameStyle('text');
-                                    }
-                                  }} 
+                                  onClick={() => applyFontSelection(font.id)} 
                                   className={`font-btn ${isFontActive ? 'active' : ''}`} 
-                                  style={{ fontFamily: font.id }}
+                                  style={{ fontFamily: `"${font.id}", sans-serif` }}
                                 >
-                                  {font.label} â˜…
+                                  {font.label} ★
                                 </button>
                               );
                             })}
@@ -6319,11 +6456,7 @@ export default function App() {
                               .filter(font => FeatureAccessManager.isFeatureEnabled(`qr_font_${font.id}`))
                               .map(font => {
                                 const featId = `qr_font_${font.id}`;
-                                const isFontActive = activeCustomText 
-                                  ? activeCustomText.font === font.id 
-                                  : (textEditMode === 'template-top' || textEditMode === 'template-bottom' || selectedTemplate)
-                                    ? templateFont === font.id
-                                    : (textEditMode === 'center' ? textCenterFont === font.id : frameFont === font.id);
+                                const isFontActive = getCurrentTargetFont() === font.id;
                                 return (
                                   <button 
                                     key={font.id} 
@@ -6333,19 +6466,10 @@ export default function App() {
                                         showPaywall(featId);
                                         return;
                                       }
-                                      if (activeCustomText) {
-                                        updateCustomText(activeCustomText.id, { font: font.id });
-                                      } else if (textEditMode === 'template-top' || textEditMode === 'template-bottom' || selectedTemplate) {
-                                        setTemplateFont(font.id);
-                                      } else if (textEditMode === 'center') {
-                                        setTextCenterFont(font.id);
-                                      } else {
-                                        setFrameFont(font.id);
-                                        if (frameStyle === 'none') setFrameStyle('text');
-                                      }
+                                      applyFontSelection(font.id);
                                     }} 
                                     className={`font-btn ${isFontActive ? 'active' : ''}`} 
-                                    style={{ fontFamily: font.id, position: 'relative' }}
+                                    style={{ fontFamily: `"${font.id}", sans-serif`, position: 'relative' }}
                                   >
                                     <PaidCrownBadge featureId={featId} fallbackFeatureId="qr_text_fonts" position="corner" size={9} />
                                     {font.label}
@@ -6391,9 +6515,9 @@ export default function App() {
                           ) : (
                             <Slider 
                               label="Size" 
-                              min={0.02} 
-                              max={0.18} 
-                              step={0.01} 
+                              min={0.025} 
+                              max={0.09} 
+                              step={0.005} 
                               value={frameSize} 
                               onChange={(val) => setFrameSize(val)} 
                             />
@@ -8199,6 +8323,20 @@ export default function App() {
                             onClick={() => {
                               generatorIsDirtyRef.current = true;
                               setTemplateFont(font.id);
+                              if (document.fonts) {
+                                const clean = font.id.replace(/['"]/g, '').trim();
+                                Promise.all([
+                                  document.fonts.load(`16px "${clean}"`).catch(() => {}),
+                                  document.fonts.load(`bold 16px "${clean}"`).catch(() => {}),
+                                  document.fonts.load(`700 16px "${clean}"`).catch(() => {}),
+                                  document.fonts.load(`400 16px "${clean}"`).catch(() => {})
+                                ]).then(() => {
+                                  if (renderCanvasRef.current) renderCanvasRef.current();
+                                });
+                              }
+                              requestAnimationFrame(() => {
+                                if (renderCanvasRef.current) renderCanvasRef.current();
+                              });
                             }}
                             style={{
                               padding: '8px 10px',
@@ -8206,7 +8344,7 @@ export default function App() {
                               border: isSelected ? '1.5px solid var(--accent-primary)' : '1px solid var(--border-color)',
                               background: isSelected ? 'var(--accent-primary)' : 'var(--bg-elevated)',
                               color: isSelected ? '#FFFFFF' : 'var(--text-primary)',
-                              fontFamily: font.id,
+                              fontFamily: `"${font.id}", sans-serif`,
                               fontSize: '13px',
                               fontWeight: isSelected ? 700 : 500,
                               cursor: 'pointer',

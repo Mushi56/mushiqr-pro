@@ -1,5 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Caveat:wght@400;700&family=Cinzel:wght@400;600;700&family=Courgette&family=Dancing+Script:wght@400;700&family=Fredoka+One&family=Fredoka:wght@400;600;700&family=Great+Vibes&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Kanit:wght@400;500;700&family=Lato:wght@400;700&family=Lobster&family=Luckiest+Guy&family=Merriweather:wght@400;700&family=Montserrat:wght@400;600;700;800&family=Noto+Sans:wght@400;700&family=Open+Sans:wght@400;600;700&family=Orbitron:wght@400;600;800&family=Oswald:wght@400;500;700&family=Outfit:wght@400;600;700;800&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@400;600;700&family=Quicksand:wght@400;600;700&family=Raleway:wght@400;600;700&family=Righteous&family=Roboto:wght@400;500;700&family=Satisfy&family=Ubuntu:wght@400;500;700&display=swap');
 
+@font-face {
+  font-family: 'Fredoka One';
+  src: local('Fredoka One'), local('Fredoka');
+}
 
 
 /* ========================================
@@ -7883,9 +7887,15 @@ video {
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.font-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-secondary);
 }
 
 .font-btn.active {

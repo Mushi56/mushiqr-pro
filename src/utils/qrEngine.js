@@ -31,6 +31,17 @@ export const QR_TYPES = {
   LINKEDIN: 'linkedin',
 };
 
+export const SINGLE_WEIGHT_FONTS = new Set([
+  'Anton', 'Bebas Neue', 'Courgette', 'Fredoka One', 'Great Vibes',
+  'Lobster', 'Luckiest Guy', 'Pacifico', 'Permanent Marker', 'Righteous', 'Satisfy'
+]);
+
+export function getCanvasFont(family, size, bold = true) {
+  const cleanFamily = (family || 'Outfit').replace(/['"]/g, '').trim();
+  const weight = (bold && !SINGLE_WEIGHT_FONTS.has(cleanFamily)) ? 'bold' : 'normal';
+  return `${weight} ${Math.max(1, Math.round(size))}px "${cleanFamily}", Outfit, sans-serif`;
+}
+
 export function formatQRData(type, data) {
   const featId = `qr_${type}`;
   const access = FeatureAccessManager.canUseFeature(featId);
@@ -446,7 +457,7 @@ export function renderQR(canvas, options) {
     textCenterPosX = 0.5,
     textCenterPosY = 0.5,
     frameFont = 'Inter',
-    frameSize = 0.12,
+    frameSize = 0.055,
     frameStrokeEnabled = false,
     frameStrokeWidth = 2,
     frameStrokeColor = '#ffffff',
@@ -3148,7 +3159,7 @@ function drawCenterText(ctx, text, canvasSize, options) {
   } = options;
 
   const fontSize = contentSize * textCenterSize;
-  ctx.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+  ctx.font = getCanvasFont(textCenterFont, fontSize);
   const metrics = ctx.measureText(text);
   const textWidth = metrics.width;
   const textHeight = fontSize * 0.8; 
@@ -3184,7 +3195,7 @@ function drawCenterText(ctx, text, canvasSize, options) {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.font = `bold ${fontSize}px '${textCenterFont}', sans-serif`;
+  ctx.font = getCanvasFont(textCenterFont, fontSize);
 
   // 4. Draw Stroke (behind fill, no shadow)
   if (textCenterStrokeEnabled) {
@@ -3270,7 +3281,7 @@ function drawCustomTexts(ctx, customTexts, canvasSize, options) {
 
     const fontSize = contentSize * (size || 0.08);
     ctx.save();
-    ctx.font = `bold ${fontSize}px '${font || 'Outfit'}', sans-serif`;
+    ctx.font = getCanvasFont(font || 'Outfit', fontSize);
     const metrics = ctx.measureText(text);
     const textWidth = metrics.width;
     const textHeight = fontSize * 0.8;
@@ -3393,7 +3404,25 @@ function drawFrame(ctx, size, padding, options) {
   // Text
   const textFillVal = frameStyle === 'text' || frameStyle === 'text-bottom' || frameStyle === 'text-top' ? frameColor : (bgTransparent ? '#ffffff' : bgColor);
   ctx.fillStyle = parseColorOrGradient(ctx, labelX, textY - 20, labelW, 40, textFillVal);
-  ctx.font = `bold ${size * frameSize}px ${frameFont}, Outfit, sans-serif`;
+
+  // Proportional font sizing: balanced height with automatic badge boundary clamping
+  let effectiveFontSize = size * (frameSize || 0.055);
+  const maxFontSize = labelHeight * 0.58;
+  if (effectiveFontSize > maxFontSize) {
+    effectiveFontSize = maxFontSize;
+  }
+  ctx.font = getCanvasFont(frameFont || 'Outfit', effectiveFontSize);
+
+  // Auto-fit: scale down gracefully if user text exceeds label banner width
+  const maxLabelTextWidth = labelW - size * 0.08;
+  if (maxLabelTextWidth > 0) {
+    const textW = ctx.measureText(frameText).width;
+    if (textW > maxLabelTextWidth) {
+      effectiveFontSize = Math.max(8, effectiveFontSize * (maxLabelTextWidth / textW));
+      ctx.font = getCanvasFont(frameFont || 'Outfit', effectiveFontSize);
+    }
+  }
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
@@ -3413,10 +3442,10 @@ function drawFrame(ctx, size, padding, options) {
   if (frameStrokeEnabled) { 
     ctx.strokeStyle = parseColorOrGradient(ctx, labelX, textY - 20, labelW, 40, frameStrokeColor); 
     ctx.lineWidth = frameStrokeWidth; 
-    ctx.strokeText(frameText, size / 2, textY + (size * frameSize) * 0.045); 
+    ctx.strokeText(frameText, size / 2, textY + effectiveFontSize * 0.045); 
   }
   
-  ctx.fillText(frameText, size / 2, textY + (size * frameSize) * 0.045);
+  ctx.fillText(frameText, size / 2, textY + effectiveFontSize * 0.045);
   ctx.restore();
 
   ctx.shadowColor = 'transparent'; 
@@ -3445,7 +3474,7 @@ function drawFrame(ctx, size, padding, options) {
     ctx.restore();
 
     const tw = ctx.measureText(frameText).width + size * 0.04;
-    const th = (size * frameSize) * 1.2;
+    const th = effectiveFontSize * 1.3;
     const tx = size / 2 - tw / 2;
     const ty = textY - th / 2;
 
