@@ -1253,6 +1253,10 @@ export default function App() {
       setIsTemplateTextModalOpen(false);
       return;
     }
+    if (logoPopup || textPopup || colorPopup || shapePopup) {
+      cancelEditing();
+      return;
+    }
     // 2. Navigation logic
     if (activePage === 'scanner') {
       // From Scan to Home or Exit if launched from widget
@@ -1262,15 +1266,6 @@ export default function App() {
         navigateTo('home');
       }
     } else if (activePage === 'generator') {
-      // â”€â”€ IMPROVED CREATOR NAVIGATION â”€â”€
-      // If we have tab history, go back to previous tab
-      if (tabHistory.length > 0) {
-        const lastTab = tabHistory[tabHistory.length - 1];
-        setTabHistory(prev => prev.slice(0, -1));
-        setActiveTab(lastTab);
-        return;
-      }
-      // If no tab history, exit to home immediately
       navigateTo(previousPage || 'home');
     } else if (activePage === 'history') {
       // From History/Recent/Menu to previous tab
@@ -1427,6 +1422,16 @@ export default function App() {
       setSelectedTemplate(null);
       setTemplateHeadlineText('');
       setTemplateHandleText('');
+      setLogo(null);
+      setLogoBackground(false);
+      setLogoOutline(false);
+      setLogoShadowEnabled(false);
+      setLogoInnerShadowEnabled(false);
+      setLogoRotation(0);
+      setLogoOpacity(1);
+      setLogoTexture('none');
+      setLogoPosX(0.5);
+      setLogoPosY(0.5);
       return;
     }
     const templateFeatId = `qr_template_${tpl.id}`;
@@ -1499,14 +1504,30 @@ export default function App() {
       } else {
         setLogo(null);
       }
-      // Apply logo shadow from template preset
+      // Apply / reset logo stroke and outline from template preset
+      setLogoOutline(Boolean(tpl.preset.logoOutline));
+      if (tpl.preset.logoOutlineColor) setLogoOutlineColor(tpl.preset.logoOutlineColor);
+      else setLogoOutlineColor('#ffffff');
+      if (tpl.preset.logoOutlineWidth !== undefined) setLogoOutlineWidth(tpl.preset.logoOutlineWidth);
+      else setLogoOutlineWidth(3);
+
+      // Apply / reset logo shadow from template preset
       if (tpl.preset.logoShadowEnabled !== undefined) {
         setLogoShadowEnabled(tpl.preset.logoShadowEnabled);
         if (tpl.preset.logoShadowColor) setLogoShadowColor(tpl.preset.logoShadowColor);
         if (tpl.preset.logoShadowBlur !== undefined) setLogoShadowBlur(tpl.preset.logoShadowBlur);
         if (tpl.preset.logoShadowOffsetX !== undefined) setLogoShadowOffsetX(tpl.preset.logoShadowOffsetX);
         if (tpl.preset.logoShadowOffsetY !== undefined) setLogoShadowOffsetY(tpl.preset.logoShadowOffsetY);
+      } else {
+        setLogoShadowEnabled(false);
       }
+
+      setLogoInnerShadowEnabled(Boolean(tpl.preset.logoInnerShadowEnabled));
+      setLogoRotation(tpl.preset.logoRotation || 0);
+      setLogoOpacity(tpl.preset.logoOpacity !== undefined ? tpl.preset.logoOpacity : 1);
+      setLogoTexture(tpl.preset.logoTexture || 'none');
+      setLogoPosX(0.5);
+      setLogoPosY(0.5);
     }
   };
   
@@ -1795,9 +1816,15 @@ export default function App() {
     } else if (type === 'color') {
       setColorPopup(val);
       setCanvasSelection(null);
+      if (val === 'pattern') {
+        setPatternTab('dots');
+      }
     } else if (type === 'shapes') {
       setShapePopup(val);
       setCanvasSelection(null);
+      if (val === 'pattern') {
+        setPatternTab('dots');
+      }
     }
   };
   const cancelEditing = () => {
@@ -1809,6 +1836,7 @@ export default function App() {
     setColorPopup(null);
     setShapePopup(null);
     setCanvasSelection(null);
+    setPatternTab('dots');
     preEditSnapshot.current = null;
   };
   const applyEditing = () => {
@@ -1817,6 +1845,7 @@ export default function App() {
     setColorPopup(null);
     setShapePopup(null);
     setCanvasSelection(null);
+    setPatternTab('dots');
     preEditSnapshot.current = null;
     saveSnapshot(); // Save the final result to history
   };
@@ -1833,7 +1862,7 @@ export default function App() {
       if (logoPopup || textPopup || colorPopup || shapePopup) {
         applyEditing();
       }
-      setTabHistory(prev => [...prev, activeTab]);
+      setPatternTab('dots');
       setActiveTab(tabId);
       // Manage canvas selections for interactive outlines/handles
       if (tabId === 'text') {
@@ -1907,6 +1936,7 @@ export default function App() {
       setTabHistory([]);
       if (page === 'generator') {
         setActiveTab('content');
+        setPatternTab('dots');
         setCanvasSelection(null);
       }
     }
@@ -2679,13 +2709,9 @@ export default function App() {
       setCropModalConfig(null);
       return;
     }
-    // 6. Dismiss color and shape popups
-    if (colorPopup) {
-      setColorPopup(null);
-      return;
-    }
-    if (shapePopup) {
-      setShapePopup(null);
+    // 6. Dismiss edit popups
+    if (logoPopup || textPopup || colorPopup || shapePopup) {
+      cancelEditing();
       return;
     }
     // 7. Dismiss advanced picker and dropdowns

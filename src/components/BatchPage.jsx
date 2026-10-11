@@ -181,7 +181,7 @@ export default function BatchPage({
     'Low': 512,
     'Normal': 1024,
     'High': 2048,
-    'Ultra': 4096
+    'Ultra': 2400
   };
 
   const handleModeSwitch = async (newType) => {
@@ -494,8 +494,18 @@ export default function BatchPage({
     const CHUNK_SIZE = 50; // items per chunk before GC yield
     const total = batchItems.length;
 
+    // Reusable single worker canvases to prevent GPU memory thrashing and WebView OOM crashes
+    const workerCanvas = document.createElement('canvas');
+    const sharedJpgCanvas = (selectedFormat === 'ALL' || selectedFormat === 'JPG') ? document.createElement('canvas') : null;
+
     for (let idx = 0; idx < total; idx++) {
       if (isCancelledRef.current) {
+        workerCanvas.width = 0;
+        workerCanvas.height = 0;
+        if (sharedJpgCanvas) {
+          sharedJpgCanvas.width = 0;
+          sharedJpgCanvas.height = 0;
+        }
         setIsExporting(false);
         setExportProgress(0);
         return;
@@ -516,69 +526,56 @@ export default function BatchPage({
         zipFilenameMap.set(rawName.toLowerCase(), 1);
       }
 
-      // Create canvas, render, then IMMEDIATELY extract data and destroy canvas
+      // Render to shared canvas, extract data immediately
       let pngDataUrl;
       let pngBase64;
 
-      {
-        // Scoped block so tempCanvas goes out of scope as soon as possible
-        const tempCanvas = document.createElement('canvas');
+      if (batchType === 'BARCODE') {
+        const scale = exportQuality === 'Low' ? 1 : exportQuality === 'Normal' ? 2 : exportQuality === 'High' ? 3 : 4;
+        workerCanvas.width = 400 * scale;
+        workerCanvas.height = 150 * scale;
 
-        if (batchType === 'BARCODE') {
-          const scale = exportQuality === 'Low' ? 1 : exportQuality === 'Normal' ? 2 : exportQuality === 'High' ? 3 : 4;
-          tempCanvas.width = 400 * scale;
-          tempCanvas.height = 150 * scale;
+        renderBarcode(workerCanvas, item.data, {
+          bcid: item.style?.bcid || 'code128',
+          barColor: item.style?.barColor || '#000000',
+          bgColor: item.style?.bgColor || '#ffffff',
+          barWidth: (item.style?.barWidth || 2) * scale,
+          height: (item.style?.height || 90) * scale,
+          margin: (item.style?.margin || 16) * scale,
+          displayValue: item.style?.displayValue !== undefined ? item.style.displayValue : true,
+          font: `${12 * scale}px Inter, sans-serif`
+        });
+      } else {
+        workerCanvas.width = exportSize;
+        workerCanvas.height = exportSize;
 
-          renderBarcode(tempCanvas, item.data, {
-            bcid: item.style?.bcid || 'code128',
-            barColor: item.style?.barColor || '#000000',
-            bgColor: item.style?.bgColor || '#ffffff',
-            barWidth: (item.style?.barWidth || 2) * scale,
-            height: (item.style?.height || 90) * scale,
-            margin: (item.style?.margin || 16) * scale,
-            displayValue: item.style?.displayValue !== undefined ? item.style.displayValue : true,
-            font: `${12 * scale}px Inter, sans-serif`
-          });
-        } else {
-          tempCanvas.width = exportSize;
-          tempCanvas.height = exportSize;
+        const matrixInfo = generateQRMatrix(item.data, item.style?.errorCorrection || 'H');
+        const logoImgElement = item.style?.logo?.src ? logoCache[item.style.logo.src] : null;
 
-          const matrixInfo = generateQRMatrix(item.data, item.style.errorCorrection || 'H');
-          const logoImgElement = item.style?.logo?.src ? logoCache[item.style.logo.src] : null;
+        renderQR(workerCanvas, {
+          ...matrixInfo,
+          size: exportSize,
+          ...item.style,
+          logo: logoImgElement,
+          textCenter: item.style?.textCenterEnabled ? item.style.textCenterText : null,
+          showHandle: false,
+          selectedType: null
+        });
+      }
 
-          renderQR(tempCanvas, {
-            ...matrixInfo,
-            size: exportSize,
-            ...item.style,
-            logo: logoImgElement,
-            textCenter: item.style.textCenterEnabled ? item.style.textCenterText : null,
-            showHandle: false,
-            selectedType: null
-          });
-        }
+      pngDataUrl = workerCanvas.toDataURL('image/png');
+      pngBase64 = pngDataUrl.split(',')[1];
 
-        pngDataUrl = tempCanvas.toDataURL('image/png');
-        pngBase64 = pngDataUrl.split(',')[1];
-
-        // 2. JPG — generate while tempCanvas still exists in scope
-        if (selectedFormat === 'ALL' || selectedFormat === 'JPG') {
-          const jpgCanvas = document.createElement('canvas');
-          jpgCanvas.width = tempCanvas.width;
-          jpgCanvas.height = tempCanvas.height;
-          const ctx = jpgCanvas.getContext('2d');
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, jpgCanvas.width, jpgCanvas.height);
-          ctx.drawImage(tempCanvas, 0, 0);
-          const jpgBase64 = jpgCanvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-          zip.file(`jpg/${safeItemName}.jpg`, jpgBase64, { base64: true });
-          // Explicitly release JPG canvas GPU memory
-          jpgCanvas.width = 0;
-          jpgCanvas.height = 0;
-        }
-
-        // Explicitly release main canvas GPU memory before leaving the block
-        tempCanvas.width = 0;
-        tempCanvas.height = 0;
+      // 2. JPG — generate using shared canvas
+      if (selectedFormat === 'ALL' || selectedFormat === 'JPG') {
+        sharedJpgCanvas.width = workerCanvas.width;
+        sharedJpgCanvas.height = workerCanvas.height;
+        const ctx = sharedJpgCanvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, sharedJpgCanvas.width, sharedJpgCanvas.height);
+        ctx.drawImage(workerCanvas, 0, 0);
+        const jpgBase64 = sharedJpgCanvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+        zip.file(`jpg/${safeItemName}.jpg`, jpgBase64, { base64: true });
       }
 
       // 1. PNG
@@ -623,12 +620,16 @@ export default function BatchPage({
       // 0-90% for item rendering
       setExportProgress(Math.round(((idx + 1) / total) * 90));
 
-      // Yield to the browser every CHUNK_SIZE items so GC can reclaim memory.
-      if ((idx + 1) % CHUNK_SIZE === 0) {
-        await new Promise(resolve => setTimeout(resolve, 16));
-      } else {
-        await new Promise(resolve => setTimeout(resolve, 0));
-      }
+      // Yield to the browser every item so GC can reclaim memory and UI stays responsive
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
+
+    // Release worker canvas GPU memory after export loop
+    workerCanvas.width = 0;
+    workerCanvas.height = 0;
+    if (sharedJpgCanvas) {
+      sharedJpgCanvas.width = 0;
+      sharedJpgCanvas.height = 0;
     }
 
     try {
@@ -1391,7 +1392,7 @@ export default function BatchPage({
 
         {/* Step 2: Columns Mapping */}
         {fileData && (
-          <div className="glass-panel" style={{ borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="glass-panel" style={{ borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', background: 'var(--bg-card, var(--bg-surface, #1e1e2d))', border: '1px solid var(--border-color)', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}>
             <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Sparkles size={20} className="text-accent" /> Column Mapping
             </h3>
@@ -1407,15 +1408,25 @@ export default function BatchPage({
               <label htmlFor="hasHeader" style={{ fontSize: '14px', fontWeight: 500 }}>First row contains headers</label>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="form-group">
-                <label className="form-label">
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              background: 'var(--bg-elevated, rgba(255,255,255,0.04))',
+              border: '1px solid var(--border-color)',
+              borderRadius: '16px',
+              padding: '18px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
+            }}>
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label" style={{ fontWeight: 600, marginBottom: '8px', display: 'block' }}>
                   Select {batchType === 'BARCODE' ? 'Barcode' : 'QR'} Data Column
                 </label>
                 <select 
                   className="form-select" 
                   value={dataCol} 
                   onChange={(e) => setDataCol(e.target.value)}
+                  style={{ width: '100%' }}
                 >
                   {columns.map(col => (
                     <option key={col.index} value={col.index}>{col.label}</option>
@@ -1423,12 +1434,15 @@ export default function BatchPage({
                 </select>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Select Filename Column (Optional)</label>
+              <div className="form-group" style={{ margin: 0 }}>
+                <label className="form-label" style={{ fontWeight: 600, marginBottom: '8px', display: 'block' }}>
+                  Select Filename Column (Optional)
+                </label>
                 <select 
                   className="form-select" 
                   value={nameCol} 
                   onChange={(e) => setNameCol(e.target.value)}
+                  style={{ width: '100%' }}
                 >
                   <option value="none">-- Autogenerate Filenames --</option>
                   {columns.map(col => (
@@ -1438,12 +1452,15 @@ export default function BatchPage({
               </div>
 
               {batchType === 'BARCODE' && (
-                <div className="form-group">
-                  <label className="form-label">Select Barcode Type</label>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 600, marginBottom: '8px', display: 'block' }}>
+                    Select Barcode Type
+                  </label>
                   <select 
                     className="form-select" 
                     value={barcodeType} 
                     onChange={(e) => setBarcodeType(e.target.value)}
+                    style={{ width: '100%' }}
                   >
                     {Object.entries(BARCODE_STANDARDS).map(([key, std]) => (
                       <option key={key} value={key}>{std.name} ({std.desc})</option>
@@ -1748,7 +1765,7 @@ export default function BatchPage({
                         border: '1px solid rgba(214, 0, 54, 0.15)',
                         letterSpacing: '0.5px'
                       }}>
-                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '4096px')}
+                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '2400px')}
                       </span>
                     </div>
                     <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>

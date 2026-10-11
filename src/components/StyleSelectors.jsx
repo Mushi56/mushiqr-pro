@@ -13,6 +13,9 @@ function getCachedDemoMatrix(errorLevel) {
   return matrixCache[errorLevel];
 }
 
+// Fixed neutral ink color so preview thumbnails remain crisp, high-contrast, and independent of user-selected QR colors
+const PREVIEW_THUMBNAIL_INK = '#0F172A';
+
 function MiniQRCanvas({ qrParams, overrideParams }) {
   const canvasRef = useRef(null);
 
@@ -21,11 +24,6 @@ function MiniQRCanvas({ qrParams, overrideParams }) {
   const eyeStyle = overrideParams?.eyeStyle;
   const hideEyes = overrideParams?.hideEyes;
   const hideDots = overrideParams?.hideDots;
-  const fgColor = qrParams?.fgColor;
-  const fgType = qrParams?.fgType;
-  const fgColor1 = qrParams?.fgColor1;
-  const fgColor2 = qrParams?.fgColor2;
-  const fgAngle = qrParams?.fgAngle;
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -38,6 +36,10 @@ function MiniQRCanvas({ qrParams, overrideParams }) {
       ...demoMatrixInfo,
       bgColor: '#FFFFFF',          // Force solid white background
       bgTransparent: false,        // Disable transparency
+      fgColor: PREVIEW_THUMBNAIL_INK, // Fixed neutral ink
+      fgType: 'solid',
+      eyeColor: PREVIEW_THUMBNAIL_INK,
+      eyeOuterColor: PREVIEW_THUMBNAIL_INK,
       logo: null,                  // Remove logo to avoid blocking center dots
       textCenterEnabled: false,    // Remove center text
       textCenter: null,
@@ -51,7 +53,7 @@ function MiniQRCanvas({ qrParams, overrideParams }) {
     };
 
     renderQR(canvasRef.current, options);
-  }, [errorLevel, dotStyle, eyeStyle, hideEyes, hideDots, fgColor, fgType, fgColor1, fgColor2, fgAngle]);
+  }, [errorLevel, dotStyle, eyeStyle, hideEyes, hideDots]);
 
   return (
     <canvas 
@@ -71,8 +73,6 @@ function MiniQRCanvas({ qrParams, overrideParams }) {
 
 function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
   const canvasRef = useRef(null);
-
-  const fgColor = qrParams?.fgColor || '#000000';
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -102,7 +102,9 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
       [0, 1, 0, 1, 1, 1]  // Row 5
     ];
 
-    ctx.fillStyle = fgColor;
+    ctx.fillStyle = PREVIEW_THUMBNAIL_INK;
+
+    const previewQrParams = { ...(qrParams || {}), fgColor: PREVIEW_THUMBNAIL_INK };
 
     for (let r = 0; r < gridCount; r++) {
       for (let c = 0; c < gridCount; c++) {
@@ -118,10 +120,10 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
           right: c < gridCount - 1 && !!matrix[r][c + 1]
         };
 
-        drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, qrParams || {}, r, c);
+        drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, previewQrParams, r, c);
       }
     }
-  }, [dotStyle, fgColor, qrParams?.dotPadding]);
+  }, [dotStyle, qrParams?.dotPadding]);
 
   return (
     <canvas 
@@ -139,10 +141,8 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
   );
 }
 
-function MiniEyeCanvas({ eyeStyle, qrParams }) {
+function MiniEyeCanvas({ eyeStyle }) {
   const canvasRef = useRef(null);
-  const fgColor = qrParams?.eyeColor || qrParams?.fgColor || '#000000';
-  const outerColor = qrParams?.eyeOuterColor || fgColor;
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -155,11 +155,11 @@ function MiniEyeCanvas({ eyeStyle, qrParams }) {
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, size, size);
 
-    // Draw single eye centered in canvas using exact QR engine drawEye
+    // Draw single eye centered in canvas using fixed neutral ink color
     const padding = 2;
     const eyeSize = size - padding * 2;
-    drawEye(ctx, padding, padding, eyeSize, eyeStyle, outerColor, fgColor);
-  }, [eyeStyle, fgColor, outerColor]);
+    drawEye(ctx, padding, padding, eyeSize, eyeStyle, PREVIEW_THUMBNAIL_INK, PREVIEW_THUMBNAIL_INK);
+  }, [eyeStyle]);
 
   return (
     <canvas 
