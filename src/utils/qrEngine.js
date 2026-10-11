@@ -566,6 +566,12 @@ export function renderQR(canvas, options) {
 
   const effectiveBgTransparent = bgTransparent;
 
+  // When no template is active and transparent background is not explicitly enabled,
+  // ensure bgColor never stays 'transparent' (which can linger from template presets).
+  const resolvedBgColor = (!options.template && !effectiveBgTransparent && (!bgColor || bgColor === 'transparent'))
+    ? '#ffffff'
+    : bgColor;
+
   // Background & Clipping
   const hasBgShape = !effectiveBgTransparent && qrBgShape && qrBgShape !== 'full' && qrBgShape !== 'none' && !options.template;
   
@@ -645,7 +651,7 @@ export function renderQR(canvas, options) {
     }
 
     if (!effectiveBgTransparent && !options.template) {
-      ctx.fillStyle = parseColorOrGradient(ctx, 0, 0, size, size, bgColor);
+      ctx.fillStyle = parseColorOrGradient(ctx, 0, 0, size, size, resolvedBgColor);
       ctx.fillRect(0, 0, size, size);
     }
 
@@ -681,7 +687,7 @@ export function renderQR(canvas, options) {
     ctx.restore();
   } else {
     if (!effectiveBgTransparent && !options.template) {
-      ctx.fillStyle = parseColorOrGradient(ctx, 0, 0, size, size, bgColor);
+      ctx.fillStyle = parseColorOrGradient(ctx, 0, 0, size, size, resolvedBgColor);
       ctx.fillRect(0, 0, size, size);
     }
   }
@@ -827,7 +833,7 @@ export function renderQR(canvas, options) {
       selectedType: options.selectedType,
       frameRotation: options.frameRotation,
       framePosition: options.framePosition,
-      bgColor,
+      bgColor: resolvedBgColor,
       bgTransparent
     });
   }

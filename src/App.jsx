@@ -1389,6 +1389,8 @@ export default function App() {
     if (applyTemplateRef.current) applyTemplateRef.current(tpl);
   }, []);
 
+  const preTemplateBgRef = useRef(null);
+
   const applyTemplate = (tpl) => {
     if (!tpl) {
       setSelectedTemplate(null);
@@ -1404,6 +1406,14 @@ export default function App() {
       setLogoTexture('none');
       setLogoPosX(0.5);
       setLogoPosY(0.5);
+
+      // Restore clean default background when removing template so QR is never left transparent
+      setBgTransparent(false);
+      const restoredBg = (preTemplateBgRef.current?.bgColor && preTemplateBgRef.current.bgColor !== 'transparent')
+        ? preTemplateBgRef.current.bgColor
+        : '#ffffff';
+      setBgColor(restoredBg);
+      preTemplateBgRef.current = null;
       return;
     }
     const templateFeatId = `qr_template_${tpl.id}`;
@@ -1412,6 +1422,15 @@ export default function App() {
       showPaywall(templateFeatId);
       return;
     }
+
+    // Save existing non-template background before applying template preset
+    if (!selectedTemplate) {
+      preTemplateBgRef.current = {
+        bgColor: (bgColor && bgColor !== 'transparent') ? bgColor : '#ffffff',
+        bgTransparent: bgTransparent || false
+      };
+    }
+
     setSelectedTemplate(tpl);
     setTemplateHeadlineText(tpl.headline || tpl.defaultHeadline || tpl.labelText || '');
     setTemplateHandleText(tpl.subtitle || tpl.defaultHandle || tpl.handle || '');
@@ -1430,6 +1449,9 @@ export default function App() {
       if (tpl.preset.ecLevel) setErrorLevel(tpl.preset.ecLevel);
       if (tpl.preset.qrColor) setQrColor(tpl.preset.qrColor);
       if (tpl.preset.bgColor) setBgColor(tpl.preset.bgColor);
+      if (tpl.preset.bgTransparent !== undefined) {
+        setBgTransparent(tpl.preset.bgTransparent);
+      }
       if (tpl.preset.dotStyle) setDotStyle(tpl.preset.dotStyle);
       if (tpl.preset.eyeStyle) setEyeStyle(tpl.preset.eyeStyle);
       if (tpl.preset.eyeColor) setEyeColor(tpl.preset.eyeColor);
