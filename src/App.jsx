@@ -63,6 +63,7 @@ import {
   Wand2,
   Layers,
   AlertCircle,
+  AlertTriangle,
   LogOut,
   Edit2,
   ChevronLeft,
@@ -1169,6 +1170,22 @@ export default function App() {
     return pathPage;
   });
   const [previousPage, setPreviousPage] = useState('home');
+  const activePageRef = useRef(activePage);
+  activePageRef.current = activePage;
+  const previousPageRef = useRef(previousPage);
+  previousPageRef.current = previousPage;
+  const lastBackPress = useRef(0);
+  const resetGeneratorRef = useRef(null);
+
+  // ── Toast Notification State ──
+  const [toast, setToast] = useState(null);
+  const toastTimeoutRef = useRef(null);
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast({ message, type });
+    toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
+  }, []);
+
   const [isFirstLaunchLogin, setIsFirstLaunchLogin] = useState(false);
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
@@ -1182,7 +1199,32 @@ export default function App() {
       page = 'onboarding';
     }
 
-    if (page !== activePage) {
+    const currentActive = activePageRef.current;
+    if (page !== currentActive) {
+      // Browser back navigation intercept: warning toast when returning to Home
+      if (page === 'home' && currentActive !== 'home' && !Capacitor.isNativePlatform()) {
+        const now = Date.now();
+        if (now - lastBackPress.current >= 2000) {
+          lastBackPress.current = now;
+          // Revert browser route back to active page so user stays on screen
+          navigate(location.pathname === '/' ? `/${currentActive}` : location.pathname, { replace: false });
+          if (currentActive === 'generator' && generatorIsDirtyRef.current) {
+            showToast('Unsaved changes! Press back again to return to Home', 'warning');
+          } else {
+            showToast('Press back again to return to Home', 'warning');
+          }
+          return;
+        } else {
+          // Double-press confirmed: allow returning to Home
+          if (currentActive === 'generator' && generatorIsDirtyRef.current) {
+            generatorIsDirtyRef.current = false;
+            if (resetGeneratorRef.current) {
+              resetGeneratorRef.current();
+            }
+          }
+        }
+      }
+
       setActivePage(page);
       
       if (page !== 'generator') {
@@ -1198,7 +1240,7 @@ export default function App() {
       if (location.state.isDataModalOpen !== undefined) setIsDataModalOpen(location.state.isDataModalOpen);
       if (location.state.loadedBarcodeItem) setLoadedBarcodeItem(location.state.loadedBarcodeItem);
     }
-  }, [location.pathname, location.state]);
+  }, [location.pathname, location.state, navigate, showToast]);
   const goBack = () => {
     // 1. Close overlays first
     if (advPicker.open) {
@@ -1684,7 +1726,6 @@ export default function App() {
   const tempCanvas = useRef(document.createElement('canvas'));
   const tempCtx = useRef(tempCanvas.current.getContext('2d'));
   const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
-  const [toast, setToast] = useState(null);
   const [exportSuccessInfo, setExportSuccessInfo] = useState(null);
 
   const galleryQrOptions = useMemo(() => ({
@@ -2474,6 +2515,7 @@ export default function App() {
       generatorIsDirtyRef.current = false;
     }, 200);
   }, []);
+  resetGeneratorRef.current = resetGenerator;
 
   // Initial snapshot on mount
   useEffect(() => {
@@ -2697,9 +2739,13 @@ export default function App() {
     }
   }, [logo]);
   // â”€â”€ Back Button Handling (Centralized) â”€â”€
-  const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
   backHandlerRef.current = () => {
+    // 0. Dismiss unsaved changes modal if open
+    if (unsavedChangesModal?.isOpen) {
+      setUnsavedChangesModal({ isOpen: false, nextPage: null });
+      return;
+    }
     // 1. Dismiss full screen preview
     if (isFullScreenPreviewOpen) {
       setIsFullScreenPreviewOpen(false);
@@ -2763,13 +2809,36 @@ export default function App() {
     }
 
     // 10. Root navigation or exit on home
+    const now = Date.now();
     if (activePage === 'home') {
-      const now = Date.now();
       if (now - lastBackPress.current < 2000) {
         CapApp.exitApp();
       } else {
         lastBackPress.current = now;
         showToast('Press back again to exit', 'info');
+      }
+      return;
+    }
+
+    // 11. Navigating back to home screen from another page using system back button
+    const targetPage = (activePage === 'generator' || activePage === 'history')
+      ? (previousPage || 'home')
+      : 'home';
+
+    if (targetPage === 'home') {
+      if (now - lastBackPress.current < 2000) {
+        if (activePage === 'generator' && generatorIsDirtyRef.current) {
+          generatorIsDirtyRef.current = false;
+          resetGenerator();
+        }
+        performNavigation('home');
+      } else {
+        lastBackPress.current = now;
+        if (activePage === 'generator' && generatorIsDirtyRef.current) {
+          showToast('Unsaved changes! Press back again to return to Home', 'warning');
+        } else {
+          showToast('Press back again to return to Home', 'warning');
+        }
       }
     } else {
       goBack();
@@ -2787,8 +2856,18 @@ export default function App() {
     };
     const listenerPromise = setupListener();
     
+    // Browser / PopState fallback for web testing and PWA
+    const handlePopState = () => {
+      if (Capacitor.isNativePlatform()) return;
+      if (backHandlerRef.current) {
+        backHandlerRef.current();
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+
     return () => {
-      listenerPromise.then(l => l.remove());
+      listenerPromise.then(l => l?.remove?.());
+      window.removeEventListener('popstate', handlePopState);
     };
   }, []); // Run once on mount
   // â”€â”€ Update body theme â”€â”€
@@ -2813,10 +2892,7 @@ export default function App() {
     };
   }, []);
   // â”€â”€ Toast â”€â”€
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
+
   // â”€â”€ Copy to Clipboard â”€â”€
   const handleCopyToClipboard = () => {
     if (!canvasRef.current) return;
@@ -8652,6 +8728,8 @@ export default function App() {
               <CheckCircle2 size={16} strokeWidth={2.5} />
             ) : toast.type === 'info' ? (
               <Info size={16} strokeWidth={2.5} />
+            ) : toast.type === 'warning' ? (
+              <AlertTriangle size={16} strokeWidth={2.5} />
             ) : (
               <AlertCircle size={16} strokeWidth={2.5} />
             )}

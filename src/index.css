@@ -8505,6 +8505,15 @@ button:active,
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
 }
 
+/* Warning Type */
+.app-toast-warning .app-toast-icon,
+.toast.warning .app-toast-icon {
+  background: rgba(245, 158, 11, 0.18);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
+}
+
 /* Error Type */
 .app-toast-error .app-toast-icon,
 .toast.error .app-toast-icon {
