@@ -65,6 +65,7 @@ import {
   AlertCircle,
   LogOut,
   Edit2,
+  ChevronLeft,
   ChevronRight,
   Cloud,
   Lock,
@@ -6419,7 +6420,7 @@ export default function App() {
                                 type="text"
                                 value={fontSearchQuery}
                                 onChange={(e) => setFontSearchQuery(e.target.value)}
-                                placeholder="Search 100 fonts..."
+                                placeholder="Search 250 fonts..."
                                 className="font-search-input"
                                 style={{
                                   width: '100%',
@@ -6508,76 +6509,130 @@ export default function App() {
                             })}
                           </div>
 
-                          {/* Font Grid with Active Highlighting */}
-                          <div className="fonts-grid">
-                            {(selectedFontCategory === 'all' ? customFonts : []).map(font => {
-                              const isFontActive = getCurrentTargetFont() === font.id;
-                              return (
-                                <button 
-                                  key={font.id} 
-                                  onClick={() => applyFontSelection(font.id)} 
-                                  className={`font-btn ${isFontActive ? 'active' : ''}`} 
-                                  style={{ fontFamily: `"${font.id}", sans-serif` }}
-                                >
-                                  {font.label} ★
-                                </button>
-                              );
-                            })}
-                            {FONT_OPTIONS
+                          {/* 1 Font per Line List with Live Typographic Preview */}
+                          {(() => {
+                            const activeUserText = (activeCustomText?.text?.trim())
+                              || (textEditMode === 'center' ? textCenterText?.trim() : null)
+                              || (textEditMode === 'frame' ? frameText?.trim() : null)
+                              || (textEditMode === 'template-top' ? templateHeadlineText?.trim() : null)
+                              || (textEditMode === 'template-bottom' ? templateHandleText?.trim() : null)
+                              || (textCenterEnabled && textCenterText?.trim())
+                              || (frameStyle !== 'none' && frameText?.trim())
+                              || null;
+
+                            const filteredCustom = (selectedFontCategory === 'all' ? customFonts : [])
+                              .filter(font => !fontSearchQuery || font.label.toLowerCase().includes(fontSearchQuery.toLowerCase()));
+
+                            const filteredFonts = FONT_OPTIONS
                               .filter(font => selectedFontCategory === 'all' || font.category === selectedFontCategory)
                               .filter(font => !fontSearchQuery || font.label.toLowerCase().includes(fontSearchQuery.toLowerCase()))
-                              .filter(font => FeatureAccessManager.isFeatureEnabled(`qr_font_${font.id}`))
-                              .map(font => {
-                                const featId = `qr_font_${font.id}`;
-                                const isFontActive = getCurrentTargetFont() === font.id;
-                                return (
-                                  <button 
-                                    key={font.id} 
-                                    onClick={() => {
-                                      const access = FeatureAccessManager.canUseFeature(featId);
-                                      if (!access.allowed) {
-                                        showPaywall(featId);
-                                        return;
-                                      }
-                                      applyFontSelection(font.id);
-                                    }} 
-                                    className={`font-btn ${isFontActive ? 'active' : ''}`} 
-                                    style={{ fontFamily: `"${font.id}", sans-serif`, position: 'relative' }}
-                                  >
-                                    <PaidCrownBadge featureId={featId} fallbackFeatureId="qr_text_fonts" position="corner" size={9} />
-                                    {font.label}
-                                  </button>
-                                );
-                              })}
-                          </div>
+                              .filter(font => FeatureAccessManager.isFeatureEnabled(`qr_font_${font.id}`));
 
-                          {/* Empty State when Search Yields Zero Results */}
-                          {FONT_OPTIONS
-                            .filter(font => selectedFontCategory === 'all' || font.category === selectedFontCategory)
-                            .filter(font => !fontSearchQuery || font.label.toLowerCase().includes(fontSearchQuery.toLowerCase()))
-                            .length === 0 && (
-                              <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '13px' }}>
-                                <p style={{ margin: '0 0 6px 0', fontWeight: 600, color: 'var(--text-secondary)' }}>No fonts found</p>
-                                <p style={{ margin: 0, fontSize: '11.5px' }}>Try searching another keyword or switch category</p>
-                                {fontSearchQuery && (
-                                  <button
-                                    onClick={() => setFontSearchQuery('')}
-                                    style={{
-                                      marginTop: '10px',
-                                      padding: '4px 12px',
-                                      borderRadius: '12px',
-                                      background: 'var(--bg-elevated)',
-                                      border: '1px solid var(--border-color)',
-                                      color: 'var(--text-primary)',
-                                      fontSize: '11px',
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    Clear Search
-                                  </button>
+                            const hasAnyFonts = filteredCustom.length > 0 || filteredFonts.length > 0;
+
+                            return (
+                              <div className="font-rows-container">
+                                {filteredCustom.map(font => {
+                                  const isFontActive = getCurrentTargetFont() === font.id;
+                                  const preview = activeUserText || `${font.label} • Aa Bb 123`;
+                                  return (
+                                    <button 
+                                      key={font.id} 
+                                      type="button"
+                                      onClick={() => applyFontSelection(font.id)} 
+                                      className={`font-row ${isFontActive ? 'active' : ''}`} 
+                                    >
+                                      <div className="font-row-info">
+                                        <div className="font-row-title-line">
+                                          <span className="font-row-name">{font.label}</span>
+                                          <span style={{ fontSize: '11px', color: '#ffb703' }}>★</span>
+                                        </div>
+                                        <span className="font-row-category-badge">Custom</span>
+                                      </div>
+                                      <div className="font-row-preview" style={{ fontFamily: `"${font.id}", sans-serif` }}>
+                                        {preview}
+                                      </div>
+                                      <div className="font-row-indicator">
+                                        {isFontActive ? (
+                                          <div className="font-row-check-badge">
+                                            <Check size={14} strokeWidth={2.8} />
+                                          </div>
+                                        ) : (
+                                          <div className="font-row-uncheck-circle" />
+                                        )}
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+
+                                {filteredFonts.map(font => {
+                                  const featId = `qr_font_${font.id}`;
+                                  const isFontActive = getCurrentTargetFont() === font.id;
+                                  const preview = activeUserText || `${font.label} • Aa Bb 123`;
+                                  return (
+                                    <button 
+                                      key={font.id} 
+                                      type="button"
+                                      onClick={() => {
+                                        const access = FeatureAccessManager.canUseFeature(featId);
+                                        if (!access.allowed) {
+                                          showPaywall(featId);
+                                          return;
+                                        }
+                                        applyFontSelection(font.id);
+                                      }} 
+                                      className={`font-row ${isFontActive ? 'active' : ''}`} 
+                                    >
+                                      <div className="font-row-info">
+                                        <div className="font-row-title-line">
+                                          <span className="font-row-name">{font.label}</span>
+                                          <PaidCrownBadge featureId={featId} fallbackFeatureId="qr_text_fonts" size={10} inline />
+                                        </div>
+                                        <span className="font-row-category-badge">{font.category}</span>
+                                      </div>
+                                      <div className="font-row-preview" style={{ fontFamily: `"${font.id}", sans-serif` }}>
+                                        {preview}
+                                      </div>
+                                      <div className="font-row-indicator">
+                                        {isFontActive ? (
+                                          <div className="font-row-check-badge">
+                                            <Check size={14} strokeWidth={2.8} />
+                                          </div>
+                                        ) : (
+                                          <div className="font-row-uncheck-circle" />
+                                        )}
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+
+                                {!hasAnyFonts && (
+                                  <div style={{ textAlign: 'center', padding: '28px 12px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                                    <p style={{ margin: '0 0 6px 0', fontWeight: 600, color: 'var(--text-secondary)' }}>No fonts found</p>
+                                    <p style={{ margin: 0, fontSize: '11.5px' }}>Try searching another keyword or choose another category</p>
+                                    {fontSearchQuery && (
+                                      <button
+                                        type="button"
+                                        onClick={() => setFontSearchQuery('')}
+                                        style={{
+                                          marginTop: '10px',
+                                          padding: '5px 14px',
+                                          borderRadius: '12px',
+                                          background: 'var(--bg-elevated)',
+                                          border: '1px solid var(--border-color)',
+                                          color: 'var(--text-primary)',
+                                          fontSize: '11.5px',
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        Clear Search
+                                      </button>
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                            )}
+                            );
+                          })()}
                         </div>
                       )}
 
@@ -8475,19 +8530,13 @@ export default function App() {
                       })}
                     </div>
                     
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(95px, 1fr))',
-                      gap: '8px',
-                      maxHeight: '160px',
-                      overflowY: 'auto',
-                      paddingRight: '2px'
-                    }}>
+                    <div className="font-rows-container" style={{ maxHeight: '180px' }}>
                       {FONT_OPTIONS
                         .filter(font => templateFontCategory === 'all' || font.category === templateFontCategory)
                         .filter(font => !templateFontSearch || font.label.toLowerCase().includes(templateFontSearch.toLowerCase()))
                         .map(font => {
                           const isSelected = templateFont === font.id;
+                          const preview = templateHeadlineText?.trim() || templateHandleText?.trim() || `${font.label} • Aa Bb 123`;
                           return (
                             <button
                               key={font.id}
@@ -8510,24 +8559,24 @@ export default function App() {
                                   if (renderCanvasRef.current) renderCanvasRef.current();
                                 });
                               }}
-                              style={{
-                                padding: '8px 10px',
-                                borderRadius: '10px',
-                                border: isSelected ? '1.5px solid var(--accent-primary)' : '1px solid var(--border-color)',
-                                background: isSelected ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                                color: isSelected ? '#FFFFFF' : 'var(--text-primary)',
-                                fontFamily: `"${font.id}", sans-serif`,
-                                fontSize: '13px',
-                                fontWeight: isSelected ? 700 : 500,
-                                cursor: 'pointer',
-                                textAlign: 'center',
-                                transition: 'all 0.15s ease',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis'
-                              }}
+                              className={`font-row ${isSelected ? 'active' : ''}`}
                             >
-                              {font.label}
+                              <div className="font-row-info">
+                                <span className="font-row-name">{font.label}</span>
+                                <span className="font-row-category-badge">{font.category}</span>
+                              </div>
+                              <div className="font-row-preview" style={{ fontFamily: `"${font.id}", sans-serif` }}>
+                                {preview}
+                              </div>
+                              <div className="font-row-indicator">
+                                {isSelected ? (
+                                  <div className="font-row-check-badge">
+                                    <Check size={14} strokeWidth={2.8} />
+                                  </div>
+                                ) : (
+                                  <div className="font-row-uncheck-circle" />
+                                )}
+                              </div>
                             </button>
                           );
                         })}
