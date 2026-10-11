@@ -30,6 +30,7 @@ import {
   ShieldCheck,
   UploadCloud,
   X,
+  Search,
   Menu,
   Info,
   Shield,
@@ -139,6 +140,7 @@ import { TemplateCustomizer } from './components/qr-templates/TemplateCustomizer
 import { FullScreenPreviewModal } from './components/FullScreenPreviewModal';
 import ImageCropShapeModal, { SHAPE_OPTIONS } from './components/ImageCropShapeModal';
 import { AI_ART_STYLES } from './utils/aiArtQrEngine';
+import { FONT_OPTIONS, FONT_CATEGORIES } from './data/fontOptions';
 const QRDotsIcon = ({ size = 24 }) => (
   <svg width={size} height={size} viewBox="2 2 20 20" fill="currentColor" className="mushi-pro-wide-dots">
     {/* Smaller Rounded Star (Preserving the shape and style) */}
@@ -794,38 +796,7 @@ const EC_LEVELS = [
   { key: 'Q', label: 'Q', pct: '25%', width: 75, desc: 'Quartile error correction. Recommended when adding a logo or for medium-range scanning.' },
   { key: 'H', label: 'H', pct: '30%', width: 100, desc: 'High error correction. Best for complex logos, small print sizes, or harsh environments.' },
 ];
-const FONT_OPTIONS = [
-  { id: 'Inter', label: 'Inter' },
-  { id: 'Outfit', label: 'Outfit' },
-  { id: 'Montserrat', label: 'Montserrat' },
-  { id: 'Playfair Display', label: 'Playfair Display' },
-  { id: 'Oswald', label: 'Oswald' },
-  { id: 'Pacifico', label: 'Pacifico' },
-  { id: 'Caveat', label: 'Caveat' },
-  { id: 'Dancing Script', label: 'Dancing Script' },
-  { id: 'Bebas Neue', label: 'Bebas Neue' },
-  { id: 'Lobster', label: 'Lobster' },
-  { id: 'Roboto', label: 'Roboto' },
-  { id: 'Open Sans', label: 'Open Sans' },
-  { id: 'Lato', label: 'Lato' },
-  { id: 'Poppins', label: 'Poppins' },
-  { id: 'Raleway', label: 'Raleway' },
-  { id: 'Merriweather', label: 'Merriweather' },
-  { id: 'Noto Sans', label: 'Noto Sans' },
-  { id: 'Ubuntu', label: 'Ubuntu' },
-  { id: 'Anton', label: 'Anton' },
-  { id: 'Permanent Marker', label: 'Permanent Marker' },
-  { id: 'Righteous', label: 'Righteous' },
-  { id: 'Cinzel', label: 'Cinzel' },
-  { id: 'Courgette', label: 'Courgette' },
-  { id: 'Fredoka One', label: 'Fredoka One' },
-  { id: 'Great Vibes', label: 'Great Vibes' },
-  { id: 'Kanit', label: 'Kanit' },
-  { id: 'Luckiest Guy', label: 'Luckiest Guy' },
-  { id: 'Orbitron', label: 'Orbitron' },
-  { id: 'Quicksand', label: 'Quicksand' },
-  { id: 'Satisfy', label: 'Satisfy' },
-];
+// 100 FONT_OPTIONS imported from ./data/fontOptions
 /* â”€â”€ Error Boundary â”€â”€ */
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { hasError: false }; }
@@ -1790,6 +1761,10 @@ export default function App() {
   const dragType = useRef(null); // 'logo' or 'text'
   const dragStartOffset = useRef({ x: 0, y: 0 });
   const [customFonts, setCustomFonts] = useState([]);
+  const [selectedFontCategory, setSelectedFontCategory] = useState('all');
+  const [fontSearchQuery, setFontSearchQuery] = useState('');
+  const [templateFontCategory, setTemplateFontCategory] = useState('all');
+  const [templateFontSearch, setTemplateFontSearch] = useState('');
   const fontInputRef = useRef(null);
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -6435,11 +6410,107 @@ export default function App() {
                       )}
                       
                       {textPopup === 'fonts' && (
-                        <div className="fade-in">
-                          <button onClick={() => fontInputRef.current?.click()} className="font-scroll-btn-wide"><Plus size={14} /> Add Font</button>
-                          <input type="file" ref={fontInputRef} style={{ display: 'none' }} accept=".ttf,.otf,.woff,.woff2" onChange={handleFontUpload} />
+                        <div className="fade-in font-picker-modal-content">
+                          {/* Search Bar & Custom Font Upload */}
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '10px' }}>
+                            <div style={{ position: 'relative', flex: 1 }}>
+                              <Search size={14} style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
+                              <input 
+                                type="text"
+                                value={fontSearchQuery}
+                                onChange={(e) => setFontSearchQuery(e.target.value)}
+                                placeholder="Search 100 fonts..."
+                                className="font-search-input"
+                                style={{
+                                  width: '100%',
+                                  padding: '7px 28px 7px 32px',
+                                  borderRadius: '10px',
+                                  border: '1px solid var(--border-color)',
+                                  background: 'var(--bg-elevated)',
+                                  color: 'var(--text-primary)',
+                                  fontSize: '12px',
+                                  outline: 'none'
+                                }}
+                              />
+                              {fontSearchQuery && (
+                                <button
+                                  type="button"
+                                  onClick={() => setFontSearchQuery('')}
+                                  style={{
+                                    position: 'absolute',
+                                    right: '8px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'var(--text-muted)',
+                                    cursor: 'pointer',
+                                    padding: '2px',
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                  }}
+                                >
+                                  <X size={12} />
+                                </button>
+                              )}
+                            </div>
+                            <button 
+                              onClick={() => fontInputRef.current?.click()} 
+                              className="font-scroll-btn-wide"
+                              style={{ width: 'auto', padding: '7px 12px', fontSize: '11.5px', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px', margin: 0 }}
+                            >
+                              <Plus size={13} /> Add Font
+                            </button>
+                            <input type="file" ref={fontInputRef} style={{ display: 'none' }} accept=".ttf,.otf,.woff,.woff2" onChange={handleFontUpload} />
+                          </div>
+
+                          {/* Category Filter Pills */}
+                          <div className="font-categories-bar" style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '8px', marginBottom: '10px', WebkitOverflowScrolling: 'touch' }}>
+                            {FONT_CATEGORIES.map(cat => {
+                              const isCatActive = selectedFontCategory === cat.id;
+                              const count = cat.id === 'all'
+                                ? FONT_OPTIONS.length + customFonts.length
+                                : FONT_OPTIONS.filter(f => f.category === cat.id).length;
+                              return (
+                                <button
+                                  key={cat.id}
+                                  type="button"
+                                  onClick={() => setSelectedFontCategory(cat.id)}
+                                  className={`font-category-chip ${isCatActive ? 'active' : ''}`}
+                                  style={{
+                                    padding: '4px 10px',
+                                    borderRadius: '16px',
+                                    border: isCatActive ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                                    background: isCatActive ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                                    color: isCatActive ? '#FFFFFF' : 'var(--text-secondary)',
+                                    fontSize: '11px',
+                                    fontWeight: isCatActive ? 700 : 500,
+                                    whiteSpace: 'nowrap',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    transition: 'all 0.15s ease'
+                                  }}
+                                >
+                                  <span>{cat.label}</span>
+                                  <span style={{
+                                    fontSize: '9.5px',
+                                    opacity: isCatActive ? 0.95 : 0.6,
+                                    background: isCatActive ? 'rgba(255,255,255,0.25)' : 'var(--bg-surface)',
+                                    padding: '1px 5px',
+                                    borderRadius: '8px'
+                                  }}>
+                                    {count}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Font Grid with Active Highlighting */}
                           <div className="fonts-grid">
-                            {customFonts.map(font => {
+                            {(selectedFontCategory === 'all' ? customFonts : []).map(font => {
                               const isFontActive = getCurrentTargetFont() === font.id;
                               return (
                                 <button 
@@ -6453,6 +6524,8 @@ export default function App() {
                               );
                             })}
                             {FONT_OPTIONS
+                              .filter(font => selectedFontCategory === 'all' || font.category === selectedFontCategory)
+                              .filter(font => !fontSearchQuery || font.label.toLowerCase().includes(fontSearchQuery.toLowerCase()))
                               .filter(font => FeatureAccessManager.isFeatureEnabled(`qr_font_${font.id}`))
                               .map(font => {
                                 const featId = `qr_font_${font.id}`;
@@ -6477,6 +6550,34 @@ export default function App() {
                                 );
                               })}
                           </div>
+
+                          {/* Empty State when Search Yields Zero Results */}
+                          {FONT_OPTIONS
+                            .filter(font => selectedFontCategory === 'all' || font.category === selectedFontCategory)
+                            .filter(font => !fontSearchQuery || font.label.toLowerCase().includes(fontSearchQuery.toLowerCase()))
+                            .length === 0 && (
+                              <div style={{ textAlign: 'center', padding: '24px 12px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                                <p style={{ margin: '0 0 6px 0', fontWeight: 600, color: 'var(--text-secondary)' }}>No fonts found</p>
+                                <p style={{ margin: 0, fontSize: '11.5px' }}>Try searching another keyword or switch category</p>
+                                {fontSearchQuery && (
+                                  <button
+                                    onClick={() => setFontSearchQuery('')}
+                                    style={{
+                                      marginTop: '10px',
+                                      padding: '4px 12px',
+                                      borderRadius: '12px',
+                                      background: 'var(--bg-elevated)',
+                                      border: '1px solid var(--border-color)',
+                                      color: 'var(--text-primary)',
+                                      fontSize: '11px',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    Clear Search
+                                  </button>
+                                )}
+                              </div>
+                            )}
                         </div>
                       )}
 
@@ -8295,15 +8396,83 @@ export default function App() {
                     </div>
                   )}
 
-                  {/* Typography & Font Family Selector */}
+                  {/* Typography & Font Family Selector (100 Fonts) */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '2px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <label className="form-label" style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                        Font Family
+                        Font Family (100 Fonts)
                       </label>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(214,0,54,0.1)', padding: '2px 8px', borderRadius: '6px' }}>
                         {templateFont}
                       </span>
+                    </div>
+
+                    {/* Search and Category Filter for TemplateModal */}
+                    <div style={{ position: 'relative' }}>
+                      <Search size={13} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
+                      <input 
+                        type="text"
+                        value={templateFontSearch}
+                        onChange={(e) => setTemplateFontSearch(e.target.value)}
+                        placeholder="Search 100 fonts..."
+                        className="font-search-input"
+                        style={{
+                          width: '100%',
+                          padding: '6px 26px 6px 30px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--border-color)',
+                          background: 'var(--bg-elevated)',
+                          color: 'var(--text-primary)',
+                          fontSize: '12px',
+                          outline: 'none'
+                        }}
+                      />
+                      {templateFontSearch && (
+                        <button
+                          type="button"
+                          onClick={() => setTemplateFontSearch('')}
+                          style={{
+                            position: 'absolute',
+                            right: '6px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--text-muted)',
+                            cursor: 'pointer',
+                            padding: '2px'
+                          }}
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="font-categories-bar" style={{ display: 'flex', gap: '5px', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
+                      {FONT_CATEGORIES.map(cat => {
+                        const isCatActive = templateFontCategory === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => setTemplateFontCategory(cat.id)}
+                            style={{
+                              padding: '3px 9px',
+                              borderRadius: '12px',
+                              border: isCatActive ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                              background: isCatActive ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                              color: isCatActive ? '#FFFFFF' : 'var(--text-secondary)',
+                              fontSize: '10.5px',
+                              fontWeight: isCatActive ? 700 : 500,
+                              whiteSpace: 'nowrap',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            {cat.label}
+                          </button>
+                        );
+                      })}
                     </div>
                     
                     <div style={{
@@ -8314,51 +8483,54 @@ export default function App() {
                       overflowY: 'auto',
                       paddingRight: '2px'
                     }}>
-                      {FONT_OPTIONS.map(font => {
-                        const isSelected = templateFont === font.id;
-                        return (
-                          <button
-                            key={font.id}
-                            type="button"
-                            onClick={() => {
-                              generatorIsDirtyRef.current = true;
-                              setTemplateFont(font.id);
-                              if (document.fonts) {
-                                const clean = font.id.replace(/['"]/g, '').trim();
-                                Promise.all([
-                                  document.fonts.load(`16px "${clean}"`).catch(() => {}),
-                                  document.fonts.load(`bold 16px "${clean}"`).catch(() => {}),
-                                  document.fonts.load(`700 16px "${clean}"`).catch(() => {}),
-                                  document.fonts.load(`400 16px "${clean}"`).catch(() => {})
-                                ]).then(() => {
+                      {FONT_OPTIONS
+                        .filter(font => templateFontCategory === 'all' || font.category === templateFontCategory)
+                        .filter(font => !templateFontSearch || font.label.toLowerCase().includes(templateFontSearch.toLowerCase()))
+                        .map(font => {
+                          const isSelected = templateFont === font.id;
+                          return (
+                            <button
+                              key={font.id}
+                              type="button"
+                              onClick={() => {
+                                generatorIsDirtyRef.current = true;
+                                setTemplateFont(font.id);
+                                if (document.fonts) {
+                                  const clean = font.id.replace(/['"]/g, '').trim();
+                                  Promise.all([
+                                    document.fonts.load(`16px "${clean}"`).catch(() => {}),
+                                    document.fonts.load(`bold 16px "${clean}"`).catch(() => {}),
+                                    document.fonts.load(`700 16px "${clean}"`).catch(() => {}),
+                                    document.fonts.load(`400 16px "${clean}"`).catch(() => {})
+                                  ]).then(() => {
+                                    if (renderCanvasRef.current) renderCanvasRef.current();
+                                  });
+                                }
+                                requestAnimationFrame(() => {
                                   if (renderCanvasRef.current) renderCanvasRef.current();
                                 });
-                              }
-                              requestAnimationFrame(() => {
-                                if (renderCanvasRef.current) renderCanvasRef.current();
-                              });
-                            }}
-                            style={{
-                              padding: '8px 10px',
-                              borderRadius: '10px',
-                              border: isSelected ? '1.5px solid var(--accent-primary)' : '1px solid var(--border-color)',
-                              background: isSelected ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                              color: isSelected ? '#FFFFFF' : 'var(--text-primary)',
-                              fontFamily: `"${font.id}", sans-serif`,
-                              fontSize: '13px',
-                              fontWeight: isSelected ? 700 : 500,
-                              cursor: 'pointer',
-                              textAlign: 'center',
-                              transition: 'all 0.15s ease',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}
-                          >
-                            {font.label}
-                          </button>
-                        );
-                      })}
+                              }}
+                              style={{
+                                padding: '8px 10px',
+                                borderRadius: '10px',
+                                border: isSelected ? '1.5px solid var(--accent-primary)' : '1px solid var(--border-color)',
+                                background: isSelected ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                                color: isSelected ? '#FFFFFF' : 'var(--text-primary)',
+                                fontFamily: `"${font.id}", sans-serif`,
+                                fontSize: '13px',
+                                fontWeight: isSelected ? 700 : 500,
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                transition: 'all 0.15s ease',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                            >
+                              {font.label}
+                            </button>
+                          );
+                        })}
                     </div>
                   </div>
 

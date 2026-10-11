@@ -6,10 +6,7 @@ import { TEMPLATE_ICONS } from '../../data/qrTemplates/templateIcons';
 
 const svgImageCache = {};
 
-const SINGLE_WEIGHT_FONTS = new Set([
-  'Anton', 'Bebas Neue', 'Courgette', 'Fredoka One', 'Great Vibes',
-  'Lobster', 'Luckiest Guy', 'Pacifico', 'Permanent Marker', 'Righteous', 'Satisfy'
-]);
+import { SINGLE_WEIGHT_FONTS } from '../../data/fontOptions';
 
 let _sharedOffscreenCanvas = null;
 function getSharedOffscreen(w, h) {

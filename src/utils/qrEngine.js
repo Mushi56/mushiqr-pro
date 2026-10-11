@@ -31,10 +31,8 @@ export const QR_TYPES = {
   LINKEDIN: 'linkedin',
 };
 
-export const SINGLE_WEIGHT_FONTS = new Set([
-  'Anton', 'Bebas Neue', 'Courgette', 'Fredoka One', 'Great Vibes',
-  'Lobster', 'Luckiest Guy', 'Pacifico', 'Permanent Marker', 'Righteous', 'Satisfy'
-]);
+import { SINGLE_WEIGHT_FONTS } from '../data/fontOptions';
+export { SINGLE_WEIGHT_FONTS };
 
 export function getCanvasFont(family, size, bold = true) {
   const cleanFamily = (family || 'Outfit').replace(/['"]/g, '').trim();
