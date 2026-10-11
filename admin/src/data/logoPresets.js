@@ -22,7 +22,7 @@ export const LOGO_PRESETS = [
   { slug: 'pdf', name: 'PDF Document', color: '#F44336', url: '/presets/pdf-svgrepo-com.svg', hasContainer: true },
 
   // ── Other Pre-styled / Standalone Icons ──
-  { slug: 'custom-icon', name: 'M Code Studio', color: '#D60036', url: '/logo.webp', hasContainer: true },
+  { slug: 'custom-icon', name: 'M Code Studio', color: '#EF1E34', url: '/logo.webp', hasContainer: true },
   { slug: 'github', name: 'GitHub', color: '#24292F', url: '/presets/github-square-svgrepo-com.svg', hasContainer: true },
   { slug: 'dribbble-square', name: 'Dribbble App', color: '#EA4C89', url: '/presets/dribbble-dribble-dribbbble-svgrepo-com.svg', hasContainer: true },
   { slug: 'google-maps', name: 'Google Maps', color: '#34A853', url: '/presets/google-maps.avif', hasContainer: true },

@@ -355,13 +355,13 @@ export function FullScreenPreviewModal({
             width: '60px',
             height: '60px',
             borderRadius: '50%',
-            backgroundColor: 'var(--accent-soft, rgba(214, 0, 54, 0.15))',
-            border: '1px solid var(--border-accent, rgba(214, 0, 54, 0.35))',
+            backgroundColor: 'var(--accent-soft, rgba(239, 30, 52, 0.15))',
+            border: '1px solid var(--border-accent, rgba(239, 30, 52, 0.35))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <Lock size={28} color="var(--accent-primary, #D60036)" />
+            <Lock size={28} color="var(--accent-primary, #EF1E34)" />
           </div>
           <div style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '0.3px' }}>
             Protected Preview Mode

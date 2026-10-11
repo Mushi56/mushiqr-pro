@@ -16,7 +16,7 @@ const CANONICAL_PLANS = [
   { id: 'free',    name: 'Free Tier',    color: '#64748b' },
   { id: 'weekly',  name: 'Weekly Pass',  color: '#8b5cf6' },
   { id: 'monthly', name: 'Monthly Pro',  color: '#3b82f6' },
-  { id: 'yearly',  name: 'Yearly VIP',   color: '#D60036' },
+  { id: 'yearly',  name: 'Yearly VIP',   color: '#EF1E34' },
 ];
 
 export default function FeatureMatrixManager({ onClose }) {
@@ -204,7 +204,7 @@ export default function FeatureMatrixManager({ onClose }) {
             onClick={handleSave}
             disabled={saving}
             style={{
-              background: '#D60036',
+              background: '#EF1E34',
               color: '#fff',
               border: 'none',
               borderRadius: 10,
@@ -215,7 +215,7 @@ export default function FeatureMatrixManager({ onClose }) {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)'
+              boxShadow: '0 4px 14px rgba(239, 30, 52, 0.35)'
             }}
           >
             <Save size={14} />

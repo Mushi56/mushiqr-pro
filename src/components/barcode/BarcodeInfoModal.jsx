@@ -46,7 +46,7 @@ export default function BarcodeInfoModal({
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #D6003D)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               TECHNICAL SPECIFICATION
             </span>
             <h3 style={{ fontSize: 18, fontWeight: 900, margin: '2px 0 0 0', color: 'var(--text-primary, #1C1C1E)' }}>
@@ -114,7 +114,7 @@ export default function BarcodeInfoModal({
         <button
           onClick={onClose}
           style={{
-            background: 'var(--accent-primary, #D6003D)',
+            background: 'var(--accent-primary, #EF1E34)',
             color: '#FFFFFF',
             border: 'none',
             borderRadius: 14,
@@ -122,7 +122,7 @@ export default function BarcodeInfoModal({
             fontSize: 14,
             fontWeight: 700,
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(214, 0, 61, 0.3)'
+            boxShadow: '0 4px 14px rgba(239, 30, 52, 0.3)'
           }}
         >
           Got It

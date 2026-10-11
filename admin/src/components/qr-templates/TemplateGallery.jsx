@@ -136,7 +136,7 @@ export const TemplateGallery = React.memo(function TemplateGallery({
                   fontWeight: isSelected ? 800 : 600,
                   cursor: 'pointer',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: isSelected ? '0 4px 12px rgba(214, 0, 54, 0.35)' : 'none',
+                  boxShadow: isSelected ? '0 4px 12px rgba(239, 30, 52, 0.35)' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',

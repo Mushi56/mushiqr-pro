@@ -53,7 +53,7 @@ export default function SplashScreen({ onFinish }) {
           width: '320px',
           height: '320px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(214, 0, 54, 0.22) 0%, rgba(139, 92, 246, 0.12) 50%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(239, 30, 52, 0.22) 0%, rgba(139, 92, 246, 0.12) 50%, transparent 70%)',
           filter: 'blur(40px)',
           transform: fadeState === 'visible' ? 'scale(1.15)' : 'scale(0.85)',
           transition: 'transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
@@ -81,7 +81,7 @@ export default function SplashScreen({ onFinish }) {
               position: 'absolute',
               inset: -8,
               borderRadius: '26px',
-              border: '2px solid rgba(214, 0, 54, 0.4)',
+              border: '2px solid rgba(239, 30, 52, 0.4)',
               animation: 'splashPulse 1.6s ease-out infinite'
             }}
           />
@@ -132,7 +132,7 @@ export default function SplashScreen({ onFinish }) {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: '#D60036',
+            background: '#EF1E34',
             animation: 'splashDot 1.2s ease-in-out infinite 0s'
           }}
         />
@@ -141,7 +141,7 @@ export default function SplashScreen({ onFinish }) {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: '#D60036',
+            background: '#EF1E34',
             animation: 'splashDot 1.2s ease-in-out infinite 0.2s'
           }}
         />
@@ -150,7 +150,7 @@ export default function SplashScreen({ onFinish }) {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: '#D60036',
+            background: '#EF1E34',
             animation: 'splashDot 1.2s ease-in-out infinite 0.4s'
           }}
         />

@@ -63,7 +63,6 @@ import {
   Wand2,
   Layers,
   AlertCircle,
-  AlertTriangle,
   LogOut,
   Edit2,
   ChevronLeft,
@@ -441,7 +440,7 @@ const LOGO_BG_GRADIENT_PRESETS = [
   'linear-gradient(135deg, #007AFF, #00F0FF)',
   'linear-gradient(135deg, #AF52DE, #FF2D55)',
   'linear-gradient(135deg, #34C759, #00F0FF)',
-  'linear-gradient(135deg, #7000FF, #FF007F)',
+  'linear-gradient(135deg, #7000FF, #FF3B50)',
   'linear-gradient(135deg, #FFCC00, #FF9500)',
   'linear-gradient(135deg, #00C5FF, #25D366)',
   'linear-gradient(135deg, #111111, #444444)'
@@ -450,7 +449,7 @@ const SWATCH_PRESETS = [
   '#000000', '#FFFFFF', '#FF3B30', '#34C759',
   '#007AFF', '#FFCC00', '#AF52DE', '#FF9500',
   '#5856D6', '#FF2D55', '#00F0FF', '#7000FF',
-  '#FF007F', '#00D1FF', '#FFD700', '#8E8E93'
+  '#FF3B50', '#00D1FF', '#FFD700', '#8E8E93'
 ];
 const SOCIAL_TEXTURES = [
   { slug: 'facebook', name: 'Facebook', url: '/textures/facebook_texture.webp' },
@@ -1170,77 +1169,11 @@ export default function App() {
     return pathPage;
   });
   const [previousPage, setPreviousPage] = useState('home');
-  const activePageRef = useRef(activePage);
-  activePageRef.current = activePage;
-  const previousPageRef = useRef(previousPage);
-  previousPageRef.current = previousPage;
-  const lastBackPress = useRef(0);
-  const resetGeneratorRef = useRef(null);
-
-  // ── Toast Notification State ──
-  const [toast, setToast] = useState(null);
-  const toastTimeoutRef = useRef(null);
-  const showToast = useCallback((message, type = 'success') => {
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    setToast({ message, type });
-    toastTimeoutRef.current = setTimeout(() => setToast(null), 3000);
-  }, []);
-
   const [isFirstLaunchLogin, setIsFirstLaunchLogin] = useState(false);
   const [theme, setTheme] = useState('auto');
   const [effectiveTheme, setEffectiveTheme] = useState('dark');
   const [historyFilter, setHistoryFilter] = useState('All');
-  useEffect(() => {
-    const onboardingCompleted = localStorage.getItem('mushi_onboarding_completed') === 'true';
-    let page = location.state?.activePage || getPageFromPath(location.pathname);
-    
-    // If not completed onboarding and on root or onboarding, force onboarding
-    if (!onboardingCompleted && (location.pathname === '/' || location.pathname === '/onboarding')) {
-      page = 'onboarding';
-    }
 
-    const currentActive = activePageRef.current;
-    if (page !== currentActive) {
-      // Browser back navigation intercept: warning toast when returning to Home
-      if (page === 'home' && currentActive !== 'home' && !Capacitor.isNativePlatform()) {
-        const now = Date.now();
-        if (now - lastBackPress.current >= 2000) {
-          lastBackPress.current = now;
-          // Revert browser route back to active page so user stays on screen
-          navigate(location.pathname === '/' ? `/${currentActive}` : location.pathname, { replace: false });
-          if (currentActive === 'generator' && generatorIsDirtyRef.current) {
-            showToast('Unsaved changes! Press back again to return to Home', 'warning');
-          } else {
-            showToast('Press back again to return to Home', 'warning');
-          }
-          return;
-        } else {
-          // Double-press confirmed: allow returning to Home
-          if (currentActive === 'generator' && generatorIsDirtyRef.current) {
-            generatorIsDirtyRef.current = false;
-            if (resetGeneratorRef.current) {
-              resetGeneratorRef.current();
-            }
-          }
-        }
-      }
-
-      setActivePage(page);
-      
-      if (page !== 'generator') {
-        setIsDataModalOpen(false);
-        setAdvPicker(prev => ({ ...prev, open: false }));
-        setFormatDropdownOpen(false);
-        setActiveBatchItemIndex(null);
-      }
-    }
-    if (location.state) {
-      if (location.state.qrType) setQrType(location.state.qrType);
-      if (location.state.qrData) setQrData(location.state.qrData);
-      if (location.state.isDataModalOpen !== undefined) setIsDataModalOpen(location.state.isDataModalOpen);
-      if (location.state.loadedBarcodeItem) setLoadedBarcodeItem(location.state.loadedBarcodeItem);
-    }
-  }, [location.pathname, location.state, navigate, showToast]);
   const goBack = () => {
     // 1. Close overlays first
     if (advPicker.open) {
@@ -1374,6 +1307,8 @@ export default function App() {
   // Tracks whether the user has meaningfully changed the QR generator since it was last reset/loaded
   const generatorIsDirtyRef = useRef(false);
   const ignoreDirtyRef = useRef(false);
+  const historyRef = useRef([]);
+  const historyIndexRef = useRef(-1);
   // â”€â”€ Batch QR â”€â”€
   const [batchItems, setBatchItems] = useState([]);
   const [activeBatchItemIndex, setActiveBatchItemIndex] = useState(null);
@@ -1726,6 +1661,7 @@ export default function App() {
   const tempCanvas = useRef(document.createElement('canvas'));
   const tempCtx = useRef(tempCanvas.current.getContext('2d'));
   const [qrMatrixInfo, setQrMatrixInfo] = useState(null);
+  const [toast, setToast] = useState(null);
   const [exportSuccessInfo, setExportSuccessInfo] = useState(null);
 
   const galleryQrOptions = useMemo(() => ({
@@ -1929,6 +1865,19 @@ export default function App() {
     }
   };
   const [batchPageDefaultType, setBatchPageDefaultType] = useState('QR');
+  // Helper: check if the generator has unsaved modifications
+  const hasUnsavedGeneratorChanges = () => {
+    if (generatorIsDirtyRef.current) return true;
+    if (historyIndex > 0 || (historyIndexRef.current && historyIndexRef.current > 0)) return true;
+    if (loadedItemId) return false;
+    if (selectedTemplate) return true;
+    if (logo) return true;
+    if (customTexts && customTexts.length > 0) return true;
+    if (qrType !== QR_TYPES.URL) return true;
+    if (qrData && qrData.url && qrData.url !== 'https://example.com') return true;
+    if (qrData && !qrData.url && Object.keys(qrData).length > 0) return true;
+    return false;
+  };
   // Custom navigation wrapper to track history
   const navigateTo = (page, type = 'QR') => {
     if (page === 'batch') {
@@ -1938,7 +1887,7 @@ export default function App() {
       setHistoryFilter(type === 'Scanned' ? 'Scanned' : type === 'Created' ? 'Created' : 'All');
     }
     if (page !== activePage) {
-      if (activePage === 'generator' && generatorIsDirtyRef.current) {
+      if (activePage === 'generator' && hasUnsavedGeneratorChanges()) {
         setUnsavedChangesModal({ isOpen: true, nextPage: page });
         return;
       }
@@ -2014,8 +1963,7 @@ export default function App() {
     return () => window.removeEventListener('appAction', handleAppAction);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const historyRef = useRef([]);
-  const historyIndexRef = useRef(-1);
+
 
   const getSnapshot = useCallback(() => {
     return {
@@ -2515,7 +2463,6 @@ export default function App() {
       generatorIsDirtyRef.current = false;
     }, 200);
   }, []);
-  resetGeneratorRef.current = resetGenerator;
 
   // Initial snapshot on mount
   useEffect(() => {
@@ -2530,6 +2477,9 @@ export default function App() {
 
   // Debounced auto-save for all parameter changes
   useEffect(() => {
+    if (!isInternalUpdate.current && !ignoreDirtyRef.current) {
+      generatorIsDirtyRef.current = true;
+    }
     const timer = setTimeout(() => {
       saveSnapshot();
     }, 600);
@@ -2607,7 +2557,7 @@ export default function App() {
         // Set overlaysWebView to TRUE and add padding in CSS for the 24dp status bar
         await StatusBar.setOverlaysWebView({ overlay: true });
         
-        // Initial state at the top of Home (over the #F01A4E red hero banner): White text/icons
+        // Initial state at the top of Home (over the #EF1E34 red hero banner): White text/icons
         if (activePage === 'home' && !isHomeScrolled) {
           await StatusBar.setStyle({ style: 'DARK' }); // White icons on red hero banner
           await StatusBar.setBackgroundColor({ color: '#00000000' });
@@ -2627,9 +2577,9 @@ export default function App() {
 
       // 2. PWA Browser Top Bar & Safe Area Theme-Color Synchronization
       try {
-        let targetColor = '#F01A4E';
+        let targetColor = '#EF1E34';
         if (activePage === 'home' && !isHomeScrolled) {
-          targetColor = '#F01A4E';
+          targetColor = '#EF1E34';
         } else {
           targetColor = effectiveTheme === 'light' ? '#FFFFFF' : '#0B0F19';
         }
@@ -2718,12 +2668,14 @@ export default function App() {
     }
     const nextPage = unsavedChangesModal.nextPage;
     setUnsavedChangesModal({ isOpen: false, nextPage: null });
+    generatorIsDirtyRef.current = false;
     resetGenerator();
     performNavigation(nextPage);
   };
   const handleDiscardAndExit = () => {
     const nextPage = unsavedChangesModal.nextPage;
     setUnsavedChangesModal({ isOpen: false, nextPage: null });
+    generatorIsDirtyRef.current = false;
     resetGenerator();
     performNavigation(nextPage);
   };
@@ -2738,12 +2690,94 @@ export default function App() {
       setErrorLevel(prev => prev === 'H' ? 'M' : prev);
     }
   }, [logo]);
+  // ── Centralized Route & Browser Back Button Synchronization ──
+  useEffect(() => {
+    const onboardingCompleted = localStorage.getItem('mushi_onboarding_completed') === 'true';
+    let page = location.state?.activePage || getPageFromPath(location.pathname);
+    
+    // If not completed onboarding and on root or onboarding, force onboarding
+    if (!onboardingCompleted && (location.pathname === '/' || location.pathname === '/onboarding')) {
+      page = 'onboarding';
+    }
+
+    if (page !== activePage) {
+      // Intercept browser / system back navigation when leaving generator
+      if (activePage === 'generator') {
+        // 1. If unsaved changes modal is open, dismiss it and remain on generator
+        if (unsavedChangesModal.isOpen) {
+          handleCancelExit();
+          navigate('/generator', { replace: true });
+          return;
+        }
+
+        // 2. If any popup/overlay inside generator is open, close that overlay and remain on generator
+        if (isFullScreenPreviewOpen) {
+          setIsFullScreenPreviewOpen(false);
+          navigate('/generator', { replace: true });
+          return;
+        }
+        if (isDataModalOpen) {
+          setIsDataModalOpen(false);
+          navigate('/generator', { replace: true });
+          return;
+        }
+        if (isTemplateTextModalOpen) {
+          setIsTemplateTextModalOpen(false);
+          navigate('/generator', { replace: true });
+          return;
+        }
+        if (advPicker?.open) {
+          setAdvPicker(prev => ({ ...prev, open: false }));
+          navigate('/generator', { replace: true });
+          return;
+        }
+        if (formatDropdownOpen) {
+          setFormatDropdownOpen(false);
+          navigate('/generator', { replace: true });
+          return;
+        }
+        if (cropModalConfig) {
+          setCropModalConfig(null);
+          navigate('/generator', { replace: true });
+          return;
+        }
+        if (logoPopup || textPopup || colorPopup || shapePopup) {
+          cancelEditing();
+          navigate('/generator', { replace: true });
+          return;
+        }
+
+        // 3. If generator has unsaved modifications, display the warning modal and prevent leaving
+        if (hasUnsavedGeneratorChanges()) {
+          setUnsavedChangesModal({ isOpen: true, nextPage: page });
+          navigate('/generator', { replace: true });
+          return;
+        }
+      }
+
+      setActivePage(page);
+      
+      if (page !== 'generator') {
+        setIsDataModalOpen(false);
+        setAdvPicker(prev => ({ ...prev, open: false }));
+        setFormatDropdownOpen(false);
+        setActiveBatchItemIndex(null);
+      }
+    }
+    if (location.state) {
+      if (location.state.qrType) setQrType(location.state.qrType);
+      if (location.state.qrData) setQrData(location.state.qrData);
+      if (location.state.isDataModalOpen !== undefined) setIsDataModalOpen(location.state.isDataModalOpen);
+      if (location.state.loadedBarcodeItem) setLoadedBarcodeItem(location.state.loadedBarcodeItem);
+    }
+  }, [location.pathname, location.state, activePage, unsavedChangesModal.isOpen, isFullScreenPreviewOpen, isDataModalOpen, isTemplateTextModalOpen, advPicker, formatDropdownOpen, cropModalConfig, logoPopup, textPopup, colorPopup, shapePopup]);
   // â”€â”€ Back Button Handling (Centralized) â”€â”€
+  const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
   backHandlerRef.current = () => {
     // 0. Dismiss unsaved changes modal if open
-    if (unsavedChangesModal?.isOpen) {
-      setUnsavedChangesModal({ isOpen: false, nextPage: null });
+    if (unsavedChangesModal.isOpen) {
+      handleCancelExit();
       return;
     }
     // 1. Dismiss full screen preview
@@ -2793,6 +2827,10 @@ export default function App() {
       setIsDataModalOpen(false);
       return;
     }
+    if (isTemplateTextModalOpen) {
+      setIsTemplateTextModalOpen(false);
+      return;
+    }
 
     // 8. Dismiss any active DOM modal dialogs / overlays
     const domModalClose = document.querySelector('.modal-overlay .modal-close, .delete-modal-overlay button:not(.confirm-btn), .paywall-modal .close-btn, .dialog-close-btn');
@@ -2808,37 +2846,24 @@ export default function App() {
       return;
     }
 
+    // 9.5. Generator unsaved changes check
+    if (activePage === 'generator') {
+      if (hasUnsavedGeneratorChanges()) {
+        setUnsavedChangesModal({ isOpen: true, nextPage: previousPage || 'home' });
+        return;
+      }
+      goBack();
+      return;
+    }
+
     // 10. Root navigation or exit on home
-    const now = Date.now();
     if (activePage === 'home') {
+      const now = Date.now();
       if (now - lastBackPress.current < 2000) {
         CapApp.exitApp();
       } else {
         lastBackPress.current = now;
         showToast('Press back again to exit', 'info');
-      }
-      return;
-    }
-
-    // 11. Navigating back to home screen from another page using system back button
-    const targetPage = (activePage === 'generator' || activePage === 'history')
-      ? (previousPage || 'home')
-      : 'home';
-
-    if (targetPage === 'home') {
-      if (now - lastBackPress.current < 2000) {
-        if (activePage === 'generator' && generatorIsDirtyRef.current) {
-          generatorIsDirtyRef.current = false;
-          resetGenerator();
-        }
-        performNavigation('home');
-      } else {
-        lastBackPress.current = now;
-        if (activePage === 'generator' && generatorIsDirtyRef.current) {
-          showToast('Unsaved changes! Press back again to return to Home', 'warning');
-        } else {
-          showToast('Press back again to return to Home', 'warning');
-        }
       }
     } else {
       goBack();
@@ -2856,18 +2881,8 @@ export default function App() {
     };
     const listenerPromise = setupListener();
     
-    // Browser / PopState fallback for web testing and PWA
-    const handlePopState = () => {
-      if (Capacitor.isNativePlatform()) return;
-      if (backHandlerRef.current) {
-        backHandlerRef.current();
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-
     return () => {
-      listenerPromise.then(l => l?.remove?.());
-      window.removeEventListener('popstate', handlePopState);
+      listenerPromise.then(l => l.remove());
     };
   }, []); // Run once on mount
   // â”€â”€ Update body theme â”€â”€
@@ -2892,7 +2907,10 @@ export default function App() {
     };
   }, []);
   // â”€â”€ Toast â”€â”€
-
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
   // â”€â”€ Copy to Clipboard â”€â”€
   const handleCopyToClipboard = () => {
     if (!canvasRef.current) return;
@@ -3048,6 +3066,7 @@ export default function App() {
       const resultObj = await downloadFn(exportCanvas, uniqueFilename, 'QR Codes');
       if (resultObj && typeof resultObj === 'object') {
         setExportSuccessInfo(resultObj);
+        generatorIsDirtyRef.current = false;
       } else {
         const result = resultObj;
         if (result === 'gallery') {
@@ -3057,6 +3076,7 @@ export default function App() {
         } else {
           showToast('Saved successfully');
         }
+        generatorIsDirtyRef.current = false;
       }
     } catch (err) {
       console.error('Download failed:', err);
@@ -3084,6 +3104,7 @@ export default function App() {
     if (savedEntry && savedEntry.id) {
       setLoadedItemId(savedEntry.id);
     }
+    generatorIsDirtyRef.current = false;
     showToast('Added to Saved QRs', 'success');
   };
   const getActiveStyle = () => {
@@ -4752,7 +4773,7 @@ export default function App() {
       {adminAnnouncement?.active && adminAnnouncement?.message && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9000,
-          background: adminAnnouncement.type === 'error' ? '#D60036' :
+          background: adminAnnouncement.type === 'error' ? '#EF1E34' :
                       adminAnnouncement.type === 'warning' ? '#f59e0b' :
                       adminAnnouncement.type === 'success' ? '#10b981' : '#3b82f6',
           color: '#fff', padding: 'calc(10px + env(safe-area-inset-top)) 20px 10px', fontSize: 13, fontWeight: 600,
@@ -4852,7 +4873,7 @@ export default function App() {
                       navigateTo('batch');
                     }}
                     style={{
-                      background: 'linear-gradient(135deg, #D6003D 0%, #FF2E63 100%)',
+                      background: 'linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%)',
                       border: 'none',
                       color: 'white',
                       padding: '8px 12px',
@@ -4924,7 +4945,7 @@ export default function App() {
                       background: 'var(--accent-gradient)',
                       borderRadius: '12px',
                       padding: '2px',
-                      boxShadow: '0 4px 14px rgba(214, 0, 54, 0.25)',
+                      boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
                       height: '38px',
                       opacity: !qrMatrixInfo ? 0.5 : 1,
                       pointerEvents: !qrMatrixInfo ? 'none' : 'auto'
@@ -5042,7 +5063,7 @@ export default function App() {
                           background: 'var(--accent-soft)',
                           padding: '3px 8px',
                           borderRadius: '6px',
-                          border: '1px solid rgba(214, 0, 54, 0.15)',
+                          border: '1px solid rgba(239, 30, 52, 0.15)',
                           letterSpacing: '0.5px'
                         }}>
                           {exportQuality === 'Low' && '512px'}
@@ -5110,7 +5131,7 @@ export default function App() {
                           </button>
                         ))}
                       </div>
-                      <div className="reliability-bar-track" style={{ height: '4px', background: 'rgba(214, 0, 54, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div className="reliability-bar-track" style={{ height: '4px', background: 'rgba(239, 30, 52, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
                         <div
                           className="reliability-bar-fill"
                           style={{ 
@@ -5203,7 +5224,7 @@ export default function App() {
                         Theme <span style={{
                           textTransform: 'capitalize',
                           marginLeft: 4,
-                          color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF007F' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF007F'),
+                          color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF3B50' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF3B50'),
                           fontWeight: 'bold'
                         }}>{theme}</span>
                       </button>
@@ -5288,7 +5309,7 @@ export default function App() {
                     color: '#fff',
                     fontSize: '12px',
                     fontWeight: 700,
-                    boxShadow: '0 4px 14px rgba(214,0,54,0.35)',
+                    boxShadow: '0 4px 14px rgba(239, 30, 52,0.35)',
                     transition: 'all 0.2s ease',
                     flexShrink: 0,
                     whiteSpace: 'nowrap'
@@ -5542,7 +5563,7 @@ export default function App() {
                     }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = 'scale(1.08)';
-                      e.currentTarget.style.borderColor = 'var(--accent-primary, #FF2A55)';
+                      e.currentTarget.style.borderColor = 'var(--accent-primary, #EF1E34)';
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = 'scale(1)';
@@ -6012,7 +6033,7 @@ export default function App() {
                                    });
                                  }}
                                  style={{
-                                   background: 'var(--accent-soft, rgba(214, 0, 54, 0.15))',
+                                   background: 'var(--accent-soft, rgba(239, 30, 52, 0.15))',
                                    border: '1px solid var(--accent-primary)',
                                    borderRadius: '10px',
                                    padding: '4px 10px',
@@ -6111,7 +6132,7 @@ export default function App() {
                                 fontSize: '13.5px',
                                 fontWeight: 700,
                                 cursor: 'pointer',
-                                boxShadow: '0 4px 14px rgba(214, 0, 54, 0.25)',
+                                boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
                                 transition: 'all 0.2s ease'
                               }}
                             >
@@ -7386,7 +7407,7 @@ export default function App() {
                               {/* â”€â”€ AI ILLUSTRATION ART QR SYNTHESIS CARD â”€â”€ */}
                               <div style={{
                                 background: aiArtQrEnabled 
-                                  ? 'linear-gradient(135deg, rgba(214,0,54,0.12) 0%, rgba(139,92,246,0.12) 100%)' 
+                                  ? 'linear-gradient(135deg, rgba(239, 30, 52,0.12) 0%, rgba(139,92,246,0.12) 100%)' 
                                   : 'var(--bg-elevated)',
                                 border: aiArtQrEnabled 
                                   ? '1.5px solid var(--accent-primary)' 
@@ -7396,7 +7417,7 @@ export default function App() {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '14px',
-                                boxShadow: aiArtQrEnabled ? '0 8px 24px rgba(214,0,54,0.15)' : 'none',
+                                boxShadow: aiArtQrEnabled ? '0 8px 24px rgba(239, 30, 52,0.15)' : 'none',
                                 transition: 'all 0.25s ease',
                                 boxSizing: 'border-box',
                                 width: '100%'
@@ -7413,7 +7434,7 @@ export default function App() {
                                       justifyContent: 'center',
                                       color: '#FFFFFF',
                                       flexShrink: 0,
-                                      boxShadow: aiArtQrEnabled ? '0 4px 12px rgba(214,0,54,0.3)' : 'none',
+                                      boxShadow: aiArtQrEnabled ? '0 4px 12px rgba(239, 30, 52,0.3)' : 'none',
                                       transition: 'all 0.2s ease'
                                     }}>
                                       <Sparkles size={18} />
@@ -7466,7 +7487,7 @@ export default function App() {
                                                 flexDirection: 'column',
                                                 gap: '3px',
                                                 transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                boxShadow: isSelected ? '0 4px 14px rgba(214, 0, 54, 0.22)' : 'none',
+                                                boxShadow: isSelected ? '0 4px 14px rgba(239, 30, 52, 0.22)' : 'none',
                                                 boxSizing: 'border-box',
                                                 minHeight: '52px',
                                                 justifyContent: 'center'
@@ -7765,7 +7786,7 @@ export default function App() {
                                           gap: '6px',
                                           width: '74px',
                                           height: '94px',
-                                          boxShadow: isActive ? '0 6px 14px rgba(214,0,54,0.2)' : 'none',
+                                          boxShadow: isActive ? '0 6px 14px rgba(239, 30, 52,0.2)' : 'none',
                                           transition: 'all 0.2s ease',
                                           overflow: 'hidden',
                                           position: 'relative'
@@ -8412,7 +8433,7 @@ export default function App() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 24px rgba(214, 0, 54, 0.4)',
+                boxShadow: '0 8px 24px rgba(239, 30, 52, 0.4)',
                 color: 'white',
                 zIndex: 101,
                 transition: 'transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67)'
@@ -8555,7 +8576,7 @@ export default function App() {
                       <label className="form-label" style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)' }}>
                         Font Family (100 Fonts)
                       </label>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(214,0,54,0.1)', padding: '2px 8px', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(239, 30, 52,0.1)', padding: '2px 8px', borderRadius: '6px' }}>
                         {templateFont}
                       </span>
                     </div>
@@ -8728,8 +8749,6 @@ export default function App() {
               <CheckCircle2 size={16} strokeWidth={2.5} />
             ) : toast.type === 'info' ? (
               <Info size={16} strokeWidth={2.5} />
-            ) : toast.type === 'warning' ? (
-              <AlertTriangle size={16} strokeWidth={2.5} />
             ) : (
               <AlertCircle size={16} strokeWidth={2.5} />
             )}
@@ -8819,7 +8838,7 @@ export default function App() {
               marginBottom: '24px',
               boxSizing: 'border-box'
             }}>
-              <FileImage size={20} color="var(--accent-primary, #D60036)" style={{ flexShrink: 0 }} />
+              <FileImage size={20} color="var(--accent-primary, #EF1E34)" style={{ flexShrink: 0 }} />
               <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
                 {exportSuccessInfo.filename}
               </span>
@@ -8859,7 +8878,7 @@ export default function App() {
                     padding: '14px',
                     borderRadius: '14px',
                     border: 'none',
-                    background: 'var(--accent-primary, #D60036)',
+                    background: 'var(--accent-primary, #EF1E34)',
                     color: '#fff',
                     fontWeight: 800,
                     fontSize: '15px',
@@ -9045,7 +9064,7 @@ export default function App() {
                 width: '56px',
                 height: '56px',
                 borderRadius: '50%',
-                background: 'rgba(214, 0, 54, 0.1)',
+                background: 'rgba(239, 30, 52, 0.1)',
                 color: 'var(--accent-primary)',
                 display: 'flex',
                 alignItems: 'center',
@@ -9076,7 +9095,7 @@ export default function App() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 12px rgba(214, 0, 54, 0.2)'
+                  boxShadow: '0 4px 12px rgba(239, 30, 52, 0.2)'
                 }}
               >
                 Update Changes
@@ -9087,14 +9106,14 @@ export default function App() {
                 style={{
                   background: 'rgba(255, 255, 255, 0.05)',
                   border: '1px solid var(--border-color)',
-                  color: '#D60036',
+                  color: '#EF1E34',
                   padding: '12px',
                   borderRadius: '12px',
                   fontWeight: 700,
                   fontSize: '14px',
                   cursor: 'pointer'
                 }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(214, 0, 54, 0.1)'}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 30, 52, 0.1)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
               >
                 Discard Changes
@@ -9205,7 +9224,7 @@ export default function App() {
                     showToast('Failed to update profile.');
                   }
                 }}
-                style={{ flex: 1, padding: '12px', border: 'none', background: 'var(--accent-gradient)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(214,0,54,0.2)' }}
+                style={{ flex: 1, padding: '12px', border: 'none', background: 'var(--accent-gradient)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 30, 52,0.2)' }}
               >
                 Save Changes
               </button>
@@ -9357,7 +9376,7 @@ export default function App() {
                   padding: '8px 4px',
                   borderRadius: '9px',
                   border: 'none',
-                  background: cloudSyncTab === 'sync' ? 'var(--accent-primary, #D60036)' : 'transparent',
+                  background: cloudSyncTab === 'sync' ? 'var(--accent-primary, #EF1E34)' : 'transparent',
                   color: cloudSyncTab === 'sync' ? '#FFFFFF' : 'var(--text-secondary, #94A3B8)',
                   fontSize: '12px',
                   fontWeight: 700,
@@ -9379,7 +9398,7 @@ export default function App() {
                   padding: '8px 4px',
                   borderRadius: '9px',
                   border: 'none',
-                  background: cloudSyncTab === 'restore' ? 'var(--accent-primary, #D60036)' : 'transparent',
+                  background: cloudSyncTab === 'restore' ? 'var(--accent-primary, #EF1E34)' : 'transparent',
                   color: cloudSyncTab === 'restore' ? '#FFFFFF' : 'var(--text-secondary, #94A3B8)',
                   fontSize: '12px',
                   fontWeight: 700,
@@ -9573,7 +9592,7 @@ export default function App() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                    boxShadow: '0 4px 14px rgba(214, 0, 54, 0.25)',
+                    boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
                     opacity: isSyncing ? 0.7 : 1
                   }}
                 >
@@ -9737,7 +9756,7 @@ export default function App() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px',
-                    boxShadow: '0 4px 14px rgba(214, 0, 54, 0.25)',
+                    boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
                     opacity: (isSyncing || (cloudCounts.cloudSavedCount === 0 && cloudCounts.cloudHistoryCount === 0)) ? 0.5 : 1
                   }}
                 >

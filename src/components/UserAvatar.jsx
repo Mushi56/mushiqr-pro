@@ -65,7 +65,7 @@ export default function UserAvatar({
     <div
       style={{
         ...containerStyle,
-        background: 'var(--accent-gradient, linear-gradient(135deg, #D60036 0%, #FF2E63 100%))',
+        background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%))',
         color: '#FFFFFF',
         fontWeight: 800,
         fontSize: `${Math.max(11, Math.round(size * 0.4))}px`,

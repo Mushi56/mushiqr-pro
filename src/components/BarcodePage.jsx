@@ -563,7 +563,7 @@ export default function BarcodePage({
                   if (onNavigate) onNavigate('batch', 'BARCODE');
                 }}
                 style={{
-                  background: 'linear-gradient(135deg, #D6003D 0%, #FF2E63 100%)',
+                  background: 'linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%)',
                   border: 'none',
                   color: 'white',
                   padding: '8px 12px',
@@ -632,10 +632,10 @@ export default function BarcodePage({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                background: 'linear-gradient(135deg, #D6003D 0%, #FF2E63 100%)',
+                background: 'linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%)',
                 borderRadius: 12,
                 padding: '2px',
-                boxShadow: '0 4px 14px rgba(214, 0, 61, 0.25)',
+                boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
                 height: 36,
                 opacity: !isDataValid ? 0.5 : 1,
                 pointerEvents: !isDataValid ? 'none' : 'auto'
@@ -731,10 +731,10 @@ export default function BarcodePage({
                         gap: 6,
                         aspectRatio: '1 / 1',
                         padding: 0,
-                        background: selectedFormat === label ? 'rgba(214, 0, 61, 0.08)' : 'var(--bg-hover, #F2F2F7)',
-                        border: selectedFormat === label ? '1.5px solid var(--accent-primary, #D6003D)' : '1px solid transparent',
+                        background: selectedFormat === label ? 'rgba(239, 30, 52, 0.08)' : 'var(--bg-hover, #F2F2F7)',
+                        border: selectedFormat === label ? '1.5px solid var(--accent-primary, #EF1E34)' : '1px solid transparent',
                         borderRadius: 12,
-                        color: selectedFormat === label ? 'var(--accent-primary, #D6003D)' : 'var(--text-primary, #1C1C1E)',
+                        color: selectedFormat === label ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #1C1C1E)',
                         cursor: 'pointer',
                         position: 'relative'
                       }}
@@ -776,7 +776,7 @@ export default function BarcodePage({
                       width: 44,
                       height: 26,
                       borderRadius: 16,
-                      background: isTransparentBg ? 'var(--accent-primary, #D6003D)' : 'var(--bg-hover, #E5E5EA)',
+                      background: isTransparentBg ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, #E5E5EA)',
                       border: 'none',
                       cursor: 'pointer',
                       position: 'relative',
@@ -930,7 +930,7 @@ export default function BarcodePage({
             boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
           }}
         >
-          <Scan size={14} color="var(--accent-primary, #D6003D)" />
+          <Scan size={14} color="var(--accent-primary, #EF1E34)" />
           <span>Test Scan</span>
         </button>
 
@@ -976,7 +976,7 @@ export default function BarcodePage({
             boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
           }}
         >
-          <Printer size={14} color="var(--accent-primary, #D6003D)" />
+          <Printer size={14} color="var(--accent-primary, #EF1E34)" />
           <span>Label Sheet</span>
         </button>
 
@@ -1208,7 +1208,7 @@ function undoRedoStyle(disabled) {
     borderRadius: 8,
     background: 'var(--bg-hover, rgba(0,0,0,0.04))',
     border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-    color: disabled ? 'var(--text-muted, #C7C7CC)' : 'var(--accent-primary, #D6003D)',
+    color: disabled ? 'var(--text-muted, #C7C7CC)' : 'var(--accent-primary, #EF1E34)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

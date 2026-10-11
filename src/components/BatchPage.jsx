@@ -450,46 +450,53 @@ export default function BatchPage({
     setIsExporting(true);
     setExportProgress(0);
 
+    // Preload logos only for QR codes
+    const logoCache = {};
+    const logoPromises = [];
+    if (batchType === 'QR') {
+      batchItems.forEach(item => {
+        const src = item.style?.logo?.src;
+        if (src && !logoCache[src]) {
+          logoCache[src] = null;
+          logoPromises.push(
+            new Promise((resolve) => {
+              const img = new Image();
+              img.crossOrigin = "anonymous";
+              img.onload = () => {
+                logoCache[src] = img;
+                resolve();
+              };
+              img.onerror = () => resolve();
+              img.src = src;
+            })
+          );
+        }
+      });
+    }
+
+    if (logoPromises.length > 0) {
+      await Promise.all(logoPromises);
+    }
+
+    const zip = new JSZip();
+    let exportSize = QUALITY_SIZES[exportQuality] || 1024;
+    
+    if (exportQuality === 'Ultra' && selectedTemplate?.dimensions) {
+      const match = selectedTemplate.dimensions.match(/^(\d+)/);
+      if (match) {
+        exportSize = parseInt(match[1], 10);
+      }
+    }
+
+    const zipFilenameMap = new Map();
+
+    // ── Chunked processing to prevent memory exhaustion on large batches ──
+    const CHUNK_SIZE = 50; // items per chunk before GC yield
+    const total = batchItems.length;
+
     // Reusable single worker canvases to prevent GPU memory thrashing and WebView OOM crashes
     const workerCanvas = document.createElement('canvas');
     const sharedJpgCanvas = (selectedFormat === 'ALL' || selectedFormat === 'JPG') ? document.createElement('canvas') : null;
-
-    try {
-      // Preload logos only for QR codes
-      const logoCache = {};
-      const logoPromises = [];
-      if (batchType === 'QR') {
-        batchItems.forEach(item => {
-          const src = item.style?.logo?.src;
-          if (src && !logoCache[src]) {
-            logoCache[src] = null;
-            logoPromises.push(
-              new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.onload = () => {
-                  logoCache[src] = img;
-                  resolve();
-                };
-                img.onerror = () => resolve();
-                img.src = src;
-              })
-            );
-          }
-        });
-      }
-
-      if (logoPromises.length > 0) {
-        await Promise.all(logoPromises);
-      }
-
-      const zip = new JSZip();
-      const exportSize = QUALITY_SIZES[exportQuality] || 1024;
-      const zipFilenameMap = new Map();
-
-      // ── Chunked processing to prevent memory exhaustion on large batches ──
-      const CHUNK_SIZE = 50; // items per chunk before GC yield
-      const total = batchItems.length;
 
     for (let idx = 0; idx < total; idx++) {
       if (isCancelledRef.current) {
@@ -614,7 +621,7 @@ export default function BatchPage({
       setExportProgress(Math.round(((idx + 1) / total) * 90));
 
       // Yield to the browser every item so GC can reclaim memory and UI stays responsive
-      await new Promise(resolve => setTimeout(resolve, 8));
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
 
     // Release worker canvas GPU memory after export loop
@@ -625,65 +632,58 @@ export default function BatchPage({
       sharedJpgCanvas.height = 0;
     }
 
-    // 90-100% for zip packaging
-    const content = await zip.generateAsync({ type: 'blob', compression: 'STORE' }, (metadata) => {
-      setExportProgress(90 + Math.round((metadata.percent / 100) * 10));
-    });
-    const defaultName = `mushi-${batchType.toLowerCase()}-batch`;
-    const cleanBaseName = customZipFileName.trim().replace(/[^a-zA-Z0-9-_]/g, '_') || defaultName;
-    const archiveName = `${cleanBaseName}.zip`;
-    if (Capacitor.isNativePlatform()) {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        try {
-          if (!reader.result || typeof reader.result !== 'string') {
-            throw new Error('Failed to read archive as data URL');
-          }
-          const base64Data = reader.result.split(',')[1];
-          const zipCategory = batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes';
-          const uri = await saveZipNative(base64Data, archiveName, zipCategory);
-          setIsExporting(false);
-          setExportSuccessInfo({
-            filename: archiveName,
-            count: total,
-            isNative: true,
-            fileUri: uri
-          });
-        } catch (nativeErr) {
-          console.error('Failed to save native zip:', nativeErr);
-          alert('Failed to save ZIP archive to device storage.');
-          setIsExporting(false);
-        }
-      };
-      reader.onerror = (readErr) => {
-        console.error('FileReader error:', readErr);
-        alert('Failed to read batch archive.');
-        setIsExporting(false);
-      };
-      reader.readAsDataURL(content);
-    } else {
-      saveAs(content, archiveName);
-      setIsExporting(false);
-      setExportSuccessInfo({
-        filename: archiveName,
-        count: total,
-        isNative: false
+    try {
+      // 90-100% for zip packaging
+      const content = await zip.generateAsync({ type: 'blob', compression: 'STORE' }, (metadata) => {
+        setExportProgress(90 + Math.round((metadata.percent / 100) * 10));
       });
+      const defaultName = `mushi-${batchType.toLowerCase()}-batch`;
+      const cleanBaseName = customZipFileName.trim().replace(/[^a-zA-Z0-9-_]/g, '_') || defaultName;
+      const archiveName = `${cleanBaseName}.zip`;
+      if (Capacitor.isNativePlatform()) {
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          try {
+            if (!reader.result || typeof reader.result !== 'string') {
+              throw new Error('Failed to read archive as data URL');
+            }
+            const base64Data = reader.result.split(',')[1];
+            const zipCategory = batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes';
+            const uri = await saveZipNative(base64Data, archiveName, zipCategory);
+            setIsExporting(false);
+            setExportSuccessInfo({
+              filename: archiveName,
+              count: total,
+              isNative: true,
+              fileUri: uri
+            });
+          } catch (nativeErr) {
+            console.error('Failed to save native zip:', nativeErr);
+            alert('Failed to save ZIP archive to device storage.');
+            setIsExporting(false);
+          }
+        };
+        reader.onerror = (readErr) => {
+          console.error('FileReader error:', readErr);
+          alert('Failed to read batch archive.');
+          setIsExporting(false);
+        };
+        reader.readAsDataURL(content);
+      } else {
+        saveAs(content, archiveName);
+        setIsExporting(false);
+        setExportSuccessInfo({
+          filename: archiveName,
+          count: total,
+          isNative: false
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Failed to package ZIP archive.');
+      setIsExporting(false);
     }
-  } catch (err) {
-    console.error('Batch export failure:', err);
-    alert('Failed to package ZIP archive. ' + (err?.message || ''));
-    setIsExporting(false);
-    setExportProgress(0);
-  } finally {
-    workerCanvas.width = 0;
-    workerCanvas.height = 0;
-    if (sharedJpgCanvas) {
-      sharedJpgCanvas.width = 0;
-      sharedJpgCanvas.height = 0;
-    }
-  }
-};
+  };
 
   return (
     <div style={{
@@ -722,7 +722,7 @@ export default function BatchPage({
               fontWeight: 800,
               fontSize: '14px',
               cursor: isProcessing ? 'default' : 'pointer',
-              boxShadow: batchType === 'QR' ? '0 4px 14px rgba(214, 0, 54, 0.35)' : 'none',
+              boxShadow: batchType === 'QR' ? '0 4px 14px rgba(239, 30, 52, 0.35)' : 'none',
               transition: 'all 0.2s ease',
               position: 'relative',
               overflow: 'hidden',
@@ -767,7 +767,7 @@ export default function BatchPage({
                   justifyContent: 'center',
                   padding: '6px',
                   borderRadius: '8px',
-                  background: batchType === 'QR' ? 'rgba(255,255,255,0.2)' : 'rgba(214, 0, 54, 0.1)',
+                  background: batchType === 'QR' ? 'rgba(255,255,255,0.2)' : 'rgba(239, 30, 52, 0.1)',
                   color: batchType === 'QR' ? '#ffffff' : 'var(--accent-primary)',
                   transition: 'all 0.2s ease'
                 }}>
@@ -790,7 +790,7 @@ export default function BatchPage({
               fontWeight: 800,
               fontSize: '14px',
               cursor: isProcessing ? 'default' : 'pointer',
-              boxShadow: batchType === 'BARCODE' ? '0 4px 14px rgba(214, 0, 54, 0.35)' : 'none',
+              boxShadow: batchType === 'BARCODE' ? '0 4px 14px rgba(239, 30, 52, 0.35)' : 'none',
               transition: 'all 0.2s ease',
               position: 'relative',
               overflow: 'hidden',
@@ -835,7 +835,7 @@ export default function BatchPage({
                   justifyContent: 'center',
                   padding: '6px',
                   borderRadius: '8px',
-                  background: batchType === 'BARCODE' ? 'rgba(255,255,255,0.2)' : 'rgba(214, 0, 54, 0.1)',
+                  background: batchType === 'BARCODE' ? 'rgba(255,255,255,0.2)' : 'rgba(239, 30, 52, 0.1)',
                   color: batchType === 'BARCODE' ? '#ffffff' : 'var(--accent-primary)',
                   transition: 'all 0.2s ease'
                 }}>
@@ -906,7 +906,7 @@ export default function BatchPage({
                   justifyContent: 'center',
                   gap: '8px',
                   position: 'relative',
-                  boxShadow: activeImportMode === 'spreadsheet' ? '0 4px 12px rgba(214,0,54,0.3)' : 'none',
+                  boxShadow: activeImportMode === 'spreadsheet' ? '0 4px 12px rgba(239, 30, 52,0.3)' : 'none',
                   transition: 'all 0.2s ease'
                 }}
               >
@@ -942,7 +942,7 @@ export default function BatchPage({
                         width: '56px',
                         height: '56px',
                         borderRadius: '50%',
-                        background: 'rgba(214, 0, 54, 0.1)',
+                        background: 'rgba(239, 30, 52, 0.1)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -962,7 +962,7 @@ export default function BatchPage({
                         width: '64px',
                         height: '64px',
                         borderRadius: '20px',
-                        background: 'rgba(214, 0, 54, 0.1)',
+                        background: 'rgba(239, 30, 52, 0.1)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -1023,8 +1023,8 @@ export default function BatchPage({
                   gap: '8px',
                   padding: '10px 14px',
                   borderRadius: '12px',
-                  background: 'rgba(214, 0, 54, 0.08)',
-                  border: '1px solid rgba(214, 0, 54, 0.2)',
+                  background: 'rgba(239, 30, 52, 0.08)',
+                  border: '1px solid rgba(239, 30, 52, 0.2)',
                   fontSize: '12px',
                   color: 'var(--text-primary)'
                 }}>
@@ -1151,12 +1151,12 @@ export default function BatchPage({
                       padding: '11px 12px',
                       borderRadius: '12px',
                       border: 'none',
-                      background: 'var(--accent-gradient, linear-gradient(135deg, #D60036, #FF3B62))',
+                      background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34, #FF5FD2))',
                       color: '#FFFFFF',
                       fontWeight: 800,
                       fontSize: '12px',
                       cursor: 'pointer',
-                      boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)',
+                      boxShadow: '0 4px 14px rgba(239, 30, 52, 0.35)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -1547,7 +1547,7 @@ export default function BatchPage({
             <div className="glass-panel" style={{ borderRadius: '24px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '15px', fontWeight: 700 }}>Batch Summary</span>
-                <span style={{ fontSize: '13px', background: 'rgba(214, 0, 54, 0.1)', color: 'var(--accent-primary)', padding: '4px 10px', borderRadius: '12px', fontWeight: 700 }}>
+                <span style={{ fontSize: '13px', background: 'rgba(239, 30, 52, 0.1)', color: 'var(--accent-primary)', padding: '4px 10px', borderRadius: '12px', fontWeight: 700 }}>
                   {batchItems.length} {batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes'}
                 </span>
               </div>
@@ -1595,7 +1595,7 @@ export default function BatchPage({
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
-                      boxShadow: '0 4px 12px rgba(214, 0, 54, 0.2)'
+                      boxShadow: '0 4px 12px rgba(239, 30, 52, 0.2)'
                     }}
                   >
                     <Edit3 size={16} />
@@ -1647,7 +1647,7 @@ export default function BatchPage({
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
-                      boxShadow: '0 4px 12px rgba(214, 0, 54, 0.2)'
+                      boxShadow: '0 4px 12px rgba(239, 30, 52, 0.2)'
                     }}
                   >
                     <Edit3 size={16} />
@@ -1762,10 +1762,10 @@ export default function BatchPage({
                         background: 'var(--accent-soft)',
                         padding: '3px 8px',
                         borderRadius: '6px',
-                        border: '1px solid rgba(214, 0, 54, 0.15)',
+                        border: '1px solid rgba(239, 30, 52, 0.15)',
                         letterSpacing: '0.5px'
                       }}>
-                        {QUALITY_SIZES[exportQuality] ? `${QUALITY_SIZES[exportQuality]}px` : '1024px'}
+                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '2400px')}
                       </span>
                     </div>
                     <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
@@ -1882,7 +1882,7 @@ export default function BatchPage({
                       justifyContent: 'center',
                       gap: '8px',
                       cursor: 'pointer',
-                      boxShadow: '0 8px 24px rgba(214, 0, 54, 0.25)',
+                      boxShadow: '0 8px 24px rgba(239, 30, 52, 0.25)',
                       marginTop: '10px',
                       position: 'relative'
                     }}
@@ -2156,13 +2156,13 @@ export default function BatchPage({
               width: '64px',
               height: '64px',
               borderRadius: '50%',
-              background: 'rgba(214, 0, 54, 0.12)',
-              color: 'var(--accent-primary, #D60036)',
+              background: 'rgba(239, 30, 52, 0.12)',
+              color: 'var(--accent-primary, #EF1E34)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               marginBottom: '18px',
-              border: '1px solid rgba(214, 0, 54, 0.25)'
+              border: '1px solid rgba(239, 30, 52, 0.25)'
             }}>
               <RefreshCw size={28} className="animate-spin" />
             </div>
@@ -2188,13 +2188,13 @@ export default function BatchPage({
               <div style={{
                 height: '100%',
                 width: `${exportProgress}%`,
-                background: 'var(--accent-gradient, linear-gradient(135deg, #D60036, #FF3B62))',
+                background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34, #FF5FD2))',
                 borderRadius: '999px',
                 transition: 'width 0.15s ease-out'
               }} />
             </div>
 
-            <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--accent-primary, #D60036)', fontFamily: 'monospace' }}>
+            <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', fontFamily: 'monospace' }}>
               {exportProgress}% Completed
             </span>
 
@@ -2298,7 +2298,7 @@ export default function BatchPage({
               marginBottom: '24px',
               boxSizing: 'border-box'
             }}>
-              <FileArchive size={20} color="var(--accent-primary, #D60036)" style={{ flexShrink: 0 }} />
+              <FileArchive size={20} color="var(--accent-primary, #EF1E34)" style={{ flexShrink: 0 }} />
               <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>
                 {exportSuccessInfo.filename}
               </span>
@@ -2338,12 +2338,12 @@ export default function BatchPage({
                     padding: '14px',
                     borderRadius: '14px',
                     border: 'none',
-                    background: 'var(--accent-gradient, linear-gradient(135deg, #D60036, #FF3B62))',
+                    background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34, #FF5FD2))',
                     color: '#FFFFFF',
                     fontWeight: 800,
                     fontSize: '15px',
                     cursor: 'pointer',
-                    boxShadow: '0 8px 20px rgba(214, 0, 54, 0.35)',
+                    boxShadow: '0 8px 20px rgba(239, 30, 52, 0.35)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

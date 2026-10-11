@@ -105,7 +105,7 @@ export default function SubscribersManager() {
         <button
           onClick={() => setGrantModal(true)}
           style={{
-            background: '#D60036',
+            background: '#EF1E34',
             color: '#fff',
             border: 'none',
             borderRadius: 10,
@@ -116,7 +116,7 @@ export default function SubscribersManager() {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)'
+            boxShadow: '0 4px 14px rgba(239, 30, 52, 0.35)'
           }}
         >
           <UserPlus size={14} /> Grant Premium
@@ -197,7 +197,7 @@ export default function SubscribersManager() {
                         )}
                       </td>
                       <td style={{ padding: '14px 18px' }}>
-                        <span style={{ fontSize: 12, fontWeight: 800, textTransform: 'capitalize', color: sub.planId === 'yearly' ? '#D60036' : sub.planId === 'monthly' ? '#3b82f6' : 'var(--ad-text)' }}>
+                        <span style={{ fontSize: 12, fontWeight: 800, textTransform: 'capitalize', color: sub.planId === 'yearly' ? '#EF1E34' : sub.planId === 'monthly' ? '#3b82f6' : 'var(--ad-text)' }}>
                           {sub.planId || (sub.isPro ? 'Pro' : 'Free')}
                         </span>
                       </td>
@@ -326,7 +326,7 @@ export default function SubscribersManager() {
 
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', padding: '14px 20px', borderTop: `1px solid var(--ad-border)` }}>
               <button onClick={() => setGrantModal(false)} style={{ padding: '8px 16px', borderRadius: 8, border: `1px solid var(--ad-border)`, background: 'transparent', color: 'var(--ad-text-sec)', cursor: 'pointer', fontSize: 12 }}>Cancel</button>
-              <button onClick={handleManualGrant} disabled={granting} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#D60036', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 800 }}>
+              <button onClick={handleManualGrant} disabled={granting} style={{ padding: '8px 18px', borderRadius: 8, border: 'none', background: '#EF1E34', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 800 }}>
                 {granting ? 'Granting...' : 'Confirm Update'}
               </button>
             </div>

@@ -18,7 +18,7 @@ import { ALL_TEMPLATES_REGISTRY } from '../data/qrTemplates';
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const FEATURE_CATEGORIES = {
-  QR_GENERATOR:      { id: 'QR_GENERATOR',      name: 'QR Code Generator',   icon: 'QrCode',    color: '#D60036', desc: 'QR formats, engine, styling, logos & templates' },
+  QR_GENERATOR:      { id: 'QR_GENERATOR',      name: 'QR Code Generator',   icon: 'QrCode',    color: '#EF1E34', desc: 'QR formats, engine, styling, logos & templates' },
   BARCODE_GENERATOR: { id: 'BARCODE_GENERATOR', name: 'Barcode Generator',   icon: 'Barcode',   color: '#3B82F6', desc: '1D & 2D barcode standards, engine & styling' },
   BULK_GENERATOR:    { id: 'BULK_GENERATOR',    name: 'Bulk Generation',     icon: 'Layers',    color: '#8B5CF6', desc: 'Batch generator, spreadsheet grid & ZIP export' },
   SCANNER:           { id: 'SCANNER',           name: 'Scanner',             icon: 'Scan',      color: '#10B981', desc: 'Live camera lens, image scan & auto-detection' },

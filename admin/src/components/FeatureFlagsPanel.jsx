@@ -62,11 +62,11 @@ const SUBCATEGORY_META = {
 
   // Home Screen Subcategories
   'Dashboard':          { icon: LayoutDashboard, color: '#F59E0B', label: 'Dashboard' },
-  'Quick Actions':      { icon: Zap,             color: '#D60036', label: 'Quick Actions' },
+  'Quick Actions':      { icon: Zap,             color: '#EF1E34', label: 'Quick Actions' },
 
   // Saved Subcategories
   'Collection':         { icon: Bookmark,        color: '#EC4899', label: 'Collection' },
-  'Save / Remove':      { icon: Heart,           color: '#D60036', label: 'Save / Remove' },
+  'Save / Remove':      { icon: Heart,           color: '#EF1E34', label: 'Save / Remove' },
   'Search & Filter':    { icon: Search,          color: '#3B82F6', label: 'Search & Filter' },
 
   // History Subcategories
@@ -85,7 +85,7 @@ const PLAN_COLORS = {
   free:    '#8B8FA8',
   weekly:  '#8B5CF6',
   monthly: '#F59E0B',
-  yearly:  '#D60036'
+  yearly:  '#EF1E34'
 };
 
 const PLAN_LABELS = {
@@ -722,7 +722,7 @@ export default function FeatureFlagsPanel({
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 3,
                     padding: '2px 7px', borderRadius: 100,
-                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(214, 0, 54, 0.15))',
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(239, 30, 52, 0.15))',
                     color: '#F59E0B', border: '1px solid rgba(245, 158, 11, 0.35)',
                     fontSize: 10, fontWeight: 800
                   }}>
@@ -1006,10 +1006,10 @@ export default function FeatureFlagsPanel({
             type="submit"
             disabled={submitting}
             style={{
-              marginTop: 10, background: '#D60036',
+              marginTop: 10, background: '#EF1E34',
               color: '#fff', border: 'none', borderRadius: 12, padding: '14px',
               fontSize: 14, fontWeight: 800, cursor: submitting ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)'
+              boxShadow: '0 4px 14px rgba(239, 30, 52, 0.35)'
             }}
           >
             {submitting ? 'Saving...' : (isEdit ? 'Save Changes' : 'Create Feature Flag')}
@@ -1058,7 +1058,7 @@ export default function FeatureFlagsPanel({
         <button
           onClick={openCreateModal}
           style={{
-            background: '#D60036',
+            background: '#EF1E34',
             border: 'none',
             borderRadius: 12,
             color: '#FFFFFF',
@@ -1069,7 +1069,7 @@ export default function FeatureFlagsPanel({
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)',
+            boxShadow: '0 4px 14px rgba(239, 30, 52, 0.35)',
             flexShrink: 0
           }}
         >
@@ -1531,9 +1531,9 @@ export default function FeatureFlagsPanel({
               type="button"
               onClick={() => setFilterOpen(false)}
               style={{
-                padding: '8px 18px', borderRadius: 10, background: '#D60036',
+                padding: '8px 18px', borderRadius: 10, background: '#EF1E34',
                 border: 'none', color: '#fff', fontSize: 12, fontWeight: 800, cursor: 'pointer',
-                boxShadow: '0 2px 10px rgba(214, 0, 54, 0.3)'
+                boxShadow: '0 2px 10px rgba(239, 30, 52, 0.3)'
               }}
             >
               Done
@@ -2042,7 +2042,7 @@ function IOSSwitch({ checked, onChange, disabled }) {
         height: 26,
         borderRadius: 100,
         border: 'none',
-        background: checked ? '#D60036' : 'rgba(148, 163, 184, 0.3)',
+        background: checked ? '#EF1E34' : 'rgba(148, 163, 184, 0.3)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         position: 'relative',
         transition: 'background 0.2s',

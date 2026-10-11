@@ -15,10 +15,10 @@ import { setFeatureFlagCloud, setPlanFeaturesCloud } from '../services/adminData
 import { db } from '../services/firebase';
 import { doc, onSnapshot, collection } from 'firebase/firestore';
 
-const C={bg:'#09090f',bgEl:'#10101a',bgCard:'#14141e',sidebar:'#0c0c15',border:'rgba(255,255,255,0.06)',accent:'#D60036',purple:'#8b5cf6',green:'#10b981',orange:'#f59e0b',blue:'#3b82f6',red:'#ef4444',text:'#f0f0f8',textSec:'#8b8fa8',textMut:'#44465a'};
+const C={bg:'#09090f',bgEl:'#10101a',bgCard:'#14141e',sidebar:'#0c0c15',border:'rgba(255,255,255,0.06)',accent:'#EF1E34',purple:'#8b5cf6',green:'#10b981',orange:'#f59e0b',blue:'#3b82f6',red:'#ef4444',text:'#f0f0f8',textSec:'#8b8fa8',textMut:'#44465a'};
 
 const CAT_META={
-  QR_GENERATOR:      {icon:QrCode,color:'#D60036',name:'QR Code Generator'},
+  QR_GENERATOR:      {icon:QrCode,color:'#EF1E34',name:'QR Code Generator'},
   BARCODE_GENERATOR: {icon:Barcode,color:'#3b82f6',name:'Barcode Generator'},
   BULK_GENERATOR:    {icon:Package,color:'#8b5cf6',name:'Bulk Generation'},
   SCANNER:           {icon:ScanLine,color:'#10b981',name:'Scanner'},
@@ -30,7 +30,7 @@ const CAT_META={
 
 const SUBCAT_META = {
   // QR Generator
-  'Content':               { icon: Type, color: '#D60036' },
+  'Content':               { icon: Type, color: '#EF1E34' },
   'Color':                 { icon: Palette, color: '#8b5cf6' },
   'Style':                 { icon: Grid3x3, color: '#ec4899' },
   'Logo':                  { icon: Image, color: '#f59e0b' },
@@ -58,11 +58,11 @@ const SUBCAT_META = {
 
   // Home
   'Dashboard':             { icon: LayoutDashboard, color: '#f59e0b' },
-  'Quick Actions':         { icon: Zap, color: '#D60036' },
+  'Quick Actions':         { icon: Zap, color: '#EF1E34' },
 
   // Saved
   'Collection':            { icon: Bookmark, color: '#ec4899' },
-  'Save / Remove':         { icon: Heart, color: '#D60036' },
+  'Save / Remove':         { icon: Heart, color: '#EF1E34' },
   'Search & Filter':       { icon: Search, color: '#3b82f6' },
 
   // History
@@ -77,7 +77,7 @@ const SUBCAT_META = {
   'Account & Security':    { icon: Shield, color: '#10b981' }
 };
 
-const PLAN_COLORS={free:'#8b8fa8',weekly:'#8b5cf6',monthly:'#f59e0b',yearly:'#D60036'};
+const PLAN_COLORS={free:'#8b8fa8',weekly:'#8b5cf6',monthly:'#f59e0b',yearly:'#EF1E34'};
 const PLAN_LABELS={free:'Free',weekly:'Weekly',monthly:'Monthly',yearly:'Yearly'};
 
 function PlanToggle({planId,checked,onChange,disabled}){
@@ -405,7 +405,7 @@ export default function FeatureManagementPanel({initialPlanFilter=null}){
                 padding: '9px 16px',
                 borderRadius: 12,
                 border: `1.5px solid ${selectedCat === null ? C.accent : C.border}`,
-                background: selectedCat === null ? 'rgba(214,0,54,0.14)' : C.bgCard,
+                background: selectedCat === null ? 'rgba(239, 30, 52,0.14)' : C.bgCard,
                 color: selectedCat === null ? C.text : C.textSec,
                 fontSize: 13,
                 fontWeight: selectedCat === null ? 800 : 600,

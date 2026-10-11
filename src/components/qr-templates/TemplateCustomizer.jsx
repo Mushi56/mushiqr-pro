@@ -39,7 +39,7 @@ export function TemplateCustomizer({
           fontSize: '11px',
           fontWeight: 700,
           color: 'var(--accent-primary)',
-          background: 'rgba(214, 0, 54, 0.1)',
+          background: 'rgba(239, 30, 52, 0.1)',
           padding: '3px 8px',
           borderRadius: '8px',
           textTransform: 'uppercase'

@@ -118,7 +118,7 @@ export default function BarcodeTestScanModal({
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #D6003D)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               VERIFICATION TEST
             </span>
             <h3 style={{ fontSize: 18, fontWeight: 900, margin: '2px 0 0 0', color: 'var(--text-primary, #1C1C1E)' }}>
@@ -208,8 +208,8 @@ export default function BarcodeTestScanModal({
               <button
                 onClick={startCamera}
                 style={{
-                  background: 'rgba(214, 0, 61, 0.08)',
-                  border: '1px solid rgba(214, 0, 61, 0.2)',
+                  background: 'rgba(239, 30, 52, 0.08)',
+                  border: '1px solid rgba(239, 30, 52, 0.2)',
                   borderRadius: 12,
                   padding: '10px 14px',
                   display: 'flex',
@@ -218,7 +218,7 @@ export default function BarcodeTestScanModal({
                   fontSize: 12,
                   fontWeight: 700,
                   cursor: 'pointer',
-                  color: 'var(--accent-primary, #D6003D)'
+                  color: 'var(--accent-primary, #EF1E34)'
                 }}
               >
                 <RefreshCw size={14} />
@@ -290,7 +290,7 @@ export default function BarcodeTestScanModal({
                 startCamera();
               }}
               style={{
-                background: 'var(--accent-primary, #D6003D)',
+                background: 'var(--accent-primary, #EF1E34)',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: 14,
@@ -302,7 +302,7 @@ export default function BarcodeTestScanModal({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
-                boxShadow: '0 4px 14px rgba(214, 0, 61, 0.3)'
+                boxShadow: '0 4px 14px rgba(239, 30, 52, 0.3)'
               }}
             >
               <RefreshCw size={16} />

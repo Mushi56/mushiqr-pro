@@ -795,7 +795,7 @@ export function renderBarcode(canvas, text, options = {}) {
       canvas.height = 120;
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, 320, 120);
-      ctx.fillStyle = '#D60036';
+      ctx.fillStyle = '#EF1E34';
       ctx.font = 'bold 13px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Invalid Data Format', 160, 50);

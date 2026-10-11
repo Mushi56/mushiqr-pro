@@ -92,7 +92,7 @@ export default function BarcodeDimensionsTab({
                 padding: '8px 16px',
                 borderRadius: 12,
                 border: 'none',
-                background: mode === m ? 'var(--accent-primary, #D6003D)' : 'transparent',
+                background: mode === m ? 'var(--accent-primary, #EF1E34)' : 'transparent',
                 color: mode === m ? '#FFFFFF' : 'var(--text-secondary, #636366)',
                 fontWeight: 700,
                 fontSize: 12,
@@ -118,7 +118,7 @@ export default function BarcodeDimensionsTab({
                 borderRadius: 8,
                 border: 'none',
                 background: unit === u ? '#FFFFFF' : 'transparent',
-                color: unit === u ? 'var(--accent-primary, #D6003D)' : 'var(--text-muted, #8E8E93)',
+                color: unit === u ? 'var(--accent-primary, #EF1E34)' : 'var(--text-muted, #8E8E93)',
                 fontWeight: 700,
                 fontSize: 11,
                 cursor: 'pointer',
@@ -200,15 +200,15 @@ export default function BarcodeDimensionsTab({
           </div>
 
           <div style={{
-            background: 'rgba(214, 0, 61, 0.04)',
-            border: '1px solid rgba(214, 0, 61, 0.15)',
+            background: 'rgba(239, 30, 52, 0.04)',
+            border: '1px solid rgba(239, 30, 52, 0.15)',
             borderRadius: 14,
             padding: '12px 14px',
             display: 'flex',
             alignItems: 'center',
             gap: 10
           }}>
-            <Info size={16} color="var(--accent-primary, #D6003D)" style={{ flexShrink: 0 }} />
+            <Info size={16} color="var(--accent-primary, #EF1E34)" style={{ flexShrink: 0 }} />
             <span style={{ fontSize: 11, color: 'var(--text-secondary, #636366)', lineHeight: 1.4 }}>
               Use standard dimensions for best scanning and print reliability in industrial/retail environments.
             </span>

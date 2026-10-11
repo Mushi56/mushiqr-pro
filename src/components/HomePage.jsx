@@ -506,11 +506,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         {/* Static Hero Section with Smooth Subtle Top-to-Bottom Ruby Gradient */}
         <div style={{
           width: '100%',
-          backgroundColor: '#F01A4E',
+          backgroundColor: '#EF1E34',
           backgroundImage: `
-            radial-gradient(ellipse 65% 50% at 0% 100%, rgba(185, 10, 50, 0.45) 0%, transparent 70%),
-            radial-gradient(ellipse 65% 50% at 100% 100%, rgba(185, 10, 50, 0.45) 0%, transparent 70%),
-            linear-gradient(180deg, #F01A4E 0%, #F01A4E 35%, #E21345 68%, #C60835 100%)
+            radial-gradient(ellipse 65% 50% at 0% 100%, rgba(181, 11, 32, 0.45) 0%, transparent 70%),
+            radial-gradient(ellipse 65% 50% at 100% 100%, rgba(181, 11, 32, 0.45) 0%, transparent 70%),
+            linear-gradient(180deg, #EF1E34 0%, #EF1E34 35%, #DE172D 68%, #C60E23 100%)
           `,
           borderRadius: '0 0 28px 28px',
           marginTop: '-64px',
@@ -520,7 +520,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           flexDirection: 'column',
           gap: '14px',
           color: '#FFFFFF',
-          boxShadow: '0 18px 40px rgba(198, 8, 53, 0.35), inset 0 -1px 2px rgba(255, 255, 255, 0.22)',
+          boxShadow: '0 18px 40px rgba(198, 14, 159, 0.35), inset 0 -1px 2px rgba(255, 255, 255, 0.22)',
           position: 'relative',
           overflow: 'hidden'
         }}>
@@ -633,7 +633,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 width: '150px', height: '150px',
                 background: isDark 
                   ? 'radial-gradient(circle, rgba(255, 30, 86, 0.35) 0%, rgba(184, 0, 38, 0.15) 50%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 42, 85, 0.2) 0%, transparent 70%)',
+                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.2) 0%, transparent 70%)',
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
               }} />
 
@@ -668,11 +668,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     width: '32px',
                     height: '32px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #FF2A55 0%, #B3002D 100%)',
+                    background: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(255, 42, 85, 0.25)',
+                    boxShadow: '0 4px 10px rgba(239, 30, 52, 0.25)',
                     flexShrink: 0
                   }}>
                     <QrCode size={16} color="#FFFFFF" />
@@ -690,7 +690,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     <div style={{
                       fontSize: '8.5px',
                       fontWeight: 700,
-                      color: isDark ? '#FF4D79' : '#D60036',
+                      color: isDark ? '#FF4D79' : '#EF1E34',
                       marginTop: '2px',
                       lineHeight: 1
                     }}>
@@ -723,7 +723,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     width: '18px',
                     height: '18px',
                     borderRadius: '6px',
-                    background: 'rgba(214, 0, 54, 0.15)',
+                    background: 'rgba(239, 30, 52, 0.15)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -737,11 +737,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   width: '20px',
                   height: '20px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #FF2A55 0%, #B3002D 100%)',
+                  background: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(255, 42, 85, 0.3)'
+                  boxShadow: '0 2px 6px rgba(239, 30, 52, 0.3)'
                 }}>
                   <ChevronRight size={12} color="#FFFFFF" />
                 </div>
@@ -1042,7 +1042,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`qr_${option.id}`} position="floating" size={10} />
-                <div className="quick-option-icon-wrapper" style={{ background: 'rgba(214, 0, 54, 0.08)', color: '#D60036' }}>
+                <div className="quick-option-icon-wrapper" style={{ background: 'rgba(239, 30, 52, 0.08)', color: '#EF1E34' }}>
                   {React.cloneElement(option.icon, { size: 20 })}
                 </div>
                 <span style={{
@@ -1096,7 +1096,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`barcode_${option.id}`} position="floating" size={10} />
-                <div className="quick-option-icon-wrapper" style={{ background: 'rgba(214, 0, 54, 0.08)', color: '#D60036' }}>
+                <div className="quick-option-icon-wrapper" style={{ background: 'rgba(239, 30, 52, 0.08)', color: '#EF1E34' }}>
                   {getBarcodeIcon(option.id)}
                 </div>
                 <span style={{
@@ -1129,8 +1129,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   setRecentItems([]);
                 }}
                 style={{
-                  background: 'rgba(214, 0, 54, 0.1)', border: 'none',
-                  color: '#D60036', fontSize: '13px', fontWeight: 600,
+                  background: 'rgba(239, 30, 52, 0.1)', border: 'none',
+                  color: '#EF1E34', fontSize: '13px', fontWeight: 600,
                   display: 'flex', alignItems: 'center', gap: '4px',
                   cursor: 'pointer', borderRadius: '8px', padding: '6px 12px'
                 }}

@@ -301,7 +301,7 @@ export default function SavedPage({ onLoadQR, onNavigate }) {
                   transition: 'all 0.2s'
                 }}
                 title="Clear Saved Items"
-                onMouseEnter={(e) => e.currentTarget.style.color = '#D60036'}
+                onMouseEnter={(e) => e.currentTarget.style.color = '#EF1E34'}
                 onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
               >
                 <Trash2 size={16} />
@@ -320,7 +320,7 @@ export default function SavedPage({ onLoadQR, onNavigate }) {
                     { label: 'Last Hour', val: 1 },
                     { label: 'Last 24 Hours', val: 24 },
                     { label: 'Last 7 Days', val: 168 },
-                    { label: 'All Time', val: -1, color: '#D60036' }
+                    { label: 'All Time', val: -1, color: '#EF1E34' }
                   ].map(opt => (
                     <button
                       key={opt.label}
@@ -459,9 +459,9 @@ export default function SavedPage({ onLoadQR, onNavigate }) {
                         onClick={(e) => handleDelete(e, item)}
                         title="Delete from Saved"
                         style={{
-                          background: 'rgba(214, 0, 54, 0.08)',
+                          background: 'rgba(239, 30, 52, 0.08)',
                           border: 'none',
-                          color: 'var(--accent-primary, #D60036)',
+                          color: 'var(--accent-primary, #EF1E34)',
                           cursor: 'pointer',
                           padding: '6px',
                           borderRadius: '8px',
@@ -472,11 +472,11 @@ export default function SavedPage({ onLoadQR, onNavigate }) {
                           flexShrink: 0
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(214, 0, 54, 0.2)';
+                          e.currentTarget.style.background = 'rgba(239, 30, 52, 0.2)';
                           e.currentTarget.style.transform = 'scale(1.08)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'rgba(214, 0, 54, 0.08)';
+                          e.currentTarget.style.background = 'rgba(239, 30, 52, 0.08)';
                           e.currentTarget.style.transform = 'scale(1)';
                         }}
                       >

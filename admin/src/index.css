@@ -28,11 +28,11 @@
   --text-muted: #64748B;
 
   /* Brand Crimson Accent */
-  --accent-primary: #D60036;
-  --accent-secondary: #B5002D;
-  --accent-gradient: linear-gradient(135deg, #D60036 0%, #B5002D 100%);
-  --accent-glow: rgba(214, 0, 54, 0.35);
-  --accent-soft: rgba(214, 0, 54, 0.18);
+  --accent-primary: #EF1E34;
+  --accent-secondary: #B50B20;
+  --accent-gradient: linear-gradient(135deg, #EF1E34 0%, #B50B20 100%);
+  --accent-glow: rgba(239, 30, 52, 0.35);
+  --accent-soft: rgba(239, 30, 52, 0.18);
 
   --border-color: rgba(255, 255, 255, 0.08);
 

@@ -22,23 +22,23 @@ export function useAdminTheme() {
 export const getTokens = (isDark = false) => ({
   isDark,
   // Brand accents matching QR Code Generator Pro app
-  primaryPink:   '#D60036',
-  primaryPurple: '#B5002D',
+  primaryPink:   '#EF1E34',
+  primaryPurple: '#B50B20',
   successGreen:  '#00E676',
   warningOrange: '#FFD54F',
   infoBlue:      '#29B6F6',
   dangerRed:     '#FF1744',
-  accent:        '#D60036',
-  accentLow:     'rgba(214, 0, 54, 0.18)',
-  purple:        '#B5002D',
+  accent:        '#EF1E34',
+  accentLow:     'rgba(239, 30, 52, 0.18)',
+  purple:        '#B50B20',
   green:         '#00E676',
   orange:        '#FFD54F',
   blue:          '#29B6F6',
   red:           '#FF1744',
 
   // Gradient accents
-  pinkPurpleGrad: 'linear-gradient(135deg, #D60036 0%, #B5002D 100%)',
-  pinkSoftGrad:   'linear-gradient(135deg, rgba(214, 0, 54, 0.18) 0%, rgba(181, 0, 45, 0.18) 100%)',
+  pinkPurpleGrad: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)',
+  pinkSoftGrad:   'linear-gradient(135deg, rgba(239, 30, 52, 0.18) 0%, rgba(181, 0, 45, 0.18) 100%)',
 
   // Sidebar (Deep midnight slate matching app)
   sidebarBg:      '#0B0F19',
@@ -46,8 +46,8 @@ export const getTokens = (isDark = false) => ({
   sidebarText:    '#94A3B8',
   sidebarTextAct: '#FFFFFF',
   sidebarItemHov: 'rgba(255, 255, 255, 0.06)',
-  sidebarActiveBg:'linear-gradient(135deg, rgba(214, 0, 54, 0.18) 0%, rgba(181, 0, 45, 0.18) 100%)',
-  sidebarActiveBorder: '#D60036',
+  sidebarActiveBg:'linear-gradient(135deg, rgba(239, 30, 52, 0.18) 0%, rgba(181, 0, 45, 0.18) 100%)',
+  sidebarActiveBorder: '#EF1E34',
 
   // Content Area (Midnight Slate in Dark, Clean Slate in Light)
   bg:             isDark ? '#0B0F19' : '#F1F5F9',

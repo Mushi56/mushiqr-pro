@@ -106,7 +106,7 @@ export const ALL_EYE_STYLES = [
 ];
 
 export const ALL_LOGO_PRESETS = [
-  { slug: 'custom-icon', name: 'Custom App Icon', color: '#D60036', url: '/presets/Icon.avif' },
+  { slug: 'custom-icon', name: 'Custom App Icon', color: '#EF1E34', url: '/presets/Icon.avif' },
   { slug: 'facebook', name: 'Facebook', color: '#1877F2', url: '/presets/facebook.avif' },
   { slug: 'whatsapp', name: 'WhatsApp', color: '#25D366', url: '/presets/whatsapp.avif' },
   { slug: 'instagram', name: 'Instagram', color: '#E4405F', url: '/presets/instagram.avif' },
@@ -531,7 +531,7 @@ function TemplateItemControlTile({ tpl, enabled, isPaid, updating, onToggleEnabl
 
 // ─── MINI CANVAS RENDERERS ──────────────────────────────────────────────────
 
-function MiniDotCanvas({ dotStyle, color = '#D60036' }) {
+function MiniDotCanvas({ dotStyle, color = '#EF1E34' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -598,7 +598,7 @@ function MiniDotCanvas({ dotStyle, color = '#D60036' }) {
   );
 }
 
-function MiniEyeCanvas({ eyeStyle, color = '#D60036' }) {
+function MiniEyeCanvas({ eyeStyle, color = '#EF1E34' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -640,7 +640,7 @@ function MiniEyeCanvas({ eyeStyle, color = '#D60036' }) {
 }
 
 // ─── SHAPE THUMBNAIL RENDERER (Matching Mushi QR Pro App.jsx) ──────────────
-export const renderShapeThumbnail = (shapeId, color = '#D60036') => {
+export const renderShapeThumbnail = (shapeId, color = '#EF1E34') => {
   switch (shapeId) {
     case 'full':
     case 'solid':
@@ -1015,7 +1015,7 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
       {feedbackToast && (
         <div style={{
           position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(15, 18, 33, 0.96)', border: '1.5px solid #D60036',
+          background: 'rgba(15, 18, 33, 0.96)', border: '1.5px solid #EF1E34',
           borderRadius: 100, padding: '8px 18px', color: '#fff',
           fontSize: 12, fontWeight: 800, boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
           zIndex: 999999, display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap'
@@ -1034,10 +1034,10 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
           <div style={{
             width: 40, height: 40, borderRadius: 12,
-            background: 'linear-gradient(135deg, rgba(214, 0, 54, 0.18) 0%, rgba(255, 77, 157, 0.15) 100%)',
-            border: '1.5px solid rgba(214, 0, 54, 0.4)', color: '#D60036',
+            background: 'linear-gradient(135deg, rgba(239, 30, 52, 0.18) 0%, rgba(255, 77, 157, 0.15) 100%)',
+            border: '1.5px solid rgba(239, 30, 52, 0.4)', color: '#EF1E34',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            boxShadow: '0 4px 12px rgba(214, 0, 54, 0.15)'
+            boxShadow: '0 4px 12px rgba(239, 30, 52, 0.15)'
           }}>
             <QrCode size={22} strokeWidth={2.4} />
           </div>
@@ -1046,7 +1046,7 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
               <h1 style={{ fontSize: 16, fontWeight: 900, color: 'var(--ad-text)', margin: 0, letterSpacing: '-0.3px', lineHeight: 1.2 }}>
                 QR Generator Studio
               </h1>
-              <span style={{ fontSize: 9.5, fontWeight: 800, padding: '2px 7px', borderRadius: 100, background: 'rgba(214, 0, 54, 0.15)', color: '#D60036' }}>
+              <span style={{ fontSize: 9.5, fontWeight: 800, padding: '2px 7px', borderRadius: 100, background: 'rgba(239, 30, 52, 0.15)', color: '#EF1E34' }}>
                 Live Assets
               </span>
             </div>
@@ -1095,11 +1095,11 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px',
                   borderRadius: 12, border: 'none',
-                  background: isActive ? '#D60036' : 'var(--ad-input)',
+                  background: isActive ? '#EF1E34' : 'var(--ad-input)',
                   color: isActive ? '#FFFFFF' : 'var(--ad-text-sec)',
                   fontSize: 11.5, fontWeight: isActive ? 800 : 600, cursor: 'pointer',
                   whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: isActive ? '0 4px 12px rgba(214, 0, 54, 0.35)' : 'none'
+                  boxShadow: isActive ? '0 4px 12px rgba(239, 30, 52, 0.35)' : 'none'
                 }}
               >
                 <IconC size={13} />
@@ -1133,11 +1133,11 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px',
                     borderRadius: 12, border: 'none',
-                    background: isSubActive ? 'rgba(214, 0, 54, 0.18)' : 'var(--ad-input)',
-                    color: isSubActive ? '#D60036' : 'var(--ad-text-sec)',
+                    background: isSubActive ? 'rgba(239, 30, 52, 0.18)' : 'var(--ad-input)',
+                    color: isSubActive ? '#EF1E34' : 'var(--ad-text-sec)',
                     fontSize: 11, fontWeight: isSubActive ? 800 : 600, cursor: 'pointer',
                     whiteSpace: 'nowrap', flexShrink: 0, transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: isSubActive ? '0 2px 8px rgba(214, 0, 54, 0.2)' : 'none'
+                    boxShadow: isSubActive ? '0 2px 8px rgba(239, 30, 52, 0.2)' : 'none'
                   }}
                 >
                   {SubIcon && <SubIcon size={12} />}
@@ -1145,7 +1145,7 @@ export default function VisualQRControlStudio({ currentUser, isDark = false }) {
                   {st.count !== undefined && (
                     <span style={{
                       fontSize: 8.5, padding: '1px 6px', borderRadius: 10,
-                      background: isSubActive ? '#D60036' : 'var(--ad-card)',
+                      background: isSubActive ? '#EF1E34' : 'var(--ad-card)',
                       color: isSubActive ? '#fff' : 'var(--ad-text-sec)', fontWeight: 800
                     }}>
                       {st.count}
@@ -2272,10 +2272,10 @@ function SectionCatalog({ title, subtitle, icon: Icon, onMakeFree, onMakePro, on
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, width: '100%' }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
-            background: 'linear-gradient(135deg, rgba(214, 0, 54, 0.25) 0%, rgba(181, 0, 45, 0.2) 100%)',
-            color: '#D60036',
+            background: 'linear-gradient(135deg, rgba(239, 30, 52, 0.25) 0%, rgba(181, 0, 45, 0.2) 100%)',
+            color: '#EF1E34',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            boxShadow: '0 2px 8px rgba(214, 0, 54, 0.25)'
+            boxShadow: '0 2px 8px rgba(239, 30, 52, 0.25)'
           }}>
             <Icon size={18} strokeWidth={2.4} />
           </div>
@@ -2421,8 +2421,8 @@ function ItemControlTile({ name, desc, badge, color, imageUrl, gradientFill, cus
         ) : (
           <div style={{
             width: 38, height: 38, borderRadius: 10,
-            background: isOff ? (isDarkMode ? 'rgba(148, 163, 184, 0.15)' : '#F1F5F9') : (isPaid ? (isDarkMode ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7') : (isDarkMode ? 'rgba(214, 0, 54, 0.12)' : 'rgba(214, 0, 54, 0.08)')),
-            color: isOff ? 'var(--ad-text-sec)' : (isPaid ? '#F59E0B' : '#D60036'),
+            background: isOff ? (isDarkMode ? 'rgba(148, 163, 184, 0.15)' : '#F1F5F9') : (isPaid ? (isDarkMode ? 'rgba(245, 158, 11, 0.2)' : '#FEF3C7') : (isDarkMode ? 'rgba(239, 30, 52, 0.12)' : 'rgba(239, 30, 52, 0.08)')),
+            color: isOff ? 'var(--ad-text-sec)' : (isPaid ? '#F59E0B' : '#EF1E34'),
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
           }}>
             {Icon && <Icon size={18} strokeWidth={2.4} />}

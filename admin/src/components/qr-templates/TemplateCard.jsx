@@ -271,7 +271,7 @@ export const TemplateCard = React.memo(function TemplateCard({
         overflow:        'hidden',
         cursor:          'pointer',
         border:          isSelected ? '2.5px solid var(--accent-primary)' : '1px solid var(--border-color)',
-        boxShadow:       isSelected ? '0 6px 20px rgba(255, 42, 85, 0.35)' : '0 2px 10px rgba(0,0,0,0.1)',
+        boxShadow:       isSelected ? '0 6px 20px rgba(239, 30, 52, 0.35)' : '0 2px 10px rgba(0,0,0,0.1)',
         transform:       isHovered ? 'translateY(-2px)' : (isSelected ? 'scale(1.02)' : 'scale(1)'),
         transition:      'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
         backgroundColor: 'var(--bg-elevated)',
@@ -355,7 +355,7 @@ export const TemplateCard = React.memo(function TemplateCard({
             width:          '28px',
             height:         '28px',
             borderRadius:   '50%',
-            background:     isFavorite ? 'rgba(255, 42, 85, 0.95)' : 'rgba(15, 23, 42, 0.65)',
+            background:     isFavorite ? 'rgba(239, 30, 52, 0.95)' : 'rgba(15, 23, 42, 0.65)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
             border:         isFavorite ? '1px solid rgba(255, 255, 255, 0.35)' : '1px solid rgba(255, 255, 255, 0.18)',
@@ -364,7 +364,7 @@ export const TemplateCard = React.memo(function TemplateCard({
             alignItems:     'center',
             justifyContent: 'center',
             cursor:         'pointer',
-            boxShadow:      isFavorite ? '0 2px 12px rgba(255, 42, 85, 0.55)' : '0 2px 8px rgba(0, 0, 0, 0.3)',
+            boxShadow:      isFavorite ? '0 2px 12px rgba(239, 30, 52, 0.55)' : '0 2px 8px rgba(0, 0, 0, 0.3)',
             transition:     'all 0.22s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
           title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}

@@ -161,7 +161,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
             : currentSlide === 0
               ? 'radial-gradient(circle, rgba(255, 30, 86, 0.28) 0%, rgba(184, 0, 38, 0.12) 50%, transparent 70%)'
               : currentSlide === 1
-              ? 'radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(214, 0, 54, 0.12) 50%, transparent 70%)'
+              ? 'radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(239, 30, 52, 0.12) 50%, transparent 70%)'
               : 'radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(59, 130, 246, 0.14) 50%, transparent 70%)',
           filter: isLight ? 'blur(55px)' : 'blur(60px)',
           transition: 'background 0.5s ease',

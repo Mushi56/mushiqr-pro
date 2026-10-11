@@ -29,8 +29,8 @@ const RouteLoader = () => (
       <div style={{
         width: 44,
         height: 44,
-        border: '3px solid rgba(214, 0, 54, 0.2)',
-        borderTopColor: '#D60036',
+        border: '3px solid rgba(239, 30, 52, 0.2)',
+        borderTopColor: '#EF1E34',
         borderRadius: '50%',
         animation: 'spin 0.8s linear infinite'
       }} />

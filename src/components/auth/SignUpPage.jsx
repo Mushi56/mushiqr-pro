@@ -229,7 +229,7 @@ export default function SignUpPage({ onNavigate, onSuccess, theme, effectiveThem
           borderRadius: '50%',
           background: isLight
             ? 'radial-gradient(circle at 45% 45%, rgba(16, 185, 129, 0.18) 0%, rgba(255, 30, 86, 0.1) 40%, rgba(56, 189, 248, 0.08) 65%, transparent 75%)'
-            : 'radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(214, 0, 54, 0.12) 50%, transparent 70%)',
+            : 'radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(239, 30, 52, 0.12) 50%, transparent 70%)',
           filter: isLight ? 'blur(55px)' : 'blur(60px)',
           pointerEvents: 'none',
           zIndex: 0

@@ -177,7 +177,7 @@ export default function BarcodeLabelModal({
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #D6003D)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               PRINT / LABEL MODE
             </span>
             <h3 style={{ fontSize: 18, fontWeight: 900, margin: '2px 0 0 0', color: 'var(--text-primary, #1C1C1E)' }}>
@@ -291,9 +291,9 @@ export default function BarcodeLabelModal({
                   style={{
                     padding: '8px 10px',
                     borderRadius: 10,
-                    border: paper === p ? '2px solid var(--accent-primary, #D6003D)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
-                    background: paper === p ? 'rgba(214, 0, 61, 0.06)' : 'var(--bg-elevated, #FFFFFF)',
-                    color: paper === p ? 'var(--accent-primary, #D6003D)' : 'var(--text-primary, #1C1C1E)',
+                    border: paper === p ? '2px solid var(--accent-primary, #EF1E34)' : '1px solid var(--border-color, rgba(0,0,0,0.08))',
+                    background: paper === p ? 'rgba(239, 30, 52, 0.06)' : 'var(--bg-elevated, #FFFFFF)',
+                    color: paper === p ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #1C1C1E)',
                     fontWeight: 700,
                     fontSize: 12,
                     textTransform: 'uppercase',
@@ -312,7 +312,7 @@ export default function BarcodeLabelModal({
               <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary, #636366)', textTransform: 'uppercase' }}>
                 Labels to Print
               </label>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary, #D6003D)' }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-primary, #EF1E34)' }}>
                 {copies} labels
               </span>
             </div>
@@ -333,7 +333,7 @@ export default function BarcodeLabelModal({
           onClick={handleGeneratePDF}
           disabled={isGenerating}
           style={{
-            background: 'var(--accent-primary, #D6003D)',
+            background: 'var(--accent-primary, #EF1E34)',
             color: '#FFFFFF',
             border: 'none',
             borderRadius: 14,
@@ -341,7 +341,7 @@ export default function BarcodeLabelModal({
             fontSize: 14,
             fontWeight: 800,
             cursor: isGenerating ? 'wait' : 'pointer',
-            boxShadow: '0 4px 14px rgba(214, 0, 61, 0.3)',
+            boxShadow: '0 4px 14px rgba(239, 30, 52, 0.3)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

@@ -20,7 +20,7 @@ export default function AppIcon({ size = 42, shadow = false, noBackground = fals
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        boxShadow: (shadow && !noBackground) ? `0 ${size * 0.08}px ${size * 0.2}px rgba(214,0,54,0.3)` : 'none',
+        boxShadow: (shadow && !noBackground) ? `0 ${size * 0.08}px ${size * 0.2}px rgba(239, 30, 52,0.3)` : 'none',
         ...style
       }}
     >

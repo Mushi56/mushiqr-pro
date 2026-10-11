@@ -415,7 +415,7 @@ export default function PremiumModal() {
                   <p>Subscribe with Google Play (Recommended)</p>
                 </div>
                 <div className="pro-radio">
-                  <div className="pro-radio-dot" style={{ background: '#E60050' }} />
+                  <div className="pro-radio-dot" style={{ background: '#EF1E34' }} />
                 </div>
               </div>
             </div>

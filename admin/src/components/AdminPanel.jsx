@@ -208,7 +208,7 @@ function Btn({ children, onClick, variant = 'primary', size = 'md', disabled, ic
     ...style
   };
   const variants = {
-    primary: { background: 'linear-gradient(135deg, #D60036 0%, #B5002D 100%)', color: '#fff', boxShadow: '0 4px 14px rgba(214, 0, 54, 0.35)' },
+    primary: { background: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)', color: '#fff', boxShadow: '0 4px 14px rgba(239, 30, 52, 0.35)' },
     ghost:   { background: 'transparent', color: 'var(--ad-text-sec)', border: `1px solid var(--ad-border)` },
     danger:  { background: `rgba(239, 68, 68, 0.12)`,  color: '#EF4444',  border: `1px solid rgba(239, 68, 68, 0.25)` },
     success: { background: `rgba(0, 230, 118, 0.12)`, color: '#00E676', border: `1px solid rgba(0, 230, 118, 0.25)` },
@@ -271,7 +271,7 @@ function Toggle({ checked, onChange, disabled }) {
       onClick={disabled ? undefined : onChange}
       style={{
         width: 44, height: 24, borderRadius: 12, border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
-        background: checked ? '#D60036' : 'var(--ad-input)',
+        background: checked ? '#EF1E34' : 'var(--ad-input)',
         position: 'relative', transition: 'background 0.2s', flexShrink: 0,
         opacity: disabled ? 0.5 : 1,
       }}
@@ -589,8 +589,8 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                 padding: '9px 12px',
                 borderRadius: 10,
                 border: 'none',
-                background: isActive ? (isDark ? 'linear-gradient(135deg, rgba(214, 0, 54, 0.2) 0%, rgba(181, 0, 45, 0.16) 100%)' : 'linear-gradient(135deg, rgba(214, 0, 54, 0.12) 0%, rgba(181, 0, 45, 0.08) 100%)') : 'transparent',
-                borderLeft: isActive ? '3px solid #D60036' : '3px solid transparent',
+                background: isActive ? (isDark ? 'linear-gradient(135deg, rgba(239, 30, 52, 0.2) 0%, rgba(181, 0, 45, 0.16) 100%)' : 'linear-gradient(135deg, rgba(239, 30, 52, 0.12) 0%, rgba(181, 0, 45, 0.08) 100%)') : 'transparent',
+                borderLeft: isActive ? '3px solid #EF1E34' : '3px solid transparent',
                 color: isActive ? (isDark ? '#FFFFFF' : '#0F172A') : (isDark ? '#94A3B8' : '#64748B'),
                 fontSize: 13,
                 fontWeight: isActive ? 800 : 600,
@@ -614,7 +614,7 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                 }
               }}
             >
-              <Icon size={17} color={isActive ? '#D60036' : (isDark ? '#94A3B8' : '#64748B')} strokeWidth={isActive ? 2.4 : 1.9} />
+              <Icon size={17} color={isActive ? '#EF1E34' : (isDark ? '#94A3B8' : '#64748B')} strokeWidth={isActive ? 2.4 : 1.9} />
               <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {label}
               </span>
@@ -624,8 +624,8 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                   fontWeight: 800,
                   padding: '2px 6px',
                   borderRadius: 100,
-                  background: 'rgba(214, 0, 54, 0.2)',
-                  color: '#D60036',
+                  background: 'rgba(239, 30, 52, 0.2)',
+                  color: '#EF1E34',
                   lineHeight: 1,
                   letterSpacing: '0.3px',
                   flexShrink: 0
@@ -698,13 +698,13 @@ function Sidebar({ active, setActive, isMobile, open, onClose, isDark, themeMode
                   fontSize: 11,
                   fontWeight: active ? 800 : 600,
                   background: active
-                    ? (isDark ? '#D60036' : '#FFFFFF')
+                    ? (isDark ? '#EF1E34' : '#FFFFFF')
                     : 'transparent',
                   color: active
                     ? (isDark ? '#FFFFFF' : '#0F172A')
                     : (isDark ? '#94A3B8' : '#64748B'),
                   boxShadow: active
-                    ? (isDark ? '0 2px 8px rgba(214,0,54,0.35)' : '0 2px 6px rgba(15,23,42,0.08)')
+                    ? (isDark ? '0 2px 8px rgba(239, 30, 52,0.35)' : '0 2px 6px rgba(15,23,42,0.08)')
                     : 'none',
                   transition: 'all 0.15s ease'
                 }}
@@ -1130,7 +1130,7 @@ function Header({ section, onMenuToggle, isMobile, currentUser, isDark }) {
               <img src={currentUser.photoURL} alt="" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
             ) : (
               <div style={{
-                width: 36, height: 36, borderRadius: '50%', background: '#D60036',
+                width: 36, height: 36, borderRadius: '50%', background: '#EF1E34',
                 color: '#fff', fontWeight: 900, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
                 {(currentUser?.displayName || currentUser?.email || 'A')[0].toUpperCase()}
@@ -1450,11 +1450,11 @@ function TemplateCanvas({ form, size = 280 }) {
     drawEye(qx, qy + qsz - cs2*3);
 
     // Position indicator
-    ctx.strokeStyle = 'rgba(214,0,54,0.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+    ctx.strokeStyle = 'rgba(239, 30, 52,0.7)'; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
     ctx.strokeRect(qx, qy, qsz, qsz); ctx.setLineDash([]);
 
     // Center dot
-    ctx.fillStyle = '#D60036'; ctx.beginPath();
+    ctx.fillStyle = '#EF1E34'; ctx.beginPath();
     ctx.arc((form.qrX||0.5)*s, (form.qrY||0.5)*s, 3, 0, Math.PI*2); ctx.fill();
 
   }, [form, size]);
@@ -1800,7 +1800,7 @@ function TemplatesPanel({ cloudTemplates, onRefresh }) {
                     <span style={{ fontSize:9, color:T.textMut, marginLeft:2 }}>{tpl.preset?.dotStyle}</span>
                   </div>
                   <button onClick={() => cloneBuiltin(tpl)} style={{
-                    marginTop:4, background:T.accentLow, border:`1px solid rgba(214,0,54,0.2)`,
+                    marginTop:4, background:T.accentLow, border:`1px solid rgba(239, 30, 52,0.2)`,
                     borderRadius:6, color:T.accent, cursor:'pointer', padding:'5px 0', fontSize:10,
                     fontWeight:700, fontFamily:'inherit', transition:'all 0.12s',
                   }}>Clone &amp; Customize â†’</button>
@@ -1897,9 +1897,9 @@ function AppSettingsPanel({ settings, onSave }) {
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: T.textSec, display: 'block', marginBottom: 6 }}>Brand Color</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <input type="color" value={form.brandColor || '#D60036'} onChange={e => set('brandColor', e.target.value)}
+              <input type="color" value={form.brandColor || '#EF1E34'} onChange={e => set('brandColor', e.target.value)}
                 style={{ width: 46, height: 38, borderRadius: T.r.md, border: `1px solid ${T.border}`, cursor: 'pointer', background: 'none', padding: 4 }} />
-              <FormInput value={form.brandColor || '#D60036'} onChange={v => set('brandColor', v)} />
+              <FormInput value={form.brandColor || '#EF1E34'} onChange={v => set('brandColor', v)} />
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8 }}>
@@ -1954,11 +1954,11 @@ function BrandingPanel({ settings, onSave }) {
           <div>
             <label style={{ fontSize: 12, fontWeight: 700, color: T.textSec, display: 'block', marginBottom: 8 }}>Brand Color</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <input type="color" value={form.brandColor || '#D60036'} onChange={e => set('brandColor', e.target.value)}
+              <input type="color" value={form.brandColor || '#EF1E34'} onChange={e => set('brandColor', e.target.value)}
                 style={{ width: 56, height: 56, borderRadius: T.r.md, border: `1px solid ${T.border}`, cursor: 'pointer', background: 'none', padding: 6 }} />
               <div>
                 <div style={{ fontSize: 11, color: T.textSec, marginBottom: 2 }}>Hex Value</div>
-                <div style={{ fontSize: 22, fontWeight: 900, color: form.brandColor || '#D60036', fontFamily: 'monospace' }}>{form.brandColor || '#D60036'}</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: form.brandColor || '#EF1E34', fontFamily: 'monospace' }}>{form.brandColor || '#EF1E34'}</div>
               </div>
             </div>
           </div>
@@ -1974,7 +1974,7 @@ function BrandingPanel({ settings, onSave }) {
       <AdminCard title="Color System Preview">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10 }}>
           {[
-            { label: 'Brand', color: form.brandColor || '#D60036' },
+            { label: 'Brand', color: form.brandColor || '#EF1E34' },
             { label: 'Dark BG', color: '#09090f' },
             { label: 'Card', color: '#14141e' },
             { label: 'Purple', color: T.purple },
@@ -2100,7 +2100,7 @@ function LegacyFeatureFlagsMatrix({ flags, plans, onSaveFlags, onSavePlans }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* â”€â”€â”€ Hero Overview Card â”€â”€â”€ */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(214,0,54,0.08) 0%, rgba(20,20,30,0.95) 100%)',
+        background: 'linear-gradient(135deg, rgba(239, 30, 52,0.08) 0%, rgba(20,20,30,0.95) 100%)',
         padding: '24px 28px',
         borderRadius: 20,
         border: `1px solid ${T.borderHov}`,
@@ -2112,7 +2112,7 @@ function LegacyFeatureFlagsMatrix({ flags, plans, onSaveFlags, onSavePlans }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(214,0,54,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(239, 30, 52,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Flag size={20} color={T.accent} />
               </div>
               <h2 style={{ fontSize: 20, fontWeight: 800, color: T.text, margin: 0, letterSpacing: '-0.3px' }}>
@@ -2196,13 +2196,13 @@ function LegacyFeatureFlagsMatrix({ flags, plans, onSaveFlags, onSavePlans }) {
               padding: '14px 16px',
               borderRadius: 14,
               border: `1px solid ${selectedCat === 'ALL' ? T.accent : T.border}`,
-              background: selectedCat === 'ALL' ? 'rgba(214,0,54,0.12)' : T.bgCard,
+              background: selectedCat === 'ALL' ? 'rgba(239, 30, 52,0.12)' : T.bgCard,
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               gap: 8,
               transition: 'all 0.18s ease',
-              boxShadow: selectedCat === 'ALL' ? '0 4px 16px rgba(214,0,54,0.2)' : 'none'
+              boxShadow: selectedCat === 'ALL' ? '0 4px 16px rgba(239, 30, 52,0.2)' : 'none'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -4079,7 +4079,7 @@ function RevenuePanel() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Revenue Header Banner */}
       <div style={{
-        background: 'linear-gradient(135deg, rgba(214,0,54,0.15) 0%, rgba(139,92,246,0.15) 100%)',
+        background: 'linear-gradient(135deg, rgba(239, 30, 52,0.15) 0%, rgba(139,92,246,0.15) 100%)',
         border: `1px solid ${T.accent}33`, borderRadius: T.r.lg, padding: '14px 16px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12
       }}>
@@ -4788,7 +4788,7 @@ function AdminPanelInner() {
               {currentUser.photoURL ? (
                 <img src={currentUser.photoURL} alt="" style={{ width: 32, height: 32, borderRadius: '50%' }} />
               ) : (
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#D60036', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
+                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#EF1E34', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>
                   {(currentUser.displayName || currentUser.email || 'U')[0].toUpperCase()}
                 </div>
               )}
@@ -4812,11 +4812,11 @@ function AdminPanelInner() {
                     onClick={handleBootstrap}
                     disabled={bootstrapState.loading}
                     style={{
-                      background: '#D60036', color: '#fff', border: 'none', padding: '13px 20px',
+                      background: '#EF1E34', color: '#fff', border: 'none', padding: '13px 20px',
                       borderRadius: 12, cursor: bootstrapState.loading ? 'not-allowed' : 'pointer', fontWeight: 800, fontSize: 14,
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
                       fontFamily: 'inherit', opacity: bootstrapState.loading ? 0.7 : 1,
-                      boxShadow: '0 4px 16px rgba(214,0,54,0.35)'
+                      boxShadow: '0 4px 16px rgba(239, 30, 52,0.35)'
                     }}
                   >
                     {bootstrapState.loading ? <RefreshCw size={16} className="animate-spin" /> : <Key size={16} />}
@@ -4839,13 +4839,13 @@ function AdminPanelInner() {
             <button
               onClick={handleAdminSignIn}
               style={{
-                background: currentUser && isOwnerEmail ? 'transparent' : '#D60036',
+                background: currentUser && isOwnerEmail ? 'transparent' : '#EF1E34',
                 color: currentUser && isOwnerEmail ? T_THEME.textSec : '#fff',
                 border: currentUser && isOwnerEmail ? `1px solid ${T_THEME.border}` : 'none',
                 padding: '12px 20px', borderRadius: 12, cursor: 'pointer', fontWeight: 800, fontSize: 14,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%',
                 fontFamily: 'inherit',
-                boxShadow: currentUser && isOwnerEmail ? 'none' : '0 4px 14px rgba(214, 0, 54, 0.35)'
+                boxShadow: currentUser && isOwnerEmail ? 'none' : '0 4px 14px rgba(239, 30, 52, 0.35)'
               }}
             >
               <Zap size={16} /> {currentUser ? 'Switch Account (Google)' : 'Sign In with Google'}
@@ -4965,8 +4965,8 @@ function AdminPanelInner() {
           --ad-text-sec: #64748B;
           --ad-text-mut: #94A3B8;
           --ad-card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
-          --accent-primary: #D60036;
-          --accent-glow: rgba(214, 0, 54, 0.35);
+          --accent-primary: #EF1E34;
+          --accent-glow: rgba(239, 30, 52, 0.35);
         }
         .ad-theme-root.dark {
           --ad-bg: #0B0F19;
@@ -4977,8 +4977,8 @@ function AdminPanelInner() {
           --ad-text-sec: #94A3B8;
           --ad-text-mut: #64748B;
           --ad-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-          --accent-primary: #D60036;
-          --accent-glow: rgba(214, 0, 54, 0.35);
+          --accent-primary: #EF1E34;
+          --accent-glow: rgba(239, 30, 52, 0.35);
         }
 
         /* Scrollbar */
@@ -5201,9 +5201,9 @@ function AdminPanelInner() {
                           gap: 8,
                           padding: '14px 8px',
                           borderRadius: 14,
-                          border: `1px solid ${isActive ? '#D60036' : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)')}`,
-                          background: isActive ? 'rgba(214, 0, 54, 0.12)' : (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(15,23,42,0.02)'),
-                          color: isActive ? '#D60036' : (isDark ? '#FFFFFF' : '#0F172A'),
+                          border: `1px solid ${isActive ? '#EF1E34' : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)')}`,
+                          background: isActive ? 'rgba(239, 30, 52, 0.12)' : (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(15,23,42,0.02)'),
+                          color: isActive ? '#EF1E34' : (isDark ? '#FFFFFF' : '#0F172A'),
                           cursor: 'pointer'
                         }}
                       >
@@ -5211,7 +5211,7 @@ function AdminPanelInner() {
                           width: 38,
                           height: 38,
                           borderRadius: 10,
-                          background: isActive ? '#D60036' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.05)'),
+                          background: isActive ? '#EF1E34' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(15,23,42,0.05)'),
                           color: isActive ? '#fff' : (isDark ? '#8E95A9' : '#64748B'),
                           display: 'flex',
                           alignItems: 'center',

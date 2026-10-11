@@ -94,7 +94,7 @@ export default function AdminLogin({ onLoginSuccess }) {
           width: '550px',
           height: '550px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(214, 0, 54, 0.16) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(239, 30, 52, 0.16) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%)',
           filter: 'blur(60px)',
           pointerEvents: 'none',
           zIndex: 0
@@ -126,7 +126,7 @@ export default function AdminLogin({ onLoginSuccess }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 5px 12.8px rgba(214,0,54,0.3)',
+                boxShadow: '0 5px 12.8px rgba(239, 30, 52,0.3)',
                 background: '#030305'
               }}
             >
@@ -308,8 +308,8 @@ export default function AdminLogin({ onLoginSuccess }) {
                   transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
                 }}
                 onFocus={e => {
-                  e.target.style.borderColor = '#D60036';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(214, 0, 54, 0.2)';
+                  e.target.style.borderColor = '#EF1E34';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(239, 30, 52, 0.2)';
                 }}
                 onBlur={e => {
                   e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.12))';
@@ -363,8 +363,8 @@ export default function AdminLogin({ onLoginSuccess }) {
                   transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
                 }}
                 onFocus={e => {
-                  e.target.style.borderColor = '#D60036';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(214, 0, 54, 0.2)';
+                  e.target.style.borderColor = '#EF1E34';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(239, 30, 52, 0.2)';
                 }}
                 onBlur={e => {
                   e.target.style.borderColor = 'var(--border-color, rgba(255, 255, 255, 0.12))';
@@ -401,7 +401,7 @@ export default function AdminLogin({ onLoginSuccess }) {
               width: '100%',
               height: '52px',
               borderRadius: '16px',
-              background: '#D60036',
+              background: '#EF1E34',
               color: '#FFFFFF',
               border: 'none',
               fontSize: '15px',
@@ -411,7 +411,7 @@ export default function AdminLogin({ onLoginSuccess }) {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              boxShadow: '0 4px 18px rgba(214, 0, 54, 0.35)',
+              boxShadow: '0 4px 18px rgba(239, 30, 52, 0.35)',
               marginTop: '10px',
               transition: 'transform 0.1s ease',
               opacity: (loading || googleLoading) ? 0.7 : 1

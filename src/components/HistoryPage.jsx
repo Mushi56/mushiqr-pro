@@ -380,9 +380,9 @@ export default function HistoryPage({ onLoadQR, onNavigate, initialFilter = 'All
                           <button 
                             onClick={() => setShowRangeMenu(!showRangeMenu)}
                             style={{ 
-                              background: 'rgba(214, 0, 54, 0.08)', 
+                              background: 'rgba(239, 30, 52, 0.08)', 
                               border: 'none', 
-                              color: '#D60036', 
+                              color: '#EF1E34', 
                               cursor: 'pointer', 
                               padding: '4px 10px',
                               borderRadius: '8px',
@@ -394,8 +394,8 @@ export default function HistoryPage({ onLoadQR, onNavigate, initialFilter = 'All
                               transition: 'all 0.2s'
                             }}
                             title="Clear History Records"
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(214, 0, 54, 0.16)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(214, 0, 54, 0.08)'}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 30, 52, 0.16)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(239, 30, 52, 0.08)'}
                           >
                             <Trash2 size={13} />
                             <span>Clear</span>
@@ -413,7 +413,7 @@ export default function HistoryPage({ onLoadQR, onNavigate, initialFilter = 'All
                                 { label: 'Last Hour', val: 1 },
                                 { label: 'Last 24 Hours', val: 24 },
                                 { label: 'Last 7 Days', val: 168 },
-                                { label: 'All Time', val: -1, color: '#D60036' }
+                                { label: 'All Time', val: -1, color: '#EF1E34' }
                               ].map(opt => (
                                 <button
                                   key={opt.label}
@@ -453,7 +453,7 @@ export default function HistoryPage({ onLoadQR, onNavigate, initialFilter = 'All
                           <div style={{
                             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                             display: 'flex', justifyContent: 'space-between',
-                            background: currentOffset > 0 ? '#F39C12' : '#D60036',
+                            background: currentOffset > 0 ? '#F39C12' : '#EF1E34',
                             borderRadius: '16px', padding: '0 20px', alignItems: 'center',
                             opacity: currentOffset === 0 ? 0 : 1,
                             transition: 'opacity 0.2s'

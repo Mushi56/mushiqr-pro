@@ -233,7 +233,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           if (status === 'DETECTED') {
             await StatusBar.setOverlaysWebView({ overlay: false });
             await StatusBar.setStyle({ style: Style.Dark }); // White text/icons for red hero banner
-            await StatusBar.setBackgroundColor({ color: '#F01A4E' });
+            await StatusBar.setBackgroundColor({ color: '#EF1E34' });
           } else {
             await StatusBar.setOverlaysWebView({ overlay: true });
             if (effectiveTheme === 'light') {
@@ -250,7 +250,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
       try {
         let targetColor;
         if (status === 'DETECTED') {
-          targetColor = '#F01A4E';
+          targetColor = '#EF1E34';
         } else {
           targetColor = effectiveTheme === 'dark' ? '#0C0C14' : '#FFFFFF';
         }
@@ -396,12 +396,12 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               bgColor: 'transparent',
               bgTransparent: true,
               gradientEnabled: true,
-              gradientColor1: '#FF2A55',
-              gradientColor2: '#B3002D',
+              gradientColor1: '#EF1E34',
+              gradientColor2: '#B50B20',
               gradientType: 'linear',
-              qrColor: '#FF2A55',
-              eyeColor: '#B3002D',
-              eyeOuterColor: '#FF2A55',
+              qrColor: '#EF1E34',
+              eyeColor: '#B50B20',
+              eyeOuterColor: '#EF1E34',
               dotStyle: 'fluid',
               eyeStyle: 'rounded',
               quietZone: 0
@@ -725,12 +725,12 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             bgColor: '#ffffff',
             bgTransparent: false,
             gradientEnabled: true,
-            gradientColor1: '#FF2A55',
-            gradientColor2: '#B3002D',
+            gradientColor1: '#EF1E34',
+            gradientColor2: '#B50B20',
             gradientType: 'linear',
-            qrColor: '#FF2A55',
-            eyeColor: '#B3002D',
-            eyeOuterColor: '#FF2A55',
+            qrColor: '#EF1E34',
+            eyeColor: '#B50B20',
+            eyeOuterColor: '#EF1E34',
             dotStyle: 'fluid',
             eyeStyle: 'rounded'
           });
@@ -1136,12 +1136,12 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             bgColor: '#ffffff',
             bgTransparent: false,
             gradientEnabled: true,
-            gradientColor1: '#FF2A55',
-            gradientColor2: '#B3002D',
+            gradientColor1: '#EF1E34',
+            gradientColor2: '#B50B20',
             gradientType: 'linear',
-            qrColor: '#FF2A55',
-            eyeColor: '#B3002D',
-            eyeOuterColor: '#FF2A55',
+            qrColor: '#EF1E34',
+            eyeColor: '#B50B20',
+            eyeOuterColor: '#EF1E34',
             dotStyle: 'fluid',
             eyeStyle: 'rounded'
           });
@@ -1400,7 +1400,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                 color: '#fff',
                 fontSize: '12px',
                 fontWeight: 700,
-                boxShadow: '0 2px 8px rgba(214, 0, 54, 0.25)'
+                boxShadow: '0 2px 8px rgba(239, 30, 52, 0.25)'
               }}
               title="Sign In"
             >
@@ -1757,8 +1757,8 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                 top: 0, 
                 zIndex: 100, 
                 display: 'flex',
-                background: '#F01A4E',
-                backgroundColor: '#F01A4E',
+                background: '#EF1E34',
+                backgroundColor: '#EF1E34',
                 transition: 'background-color 0.3s ease, background 0.3s ease',
                 paddingTop: 'env(safe-area-inset-top, 0px)',
                 height: 'calc(64px + env(safe-area-inset-top, 0px))',
@@ -1806,7 +1806,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                       color: '#fff',
                       fontSize: '12px',
                       fontWeight: 700,
-                      boxShadow: '0 2px 8px rgba(214, 0, 54, 0.25)'
+                      boxShadow: '0 2px 8px rgba(239, 30, 52, 0.25)'
                     }}
                     title="Sign In"
                   >

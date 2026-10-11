@@ -80,7 +80,7 @@ export async function getHistory(limitVal = 100) {
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 const DEFAULT_APP_SETTINGS = {
   appName:            'Mushi QR Pro',
-  brandColor:         '#D60036',
+  brandColor:         '#EF1E34',
   welcomeText:        'Create and scan QR codes instantly!',
   maintenanceMode:    false,
   maintenanceMessage: 'We are performing scheduled maintenance. Please check back soon.',

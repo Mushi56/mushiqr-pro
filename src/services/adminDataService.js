@@ -79,7 +79,7 @@ export async function getHistory(limitVal = 100) {
 // ═══════════════════════════════════════════════════════════════════════════
 const DEFAULT_APP_SETTINGS = {
   appName:            'Mushi QR Pro',
-  brandColor:         '#D60036',
+  brandColor:         '#EF1E34',
   welcomeText:        'Create and scan QR codes instantly!',
   maintenanceMode:    false,
   maintenanceMessage: 'We are performing scheduled maintenance. Please check back soon.',
@@ -332,7 +332,7 @@ const DEFAULT_PLANS = [
   { id: 'free',    name: 'Free',    price: 0,     period: 'forever', color: '#8b8fa8', active: true,  popular: false, sortOrder: 0 },
   { id: 'daily',   name: 'Daily',   price: 0.49,  period: 'day',     color: '#3b82f6', active: true,  popular: false, sortOrder: 1 },
   { id: 'weekly',  name: 'Weekly',  price: 2.99,  period: 'week',    color: '#8b5cf6', active: true,  popular: true,  sortOrder: 2 },
-  { id: 'yearly',  name: 'Yearly',  price: 29.99, period: 'year',    color: '#D60036', active: true,  popular: false, sortOrder: 3 },
+  { id: 'yearly',  name: 'Yearly',  price: 29.99, period: 'year',    color: '#EF1E34', active: true,  popular: false, sortOrder: 3 },
 ];
 
 export async function getSubscriptionPlans() {

@@ -62,7 +62,7 @@ export default function SettingsPage({ onNavigate, theme, setTheme, effectiveThe
       ),
       value: <span style={{
         textTransform: 'capitalize',
-        color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF007F' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF007F'),
+        color: theme === 'dark' ? '#00F0FF' : theme === 'light' ? '#FF3B50' : (effectiveTheme === 'dark' ? '#00F0FF' : '#FF3B50'),
         fontWeight: 'bold'
       }}>{theme}</span>,
       onClick: handleThemeChange
@@ -143,7 +143,7 @@ export default function SettingsPage({ onNavigate, theme, setTheme, effectiveThe
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(214, 0, 54, 0.2)',
+            boxShadow: '0 4px 12px rgba(239, 30, 52, 0.2)',
             flexShrink: 0
           }}>
             <SettingsIcon size={20} color="#FFFFFF" />

@@ -68,7 +68,7 @@ export default function YouPage({ onNavigate, theme, setTheme, effectiveTheme, c
             onClick={() => showPaywall()}
             style={{
               position: 'relative',
-              background: 'linear-gradient(135deg, #D60036 0%, #ff4d6d 50%, #8b5cf6 100%)',
+              background: 'linear-gradient(135deg, #EF1E34 0%, #ff4d6d 50%, #8b5cf6 100%)',
               borderRadius: '18px',
               padding: '22px 20px',
               marginBottom: '16px',
@@ -155,7 +155,7 @@ export default function YouPage({ onNavigate, theme, setTheme, effectiveTheme, c
 
           {/* Subscription */}
           <div className="settings-row-item" onClick={() => showPaywall()} style={{ padding: '16px' }}>
-            <div className="icon-container-gradient" style={{ background: 'linear-gradient(135deg, #D60036 0%, #ff4d6d 100%)' }}>
+            <div className="icon-container-gradient" style={{ background: 'linear-gradient(135deg, #EF1E34 0%, #ff4d6d 100%)' }}>
               <Crown size={18} />
             </div>
             <div style={{ flex: 1, fontSize: '14px', fontWeight: 600 }}>Subscription</div>

@@ -4,7 +4,7 @@
 // creating an illustration artwork that scans with 100% camera reliability.
 
 export const AI_ART_STYLES = [
-  { id: 'illustration', name: 'Illustration', desc: 'Vibrant digital art & clean lines', color: '#D60036' },
+  { id: 'illustration', name: 'Illustration', desc: 'Vibrant digital art & clean lines', color: '#EF1E34' },
   { id: 'anime', name: 'Anime / Manga', desc: 'Crisp cel-shading & deep outlines', color: '#3B82F6' },
   { id: 'synthwave', name: 'Synthwave 80s', desc: 'Hot pink neon & sunset violet glow', color: '#EC4899' },
   { id: 'cyberpunk', name: 'Cyberpunk Neon', desc: 'Electric cyan & deep dark matrix', color: '#8B5CF6' },

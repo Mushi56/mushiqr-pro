@@ -166,7 +166,7 @@ export default function SaveLocationModal({ isOpen, onClose, onSave, showToast }
                     style={{
                       padding: '12px 14px',
                       borderRadius: '12px',
-                      background: isSelected ? 'rgba(214, 0, 54, 0.12)' : 'var(--bg-hover)',
+                      background: isSelected ? 'rgba(239, 30, 52, 0.12)' : 'var(--bg-hover)',
                       border: '1px solid',
                       borderColor: isSelected ? 'var(--accent-primary)' : 'transparent',
                       display: 'flex',
@@ -235,12 +235,12 @@ export default function SaveLocationModal({ isOpen, onClose, onSave, showToast }
               padding: '14px',
               borderRadius: '14px',
               border: 'none',
-              background: 'var(--accent-gradient, linear-gradient(135deg, #D60036, #FF3B62))',
+              background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34, #FF5FD2))',
               color: '#FFFFFF',
               fontWeight: 800,
               fontSize: '14px',
               cursor: 'pointer',
-              boxShadow: '0 6px 16px rgba(214, 0, 54, 0.35)'
+              boxShadow: '0 6px 16px rgba(239, 30, 52, 0.35)'
             }}
           >
             Save Location

@@ -200,7 +200,7 @@ export default function AuthDropdownPanel({ onClose }) {
           background: 'var(--accent-gradient)', border: 'none', color: '#fff',
           fontWeight: 700, fontSize: '15px', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-          boxShadow: '0 4px 14px rgba(214,0,54,0.25)',
+          boxShadow: '0 4px 14px rgba(239, 30, 52,0.25)',
           opacity: loading ? 0.7 : 1, transition: 'opacity 0.2s',
           fontFamily: 'inherit'
         }}>

@@ -566,7 +566,7 @@ export function ImageCropShapeModal({
               <path 
                 d={currentShapePath} 
                 fill="none" 
-                stroke="var(--accent-primary, #D60036)" 
+                stroke="var(--accent-primary, #EF1E34)" 
                 strokeWidth="2.5" 
                 strokeLinejoin="round"
                 strokeLinecap="round"
@@ -606,7 +606,7 @@ export function ImageCropShapeModal({
               step="0.02"
               value={zoom}
               onChange={e => setZoom(parseFloat(e.target.value))}
-              style={{ flex: 1, accentColor: 'var(--accent-primary, #D60036)', cursor: 'pointer' }}
+              style={{ flex: 1, accentColor: 'var(--accent-primary, #EF1E34)', cursor: 'pointer' }}
             />
             <button 
               onClick={() => setZoom(z => Math.min(4.0, z + 0.15))}
@@ -645,9 +645,9 @@ export function ImageCropShapeModal({
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: '10px',
-                    background: isSelected ? 'var(--accent-primary, #D60036)' : 'var(--bg-primary, #0B0F19)',
+                    background: isSelected ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-primary, #0B0F19)',
                     border: '1px solid',
-                    borderColor: isSelected ? 'var(--accent-primary, #D60036)' : 'var(--border-color, rgba(255, 255, 255, 0.1))',
+                    borderColor: isSelected ? 'var(--accent-primary, #EF1E34)' : 'var(--border-color, rgba(255, 255, 255, 0.1))',
                     color: isSelected ? '#FFFFFF' : 'var(--text-secondary, #94A3B8)',
                     cursor: 'pointer',
                     transition: 'all 0.15s ease'
@@ -750,9 +750,9 @@ export function ImageCropShapeModal({
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                background: flipH ? 'var(--accent-primary, #D60036)' : 'var(--bg-primary, #0B0F19)',
+                background: flipH ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-primary, #0B0F19)',
                 border: '1px solid',
-                borderColor: flipH ? 'var(--accent-primary, #D60036)' : 'var(--border-color, rgba(255, 255, 255, 0.1))',
+                borderColor: flipH ? 'var(--accent-primary, #EF1E34)' : 'var(--border-color, rgba(255, 255, 255, 0.1))',
                 color: flipH ? '#FFFFFF' : 'var(--text-primary, #FFFFFF)',
                 display: 'flex',
                 alignItems: 'center',
@@ -772,9 +772,9 @@ export function ImageCropShapeModal({
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                background: flipV ? 'var(--accent-primary, #D60036)' : 'var(--bg-primary, #0B0F19)',
+                background: flipV ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-primary, #0B0F19)',
                 border: '1px solid',
-                borderColor: flipV ? 'var(--accent-primary, #D60036)' : 'var(--border-color, rgba(255, 255, 255, 0.1))',
+                borderColor: flipV ? 'var(--accent-primary, #EF1E34)' : 'var(--border-color, rgba(255, 255, 255, 0.1))',
                 color: flipV ? '#FFFFFF' : 'var(--text-primary, #FFFFFF)',
                 display: 'flex',
                 alignItems: 'center',
@@ -795,23 +795,23 @@ export function ImageCropShapeModal({
               width: '42px',
               height: '42px',
               borderRadius: '12px',
-              background: 'var(--accent-primary, #D60036)',
+              background: 'var(--accent-primary, #EF1E34)',
               border: 'none',
               color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(214, 0, 54, 0.4)',
+              boxShadow: '0 4px 14px rgba(239, 30, 52, 0.4)',
               transition: 'all 0.15s ease'
             }}
             onMouseEnter={e => {
               e.currentTarget.style.transform = 'scale(1.06)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(214, 0, 54, 0.55)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 30, 52, 0.55)';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 14px rgba(214, 0, 54, 0.4)';
+              e.currentTarget.style.boxShadow = '0 4px 14px rgba(239, 30, 52, 0.4)';
             }}
           >
             <Check size={22} strokeWidth={2.8} />
