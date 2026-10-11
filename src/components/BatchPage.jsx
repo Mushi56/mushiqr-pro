@@ -450,53 +450,46 @@ export default function BatchPage({
     setIsExporting(true);
     setExportProgress(0);
 
-    // Preload logos only for QR codes
-    const logoCache = {};
-    const logoPromises = [];
-    if (batchType === 'QR') {
-      batchItems.forEach(item => {
-        const src = item.style?.logo?.src;
-        if (src && !logoCache[src]) {
-          logoCache[src] = null;
-          logoPromises.push(
-            new Promise((resolve) => {
-              const img = new Image();
-              img.crossOrigin = "anonymous";
-              img.onload = () => {
-                logoCache[src] = img;
-                resolve();
-              };
-              img.onerror = () => resolve();
-              img.src = src;
-            })
-          );
-        }
-      });
-    }
-
-    if (logoPromises.length > 0) {
-      await Promise.all(logoPromises);
-    }
-
-    const zip = new JSZip();
-    let exportSize = QUALITY_SIZES[exportQuality] || 1024;
-    
-    if (exportQuality === 'Ultra' && selectedTemplate?.dimensions) {
-      const match = selectedTemplate.dimensions.match(/^(\d+)/);
-      if (match) {
-        exportSize = parseInt(match[1], 10);
-      }
-    }
-
-    const zipFilenameMap = new Map();
-
-    // ── Chunked processing to prevent memory exhaustion on large batches ──
-    const CHUNK_SIZE = 50; // items per chunk before GC yield
-    const total = batchItems.length;
-
     // Reusable single worker canvases to prevent GPU memory thrashing and WebView OOM crashes
     const workerCanvas = document.createElement('canvas');
     const sharedJpgCanvas = (selectedFormat === 'ALL' || selectedFormat === 'JPG') ? document.createElement('canvas') : null;
+
+    try {
+      // Preload logos only for QR codes
+      const logoCache = {};
+      const logoPromises = [];
+      if (batchType === 'QR') {
+        batchItems.forEach(item => {
+          const src = item.style?.logo?.src;
+          if (src && !logoCache[src]) {
+            logoCache[src] = null;
+            logoPromises.push(
+              new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => {
+                  logoCache[src] = img;
+                  resolve();
+                };
+                img.onerror = () => resolve();
+                img.src = src;
+              })
+            );
+          }
+        });
+      }
+
+      if (logoPromises.length > 0) {
+        await Promise.all(logoPromises);
+      }
+
+      const zip = new JSZip();
+      const exportSize = QUALITY_SIZES[exportQuality] || 1024;
+      const zipFilenameMap = new Map();
+
+      // ── Chunked processing to prevent memory exhaustion on large batches ──
+      const CHUNK_SIZE = 50; // items per chunk before GC yield
+      const total = batchItems.length;
 
     for (let idx = 0; idx < total; idx++) {
       if (isCancelledRef.current) {
@@ -621,7 +614,7 @@ export default function BatchPage({
       setExportProgress(Math.round(((idx + 1) / total) * 90));
 
       // Yield to the browser every item so GC can reclaim memory and UI stays responsive
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 8));
     }
 
     // Release worker canvas GPU memory after export loop
@@ -632,58 +625,65 @@ export default function BatchPage({
       sharedJpgCanvas.height = 0;
     }
 
-    try {
-      // 90-100% for zip packaging
-      const content = await zip.generateAsync({ type: 'blob', compression: 'STORE' }, (metadata) => {
-        setExportProgress(90 + Math.round((metadata.percent / 100) * 10));
-      });
-      const defaultName = `mushi-${batchType.toLowerCase()}-batch`;
-      const cleanBaseName = customZipFileName.trim().replace(/[^a-zA-Z0-9-_]/g, '_') || defaultName;
-      const archiveName = `${cleanBaseName}.zip`;
-      if (Capacitor.isNativePlatform()) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          try {
-            if (!reader.result || typeof reader.result !== 'string') {
-              throw new Error('Failed to read archive as data URL');
-            }
-            const base64Data = reader.result.split(',')[1];
-            const zipCategory = batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes';
-            const uri = await saveZipNative(base64Data, archiveName, zipCategory);
-            setIsExporting(false);
-            setExportSuccessInfo({
-              filename: archiveName,
-              count: total,
-              isNative: true,
-              fileUri: uri
-            });
-          } catch (nativeErr) {
-            console.error('Failed to save native zip:', nativeErr);
-            alert('Failed to save ZIP archive to device storage.');
-            setIsExporting(false);
+    // 90-100% for zip packaging
+    const content = await zip.generateAsync({ type: 'blob', compression: 'STORE' }, (metadata) => {
+      setExportProgress(90 + Math.round((metadata.percent / 100) * 10));
+    });
+    const defaultName = `mushi-${batchType.toLowerCase()}-batch`;
+    const cleanBaseName = customZipFileName.trim().replace(/[^a-zA-Z0-9-_]/g, '_') || defaultName;
+    const archiveName = `${cleanBaseName}.zip`;
+    if (Capacitor.isNativePlatform()) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          if (!reader.result || typeof reader.result !== 'string') {
+            throw new Error('Failed to read archive as data URL');
           }
-        };
-        reader.onerror = (readErr) => {
-          console.error('FileReader error:', readErr);
-          alert('Failed to read batch archive.');
+          const base64Data = reader.result.split(',')[1];
+          const zipCategory = batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes';
+          const uri = await saveZipNative(base64Data, archiveName, zipCategory);
           setIsExporting(false);
-        };
-        reader.readAsDataURL(content);
-      } else {
-        saveAs(content, archiveName);
+          setExportSuccessInfo({
+            filename: archiveName,
+            count: total,
+            isNative: true,
+            fileUri: uri
+          });
+        } catch (nativeErr) {
+          console.error('Failed to save native zip:', nativeErr);
+          alert('Failed to save ZIP archive to device storage.');
+          setIsExporting(false);
+        }
+      };
+      reader.onerror = (readErr) => {
+        console.error('FileReader error:', readErr);
+        alert('Failed to read batch archive.');
         setIsExporting(false);
-        setExportSuccessInfo({
-          filename: archiveName,
-          count: total,
-          isNative: false
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Failed to package ZIP archive.');
+      };
+      reader.readAsDataURL(content);
+    } else {
+      saveAs(content, archiveName);
       setIsExporting(false);
+      setExportSuccessInfo({
+        filename: archiveName,
+        count: total,
+        isNative: false
+      });
     }
-  };
+  } catch (err) {
+    console.error('Batch export failure:', err);
+    alert('Failed to package ZIP archive. ' + (err?.message || ''));
+    setIsExporting(false);
+    setExportProgress(0);
+  } finally {
+    workerCanvas.width = 0;
+    workerCanvas.height = 0;
+    if (sharedJpgCanvas) {
+      sharedJpgCanvas.width = 0;
+      sharedJpgCanvas.height = 0;
+    }
+  }
+};
 
   return (
     <div style={{
@@ -1765,7 +1765,7 @@ export default function BatchPage({
                         border: '1px solid rgba(214, 0, 54, 0.15)',
                         letterSpacing: '0.5px'
                       }}>
-                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '2400px')}
+                        {QUALITY_SIZES[exportQuality] ? `${QUALITY_SIZES[exportQuality]}px` : '1024px'}
                       </span>
                     </div>
                     <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
