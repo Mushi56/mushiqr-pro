@@ -186,7 +186,7 @@ export default function DeleteConfirmModal({
               padding: '12px 16px',
               borderRadius: '14px',
               border: 'none',
-              background: 'linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)',
+              background: '#EF4444',
               color: '#FFFFFF',
               fontSize: '14px',
               fontWeight: 700,

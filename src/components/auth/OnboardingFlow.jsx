@@ -1758,7 +1758,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
                         width: '100%',
                         height: '26px',
                         borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                        background: '#10B981',
                         border: 'none',
                         color: '#FFFFFF',
                         fontSize: '9.5px',

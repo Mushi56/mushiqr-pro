@@ -160,7 +160,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
               <button
                 onClick={() => showPaywall('scanner_camera_live')}
-                style={{ background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', color: '#000', border: 'none', padding: '12px 24px', borderRadius: 14, fontWeight: 800, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 18px rgba(255, 170, 0, 0.4)' }}
+                style={{ background: '#FFD700', color: '#000', border: 'none', padding: '12px 24px', borderRadius: 14, fontWeight: 800, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 18px rgba(255, 170, 0, 0.4)' }}
               >
                 <Crown size={16} fill="#000" color="#000" strokeWidth={2.5} />
                 <span>Buy Pro</span>
@@ -1392,7 +1392,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'var(--accent-gradient)',
+                background: 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: '20px',
                 padding: '6px 12px',
@@ -1798,7 +1798,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px',
-                      background: 'var(--accent-gradient)',
+                      background: 'var(--accent-primary)',
                       border: 'none',
                       borderRadius: '20px',
                       padding: '6px 12px',

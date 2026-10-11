@@ -258,7 +258,7 @@ export default function ScanSettingsModal({ isOpen, onClose, showToast }) {
             width: '100%',
             padding: '12px',
             borderRadius: '14px',
-            background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34 0%, #EF1E34 100%))',
+            background: 'var(--accent-primary)',
             color: '#FFFFFF',
             border: 'none',
             fontSize: '14px',

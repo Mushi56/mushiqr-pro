@@ -479,15 +479,7 @@ export default function BatchPage({
     }
 
     const zip = new JSZip();
-    let exportSize = QUALITY_SIZES[exportQuality] || 1024;
-    
-    if (exportQuality === 'Ultra' && selectedTemplate?.dimensions) {
-      const match = selectedTemplate.dimensions.match(/^(\d+)/);
-      if (match) {
-        exportSize = parseInt(match[1], 10);
-      }
-    }
-
+    const exportSize = QUALITY_SIZES[exportQuality] || 1024;
     const zipFilenameMap = new Map();
 
     // ── Chunked processing to prevent memory exhaustion on large batches ──
@@ -620,8 +612,8 @@ export default function BatchPage({
       // 0-90% for item rendering
       setExportProgress(Math.round(((idx + 1) / total) * 90));
 
-      // Yield to the browser every item so GC can reclaim memory and UI stays responsive
-      await new Promise(resolve => setTimeout(resolve, 0));
+      // Yield to the browser between items so GC can reclaim memory and UI stays completely responsive even at Ultra resolution
+      await new Promise(resolve => setTimeout(resolve, 12));
     }
 
     // Release worker canvas GPU memory after export loop
@@ -1508,7 +1500,7 @@ export default function BatchPage({
                   onClick={handleImport}
                   style={{
                     flex: 1,
-                    background: 'var(--accent-gradient)',
+                    background: 'var(--accent-primary)',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '16px',
@@ -1765,7 +1757,7 @@ export default function BatchPage({
                         border: '1px solid rgba(239, 30, 52, 0.15)',
                         letterSpacing: '0.5px'
                       }}>
-                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : (selectedTemplate?.dimensions ? selectedTemplate.dimensions.replace(' px', '') : '2400px')}
+                        {exportQuality === 'Low' ? '512px' : exportQuality === 'Normal' ? '1024px' : exportQuality === 'High' ? '2048px' : '2400px'}
                       </span>
                     </div>
                     <div style={{ padding: '0 8px', marginTop: '12px', marginBottom: '8px' }}>
@@ -1777,7 +1769,7 @@ export default function BatchPage({
                         value={['Low', 'Normal', 'High', 'Ultra'].indexOf(exportQuality)}
                         onChange={(e) => {
                           const steps = ['Low', 'Normal', 'High', 'Ultra'];
-                          const selected = steps[parseInt(e.target.value)] || 'Normal';
+                          const selected = steps[parseInt(e.target.value, 10)] || 'Normal';
                           if (selected === 'High' || selected === 'Ultra') {
                             const access = FeatureAccessManager.canUseFeature('bulk_export_quality');
                             if (!access.allowed) {
@@ -2373,7 +2365,7 @@ export default function BatchPage({
   );
 }
 
-function BatchThumbnail({ type, data, style }) {
+const BatchThumbnail = React.memo(function BatchThumbnail({ type, data, style }) {
   const canvasRef = useRef(null);
   const [loadedLogoImg, setLoadedLogoImg] = useState(null);
   const safeStyle = style || {};
@@ -2430,4 +2422,4 @@ function BatchThumbnail({ type, data, style }) {
       style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
     />
   );
-}
+});

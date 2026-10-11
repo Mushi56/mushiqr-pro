@@ -218,7 +218,7 @@ export default function ForgotPasswordPage({ onNavigate }) {
               width: '100%',
               height: '48px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)',
+              background: 'var(--accent-primary)',
               border: 'none',
               color: '#FFFFFF',
               fontSize: '14.5px',

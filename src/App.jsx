@@ -4873,7 +4873,7 @@ export default function App() {
                       navigateTo('batch');
                     }}
                     style={{
-                      background: 'linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%)',
+                      background: 'var(--accent-primary)',
                       border: 'none',
                       color: 'white',
                       padding: '8px 12px',
@@ -4942,7 +4942,7 @@ export default function App() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      background: 'var(--accent-gradient)',
+                      background: 'var(--accent-primary)',
                       borderRadius: '12px',
                       padding: '2px',
                       boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
@@ -5301,7 +5301,7 @@ export default function App() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    background: 'var(--accent-gradient)',
+                    background: 'var(--accent-primary)',
                     border: 'none',
                     borderRadius: '20px',
                     padding: '7px 14px',
@@ -9083,7 +9083,7 @@ export default function App() {
               <button 
                 onClick={handleSaveAndExit}
                 style={{
-                  background: 'var(--accent-gradient)',
+                  background: 'var(--accent-primary)',
                   color: '#FFFFFF',
                   border: 'none',
                   padding: '12px',
@@ -9224,7 +9224,7 @@ export default function App() {
                     showToast('Failed to update profile.');
                   }
                 }}
-                style={{ flex: 1, padding: '12px', border: 'none', background: 'var(--accent-gradient)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 30, 52,0.2)' }}
+                style={{ flex: 1, padding: '12px', border: 'none', background: 'var(--accent-primary)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(239, 30, 52,0.2)' }}
               >
                 Save Changes
               </button>
@@ -9251,7 +9251,7 @@ export default function App() {
                 </p>
                 <button 
                   onClick={() => setIsSecurityModalOpen(false)}
-                  style={{ width: '100%', padding: '12px', border: 'none', background: 'var(--accent-gradient)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
+                  style={{ width: '100%', padding: '12px', border: 'none', background: 'var(--accent-primary)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}
                 >
                   Close Settings
                 </button>
@@ -9312,7 +9312,7 @@ export default function App() {
                       }
                     }}
                     disabled={isChangingPassword}
-                    style={{ flex: 1, padding: '12px', border: 'none', background: 'var(--accent-gradient)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', opacity: isChangingPassword ? 0.7 : 1 }}
+                    style={{ flex: 1, padding: '12px', border: 'none', background: 'var(--accent-primary)', color: '#fff', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', opacity: isChangingPassword ? 0.7 : 1 }}
                   >
                     {isChangingPassword ? 'Updating...' : 'Update'}
                   </button>
@@ -9582,7 +9582,7 @@ export default function App() {
                     width: '100%',
                     padding: '12px',
                     border: 'none',
-                    background: 'var(--accent-gradient)',
+                    background: 'var(--accent-primary)',
                     color: '#FFFFFF',
                     borderRadius: '12px',
                     fontWeight: 700,
@@ -9746,7 +9746,7 @@ export default function App() {
                     width: '100%',
                     padding: '12px',
                     border: 'none',
-                    background: 'var(--accent-gradient)',
+                    background: 'var(--accent-primary)',
                     color: '#FFFFFF',
                     borderRadius: '12px',
                     fontWeight: 700,

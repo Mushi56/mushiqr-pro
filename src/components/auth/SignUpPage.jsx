@@ -603,7 +603,7 @@ export default function SignUpPage({ onNavigate, onSuccess, theme, effectiveThem
               width: '100%',
               height: '50px',
               borderRadius: '16px',
-              background: 'linear-gradient(135deg, #FF1E56 0%, #D8042B 100%)',
+              background: 'var(--accent-primary)',
               border: 'none',
               color: '#FFFFFF',
               fontSize: '14.5px',

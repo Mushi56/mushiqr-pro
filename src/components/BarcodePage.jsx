@@ -116,7 +116,7 @@ export default function BarcodePage({
             <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
               <button
                 onClick={() => showPaywall('barcode_generator')}
-                style={{ background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', color: '#000', border: 'none', padding: '12px 24px', borderRadius: 14, fontWeight: 800, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 18px rgba(255, 170, 0, 0.4)' }}
+                style={{ background: '#FFD700', color: '#000', border: 'none', padding: '12px 24px', borderRadius: 14, fontWeight: 800, fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 18px rgba(255, 170, 0, 0.4)' }}
               >
                 <Crown size={16} fill="#000" color="#000" strokeWidth={2.5} />
                 <span>Buy Pro</span>
@@ -563,7 +563,7 @@ export default function BarcodePage({
                   if (onNavigate) onNavigate('batch', 'BARCODE');
                 }}
                 style={{
-                  background: 'linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%)',
+                  background: '#EF1E34',
                   border: 'none',
                   color: 'white',
                   padding: '8px 12px',
@@ -632,7 +632,7 @@ export default function BarcodePage({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                background: 'linear-gradient(135deg, #EF1E34 0%, #FF5FD2 100%)',
+                background: '#EF1E34',
                 borderRadius: 12,
                 padding: '2px',
                 boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
@@ -731,16 +731,16 @@ export default function BarcodePage({
                         gap: 6,
                         aspectRatio: '1 / 1',
                         padding: 0,
-                        background: selectedFormat === label ? 'rgba(239, 30, 52, 0.08)' : 'var(--bg-hover, #F2F2F7)',
+                        background: selectedFormat === label ? 'rgba(239, 30, 52, 0.12)' : 'var(--bg-hover, rgba(255, 255, 255, 0.06))',
                         border: selectedFormat === label ? '1.5px solid var(--accent-primary, #EF1E34)' : '1px solid transparent',
                         borderRadius: 12,
-                        color: selectedFormat === label ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #1C1C1E)',
+                        color: selectedFormat === label ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #FFFFFF)',
                         cursor: 'pointer',
                         position: 'relative'
                       }}
                     >
                       <PaidCrownBadge featureId={featId} position="floating" size={8} />
-                      <Icon size={18} />
+                      <Icon size={18} color={selectedFormat === label ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #FFFFFF)'} />
                       <span style={{ fontSize: 10, fontWeight: 700 }}>{label}</span>
                     </button>
                   ))}
@@ -805,24 +805,60 @@ export default function BarcodePage({
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleCopy(); setFormatDropdownOpen(false); }}
-                    style={{ flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, border: '1px solid var(--border-color, rgba(0,0,0,0.08))', background: 'var(--bg-hover, #F2F2F7)', cursor: 'pointer' }}
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                      border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+                      background: 'var(--bg-hover, rgba(255, 255, 255, 0.06))',
+                      color: 'var(--text-primary, #FFFFFF)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
                     title="Copy Image"
                   >
-                    <Copy size={18} />
+                    <Copy size={18} color="var(--text-primary, #FFFFFF)" />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSaveToArchive(); setFormatDropdownOpen(false); }}
-                    style={{ flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, border: '1px solid var(--border-color, rgba(0,0,0,0.08))', background: 'var(--bg-hover, #F2F2F7)', cursor: 'pointer' }}
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                      border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+                      background: 'var(--bg-hover, rgba(255, 255, 255, 0.06))',
+                      color: 'var(--text-primary, #FFFFFF)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
                     title="Bookmark to Saved"
                   >
-                    <Bookmark size={18} />
+                    <Bookmark size={18} color="var(--text-primary, #FFFFFF)" />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleShare(); setFormatDropdownOpen(false); }}
-                    style={{ flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, border: '1px solid var(--border-color, rgba(0,0,0,0.08))', background: 'var(--bg-hover, #F2F2F7)', cursor: 'pointer' }}
+                    style={{
+                      flex: 1,
+                      height: 40,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 10,
+                      border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+                      background: 'var(--bg-hover, rgba(255, 255, 255, 0.06))',
+                      color: 'var(--text-primary, #FFFFFF)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
                     title="Share Barcode"
                   >
-                    <Share2 size={18} />
+                    <Share2 size={18} color="var(--text-primary, #FFFFFF)" />
                   </button>
                 </div>
               </div>
@@ -920,9 +956,9 @@ export default function BarcodePage({
             gap: 6,
             padding: '7px 12px',
             borderRadius: 20,
-            border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-            background: 'var(--bg-card, #FFFFFF)',
-            color: 'var(--text-primary, #1C1C1E)',
+            border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+            background: 'var(--bg-card, #151C2E)',
+            color: 'var(--text-primary, #FFFFFF)',
             fontSize: 11,
             fontWeight: 700,
             cursor: 'pointer',
@@ -943,9 +979,9 @@ export default function BarcodePage({
             gap: 6,
             padding: '7px 12px',
             borderRadius: 20,
-            border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-            background: 'var(--bg-card, #FFFFFF)',
-            color: 'var(--text-primary, #1C1C1E)',
+            border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+            background: 'var(--bg-card, #151C2E)',
+            color: 'var(--text-primary, #FFFFFF)',
             fontSize: 11,
             fontWeight: 700,
             cursor: 'pointer',
@@ -966,9 +1002,9 @@ export default function BarcodePage({
             gap: 6,
             padding: '7px 12px',
             borderRadius: 20,
-            border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-            background: 'var(--bg-card, #FFFFFF)',
-            color: 'var(--text-primary, #1C1C1E)',
+            border: '1px solid var(--border-color, rgba(255, 255, 255, 0.08))',
+            background: 'var(--bg-card, #151C2E)',
+            color: 'var(--text-primary, #FFFFFF)',
             fontSize: 11,
             fontWeight: 700,
             cursor: 'pointer',

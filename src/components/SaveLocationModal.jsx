@@ -235,7 +235,7 @@ export default function SaveLocationModal({ isOpen, onClose, onSave, showToast }
               padding: '14px',
               borderRadius: '14px',
               border: 'none',
-              background: 'var(--accent-gradient, linear-gradient(135deg, #EF1E34, #FF5FD2))',
+              background: 'var(--accent-primary)',
               color: '#FFFFFF',
               fontWeight: 800,
               fontSize: '14px',

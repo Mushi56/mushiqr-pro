@@ -668,7 +668,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     width: '32px',
                     height: '32px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)',
+                    background: '#EF1E34',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -690,7 +690,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     <div style={{
                       fontSize: '8.5px',
                       fontWeight: 700,
-                      color: isDark ? '#FF4D79' : '#EF1E34',
+                      color: isDark ? '#FF6B7A' : '#C60E23',
                       marginTop: '2px',
                       lineHeight: 1
                     }}>
@@ -718,26 +718,15 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 zIndex: 4,
                 position: 'relative'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <div style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '6px',
-                    background: 'rgba(239, 30, 52, 0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <Image size={10} color="#FF4D79" />
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Image size={12} color={isDark ? '#94A3B8' : '#64748B'} />
                   <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>Make it Yours</span>
                 </div>
                 <div style={{
                   width: '20px',
                   height: '20px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #EF1E34 0%, #B50B20 100%)',
+                  background: '#EF1E34',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -818,7 +807,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     width: '32px',
                     height: '32px',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #FF7C00 0%, #994A00 100%)',
+                    background: '#FF7C00',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -868,26 +857,15 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 zIndex: 4,
                 position: 'relative'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <div style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '6px',
-                    background: 'rgba(255, 124, 0, 0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <Barcode size={10} color="#FF9D33" />
-                  </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Barcode size={12} color={isDark ? '#94A3B8' : '#64748B'} />
                   <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30+ Formats</span>
                 </div>
                 <div style={{
                   width: '20px',
                   height: '20px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #FF7C00 0%, #994A00 100%)',
+                  background: '#FF7C00',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -918,13 +896,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               overflow: 'hidden',
               padding: '12px',
               boxSizing: 'border-box',
-              backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              border: 'none',
+              backgroundColor: isDark ? '#141A28' : '#FFFFFF',
               boxShadow: isDark 
-                ? '0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
-                : '0 12px 30px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                ? '0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.08)' 
+                : '0 12px 30px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
               width: '100%',
               cursor: 'pointer',
               transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -932,21 +907,21 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           >
             <PaidCrownBadge featureId="batch_view" position="floating" size={10} />
             
-            {/* Onboarding Style Ambient Emerald Nebula Background */}
+            {/* Ambient Vibrant Warm Coral-Crimson Accent Nebula Background */}
             <div style={{
               position: 'absolute', top: '-40%', right: '8%',
               width: '200px', height: '180px',
               background: isDark 
-                ? 'radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.15) 50%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%)',
+                ? 'radial-gradient(circle, rgba(255, 42, 84, 0.32) 0%, rgba(255, 124, 0, 0.12) 50%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(255, 42, 84, 0.14) 0%, transparent 70%)',
               filter: 'blur(24px)', pointerEvents: 'none', zIndex: 1
             }} />
 
-            {/* Onboarding Style Sparkle Stars */}
-            <span className="sparkle-star" style={{ top: '16%', right: '124px', color: '#00E676', fontSize: '10px', zIndex: 2 }}>✦</span>
-            <span className="sparkle-star" style={{ bottom: '18%', right: '16px', color: '#34D399', fontSize: '11px', animationDelay: '1.4s', zIndex: 2 }}>✦</span>
+            {/* Sparkle Stars */}
+            <span className="sparkle-star" style={{ top: '16%', right: '124px', color: '#FF4D6D', fontSize: '10px', zIndex: 2 }}>✦</span>
+            <span className="sparkle-star" style={{ bottom: '18%', right: '16px', color: '#FF758F', fontSize: '11px', animationDelay: '1.4s', zIndex: 2 }}>✦</span>
 
-            {/* Card Image with 3D Drop-Shadow and Emerald Neon Glow */}
+            {/* Card Image with 3D Drop-Shadow */}
             <img 
               src="/Bulk Ganaration.webp" 
               alt="Bulk Generation" 
@@ -962,8 +937,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 pointerEvents: 'none',
                 opacity: 0.98,
                 filter: isDark 
-                  ? ') )'
-                  : ')'
+                  ? 'drop-shadow(0 14px 24px rgba(0,0,0,0.7)) drop-shadow(0 4px 10px rgba(255, 42, 84, 0.35))'
+                  : 'drop-shadow(0 10px 18px rgba(0,0,0,0.18))'
               }} 
             />
 
@@ -974,11 +949,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   width: '32px',
                   height: '32px',
                   borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #10B981 0%, #047857 100%)',
+                  background: '#FF2A54',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 10px rgba(16, 185, 129, 0.25)',
+                  boxShadow: '0 4px 12px rgba(255, 42, 84, 0.35)',
                   flexShrink: 0
                 }}>
                   <Layers size={16} color="#FFFFFF" />
@@ -996,7 +971,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   <div style={{
                     fontSize: '8.5px',
                     fontWeight: 700,
-                    color: isDark ? '#34D399' : '#059669',
+                    color: isDark ? '#FF6B8B' : '#D90F38',
                     marginTop: '2px',
                     lineHeight: 1
                   }}>
@@ -1020,7 +995,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               style={{ 
                 background: 'none', 
                 border: 'none', 
-                color: 'var(--accent-primary)', 
+                color: isDark ? '#E53E3E' : '#B91C1C', 
                 fontSize: '13px', 
                 fontWeight: 600, 
                 cursor: 'pointer', 
@@ -1042,8 +1017,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`qr_${option.id}`} position="floating" size={10} />
-                <div className="quick-option-icon-wrapper" style={{ background: 'rgba(239, 30, 52, 0.08)', color: '#EF1E34' }}>
-                  {React.cloneElement(option.icon, { size: 20 })}
+                <div className="quick-option-icon-wrapper" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
+                  {React.cloneElement(option.icon, { size: 22 })}
                 </div>
                 <span style={{
                   fontSize: '9px',
@@ -1074,7 +1049,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               style={{ 
                 background: 'none', 
                 border: 'none', 
-                color: 'var(--accent-primary)', 
+                color: isDark ? '#E53E3E' : '#B91C1C', 
                 fontSize: '13px', 
                 fontWeight: 600, 
                 cursor: 'pointer', 
@@ -1096,7 +1071,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`barcode_${option.id}`} position="floating" size={10} />
-                <div className="quick-option-icon-wrapper" style={{ background: 'rgba(239, 30, 52, 0.08)', color: '#EF1E34' }}>
+                <div className="quick-option-icon-wrapper" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
                   {getBarcodeIcon(option.id)}
                 </div>
                 <span style={{

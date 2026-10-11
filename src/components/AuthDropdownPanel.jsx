@@ -197,7 +197,7 @@ export default function AuthDropdownPanel({ onClose }) {
 
         <button type="submit" disabled={loading} style={{
           width: '100%', height: '48px', borderRadius: '12px',
-          background: 'var(--accent-gradient)', border: 'none', color: '#fff',
+          background: 'var(--accent-primary)', border: 'none', color: '#fff',
           fontWeight: 700, fontSize: '15px', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
           boxShadow: '0 4px 14px rgba(239, 30, 52,0.25)',
