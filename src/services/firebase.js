@@ -13,7 +13,11 @@ const requiredEnvVars = [
 // Runtime security validation: Check for missing environment variables
 const missingVars = requiredEnvVars.filter(key => !import.meta.env[key]);
 if (missingVars.length > 0) {
-  console.warn(`[Security Alert] Missing Firebase environment variables: ${missingVars.join(', ')}. Cloud sync features may be limited.`);
+  if (import.meta.env.PROD) {
+    console.error(`[CRITICAL CONFIG ALERT] Production build missing Firebase environment variables: ${missingVars.join(', ')}. Hard-coded fallback project credentials are in active use.`);
+  } else {
+    console.warn(`[Config Notice] Missing Firebase environment variables: ${missingVars.join(', ')}. Using default development configuration.`);
+  }
 }
 
 const firebaseConfig = {

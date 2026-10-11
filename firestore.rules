@@ -92,12 +92,19 @@ service cloud.firestore {
     }
 
     // ── App Visitors (anonymous device tracking)
-    // Any visitor can register a device; updates are restricted to visitor telemetry attributes
+    // Any visitor can register their own device; linked/registered UID cannot be forged without auth ownership
     match /app_visitors/{deviceId} {
       allow get: if true;
       allow list: if isSuperAdmin();
-      allow create: if true;
-      allow update: if isSuperAdmin() || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastVisitAt', 'visitCount', 'linkedUid', 'updatedAt', 'deviceInfo', 'userAgent', 'platform']);
+      allow create: if request.resource.data.deviceId == deviceId
+                    && (!('registeredUid' in request.resource.data) || request.resource.data.registeredUid == null || (request.auth != null && request.auth.uid == request.resource.data.registeredUid))
+                    && (!('linkedUid' in request.resource.data) || request.resource.data.linkedUid == null || (request.auth != null && request.auth.uid == request.resource.data.linkedUid));
+      allow update: if isSuperAdmin() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeenAt', 'lastVisitAt', 'visitCount', 'isRegistered', 'registeredUid', 'linkedUid', 'updatedAt', 'deviceInfo', 'userAgent', 'platform'])
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['registeredUid']) || (request.auth != null && request.auth.uid == request.resource.data.registeredUid))
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['linkedUid']) || (request.auth != null && request.auth.uid == request.resource.data.linkedUid))
+      );
+      allow delete: if isSuperAdmin();
     }
 
     // ── Subscription Plan Configurations

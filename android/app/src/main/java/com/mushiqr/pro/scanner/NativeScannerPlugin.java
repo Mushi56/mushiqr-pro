@@ -141,10 +141,12 @@ public class NativeScannerPlugin extends Plugin {
     @PluginMethod
     public void stopScanner(PluginCall call) {
         getActivity().runOnUiThread(() -> {
-            nativeScanner.stopScanner();
-            bridge.getWebView().setBackgroundColor(Color.TRANSPARENT);
+            if (nativeScanner != null) {
+                nativeScanner.stopScanner();
+            }
+            bridge.getWebView().setBackgroundColor(Color.WHITE);
             ViewGroup parent = (ViewGroup) bridge.getWebView().getParent();
-            if (containerView.getParent() != null) {
+            if (containerView != null && containerView.getParent() != null && parent != null) {
                 parent.removeView(containerView);
             }
             call.resolve();
@@ -197,8 +199,20 @@ public class NativeScannerPlugin extends Plugin {
 
     @PluginMethod
     public void switchCamera(PluginCall call) {
-        nativeScanner.switchCamera();
-        call.resolve();
+        getActivity().runOnUiThread(() -> {
+            if (nativeScanner != null) {
+                nativeScanner.switchCamera(
+                    () -> {
+                        JSObject ret = new JSObject();
+                        ret.put("lensFacing", nativeScanner.getLensFacing() == androidx.camera.core.CameraSelector.LENS_FACING_FRONT ? "front" : "back");
+                        call.resolve(ret);
+                    },
+                    () -> call.reject("Failed to switch camera")
+                );
+            } else {
+                call.reject("Scanner not initialized");
+            }
+        });
     }
 
     @PluginMethod

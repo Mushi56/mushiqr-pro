@@ -36,7 +36,10 @@ dist-ssr
 # Android APKs and Build Outputs
 *.apk
 *.aab
+dist-admin/
+apks/
 first-commit-build/
+mushiqr-pro-v2-temp/
 
 # Temporary Log Dumps & Audit Outputs
 build_*.txt

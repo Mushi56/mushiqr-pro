@@ -57,11 +57,39 @@ export function getHistory() {
 export function deleteFromHistory(id) {
   const history = getHistory().filter(item => item.id !== id);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+  // Mirror deletion to Firestore
+  try {
+    const user = auth.currentUser;
+    if (user && id) {
+      deleteDoc(doc(db, 'users', user.uid, 'history', id)).catch(e => console.error('Firestore deleteFromHistory error:', e));
+    }
+  } catch (e) {
+    console.error('Firestore deleteFromHistory error:', e);
+  }
+
   return history;
 }
 
 export function clearHistory() {
+  const current = getHistory();
   localStorage.removeItem(HISTORY_KEY);
+
+  // Mirror purge to Firestore
+  try {
+    const user = auth.currentUser;
+    if (user && current.length > 0) {
+      const batch = writeBatch(db);
+      current.forEach(item => {
+        if (item.id) {
+          batch.delete(doc(db, 'users', user.uid, 'history', item.id));
+        }
+      });
+      batch.commit().catch(e => console.error('Firestore clearHistory error:', e));
+    }
+  } catch (e) {
+    console.error('Firestore clearHistory error:', e);
+  }
 }
 
 export function clearHistoryByRange(hours) {
@@ -71,12 +99,34 @@ export function clearHistoryByRange(hours) {
   }
   const history = getHistory();
   const cutoff = Date.now() - (hours * 60 * 60 * 1000);
+  const toDelete = [];
   const updated = history.filter(item => {
     const time = new Date(item.timestamp).getTime();
-    return time < cutoff;
+    if (time >= cutoff) {
+      toDelete.push(item);
+      return false;
+    }
+    return true;
   });
 
   localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+
+  // Mirror range purge to Firestore
+  try {
+    const user = auth.currentUser;
+    if (user && toDelete.length > 0) {
+      const batch = writeBatch(db);
+      toDelete.forEach(item => {
+        if (item.id) {
+          batch.delete(doc(db, 'users', user.uid, 'history', item.id));
+        }
+      });
+      batch.commit().catch(e => console.error('Firestore clearHistoryByRange error:', e));
+    }
+  } catch (e) {
+    console.error('Firestore clearHistoryByRange error:', e);
+  }
+
   return updated;
 }
 
@@ -190,12 +240,44 @@ export function deleteFromSaved(idOrItem) {
   const remaining = saved.filter(item => !toDeleteIds.includes(item.id));
   localStorage.setItem(SAVED_KEY, JSON.stringify(remaining));
   window.dispatchEvent(new Event('storage-sync'));
+
+  // Mirror deletion to Firestore
+  try {
+    const user = auth.currentUser;
+    if (user && toDeleteIds.length > 0) {
+      const batch = writeBatch(db);
+      toDeleteIds.forEach(id => {
+        batch.delete(doc(db, 'users', user.uid, 'saved', id));
+      });
+      batch.commit().catch(e => console.error('Firestore deleteFromSaved error:', e));
+    }
+  } catch (e) {
+    console.error('Firestore deleteFromSaved error:', e);
+  }
+
   return remaining;
 }
 
 export function clearSaved() {
+  const current = getSaved();
   localStorage.removeItem(SAVED_KEY);
   window.dispatchEvent(new Event('storage-sync'));
+
+  // Mirror purge to Firestore
+  try {
+    const user = auth.currentUser;
+    if (user && current.length > 0) {
+      const batch = writeBatch(db);
+      current.forEach(item => {
+        if (item.id) {
+          batch.delete(doc(db, 'users', user.uid, 'saved', item.id));
+        }
+      });
+      batch.commit().catch(e => console.error('Firestore clearSaved error:', e));
+    }
+  } catch (e) {
+    console.error('Firestore clearSaved error:', e);
+  }
 }
 
 export function clearSavedByRange(hours) {

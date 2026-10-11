@@ -450,7 +450,7 @@ export default function BarcodePage({
           barColor,
           bgColor: isTransparentBg ? 'transparent' : bgColor,
           barWidth: barWidth * scale,
-          height,
+          height: height * scale,
           margin: margin * scale,
           displayValue,
           textPosition,
@@ -463,8 +463,10 @@ export default function BarcodePage({
         else if (format === 'PDF') result = await downloadPDF(tempCanvas, filename, 'Barcodes');
       }
 
-      if (result === 'gallery') showToast('Saved to Gallery', 'success');
-      else if (result === 'share') showToast('Share Sheet Opened', 'success');
+      const status = typeof result === 'object' ? result?.result : result;
+      if (status === 'gallery' || status === 'saved') showToast('Saved successfully', 'success');
+      else if (status === 'share') showToast('Share Sheet Opened', 'success');
+      else if (status === 'download') showToast('Downloaded successfully', 'success');
       else showToast('Saved successfully', 'success');
 
       // Also record in history

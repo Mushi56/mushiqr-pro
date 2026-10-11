@@ -208,6 +208,6 @@ export async function downloadPDF(canvas, filename = 'qrcode', category = 'QR Co
     return await saveFileNative(base64Data, `${filename}.pdf`, category);
   } else {
     pdf.save(`${filename}.pdf`);
-    return 'download';
+    return { result: 'download', filename: `${filename}.pdf`, isNative: false };
   }
 }

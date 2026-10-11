@@ -436,10 +436,10 @@ export default function SavedPage({ onLoadQR, onNavigate }) {
                     border: 'none',
                     overflow: 'hidden'
                   }}>
-                    {isScannedQR(item) ? (
-                      <ScannedQRThumbnail item={item} />
-                    ) : item.thumbnail ? (
+                    {item.thumbnail ? (
                       <img src={item.thumbnail} alt="QR" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
+                    ) : isScannedQR(item) ? (
+                      <ScannedQRThumbnail item={item} />
                     ) : (
                       <QrCode size={40} color="var(--accent-primary)" />
                     )}

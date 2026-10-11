@@ -319,6 +319,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
   const listenersRef = useRef([]);
   const zoomRafRef = useRef(null);
   const capturingRef = useRef(false);
+  const isPickingFileRef = useRef(false);
 
   const handleEditResult = () => {
     triggerHapticFeedback();
@@ -463,6 +464,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     
     if (Capacitor.isNativePlatform()) {
       try { await NativeScanner.stopScanner(); } catch (e) { console.warn(e); }
+      try { await StatusBar.setOverlaysWebView({ overlay: false }); } catch (e) {}
       document.documentElement.classList.remove('native-scanner-active');
       document.body.classList.remove('native-scanner-active');
       document.body.style.removeProperty('background');
@@ -938,10 +940,10 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
           // App went to background: stop the camera to release Android locks
           await stopScanner();
         } else {
-          // App returned to foreground: restart the camera if we were scanning
-          if (isScanningRef.current) {
+          // App returned to foreground: restart the camera if we were scanning and NOT picking a file from gallery
+          if (isScanningRef.current && !isPickingFileRef.current) {
             setTimeout(() => {
-              if (isScanningRef.current) {
+              if (isScanningRef.current && !isPickingFileRef.current) {
                 startScanner();
               }
             }, 300);
@@ -958,8 +960,32 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
     };
   }, [stopScanner, startScanner]);
 
+  // Reset file picking flag if user dismisses native picker and window regains focus
+  useEffect(() => {
+    const handleFocus = () => {
+      if (isPickingFileRef.current) {
+        setTimeout(() => {
+          if (isPickingFileRef.current) {
+            isPickingFileRef.current = false;
+            if (isScanningRef.current && status === 'SCANNING') {
+              startScanner();
+            }
+          }
+        }, 600);
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [startScanner, status]);
+
   const handleFileUpload = async (file) => {
-    if (!file) return;
+    isPickingFileRef.current = false;
+    if (!file) {
+      if (isScanningRef.current && status === 'SCANNING') {
+        startScanner();
+      }
+      return;
+    }
     setStatus('LOADING'); setResult(null); setQrTypeData(null); setError(null);
     await stopScanner();
     scanHandledRef.current = false;
@@ -1709,6 +1735,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
                 return;
               }
               triggerHapticFeedback(); 
+              isPickingFileRef.current = true;
               fileInputRef.current?.click(); 
             }} 
             aria-label="Gallery"

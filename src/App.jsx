@@ -2654,16 +2654,74 @@ export default function App() {
   const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
   backHandlerRef.current = () => {
+    // 1. Dismiss full screen preview
     if (isFullScreenPreviewOpen) {
       setIsFullScreenPreviewOpen(false);
       return;
     }
+    // 2. Dismiss export success modal
+    if (exportSuccessInfo) {
+      setExportSuccessInfo(null);
+      return;
+    }
+    // 3. Dismiss delete confirmation modal
+    if (deleteModalConfig?.isOpen) {
+      setDeleteModalConfig(prev => ({ ...prev, isOpen: false }));
+      return;
+    }
+    // 4. Dismiss folder / save location modal
+    if (isFolderModalOpen) {
+      setIsFolderModalOpen(false);
+      return;
+    }
+    // 5. Dismiss image crop & shape modal
+    if (cropModalConfig) {
+      setCropModalConfig(null);
+      return;
+    }
+    // 6. Dismiss color and shape popups
+    if (colorPopup) {
+      setColorPopup(null);
+      return;
+    }
+    if (shapePopup) {
+      setShapePopup(null);
+      return;
+    }
+    // 7. Dismiss advanced picker and dropdowns
+    if (advPicker?.open) {
+      setAdvPicker({ open: false, type: null });
+      return;
+    }
+    if (formatDropdownOpen) {
+      setFormatDropdownOpen(false);
+      return;
+    }
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+      return;
+    }
+    if (isDataModalOpen) {
+      setIsDataModalOpen(false);
+      return;
+    }
+
+    // 8. Dismiss any active DOM modal dialogs / overlays
+    const domModalClose = document.querySelector('.modal-overlay .modal-close, .delete-modal-overlay button:not(.confirm-btn), .paywall-modal .close-btn, .dialog-close-btn');
+    if (domModalClose) {
+      domModalClose.click();
+      return;
+    }
+
+    // 9. Scanner result banner
     const scannerResultBtn = document.querySelector('.qrs-result-banner-btn');
     if (scannerResultBtn) {
       scannerResultBtn.click();
       return;
     }
-    if (activePage === 'home' && !advPicker.open && !formatDropdownOpen && !isMenuOpen && !isDataModalOpen) {
+
+    // 10. Root navigation or exit on home
+    if (activePage === 'home') {
       const now = Date.now();
       if (now - lastBackPress.current < 2000) {
         CapApp.exitApp();

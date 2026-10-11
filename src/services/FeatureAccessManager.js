@@ -694,7 +694,8 @@ class FeatureAccessManagerService {
     }
 
     // 4. Background shape prefix alias (qr_bg_* <-> qr_bgshape_*)
-    if (norm.startsWith('qr_bg_')) {
+    const BG_SHAPE_IDS = ['qr_bg_full', 'qr_bg_rounded', 'qr_bg_squircle', 'qr_bg_cut', 'qr_bg_leaf', 'qr_bg_circle', 'qr_bg_shield', 'qr_bg_hexagon', 'qr_bg_octagon', 'qr_bg_diamond'];
+    if (norm.startsWith('qr_bg_') && BG_SHAPE_IDS.includes(norm)) {
       const altKey = norm.replace('qr_bg_', 'qr_bgshape_');
       if (this.globalFlags[altKey] !== undefined) return Boolean(this.globalFlags[altKey]);
     } else if (norm.startsWith('qr_bgshape_')) {
@@ -827,7 +828,8 @@ class FeatureAccessManagerService {
     if (norm.startsWith('qr_eye_') && (this._resolveFlagValue('custom_eye_styles') === false || this._resolveFlagValue('qr_style_eyes') === false)) {
       return false;
     }
-    if ((norm.startsWith('qr_bg_') || norm.startsWith('qr_bgshape_')) && (this._resolveFlagValue('custom_background_shapes') === false || this._resolveFlagValue('qr_style_background') === false)) {
+    const BG_SHAPES_CHECK = ['qr_bg_full', 'qr_bg_rounded', 'qr_bg_squircle', 'qr_bg_cut', 'qr_bg_leaf', 'qr_bg_circle', 'qr_bg_shield', 'qr_bg_hexagon', 'qr_bg_octagon', 'qr_bg_diamond'];
+    if ((BG_SHAPES_CHECK.includes(norm) || norm.startsWith('qr_bgshape_')) && (this._resolveFlagValue('custom_background_shapes') === false || this._resolveFlagValue('qr_style_background') === false)) {
       return false;
     }
     if (norm.startsWith('qr_logo_') && this._resolveFlagValue('custom_logo_presets') === false) {
@@ -876,7 +878,8 @@ class FeatureAccessManagerService {
       if (freePlan.features.includes(featureId) || freePlan.features.includes(norm)) {
         return false;
       }
-      if (norm.startsWith('qr_bg_') && freePlan.features.includes(norm.replace('qr_bg_', 'qr_bgshape_'))) {
+      const BG_SHAPES_SET = ['qr_bg_full', 'qr_bg_rounded', 'qr_bg_squircle', 'qr_bg_cut', 'qr_bg_leaf', 'qr_bg_circle', 'qr_bg_shield', 'qr_bg_hexagon', 'qr_bg_octagon', 'qr_bg_diamond'];
+      if (norm.startsWith('qr_bg_') && BG_SHAPES_SET.includes(norm) && freePlan.features.includes(norm.replace('qr_bg_', 'qr_bgshape_'))) {
         return false;
       }
       if (norm.startsWith('qr_bgshape_') && freePlan.features.includes(norm.replace('qr_bgshape_', 'qr_bg_'))) {
@@ -914,7 +917,8 @@ class FeatureAccessManagerService {
         if (planData.features.includes(featureId) || planData.features.includes(norm)) {
           return true;
         }
-        if (norm.startsWith('qr_bg_') && planData.features.includes(norm.replace('qr_bg_', 'qr_bgshape_'))) {
+        const BG_SHAPES_SET = ['qr_bg_full', 'qr_bg_rounded', 'qr_bg_squircle', 'qr_bg_cut', 'qr_bg_leaf', 'qr_bg_circle', 'qr_bg_shield', 'qr_bg_hexagon', 'qr_bg_octagon', 'qr_bg_diamond'];
+        if (norm.startsWith('qr_bg_') && BG_SHAPES_SET.includes(norm) && planData.features.includes(norm.replace('qr_bg_', 'qr_bgshape_'))) {
           return true;
         }
         if (norm.startsWith('qr_bgshape_') && planData.features.includes(norm.replace('qr_bgshape_', 'qr_bg_'))) {

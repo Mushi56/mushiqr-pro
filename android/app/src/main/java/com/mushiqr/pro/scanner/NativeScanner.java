@@ -48,6 +48,8 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.ArrayList;
+import java.util.List;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -90,8 +92,8 @@ public class NativeScanner {
     }
     
     private ScanListener scanListener;
-    private Runnable onReadyCallback;
-    private Runnable onErrorCallback;
+    private final List<Runnable> pendingReadyCallbacks = new ArrayList<>();
+    private final List<Runnable> pendingErrorCallbacks = new ArrayList<>();
     
     private volatile Barcode latestBarcode = null;
     private volatile long latestBarcodeTimestamp = 0;
@@ -138,28 +140,40 @@ public class NativeScanner {
         if (scanListener != null) {
             scanListener.onError(message, details);
         }
-        if (onErrorCallback != null) {
-            onErrorCallback.run();
-            onErrorCallback = null;
+        synchronized (this) {
+            List<Runnable> errors = new ArrayList<>(pendingErrorCallbacks);
+            pendingErrorCallbacks.clear();
+            pendingReadyCallbacks.clear();
+            for (Runnable cb : errors) {
+                if (cb != null) {
+                    try { cb.run(); } catch (Exception ignored) {}
+                }
+            }
         }
-        onReadyCallback = null;
         stopScanner();
         currentState = State.ERROR;
     }
 
-    public void startScanner(Runnable onReady, Runnable onError) {
+    public synchronized void startScanner(Runnable onReady, Runnable onError) {
         manualZoomOverride = false;
         isPaused = false;
-        if (currentState == State.STARTING || currentState == State.READY) {
-            if (currentState == State.READY && onReady != null) {
+        if (currentState == State.READY) {
+            if (onReady != null) {
                 onReady.run();
             }
             return;
         }
+        if (currentState == State.STARTING) {
+            if (onReady != null) pendingReadyCallbacks.add(onReady);
+            if (onError != null) pendingErrorCallbacks.add(onError);
+            return;
+        }
 
         currentState = State.STARTING;
-        this.onReadyCallback = onReady;
-        this.onErrorCallback = onError;
+        pendingReadyCallbacks.clear();
+        pendingErrorCallbacks.clear();
+        if (onReady != null) pendingReadyCallbacks.add(onReady);
+        if (onError != null) pendingErrorCallbacks.add(onError);
         this.latestBarcode = null;
         this.latestBarcodeTimestamp = 0;
 
@@ -326,9 +340,15 @@ public class NativeScanner {
                         
                         initMlKit();
                         
-                        if (onReadyCallback != null) {
-                            onReadyCallback.run();
-                            onReadyCallback = null;
+                        synchronized (NativeScanner.this) {
+                            List<Runnable> readyCallbacks = new ArrayList<>(pendingReadyCallbacks);
+                            pendingReadyCallbacks.clear();
+                            pendingErrorCallbacks.clear();
+                            for (Runnable cb : readyCallbacks) {
+                                if (cb != null) {
+                                    try { cb.run(); } catch (Exception ignored) {}
+                                }
+                            }
                         }
                     }
                 }
@@ -431,8 +451,8 @@ public class NativeScanner {
         }
         
         camera = null;
-        onReadyCallback = null;
-        onErrorCallback = null;
+        pendingReadyCallbacks.clear();
+        pendingErrorCallbacks.clear();
         latestBarcode = null;
         latestBarcodeTimestamp = 0;
         
@@ -566,15 +586,17 @@ public class NativeScanner {
         }
     }
 
-    public void switchCamera() {
+    public void switchCamera(Runnable onReady, Runnable onError) {
         if (lensFacing == CameraSelector.LENS_FACING_BACK) {
             lensFacing = CameraSelector.LENS_FACING_FRONT;
         } else {
             lensFacing = CameraSelector.LENS_FACING_BACK;
         }
-        if (currentState == State.READY) {
-            stopScanner();
-            startScanner(null, null); // Callbacks handled by state or caller if needed
-        }
+        stopScanner();
+        startScanner(onReady, onError);
+    }
+
+    public int getLensFacing() {
+        return lensFacing;
     }
 }

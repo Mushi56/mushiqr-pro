@@ -338,7 +338,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
   const isDark = effectiveTheme === 'dark';
   const { isSuperAdmin } = useUserRole();
   const [recentItems, setRecentItems] = useState([]);
-  const [savedIds, setSavedIds] = useState(new Set());
+  const [savedItems, setSavedItems] = useState([]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [showAllBarcodes, setShowAllBarcodes] = useState(false);
   const [showAllQR, setShowAllQR] = useState(false);
@@ -405,7 +405,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
     const refreshData = () => {
       const history = getHistory().filter(item => item.source !== 'scan');
       setRecentItems(history.slice(0, 10));
-      setSavedIds(new Set(getSaved().map(s => s.id)));
+      setSavedItems(getSaved());
     };
 
     if (activePage === 'home') {
@@ -418,8 +418,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
 
   const handleToggleSave = (item) => {
     toggleSaved(item);
-    const updated = getSaved();
-    setSavedIds(new Set(updated.map(s => s.id)));
+    setSavedItems(getSaved());
   };
 
   const quickOptions = [
@@ -1201,30 +1200,35 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       </span>
 
                       {/* Save/Favorite Star */}
-                      <button
-                        onClick={() => handleToggleSave(item)}
-                        title={savedIds.has(item.id) ? "Remove from Saved" : "Add to Saved"}
-                        style={{
-                          background: 'transparent', border: 'none',
-                          color: savedIds.has(item.id) ? '#F39C12' : 'var(--text-tertiary)', cursor: 'pointer',
-                          padding: '2px', borderRadius: '50%',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          lineHeight: 1,
-                          transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#F39C12'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = savedIds.has(item.id) ? '#F39C12' : 'var(--text-tertiary)'}
-                      >
-                        <Star
-                          size={15}
-                          fill={savedIds.has(item.id) ? '#F39C12' : 'none'}
-                          style={{
-                            transition: 'all 0.2s ease',
-                            transform: savedIds.has(item.id) ? 'scale(1.1)' : 'scale(1)',
-                            color: savedIds.has(item.id) ? '#F39C12' : 'var(--text-tertiary)'
-                          }}
-                        />
-                      </button>
+                      {(() => {
+                        const isSaved = isItemSaved(item);
+                        return (
+                          <button
+                            onClick={() => handleToggleSave(item)}
+                            title={isSaved ? "Remove from Saved" : "Add to Saved"}
+                            style={{
+                              background: 'transparent', border: 'none',
+                              color: isSaved ? '#F39C12' : 'var(--text-tertiary)', cursor: 'pointer',
+                              padding: '2px', borderRadius: '50%',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              lineHeight: 1,
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.color = '#F39C12'}
+                            onMouseLeave={(e) => e.currentTarget.style.color = isSaved ? '#F39C12' : 'var(--text-tertiary)'}
+                          >
+                            <Star
+                              size={15}
+                              fill={isSaved ? '#F39C12' : 'none'}
+                              style={{
+                                transition: 'all 0.2s ease',
+                                transform: isSaved ? 'scale(1.1)' : 'scale(1)',
+                                color: isSaved ? '#F39C12' : 'var(--text-tertiary)'
+                              }}
+                            />
+                          </button>
+                        );
+                      })()}
                     </div>
                   </div>
 

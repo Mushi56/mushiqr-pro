@@ -642,16 +642,30 @@ export default function BatchPage({
       if (Capacitor.isNativePlatform()) {
         const reader = new FileReader();
         reader.onloadend = async () => {
-          const base64Data = reader.result.split(',')[1];
-          const zipCategory = batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes';
-          const uri = await saveZipNative(base64Data, archiveName, zipCategory);
+          try {
+            if (!reader.result || typeof reader.result !== 'string') {
+              throw new Error('Failed to read archive as data URL');
+            }
+            const base64Data = reader.result.split(',')[1];
+            const zipCategory = batchType === 'BARCODE' ? 'Barcodes' : 'QR Codes';
+            const uri = await saveZipNative(base64Data, archiveName, zipCategory);
+            setIsExporting(false);
+            setExportSuccessInfo({
+              filename: archiveName,
+              count: total,
+              isNative: true,
+              fileUri: uri
+            });
+          } catch (nativeErr) {
+            console.error('Failed to save native zip:', nativeErr);
+            alert('Failed to save ZIP archive to device storage.');
+            setIsExporting(false);
+          }
+        };
+        reader.onerror = (readErr) => {
+          console.error('FileReader error:', readErr);
+          alert('Failed to read batch archive.');
           setIsExporting(false);
-          setExportSuccessInfo({
-            filename: archiveName,
-            count: total,
-            isNative: true,
-            fileUri: uri
-          });
         };
         reader.readAsDataURL(content);
       } else {

@@ -35,7 +35,7 @@ export default function OnboardingFlow({ onComplete, theme, effectiveTheme: prop
     const attr = typeof document !== 'undefined' ? document.documentElement.getAttribute('data-theme') : null;
     if (attr === 'light' || attr === 'dark') return attr;
     try {
-      const prefs = JSON.parse(localStorage.getItem('mushi_qr_preferences_v2') || '{}');
+      const prefs = JSON.parse(localStorage.getItem('qrgen_preferences') || localStorage.getItem('mushi_qr_preferences_v2') || '{}');
       if (prefs.theme === 'light') return 'light';
       if (prefs.theme === 'dark') return 'dark';
     } catch (e) {}
