@@ -625,9 +625,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                padding: '10px',
+                padding: '9px 10px 8px 10px',
                 boxSizing: 'border-box',
-                minHeight: '154px',
+                minHeight: '135px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -641,10 +641,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="qr_generator" position="floating" size={10} />
               
-              {/* Top Badge Image with Ambient Glow (Increased Size) */}
+              {/* Top Badge Image with Ambient Glow */}
               <div style={{
                 width: '100%',
-                height: '78px',
+                height: '62px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -653,27 +653,27 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }}>
                 <div style={{
                   position: 'absolute',
-                  width: '110px',
-                  height: '65px',
+                  width: '95px',
+                  height: '52px',
                   background: isDark 
                     ? 'radial-gradient(ellipse, rgba(255, 30, 86, 0.32) 0%, transparent 70%)' 
                     : 'radial-gradient(ellipse, rgba(239, 30, 52, 0.2) 0%, transparent 70%)',
-                  filter: 'blur(14px)',
+                  filter: 'blur(12px)',
                   pointerEvents: 'none'
                 }} />
                 <img 
                   src="/Glossy Pink QR Code Badge.webp" 
                   alt="QR Codes" 
                   style={{
-                    maxHeight: '74px',
-                    maxWidth: '96px',
+                    maxHeight: '60px',
+                    maxWidth: '82px',
                     objectFit: 'contain',
                     position: 'relative',
                     zIndex: 2,
                     pointerEvents: 'none',
                     filter: isDark 
-                      ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 3px 10px rgba(255, 30, 86, 0.35))' 
-                      : 'drop-shadow(0 8px 16px rgba(239, 30, 52, 0.2))'
+                      ? 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55)) drop-shadow(0 2px 8px rgba(255, 30, 86, 0.35))' 
+                      : 'drop-shadow(0 6px 14px rgba(239, 30, 52, 0.2))'
                   }} 
                 />
               </div>
@@ -686,11 +686,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 width: '100%',
                 position: 'relative',
                 zIndex: 2,
-                marginTop: '6px',
-                marginBottom: '6px'
+                marginTop: '3px',
+                marginBottom: '5px'
               }}>
                 <span style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 800,
                   color: isDark ? '#FFFFFF' : '#0F172A',
                   letterSpacing: '-0.2px',
@@ -699,8 +699,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   QR Codes
                 </span>
                 <div style={{
-                  width: '24px',
-                  height: '24px',
+                  width: '21px',
+                  height: '21px',
                   borderRadius: '50%',
                   backgroundColor: isDark ? 'rgba(239, 30, 52, 0.22)' : 'rgba(239, 30, 52, 0.1)',
                   display: 'flex',
@@ -708,7 +708,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   justifyContent: 'center',
                   flexShrink: 0
                 }}>
-                  <ChevronRight size={13} color="#EF1E34" strokeWidth={2.6} />
+                  <ChevronRight size={12} color="#EF1E34" strokeWidth={2.6} />
                 </div>
               </div>
 
@@ -716,7 +716,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '6px',
+                gap: '5px',
                 width: '100%',
                 position: 'relative',
                 zIndex: 2
@@ -724,41 +724,41 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="Custom QR Templates"
                   style={{
-                    height: '30px',
-                    borderRadius: '9px',
+                    height: '26px',
+                    borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <LayoutTemplate size={15} color="#EF1E34" strokeWidth={2.2} />
+                  <LayoutTemplate size={14} color="#EF1E34" strokeWidth={2.2} />
                 </div>
                 <div 
                   title="Custom Colors & Gradients"
                   style={{
-                    height: '30px',
-                    borderRadius: '9px',
+                    height: '26px',
+                    borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <Palette size={15} color="#EF1E34" strokeWidth={2.2} />
+                  <Palette size={14} color="#EF1E34" strokeWidth={2.2} />
                 </div>
                 <div 
                   title="Custom Logo & Framing"
                   style={{
-                    height: '30px',
-                    borderRadius: '9px',
+                    height: '26px',
+                    borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <Image size={15} color="#EF1E34" strokeWidth={2.2} />
+                  <Image size={14} color="#EF1E34" strokeWidth={2.2} />
                 </div>
               </div>
             </div>
@@ -777,9 +777,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                padding: '10px',
+                padding: '9px 10px 8px 10px',
                 boxSizing: 'border-box',
-                minHeight: '154px',
+                minHeight: '135px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -793,10 +793,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="barcode_generator" position="floating" size={10} />
               
-              {/* Top Badge Image with Ambient Glow (Increased Size) */}
+              {/* Top Badge Image with Ambient Glow */}
               <div style={{
                 width: '100%',
-                height: '78px',
+                height: '62px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -805,27 +805,27 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }}>
                 <div style={{
                   position: 'absolute',
-                  width: '110px',
-                  height: '65px',
+                  width: '95px',
+                  height: '52px',
                   background: isDark 
                     ? 'radial-gradient(ellipse, rgba(255, 124, 0, 0.32) 0%, transparent 70%)' 
                     : 'radial-gradient(ellipse, rgba(255, 124, 0, 0.2) 0%, transparent 70%)',
-                  filter: 'blur(14px)',
+                  filter: 'blur(12px)',
                   pointerEvents: 'none'
                 }} />
                 <img 
                   src="/Glossy Orange Barcode Badge.webp" 
                   alt="Barcodes" 
                   style={{
-                    maxHeight: '74px',
-                    maxWidth: '96px',
+                    maxHeight: '60px',
+                    maxWidth: '82px',
                     objectFit: 'contain',
                     position: 'relative',
                     zIndex: 2,
                     pointerEvents: 'none',
                     filter: isDark 
-                      ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 3px 10px rgba(255, 124, 0, 0.35))' 
-                      : 'drop-shadow(0 8px 16px rgba(255, 124, 0, 0.2))'
+                      ? 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55)) drop-shadow(0 2px 8px rgba(255, 124, 0, 0.35))' 
+                      : 'drop-shadow(0 6px 14px rgba(255, 124, 0, 0.2))'
                   }} 
                 />
               </div>
@@ -838,11 +838,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 width: '100%',
                 position: 'relative',
                 zIndex: 2,
-                marginTop: '6px',
-                marginBottom: '6px'
+                marginTop: '3px',
+                marginBottom: '5px'
               }}>
                 <span style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 800,
                   color: isDark ? '#FFFFFF' : '#0F172A',
                   letterSpacing: '-0.2px',
@@ -851,8 +851,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   Barcodes
                 </span>
                 <div style={{
-                  width: '24px',
-                  height: '24px',
+                  width: '21px',
+                  height: '21px',
                   borderRadius: '50%',
                   backgroundColor: isDark ? 'rgba(239, 30, 52, 0.22)' : 'rgba(239, 30, 52, 0.1)',
                   display: 'flex',
@@ -860,7 +860,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   justifyContent: 'center',
                   flexShrink: 0
                 }}>
-                  <ChevronRight size={13} color="#EF1E34" strokeWidth={2.6} />
+                  <ChevronRight size={12} color="#EF1E34" strokeWidth={2.6} />
                 </div>
               </div>
 
@@ -868,7 +868,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: '6px',
+                gap: '5px',
                 width: '100%',
                 position: 'relative',
                 zIndex: 2
@@ -876,41 +876,41 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="30+ Barcode Standards"
                   style={{
-                    height: '30px',
-                    borderRadius: '9px',
+                    height: '26px',
+                    borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <Barcode size={15} color="#EF1E34" strokeWidth={2.2} />
+                  <Barcode size={14} color="#EF1E34" strokeWidth={2.2} />
                 </div>
                 <div 
                   title="Custom Barcode Colors"
                   style={{
-                    height: '30px',
-                    borderRadius: '9px',
+                    height: '26px',
+                    borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <Palette size={15} color="#EF1E34" strokeWidth={2.2} />
+                  <Palette size={14} color="#EF1E34" strokeWidth={2.2} />
                 </div>
                 <div 
                   title="Custom Dimensions & Text Labels"
                   style={{
-                    height: '30px',
-                    borderRadius: '9px',
+                    height: '26px',
+                    borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}
                 >
-                  <Sliders size={15} color="#EF1E34" strokeWidth={2.2} />
+                  <Sliders size={14} color="#EF1E34" strokeWidth={2.2} />
                 </div>
               </div>
             </div>
