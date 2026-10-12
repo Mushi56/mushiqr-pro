@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, ChevronLeft, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2, Star, FileSpreadsheet, Barcode, Link, Contact, File, Music, Coins, MessageCircle, Play, Calendar, Layers, Zap, Target } from 'lucide-react';
+import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, ChevronLeft, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2, Star, FileSpreadsheet, Barcode, Link, Contact, File, Music, Coins, MessageCircle, Play, Calendar, Layers, Zap, Target, Palette, ShieldCheck, Gauge, LayoutTemplate, Sliders } from 'lucide-react';
 import { FaInstagram, FaFacebookF, FaXTwitter, FaLinkedinIn } from 'react-icons/fa6';
 import { QR_TYPES, renderQR, generateQRMatrix, getQRItemTitle, getQRItemSubtitle } from '../utils/qrEngine';
 import { renderBarcode } from '../utils/barcodeEngine';
@@ -122,6 +122,18 @@ function HeroBarcodeCanvas() {
         display: 'block'
       }}
     />
+  );
+}
+
+function BarcodeTargetIcon({ size = 14, color = '#EF1E34' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 8V5a1 1 0 0 1 1-1h3" />
+      <path d="M16 4h3a1 1 0 0 1 1 1v3" />
+      <path d="M20 16v3a1 1 0 0 1-1 1h-3" />
+      <path d="M8 20H5a1 1 0 0 1-1-1v-3" />
+      <circle cx="12" cy="12" r="3" stroke={color} fill={color} fillOpacity="0.2" />
+    </svg>
   );
 }
 
@@ -599,10 +611,12 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
 
           {/* Top Row: Create QR Code & Create Barcode 50-50 side-by-side in 1 line */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', width: '100%', position: 'relative', zIndex: 2 }}>
+            {/* Card 1: QR Codes */}
             <div 
               onClick={() => onNavigate('generator')}
               role="button"
               tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && onNavigate('generator')}
               style={{
                 borderRadius: '18px',
                 color: isDark ? '#FFFFFF' : '#0F172A',
@@ -611,9 +625,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                padding: '12px',
+                padding: '10px',
                 boxSizing: 'border-box',
-                minHeight: '135px',
+                minHeight: '154px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -627,121 +641,134 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="qr_generator" position="floating" size={10} />
               
-              {/* Onboarding Style Ambient Ruby Nebula Background */}
+              {/* Top Badge Image with Ambient Glow (Increased Size) */}
               <div style={{
-                position: 'absolute', top: '-30%', right: '-15%',
-                width: '150px', height: '150px',
-                background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.35) 0%, rgba(184, 0, 38, 0.15) 50%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.2) 0%, transparent 70%)',
-                filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
-              }} />
-
-              {/* Onboarding Style Sparkle Stars */}
-              <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FF4D80', fontSize: '9px', zIndex: 2 }}>✦</span>
-              <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FF2A6D', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
-
-              {/* Card Image with 3D Drop-Shadow and Ruby Neon Glow */}
-              <img 
-                src="/Qr Code.webp" 
-                alt="QR Code" 
-                style={{
+                width: '100%',
+                height: '78px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                zIndex: 2
+              }}>
+                <div style={{
                   position: 'absolute',
-                  right: '-10px',
-                  bottom: '4px',
-                  width: '115px',
-                  height: '115px',
-                  objectFit: 'contain',
-                  zIndex: 3,
-                  pointerEvents: 'none',
-                  opacity: 0.98,
-                  filter: isDark 
-                    ? ') )'
-                    : ')'
-                }} 
-              />
-
-              {/* Top Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    background: '#EF1E34',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(239, 30, 52, 0.25)',
-                    flexShrink: 0
-                  }}>
-                    <QrCode size={16} color="#FFFFFF" />
-                  </div>
-                  <div>
-                    <h2 style={{
-                      fontSize: '13px',
-                      fontWeight: 800,
-                      color: isDark ? '#FFFFFF' : '#0F172A',
-                      margin: 0,
-                      lineHeight: 1.1
-                    }}>
-                      QR Codes
-                    </h2>
-                    <div style={{
-                      fontSize: '8.5px',
-                      fontWeight: 700,
-                      color: isDark ? '#FF6B7A' : '#C60E23',
-                      marginTop: '2px',
-                      lineHeight: 1
-                    }}>
-                      Design Without Limits
-                    </div>
-                  </div>
-                </div>
-                <p style={{ fontSize: '8.5px', margin: '0 0 8px 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.3, maxWidth: '85px' }}>
-                  Create beautiful, custom QR codes with logos, colors, and unique frames.
-                </p>
+                  width: '110px',
+                  height: '65px',
+                  background: isDark 
+                    ? 'radial-gradient(ellipse, rgba(255, 30, 86, 0.32) 0%, transparent 70%)' 
+                    : 'radial-gradient(ellipse, rgba(239, 30, 52, 0.2) 0%, transparent 70%)',
+                  filter: 'blur(14px)',
+                  pointerEvents: 'none'
+                }} />
+                <img 
+                  src="/Glossy Pink QR Code Badge.webp" 
+                  alt="QR Codes" 
+                  style={{
+                    maxHeight: '74px',
+                    maxWidth: '96px',
+                    objectFit: 'contain',
+                    position: 'relative',
+                    zIndex: 2,
+                    pointerEvents: 'none',
+                    filter: isDark 
+                      ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 3px 10px rgba(255, 30, 86, 0.35))' 
+                      : 'drop-shadow(0 8px 16px rgba(239, 30, 52, 0.2))'
+                  }} 
+                />
               </div>
 
-              {/* Bottom Action Pill */}
+              {/* Title & Circular Arrow Row */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '5px 8px',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.35)' : '#F8FAFC',
-                borderRadius: '12px',
-                border: 'none',
-                width: 'calc(100% + 24px)',
-                boxSizing: 'border-box',
-                margin: 'auto -12px -12px -12px',
-                zIndex: 4,
-                position: 'relative'
+                width: '100%',
+                position: 'relative',
+                zIndex: 2,
+                marginTop: '6px',
+                marginBottom: '6px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Image size={12} color={isDark ? '#94A3B8' : '#64748B'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>Make it Yours</span>
-                </div>
+                <span style={{
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  color: isDark ? '#FFFFFF' : '#0F172A',
+                  letterSpacing: '-0.2px',
+                  lineHeight: 1.2
+                }}>
+                  QR Codes
+                </span>
                 <div style={{
-                  width: '20px',
-                  height: '20px',
+                  width: '24px',
+                  height: '24px',
                   borderRadius: '50%',
-                  background: '#EF1E34',
+                  backgroundColor: isDark ? 'rgba(239, 30, 52, 0.22)' : 'rgba(239, 30, 52, 0.1)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(239, 30, 52, 0.3)'
+                  flexShrink: 0
                 }}>
-                  <ChevronRight size={12} color="#FFFFFF" />
+                  <ChevronRight size={13} color="#EF1E34" strokeWidth={2.6} />
+                </div>
+              </div>
+
+              {/* 3 Section Feature Badges: Custom Templates, Colors, Logo/Styles */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '6px',
+                width: '100%',
+                position: 'relative',
+                zIndex: 2
+              }}>
+                <div 
+                  title="Custom QR Templates"
+                  style={{
+                    height: '30px',
+                    borderRadius: '9px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <LayoutTemplate size={15} color="#EF1E34" strokeWidth={2.2} />
+                </div>
+                <div 
+                  title="Custom Colors & Gradients"
+                  style={{
+                    height: '30px',
+                    borderRadius: '9px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Palette size={15} color="#EF1E34" strokeWidth={2.2} />
+                </div>
+                <div 
+                  title="Custom Logo & Framing"
+                  style={{
+                    height: '30px',
+                    borderRadius: '9px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Image size={15} color="#EF1E34" strokeWidth={2.2} />
                 </div>
               </div>
             </div>
 
-            {/* Card 2: Create Barcode */}
+            {/* Card 2: Barcodes */}
             <div 
               onClick={() => onNavigate('barcode')}
               role="button"
               tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && onNavigate('barcode')}
               style={{
                 borderRadius: '18px',
                 color: isDark ? '#FFFFFF' : '#0F172A',
@@ -750,9 +777,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                padding: '12px',
+                padding: '10px',
                 boxSizing: 'border-box',
-                minHeight: '135px',
+                minHeight: '154px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -766,116 +793,127 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="barcode_generator" position="floating" size={10} />
               
-              {/* Onboarding Style Ambient Golden Amber Nebula Background */}
+              {/* Top Badge Image with Ambient Glow (Increased Size) */}
               <div style={{
-                position: 'absolute', top: '-30%', right: '-15%',
-                width: '150px', height: '150px',
-                background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.35) 0%, rgba(217, 101, 0, 0.15) 50%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.2) 0%, transparent 70%)',
-                filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
-              }} />
-
-              {/* Onboarding Style Sparkle Stars */}
-              <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FFB74D', fontSize: '9px', zIndex: 2 }}>✦</span>
-              <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FFA000', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
-
-              {/* Card Image with 3D Drop-Shadow and Golden Neon Glow */}
-              <img 
-                src="/Barcode.webp" 
-                alt="Barcode" 
-                style={{
+                width: '100%',
+                height: '78px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                zIndex: 2
+              }}>
+                <div style={{
                   position: 'absolute',
-                  right: '-10px',
-                  bottom: '4px',
-                  width: '115px',
-                  height: '115px',
-                  objectFit: 'contain',
-                  zIndex: 3,
-                  pointerEvents: 'none',
-                  opacity: 0.98,
-                  filter: isDark 
-                    ? ') )'
-                    : ')'
-                }} 
-              />
-
-              {/* Top Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    background: '#FF7C00',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(255, 124, 0, 0.25)',
-                    flexShrink: 0
-                  }}>
-                    <Barcode size={16} color="#FFFFFF" />
-                  </div>
-                  <div>
-                    <h2 style={{
-                      fontSize: '13px',
-                      fontWeight: 800,
-                      color: isDark ? '#FFFFFF' : '#0F172A',
-                      margin: 0,
-                      lineHeight: 1.1
-                    }}>
-                      Barcodes
-                    </h2>
-                    <div style={{
-                      fontSize: '8.5px',
-                      fontWeight: 700,
-                      color: isDark ? '#FF9D33' : '#D96500',
-                      marginTop: '2px',
-                      lineHeight: 1
-                    }}>
-                      Professional &amp; Reliable
-                    </div>
-                  </div>
-                </div>
-                <p style={{ fontSize: '8.5px', margin: '0 0 8px 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.3, maxWidth: '85px' }}>
-                  Generate reliable 1D &amp; 2D barcodes for over 30 industrial standards.
-                </p>
+                  width: '110px',
+                  height: '65px',
+                  background: isDark 
+                    ? 'radial-gradient(ellipse, rgba(255, 124, 0, 0.32) 0%, transparent 70%)' 
+                    : 'radial-gradient(ellipse, rgba(255, 124, 0, 0.2) 0%, transparent 70%)',
+                  filter: 'blur(14px)',
+                  pointerEvents: 'none'
+                }} />
+                <img 
+                  src="/Glossy Orange Barcode Badge.webp" 
+                  alt="Barcodes" 
+                  style={{
+                    maxHeight: '74px',
+                    maxWidth: '96px',
+                    objectFit: 'contain',
+                    position: 'relative',
+                    zIndex: 2,
+                    pointerEvents: 'none',
+                    filter: isDark 
+                      ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.55)) drop-shadow(0 3px 10px rgba(255, 124, 0, 0.35))' 
+                      : 'drop-shadow(0 8px 16px rgba(255, 124, 0, 0.2))'
+                  }} 
+                />
               </div>
 
-              {/* Bottom Action Pill */}
+              {/* Title & Circular Arrow Row */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '5px 8px',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.35)' : '#F8FAFC',
-                borderRadius: '12px',
-                border: 'none',
-                width: 'calc(100% + 24px)',
-                boxSizing: 'border-box',
-                margin: 'auto -12px -12px -12px',
-                zIndex: 4,
-                position: 'relative'
+                width: '100%',
+                position: 'relative',
+                zIndex: 2,
+                marginTop: '6px',
+                marginBottom: '6px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Barcode size={12} color={isDark ? '#94A3B8' : '#64748B'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30+ Formats</span>
-                </div>
+                <span style={{
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  color: isDark ? '#FFFFFF' : '#0F172A',
+                  letterSpacing: '-0.2px',
+                  lineHeight: 1.2
+                }}>
+                  Barcodes
+                </span>
                 <div style={{
-                  width: '20px',
-                  height: '20px',
+                  width: '24px',
+                  height: '24px',
                   borderRadius: '50%',
-                  background: '#FF7C00',
+                  backgroundColor: isDark ? 'rgba(239, 30, 52, 0.22)' : 'rgba(239, 30, 52, 0.1)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(255, 124, 0, 0.3)'
+                  flexShrink: 0
                 }}>
-                  <ChevronRight size={12} color="#FFFFFF" />
+                  <ChevronRight size={13} color="#EF1E34" strokeWidth={2.6} />
+                </div>
+              </div>
+
+              {/* 3 Section Feature Badges: 30+ Standards, Colors, Dimensions/Labels */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '6px',
+                width: '100%',
+                position: 'relative',
+                zIndex: 2
+              }}>
+                <div 
+                  title="30+ Barcode Standards"
+                  style={{
+                    height: '30px',
+                    borderRadius: '9px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Barcode size={15} color="#EF1E34" strokeWidth={2.2} />
+                </div>
+                <div 
+                  title="Custom Barcode Colors"
+                  style={{
+                    height: '30px',
+                    borderRadius: '9px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Palette size={15} color="#EF1E34" strokeWidth={2.2} />
+                </div>
+                <div 
+                  title="Custom Dimensions & Text Labels"
+                  style={{
+                    height: '30px',
+                    borderRadius: '9px',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <Sliders size={15} color="#EF1E34" strokeWidth={2.2} />
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
