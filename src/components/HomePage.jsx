@@ -625,7 +625,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                padding: '9px 10px 8px 10px',
+                padding: '4px 10px 8px 10px',
                 boxSizing: 'border-box',
                 minHeight: '135px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
@@ -641,10 +641,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="qr_generator" position="floating" size={10} />
               
-              {/* Top Badge Image with Ambient Glow */}
+              {/* Top Badge Image (Centered, Same Large Size) */}
               <div style={{
                 width: '100%',
-                height: '62px',
+                height: '70px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -653,27 +653,34 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }}>
                 <div style={{
                   position: 'absolute',
-                  width: '95px',
-                  height: '52px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '125px',
+                  height: '65px',
                   background: isDark 
-                    ? 'radial-gradient(ellipse, rgba(255, 30, 86, 0.32) 0%, transparent 70%)' 
-                    : 'radial-gradient(ellipse, rgba(239, 30, 52, 0.2) 0%, transparent 70%)',
-                  filter: 'blur(12px)',
+                    ? 'radial-gradient(ellipse, rgba(255, 30, 86, 0.38) 0%, transparent 75%)' 
+                    : 'radial-gradient(ellipse, rgba(239, 30, 52, 0.22) 0%, transparent 75%)',
+                  filter: 'blur(14px)',
                   pointerEvents: 'none'
                 }} />
                 <img 
                   src="/Glossy Pink QR Code Badge.webp" 
                   alt="QR Codes" 
                   style={{
-                    maxHeight: '60px',
-                    maxWidth: '82px',
+                    maxHeight: '74px',
+                    maxWidth: '110px',
+                    width: 'auto',
+                    height: 'auto',
                     objectFit: 'contain',
+                    display: 'block',
+                    margin: '0 auto',
                     position: 'relative',
                     zIndex: 2,
                     pointerEvents: 'none',
                     filter: isDark 
-                      ? 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55)) drop-shadow(0 2px 8px rgba(255, 30, 86, 0.35))' 
-                      : 'drop-shadow(0 6px 14px rgba(239, 30, 52, 0.2))'
+                      ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)) drop-shadow(0 3px 10px rgba(255, 30, 86, 0.4))' 
+                      : 'drop-shadow(0 8px 16px rgba(239, 30, 52, 0.22))'
                   }} 
                 />
               </div>
@@ -686,8 +693,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 width: '100%',
                 position: 'relative',
                 zIndex: 2,
-                marginTop: '3px',
-                marginBottom: '5px'
+                marginTop: '2px',
+                marginBottom: '4px'
               }}>
                 <span style={{
                   fontSize: '13px',
@@ -724,7 +731,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="Custom QR Templates"
                   style={{
-                    height: '26px',
+                    height: '25px',
                     borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
@@ -737,7 +744,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="Custom Colors & Gradients"
                   style={{
-                    height: '26px',
+                    height: '25px',
                     borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
@@ -750,7 +757,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="Custom Logo & Framing"
                   style={{
-                    height: '26px',
+                    height: '25px',
                     borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
@@ -777,7 +784,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                padding: '9px 10px 8px 10px',
+                padding: '4px 10px 8px 10px',
                 boxSizing: 'border-box',
                 minHeight: '135px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
@@ -793,10 +800,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="barcode_generator" position="floating" size={10} />
               
-              {/* Top Badge Image with Ambient Glow */}
+              {/* Top Badge Image (Centered, Same Large Size) */}
               <div style={{
                 width: '100%',
-                height: '62px',
+                height: '70px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -805,27 +812,34 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }}>
                 <div style={{
                   position: 'absolute',
-                  width: '95px',
-                  height: '52px',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '125px',
+                  height: '65px',
                   background: isDark 
-                    ? 'radial-gradient(ellipse, rgba(255, 124, 0, 0.32) 0%, transparent 70%)' 
-                    : 'radial-gradient(ellipse, rgba(255, 124, 0, 0.2) 0%, transparent 70%)',
-                  filter: 'blur(12px)',
+                    ? 'radial-gradient(ellipse, rgba(255, 124, 0, 0.38) 0%, transparent 75%)' 
+                    : 'radial-gradient(ellipse, rgba(255, 124, 0, 0.22) 0%, transparent 75%)',
+                  filter: 'blur(14px)',
                   pointerEvents: 'none'
                 }} />
                 <img 
                   src="/Glossy Orange Barcode Badge.webp" 
                   alt="Barcodes" 
                   style={{
-                    maxHeight: '60px',
-                    maxWidth: '82px',
+                    maxHeight: '74px',
+                    maxWidth: '110px',
+                    width: 'auto',
+                    height: 'auto',
                     objectFit: 'contain',
+                    display: 'block',
+                    margin: '0 auto',
                     position: 'relative',
                     zIndex: 2,
                     pointerEvents: 'none',
                     filter: isDark 
-                      ? 'drop-shadow(0 8px 18px rgba(0, 0, 0, 0.55)) drop-shadow(0 2px 8px rgba(255, 124, 0, 0.35))' 
-                      : 'drop-shadow(0 6px 14px rgba(255, 124, 0, 0.2))'
+                      ? 'drop-shadow(0 10px 20px rgba(0, 0, 0, 0.6)) drop-shadow(0 3px 10px rgba(255, 124, 0, 0.4))' 
+                      : 'drop-shadow(0 8px 16px rgba(255, 124, 0, 0.22))'
                   }} 
                 />
               </div>
@@ -838,8 +852,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 width: '100%',
                 position: 'relative',
                 zIndex: 2,
-                marginTop: '3px',
-                marginBottom: '5px'
+                marginTop: '2px',
+                marginBottom: '4px'
               }}>
                 <span style={{
                   fontSize: '13px',
@@ -876,7 +890,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="30+ Barcode Standards"
                   style={{
-                    height: '26px',
+                    height: '25px',
                     borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
@@ -889,7 +903,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="Custom Barcode Colors"
                   style={{
-                    height: '26px',
+                    height: '25px',
                     borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
@@ -902,7 +916,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div 
                   title="Custom Dimensions & Text Labels"
                   style={{
-                    height: '26px',
+                    height: '25px',
                     borderRadius: '8px',
                     backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 30, 52, 0.08)',
                     display: 'flex',
