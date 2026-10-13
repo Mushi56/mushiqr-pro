@@ -19,8 +19,6 @@ export const QR_TEMPLATES = ALL_50_TEMPLATES.map(tpl => {
       qrSize: tpl.qrSize || 0.4,
       qrX: tpl.qrX || 0.5,
       qrY: tpl.qrY || 0.5,
-      qrShape: tpl.qrShape,
-      cleanEdges: tpl.cleanEdges,
       quietZone: tpl.quietZone,
       preset: tpl.preset || {},
       bgImage: tpl.bgImage,

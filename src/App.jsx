@@ -299,8 +299,7 @@ const QR_BG_SHAPES = [
   { id: 'squircle', label: 'Squircle Box' },
   { id: 'cut', label: 'Cut/Beveled' },
   { id: 'leaf', label: 'Leaf Shape' },
-  { id: 'circle', label: 'Circle' },
-  { id: 'flower_blob', label: 'Flower Blob' },
+  { id: 'circle', label: 'Circle Box' },
   { id: 'shield', label: 'Shield' },
   { id: 'hexagon', label: 'Hexagon' },
   { id: 'octagon', label: 'Octagon' },
@@ -1317,7 +1316,6 @@ export default function App() {
   const [qrColor, setQrColor] = useState('#000000');
   const [bgColor, setBgColor] = useState('#ffffff');
   const [bgTransparent, setBgTransparent] = useState(false);
-  const [cleanEdges, setCleanEdges] = useState(true);
   const [eyeColor, setEyeColor] = useState('');
   const [eyeOuterColor, setEyeOuterColor] = useState('');
   const [syncEyes, setSyncEyes] = useState(true);
@@ -1430,16 +1428,6 @@ export default function App() {
       if (tpl.preset.bgColor) setBgColor(tpl.preset.bgColor);
       if (tpl.preset.bgTransparent !== undefined) {
         setBgTransparent(tpl.preset.bgTransparent);
-      }
-      if (tpl.preset.cleanEdges !== undefined) {
-        setCleanEdges(tpl.preset.cleanEdges);
-      } else if (tpl.cleanEdges !== undefined) {
-        setCleanEdges(tpl.cleanEdges);
-      }
-      if (tpl.qrShape) {
-        setQrBgShape(tpl.qrShape);
-      } else if (tpl.preset.qrBgShape) {
-        setQrBgShape(tpl.preset.qrBgShape);
       }
       if (tpl.preset.dotStyle) setDotStyle(tpl.preset.dotStyle);
       if (tpl.preset.eyeStyle) setEyeStyle(tpl.preset.eyeStyle);
@@ -3300,7 +3288,7 @@ export default function App() {
         templateHandleText: templateHandleText !== undefined ? templateHandleText : (selectedTemplate?.subtitle || selectedTemplate?.defaultHandle || selectedTemplate?.handle || ''),
         templateFont,
         ...vcardFields,
-        qrColor, bgColor, bgTransparent, cleanEdges, dotStyle, eyeStyle,
+        qrColor, bgColor, bgTransparent, dotStyle, eyeStyle,
         eyeColor,
         eyeOuterColor,
         syncEyes,
@@ -3369,7 +3357,7 @@ export default function App() {
       renderTimeoutRef.current = requestAnimationFrame(executeRender);
     }
   }, [
-    qrMatrixInfo, qrColor, bgColor, bgTransparent, cleanEdges, dotStyle, eyeStyle, eyeColor,
+    qrMatrixInfo, qrColor, bgColor, bgTransparent, dotStyle, eyeStyle, eyeColor,
     eyeOuterColor, syncEyes, gradientEnabled, gradientColor1, gradientColor2, gradientType,
     logo, logoWidth, logoHeight, logoPadding, logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity,
@@ -7757,14 +7745,11 @@ export default function App() {
                         {shapePopup === 'background' && (
                           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
-                            {(qrBgShape === 'flower_blob' || qrBgShape === 'circle' || selectedTemplate?.qrShape) && (
-                              <Toggle label="Clean Edges (No Cropped Dots)" checked={cleanEdges} onChange={setCleanEdges} />
-                            )}
-                            <div>
+                            <div style={{ opacity: bgTransparent ? 0.4 : 1, pointerEvents: bgTransparent ? 'none' : 'auto', transition: 'all 0.2s ease' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Background Shape</div>
                                 {bgTransparent && (
-                                  <span style={{ fontSize: '10px', color: 'var(--accent-primary)', fontWeight: '600' }}>Transparent BG Active</span>
+                                  <span style={{ fontSize: '10px', color: 'var(--accent-primary)', fontWeight: '600' }}>Disabled (Transparent BG)</span>
                                 )}
                               </div>
                               <div className="font-scroll-container" style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '4px 0 8px 0', scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch', marginBottom: '4px' }}>
