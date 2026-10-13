@@ -828,7 +828,7 @@ class FeatureAccessManagerService {
     if (norm.startsWith('qr_eye_') && (this._resolveFlagValue('custom_eye_styles') === false || this._resolveFlagValue('qr_style_eyes') === false)) {
       return false;
     }
-    const BG_SHAPES_CHECK = ['qr_bg_full', 'qr_bg_rounded', 'qr_bg_squircle', 'qr_bg_cut', 'qr_bg_leaf', 'qr_bg_circle', 'qr_bg_shield', 'qr_bg_hexagon', 'qr_bg_octagon', 'qr_bg_diamond'];
+    const BG_SHAPES_CHECK = ['qr_bg_full', 'qr_bg_rounded', 'qr_bg_squircle', 'qr_bg_cut', 'qr_bg_leaf', 'qr_bg_circle', 'qr_bg_flower_blob', 'qr_bg_shield', 'qr_bg_hexagon', 'qr_bg_octagon', 'qr_bg_diamond'];
     if ((BG_SHAPES_CHECK.includes(norm) || norm.startsWith('qr_bgshape_')) && (this._resolveFlagValue('custom_background_shapes') === false || this._resolveFlagValue('qr_style_background') === false)) {
       return false;
     }

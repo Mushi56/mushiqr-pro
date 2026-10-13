@@ -2,6 +2,7 @@ import qrcode from 'qrcode-generator';
 import { FeatureAccessManager } from '../services/FeatureAccessManager';
 import { drawTemplateBackground } from '../components/qr-templates/TemplateRenderer';
 import { synthesizeAiArtQR } from './aiArtQrEngine';
+import { fitShape, getBlobRadius, isNearFinderEye, buildShapePath, getDecorativeFillerDots } from './shapedQrEngine';
 
 /**
  * QR Code Generation Engine
@@ -582,6 +583,9 @@ export function renderQR(canvas, options) {
       const r = size * 0.12; // corner radius
       if (qrBgShape === 'circle') {
         ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      } else if (qrBgShape === 'flower_blob') {
+        const F = fitShape(moduleCount || 25, 'flower_blob');
+        buildShapePath(ctx, 'flower_blob', F, size / 2, size / 2, size / (2 * F.V));
       } else if (qrBgShape === 'rounded') {
         if (typeof ctx.roundRect === 'function') {
           ctx.roundRect(0, 0, size, size, r);
@@ -733,7 +737,7 @@ export function renderQR(canvas, options) {
       const qrSize = w * (options.template.qrSize || 0.35);
       const qrX = w * (options.template.qrX || 0.5) - qrSize / 2;
       const qrY = h * (options.template.qrY || 0.555) - qrSize / 2;
-      const margin = qrSize * 0.06;
+      const margin = (options.template.qrShape || options.template.quietZone === 0) ? 0 : qrSize * 0.06;
       const inner = qrSize - margin * 2;
       ctx.translate(qrX + margin, qrY + margin);
       ctx.scale(inner / w, inner / w);
@@ -763,8 +767,8 @@ export function renderQR(canvas, options) {
   // Adjust content area for background shape corners to fit perfectly with margins
   if (qrBgShape && qrBgShape !== 'full' && qrBgShape !== 'none') {
     let shapeScale = 1.0;
-    if (qrBgShape === 'circle') {
-      shapeScale = 0.68; // Leave a nice margin (0.707 is absolute max)
+    if (qrBgShape === 'circle' || qrBgShape === 'flower_blob') {
+      shapeScale = 1.0; // Managed by shaped QR engine with fitShape and filler dots!
     } else if (qrBgShape === 'leaf') {
       shapeScale = 0.72; // Leaf shape cuts off top-left and bottom-right
     } else if (qrBgShape === 'cut') {
@@ -986,125 +990,244 @@ export function renderQR(canvas, options) {
     silhouetteCtx = silhouetteCanvas.getContext('2d');
   }
 
-  // 1. Draw Eyes (Finder Patterns) with Sleek Rounded Safety Plates
-  if (!options.hideEyes) {
-    const eyePositions = [
-      { r: 0, c: 0, type: 'top-left' }, // Top-left
-      { r: 0, c: moduleCount - 7, type: 'top-right' }, // Top-right
-      { r: moduleCount - 7, c: 0, type: 'bottom-left' } // Bottom-left
-    ];
-    
-    eyePositions.forEach(pos => {
-      const x = contentX + (pos.c + quietZone) * cellSize;
-      const y = contentY + (pos.r + quietZone) * cellSize;
-      const eyeSize = cellSize * 7;
-      const eyeCenterX = x + eyeSize / 2;
-      const eyeCenterY = y + eyeSize / 2;
+  const effectiveShape = options.template?.qrShape || (qrBgShape === 'flower_blob' || qrBgShape === 'circle' ? qrBgShape : null);
+  const isShapedQR = Boolean(effectiveShape);
 
-      // ── Hard-Corner Square Safety Backing behind Finder Eyes for 100% Recognition ──
-      if (backgroundImageEnabled && backgroundImage && !options.template) {
+  if (isShapedQR) {
+    const shapeType = effectiveShape === 'flower_blob' ? 'flower_blob' : 'circle';
+    const F = fitShape(moduleCount, shapeType);
+    const contentCenterX = contentX + contentSize / 2;
+    const contentCenterY = contentY + contentSize / 2;
+    const shapedCellSize = contentSize / (2 * F.V);
+    const hMod = moduleCount / 2;
+
+    // Optional background shape fill if not transparent
+    if (!effectiveBgTransparent && (hasBgShape || (qrBgShape && qrBgShape !== 'none' && qrBgShape !== 'full') || options.qrShapeBackground)) {
+      ctx.save();
+      buildShapePath(ctx, shapeType, F, contentCenterX, contentCenterY, shapedCellSize);
+      ctx.fillStyle = resolvedBgColor;
+      ctx.fill();
+      if (options.qrShapeOutline || options.template?.qrShapeOutline) {
+        ctx.strokeStyle = options.qrShapeOutlineColor || fillStyle;
+        ctx.lineWidth = Math.max(1.5, shapedCellSize * 0.4);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 1. Draw Eyes (Finder Patterns) at fitted positions
+    if (!options.hideEyes) {
+      const eyePositions = [
+        { r: 0, c: 0, type: 'top-left' },
+        { r: 0, c: moduleCount - 7, type: 'top-right' },
+        { r: moduleCount - 7, c: 0, type: 'bottom-left' }
+      ];
+
+      eyePositions.forEach(pos => {
+        const x = contentCenterX + (pos.c - hMod) * shapedCellSize;
+        const y = contentCenterY + (pos.r - hMod) * shapedCellSize;
+        const eyeSize = shapedCellSize * 7;
+
+        const useEyeColor = syncEyes ? fillStyle : (eyeColor || qrColor);
+        const useEyeOuterColor = syncEyes ? fillStyle : (eyeOuterColor || useEyeColor);
+
+        const parsedInner = typeof useEyeColor === 'string' ? parseColorOrGradient(ctx, x, y, eyeSize, eyeSize, useEyeColor) : useEyeColor;
+        const parsedOuter = typeof useEyeOuterColor === 'string' ? parseColorOrGradient(ctx, x, y, eyeSize, eyeSize, useEyeOuterColor) : useEyeOuterColor;
+
+        if (qrTextureEnabled && qrTexture?.image && qrTextureSyncEyes) {
+          drawEye(silhouetteCtx, x, y, eyeSize, eyeStyle, '#000', '#000', pos.type);
+        } else {
+          drawEye(ctx, x, y, eyeSize, eyeStyle, parsedOuter, parsedInner, pos.type);
+        }
+      });
+    }
+
+    // 2. Draw QR Modules & Decorative Edge Filler Dots
+    const cleanEdges = options.cleanEdges !== undefined
+      ? Boolean(options.cleanEdges)
+      : (options.template?.cleanEdges !== undefined
+          ? Boolean(options.template.cleanEdges)
+          : (options.template?.preset?.cleanEdges !== undefined
+              ? Boolean(options.template.preset.cleanEdges)
+              : true));
+
+    if (!options.hideDots) {
+      // If cleanEdges is enabled, dots are strictly bounded and whole with no cropped edges
+      if (!cleanEdges) {
         ctx.save();
-        const pad = cellSize * 0.45;
-        const plateX = x - pad;
-        const plateY = y - pad;
-        const plateSize = eyeSize + pad * 2;
-
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
-        ctx.beginPath();
-        ctx.rect(plateX, plateY, plateSize, plateSize);
-        ctx.fill();
-        ctx.restore();
+        buildShapePath(ctx, shapeType, F, contentCenterX, contentCenterY, shapedCellSize);
+        ctx.clip();
       }
-      
-      const useEyeColor = syncEyes ? fillStyle : (eyeColor || qrColor);
-      const useEyeOuterColor = syncEyes ? fillStyle : (eyeOuterColor || useEyeColor);
 
-      const parsedInner = typeof useEyeColor === 'string' ? parseColorOrGradient(ctx, x, y, eyeSize, eyeSize, useEyeColor) : useEyeColor;
-      const parsedOuter = typeof useEyeOuterColor === 'string' ? parseColorOrGradient(ctx, x, y, eyeSize, eyeSize, useEyeOuterColor) : useEyeOuterColor;
-      
-      if (qrTextureEnabled && qrTexture?.image && qrTextureSyncEyes) {
-        drawEye(silhouetteCtx, x, y, eyeSize, eyeStyle, '#000', '#000', pos.type);
-      } else {
-        drawEye(ctx, x, y, eyeSize, eyeStyle, parsedOuter, parsedInner, pos.type);
-      }
-    });
-  }
-  
-  // 2. Draw QR modules with AI Adaptive Dual-Tone Halftone Processing
-  if (!options.hideDots) {
-    // Pass A: On messy/dark photo regions, render subtle light substrate on empty spaces
-    if (backgroundImageEnabled && backgroundImage && !options.template && bgPixelData) {
+      // Real active QR modules
       for (let row = 0; row < moduleCount; row++) {
         for (let col = 0; col < moduleCount; col++) {
           if (isFinderPattern(row, col, moduleCount)) continue;
-          if (matrix[row][col]) continue; // Only process empty modules (0)
+          if (!matrix[row][col]) continue;
+
+          const x = contentCenterX + (col - hMod) * shapedCellSize;
+          const y = contentCenterY + (row - hMod) * shapedCellSize;
+
+          const neighbors = {
+            top: row > 0 && matrix[row-1][col] && !isFinderPattern(row-1, col, moduleCount),
+            bottom: row < moduleCount - 1 && matrix[row+1][col] && !isFinderPattern(row+1, col, moduleCount),
+            left: col > 0 && matrix[row][col-1] && !isFinderPattern(row, col-1, moduleCount),
+            right: col < moduleCount - 1 && matrix[row][col+1] && !isFinderPattern(row, col+1, moduleCount)
+          };
+
+          if (qrTextureEnabled && qrTexture?.image) {
+            silhouetteCtx.fillStyle = '#000';
+            drawDotModule(silhouetteCtx, x, y, shapedCellSize, dotStyle, neighbors, options, row, col);
+          } else {
+            ctx.fillStyle = fillStyle;
+            drawDotModule(ctx, x, y, shapedCellSize, dotStyle, neighbors, options, row, col);
+          }
+        }
+      }
+
+      // Decorative edge filler dots (filling out the circular or blob contour seamlessly)
+      if (!options.disableDecorativeDots) {
+        const fillerDots = getDecorativeFillerDots(moduleCount, shapeType, F, cleanEdges);
+        const emptyNeighbors = { top: false, bottom: false, left: false, right: false };
+        for (const d of fillerDots) {
+          const x = contentCenterX + (d.c - hMod) * shapedCellSize;
+          const y = contentCenterY + (d.r - hMod) * shapedCellSize;
+
+          if (qrTextureEnabled && qrTexture?.image) {
+            silhouetteCtx.fillStyle = '#000';
+            drawDotModule(silhouetteCtx, x, y, shapedCellSize, dotStyle, emptyNeighbors, options, d.r, d.c);
+          } else {
+            ctx.fillStyle = fillStyle;
+            drawDotModule(ctx, x, y, shapedCellSize, dotStyle, emptyNeighbors, options, d.r, d.c);
+          }
+        }
+      }
+
+      if (!cleanEdges) {
+        ctx.restore();
+      }
+    }
+  } else {
+    // 1. Draw Eyes (Finder Patterns) with Sleek Rounded Safety Plates
+    if (!options.hideEyes) {
+      const eyePositions = [
+        { r: 0, c: 0, type: 'top-left' }, // Top-left
+        { r: 0, c: moduleCount - 7, type: 'top-right' }, // Top-right
+        { r: moduleCount - 7, c: 0, type: 'bottom-left' } // Bottom-left
+      ];
+      
+      eyePositions.forEach(pos => {
+        const x = contentX + (pos.c + quietZone) * cellSize;
+        const y = contentY + (pos.r + quietZone) * cellSize;
+        const eyeSize = cellSize * 7;
+        const eyeCenterX = x + eyeSize / 2;
+        const eyeCenterY = y + eyeSize / 2;
+
+        // ── Hard-Corner Square Safety Backing behind Finder Eyes for 100% Recognition ──
+        if (backgroundImageEnabled && backgroundImage && !options.template) {
+          ctx.save();
+          const pad = cellSize * 0.45;
+          const plateX = x - pad;
+          const plateY = y - pad;
+          const plateSize = eyeSize + pad * 2;
+
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+          ctx.shadowBlur = 10;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+          ctx.beginPath();
+          ctx.rect(plateX, plateY, plateSize, plateSize);
+          ctx.fill();
+          ctx.restore();
+        }
+        
+        const useEyeColor = syncEyes ? fillStyle : (eyeColor || qrColor);
+        const useEyeOuterColor = syncEyes ? fillStyle : (eyeOuterColor || useEyeColor);
+
+        const parsedInner = typeof useEyeColor === 'string' ? parseColorOrGradient(ctx, x, y, eyeSize, eyeSize, useEyeColor) : useEyeColor;
+        const parsedOuter = typeof useEyeOuterColor === 'string' ? parseColorOrGradient(ctx, x, y, eyeSize, eyeSize, useEyeOuterColor) : useEyeOuterColor;
+        
+        if (qrTextureEnabled && qrTexture?.image && qrTextureSyncEyes) {
+          drawEye(silhouetteCtx, x, y, eyeSize, eyeStyle, '#000', '#000', pos.type);
+        } else {
+          drawEye(ctx, x, y, eyeSize, eyeStyle, parsedOuter, parsedInner, pos.type);
+        }
+      });
+    }
+    
+    // 2. Draw QR modules with AI Adaptive Dual-Tone Halftone Processing
+    if (!options.hideDots) {
+      // Pass A: On messy/dark photo regions, render subtle light substrate on empty spaces
+      if (backgroundImageEnabled && backgroundImage && !options.template && bgPixelData) {
+        for (let row = 0; row < moduleCount; row++) {
+          for (let col = 0; col < moduleCount; col++) {
+            if (isFinderPattern(row, col, moduleCount)) continue;
+            if (matrix[row][col]) continue; // Only process empty modules (0)
+
+            const x = contentX + (col + quietZone) * cellSize;
+            const y = contentY + (row + quietZone) * cellSize;
+            const moduleCenterX = x + cellSize / 2;
+            const moduleCenterY = y + cellSize / 2;
+            const localLum = getSampledLuminance(moduleCenterX, moduleCenterY, cellSize * 0.45);
+
+            // If photo under empty cell is dark, brighten it slightly so camera binarizer doesn't mistake it for a dot
+            if (localLum < 125) {
+              ctx.save();
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+              ctx.beginPath();
+              ctx.arc(moduleCenterX, moduleCenterY, cellSize * 0.42, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+          }
+        }
+      }
+
+      // Pass B: Render Active Dots with Adaptive Micro-Backing
+      for (let row = 0; row < moduleCount; row++) {
+        for (let col = 0; col < moduleCount; col++) {
+          if (isFinderPattern(row, col, moduleCount)) continue;
+          if (!matrix[row][col]) continue;
 
           const x = contentX + (col + quietZone) * cellSize;
           const y = contentY + (row + quietZone) * cellSize;
           const moduleCenterX = x + cellSize / 2;
           const moduleCenterY = y + cellSize / 2;
-          const localLum = getSampledLuminance(moduleCenterX, moduleCenterY, cellSize * 0.45);
 
-          // If photo under empty cell is dark, brighten it slightly so camera binarizer doesn't mistake it for a dot
-          if (localLum < 125) {
-            ctx.save();
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
-            ctx.beginPath();
-            ctx.arc(moduleCenterX, moduleCenterY, cellSize * 0.42, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-          }
-        }
-      }
-    }
+          const neighbors = {
+            top: row > 0 && matrix[row-1][col] && !isFinderPattern(row-1, col, moduleCount),
+            bottom: row < moduleCount - 1 && matrix[row+1][col] && !isFinderPattern(row+1, col, moduleCount),
+            left: col > 0 && matrix[row][col-1] && !isFinderPattern(row, col-1, moduleCount),
+            right: col < moduleCount - 1 && matrix[row][col+1] && !isFinderPattern(row, col+1, moduleCount)
+          };
 
-    // Pass B: Render Active Dots with Adaptive Micro-Backing
-    for (let row = 0; row < moduleCount; row++) {
-      for (let col = 0; col < moduleCount; col++) {
-        if (isFinderPattern(row, col, moduleCount)) continue;
-        if (!matrix[row][col]) continue;
-
-        const x = contentX + (col + quietZone) * cellSize;
-        const y = contentY + (row + quietZone) * cellSize;
-        const moduleCenterX = x + cellSize / 2;
-        const moduleCenterY = y + cellSize / 2;
-
-        const neighbors = {
-          top: row > 0 && matrix[row-1][col] && !isFinderPattern(row-1, col, moduleCount),
-          bottom: row < moduleCount - 1 && matrix[row+1][col] && !isFinderPattern(row+1, col, moduleCount),
-          left: col > 0 && matrix[row][col-1] && !isFinderPattern(row, col-1, moduleCount),
-          right: col < moduleCount - 1 && matrix[row][col+1] && !isFinderPattern(row, col+1, moduleCount)
-        };
-
-        if (qrTextureEnabled && qrTexture?.image) {
-          silhouetteCtx.fillStyle = '#000';
-          drawDotModule(silhouetteCtx, x, y, cellSize, dotStyle, neighbors, options, row, col);
-        } else {
-          // AI Adaptive Micro-Backing for Photo Backgrounds
-          if (backgroundImageEnabled && backgroundImage && !options.template && bgPixelData) {
-            const localLum = getSampledLuminance(moduleCenterX, moduleCenterY, cellSize * 0.45);
-            
-            ctx.save();
-            // Draw protective micro-base under the active dot
-            if (localLum < 145) {
-              ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
-              ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
-              ctx.shadowBlur = 4;
-              ctx.beginPath();
-              ctx.arc(moduleCenterX, moduleCenterY, cellSize * 0.46, 0, Math.PI * 2);
-              ctx.fill();
-            }
-            ctx.restore();
-
-            ctx.save();
-            ctx.fillStyle = '#000000'; // Pure solid black module for 100% camera decodability
-            drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, options, row, col);
-            ctx.restore();
+          if (qrTextureEnabled && qrTexture?.image) {
+            silhouetteCtx.fillStyle = '#000';
+            drawDotModule(silhouetteCtx, x, y, cellSize, dotStyle, neighbors, options, row, col);
           } else {
-            ctx.fillStyle = fillStyle;
-            drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, options, row, col);
+            // AI Adaptive Micro-Backing for Photo Backgrounds
+            if (backgroundImageEnabled && backgroundImage && !options.template && bgPixelData) {
+              const localLum = getSampledLuminance(moduleCenterX, moduleCenterY, cellSize * 0.45);
+              
+              ctx.save();
+              // Draw protective micro-base under the active dot
+              if (localLum < 145) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+                ctx.shadowBlur = 4;
+                ctx.beginPath();
+                ctx.arc(moduleCenterX, moduleCenterY, cellSize * 0.46, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              ctx.restore();
+
+              ctx.save();
+              ctx.fillStyle = '#000000'; // Pure solid black module for 100% camera decodability
+              drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, options, row, col);
+              ctx.restore();
+            } else {
+              ctx.fillStyle = fillStyle;
+              drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, options, row, col);
+            }
           }
         }
       }

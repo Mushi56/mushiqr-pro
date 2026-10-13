@@ -11,9 +11,11 @@ import { VCARD_TEMPLATES }          from './vcardTemplates';
 import { FRAME_TEMPLATES }          from './frameTemplates';
 import { NETWORK_TEMPLATES }        from './networkTemplates';
 import { ANIMAL_TEMPLATES }         from './animalTemplates';
+import { FLORAL_TEMPLATES }         from './floralTemplates';
 
 export const TEMPLATE_CATEGORIES = [
   'All',
+  'Floral & Aesthetic',
   'Scan Me Frames',
   'AI Magic',
   'Cute Animals',
@@ -167,6 +169,7 @@ for (const [key, group] of platformGroups.entries()) {
 }
 
 export const ALL_TEMPLATES_REGISTRY = [
+  ...FLORAL_TEMPLATES,
   ...ANIMAL_TEMPLATES,
   ...FRAME_TEMPLATES,
   ...groupedStandardTemplates,
