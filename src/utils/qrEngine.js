@@ -2,6 +2,8 @@ import qrcode from 'qrcode-generator';
 import { FeatureAccessManager } from '../services/FeatureAccessManager';
 import { drawTemplateBackground } from '../components/qr-templates/TemplateRenderer';
 import { synthesizeAiArtQR } from './aiArtQrEngine';
+import { DOT_PATHS, isPathDot } from './dotPaths';
+import { isShapedQr, buildQrShape, shapePath2D, decoHash } from './shapedQr';
 
 /**
  * QR Code Generation Engine
@@ -269,6 +271,11 @@ export const DOT_STYLES = {
   HEXAGON: 'hexagon',
   SQUARE: 'square',
   ROUNDED: 'rounded',
+  HBAR: 'hbar',
+  VBAR: 'vbar',
+  SMALL: 'small',
+  LIQUID: 'liquid',
+  CLASSY: 'classy',
   LEAF: 'leaf',
   DIAMOND: 'diamond',
   PIXEL: 'pixel',
@@ -562,6 +569,11 @@ export function renderQR(canvas, options) {
 
       return canvas;
     }
+  }
+
+  // ── SHAPED QR (Paper frame / Torn paper / Flower blob / Round) ──
+  if (isShapedQr(qrBgShape) && !options.template) {
+    return renderShapedQr(canvas, ctx, options);
   }
 
   const effectiveBgTransparent = bgTransparent;
@@ -1208,6 +1220,142 @@ export function renderQR(canvas, options) {
 }
 
 /**
+ * Shaped QR renderer (Paper frame / Torn paper / Flower blob / Round).
+ * Uses the app's dot style, eye style and colors; background obeys the Background section
+ * (solid/gradient fill inside the outline, or fully transparent). `qrShapeOpts.clean`
+ * keeps decorative dots from ever being cropped by the outline.
+ */
+function renderShapedQr(canvas, ctx, options) {
+  const {
+    matrix, moduleCount: N, size = 1024,
+    qrColor = '#000000', bgColor = '#ffffff', bgTransparent = false,
+    qrBgShape, dotStyle = DOT_STYLES.DENSO, eyeStyle = EYE_STYLES.SQUARE,
+    eyeColor = '', eyeOuterColor = '', syncEyes = true,
+    gradientEnabled = false, gradientColor1 = '#000000', gradientColor2 = '#0066ff', gradientType = 'linear',
+    logo = null, textCenter = null,
+    qrSizeScale = 1, qrPosX = 0.5, qrPosY = 0.5
+  } = options;
+  const so = options.qrShapeOpts || {};
+  const clean = !!so.clean;
+  const decor = so.decor !== false;
+  const outline = !!so.outline;
+
+  const shape = buildQrShape(qrBgShape, N);
+  const h = N / 2;
+  const { ox, oy, rf, V, R } = shape;
+  const scale = qrSizeScale || 1;
+  const unit = (size / (2 * V)) * scale;
+  const cx = size / 2 + (qrPosX - 0.5) * (size - size * scale);
+  const cy = size / 2 + (qrPosY - 0.5) * (size - size * scale);
+  const path = shapePath2D(shape);
+  const resolvedBg = (!bgColor || bgColor === 'transparent') ? '#ffffff' : bgColor;
+
+  let fillStyle;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(unit, unit);
+
+  if (gradientEnabled) {
+    fillStyle = gradientType === 'linear'
+      ? ctx.createLinearGradient(-h, -h, h, h)
+      : ctx.createRadialGradient(0, 0, 0, 0, 0, h);
+    fillStyle.addColorStop(0, gradientColor1);
+    fillStyle.addColorStop(1, gradientColor2);
+  } else {
+    fillStyle = parseColorOrGradient(ctx, -h, -h, N, N, qrColor);
+  }
+
+  // Background (inside the outline only)
+  if (!bgTransparent) {
+    ctx.fillStyle = parseColorOrGradient(ctx, -V, -V, 2 * V, 2 * V, resolvedBg);
+    ctx.fill(path);
+  }
+
+  // Area reserved for logo / center text
+  const hasCenter = !!(logo || textCenter);
+  const clearHW = logo ? ((options.logoWidth || 0.18) * N) / 2 + 0.8 : N * 0.16;
+  const clearHH = logo ? ((options.logoHeight || 0.18) * N) / 2 + 0.8 : N * 0.08;
+  const clearCX = ((options.logoPosX ?? 0.5) - 0.5) * N;
+  const clearCY = ((options.logoPosY ?? 0.5) - 0.5) * N;
+  const inClear = (mx, my) => hasCenter && Math.abs(mx - clearCX) < clearHW && Math.abs(my - clearCY) < clearHH;
+
+  const eyeCorners = [[-h, -h], [h - 7, -h], [-h, h - 7]];
+  const nearEye = (x, y) => eyeCorners.some(([a, b]) => x > a - 1 && x < a + 8 && y > b - 1 && y < b + 8);
+  const inShape = (x, y) => Math.hypot(x - ox, y - oy) <= rf(Math.atan2(y - oy, x - ox));
+  const dotOpts = { ...options, dotPadding: options.dotPadding };
+
+  // Data + decorative dots (clipped to the outline unless "clean edges")
+  ctx.save();
+  if (!clean) ctx.clip(path);
+  ctx.fillStyle = fillStyle;
+
+  if (!options.hideDots) {
+    const isEye = (r, c) => (r < 8 && c < 8) || (r < 8 && c >= N - 8) || (r >= N - 8 && c < 8);
+    const dark = (r, c) => r >= 0 && c >= 0 && r < N && c < N && !!matrix[r][c] && !isFinderPattern(r, c, N);
+    for (let r = 0; r < N; r++) {
+      for (let c = 0; c < N; c++) {
+        if (isEye(r, c) && isFinderPattern(r, c, N)) continue;
+        if (!matrix[r][c] || isFinderPattern(r, c, N)) continue;
+        if (inClear(c + 0.5 - h, r + 0.5 - h)) continue;
+        const nb = { top: dark(r - 1, c), bottom: dark(r + 1, c), left: dark(r, c - 1), right: dark(r, c + 1) };
+        drawDotModule(ctx, c - h, r - h, 1, dotStyle, nb, dotOpts, r, c);
+      }
+    }
+
+    if (decor) {
+      const K = Math.ceil(R - h) + 1;
+      for (let r = -K; r < N + K; r++) {
+        for (let c = -K; c < N + K; c++) {
+          const x = c + 0.5 - h, y = r + 0.5 - h;
+          const outside = clean
+            ? ![[0.5, 0.5], [-0.5, 0.5], [0.5, -0.5], [-0.5, -0.5]].every(([a, b]) => inShape(x + a, y + b))
+            : Math.hypot(x - ox, y - oy) > rf(Math.atan2(y - oy, x - ox)) + 0.5;
+          if (outside || (Math.abs(x) < h && Math.abs(y) < h) || nearEye(x, y)) continue;
+          if (decoHash(c, r) < 0.5) drawDotModule(ctx, c - h, r - h, 1, dotStyle, {}, dotOpts, r, c);
+        }
+      }
+    }
+  }
+  ctx.restore();
+
+  // Eyes
+  if (!options.hideEyes) {
+    const useEyeColor = syncEyes ? fillStyle : (eyeColor || qrColor);
+    const useEyeOuterColor = syncEyes ? fillStyle : (eyeOuterColor || useEyeColor);
+    const types = ['top-left', 'top-right', 'bottom-left'];
+    eyeCorners.forEach(([ex, ey], i) => {
+      const inner = typeof useEyeColor === 'string' ? parseColorOrGradient(ctx, ex, ey, 7, 7, useEyeColor) : useEyeColor;
+      const outer = typeof useEyeOuterColor === 'string' ? parseColorOrGradient(ctx, ex, ey, 7, 7, useEyeOuterColor) : useEyeOuterColor;
+      drawEye(ctx, ex, ey, 7, eyeStyle, outer, inner, types[i]);
+    });
+  }
+
+  // Optional outline
+  if (outline) {
+    ctx.strokeStyle = typeof fillStyle === 'string' ? fillStyle : qrColor;
+    ctx.lineWidth = 1.1;
+    ctx.lineJoin = 'round';
+    ctx.stroke(path);
+  }
+  ctx.restore();
+
+  // Overlays in pixel space (grid area as content box)
+  const contentSize = N * unit;
+  const contentX = cx - h * unit;
+  const contentY = cy - h * unit;
+  const overlay = { contentX, contentY, contentSize, moduleCount: N, quietZone: 0 };
+  if (logo) {
+    drawLogo(ctx, logo, size, { ...options, ...overlay });
+  } else if (textCenter) {
+    drawCenterText(ctx, textCenter, size, { ...options, ...overlay });
+  }
+  if (options.customTexts && Array.isArray(options.customTexts) && options.customTexts.length > 0) {
+    drawCustomTexts(ctx, options.customTexts, size, { ...options, ...overlay });
+  }
+  return canvas;
+}
+
+/**
  * Draw a single dot module
  */
 export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = {}, row = 0, col = 0) {
@@ -1240,6 +1388,16 @@ export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = 
   const padding = (size * effectivePaddingPct) / 100;
   const s = size - padding * 2;
   const { top, bottom, left, right } = neighbors;
+
+  // Reference-sheet shapes (SVG path based) — identical to the thumbnails
+  if (isPathDot(style)) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(size, size);
+    ctx.fill(new Path2D(DOT_PATHS[style](0, 0, { L: !!left, R: !!right, U: !!top, D: !!bottom })));
+    ctx.restore();
+    return;
+  }
 
   // Premium decorative/floral styles setup
   const isFloral = [
@@ -1302,15 +1460,54 @@ export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = 
       ctx.moveTo(leftX, topY);
       ctx.lineTo(leftX + w, topY);
       ctx.lineTo(leftX + w, topY + h * 0.5);
-      ctx.quadraticCurveTo(leftX + w * 0.5, topY + h * 1.1, leftX, topY + h * 0.5);
+      ctx.quadraticCurveTo(leftX + w, topY + h * 0.88, leftX + w * 0.5, topY + h);
+      ctx.quadraticCurveTo(leftX, topY + h * 0.88, leftX, topY + h * 0.5);
       ctx.closePath();
       ctx.fill();
       break;
     }
     case DOT_STYLES.PIXEL: {
-      ctx.fillRect(x + padding, y + padding, s, s);
       const innerCut = s * 0.35;
-      ctx.clearRect(x + size / 2 - innerCut / 2, y + size / 2 - innerCut / 2, innerCut, innerCut);
+      const ix = x + size / 2 - innerCut / 2, iy = y + size / 2 - innerCut / 2;
+      ctx.beginPath();
+      ctx.rect(x + padding, y + padding, s, s);
+      ctx.rect(ix, iy, innerCut, innerCut);
+      ctx.fill('evenodd');
+      break;
+    }
+    case DOT_STYLES.HBAR: {
+      // Horizontal bars: merge with left/right neighbours, rounded free ends
+      const t = size * 0.62;
+      const by = y + (size - t) / 2;
+      const x0 = left ? x - 0.5 : x + size * 0.06;
+      const x1 = right ? x + size + 0.5 : x + size * 0.94;
+      const rr = t / 2;
+      ctx.beginPath();
+      ctx.moveTo(x0 + (left ? 0 : rr), by);
+      ctx.lineTo(x1 - (right ? 0 : rr), by);
+      if (!right) ctx.arc(x1 - rr, by + rr, rr, -Math.PI / 2, Math.PI / 2); else ctx.lineTo(x1, by + t);
+      ctx.lineTo(x1 - (right ? 0 : rr), by + t);
+      ctx.lineTo(x0 + (left ? 0 : rr), by + t);
+      if (!left) ctx.arc(x0 + rr, by + rr, rr, Math.PI / 2, Math.PI * 1.5); else ctx.lineTo(x0, by);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case DOT_STYLES.VBAR: {
+      // Vertical bars: merge with top/bottom neighbours, rounded free ends
+      const t = size * 0.62;
+      const bx = x + (size - t) / 2;
+      const y0 = top ? y - 0.5 : y + size * 0.06;
+      const y1 = bottom ? y + size + 0.5 : y + size * 0.94;
+      const rr = t / 2;
+      ctx.beginPath();
+      ctx.moveTo(bx, y0 + (top ? 0 : rr));
+      ctx.lineTo(bx, y1 - (bottom ? 0 : rr));
+      if (!bottom) ctx.arc(bx + rr, y1 - rr, rr, Math.PI, 0, true); else ctx.lineTo(bx + t, y1);
+      ctx.lineTo(bx + t, y0 + (top ? 0 : rr));
+      if (!top) ctx.arc(bx + rr, y0 + rr, rr, 0, Math.PI, true); else ctx.lineTo(bx, y0);
+      ctx.closePath();
+      ctx.fill();
       break;
     }
     case DOT_STYLES.DIAMOND:
@@ -1341,14 +1538,15 @@ export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = 
       ctx.closePath(); ctx.fill();
       break;
     case DOT_STYLES.HEART: {
-      const d = s * 0.8;
-      const hx = x + (size - d) / 2, hy = y + (size - d) / 2 + d / 4;
+      const d = s * 0.95;
+      const hx = x + (size - d) / 2, hy = y + (size - d) / 2 + d * 0.04;
       ctx.beginPath();
-      ctx.moveTo(hx + d/2, hy + d/5);
-      ctx.bezierCurveTo(hx + d/2, hy, hx, hy, hx, hy + d/3);
-      ctx.bezierCurveTo(hx, hy + d/2, hx + d/2, hy + d, hx + d/2, hy + d);
-      ctx.bezierCurveTo(hx + d/2, hy + d, hx + d, hy + d/2, hx + d, hy + d/3);
-      ctx.bezierCurveTo(hx + d, hy, hx + d/2, hy, hx + d/2, hy + d/5);
+      ctx.moveTo(hx + d/2, hy + d * 0.28);
+      ctx.bezierCurveTo(hx + d/2, hy + d * 0.08, hx, hy, hx, hy + d * 0.32);
+      ctx.bezierCurveTo(hx, hy + d * 0.58, hx + d/2, hy + d * 0.82, hx + d/2, hy + d * 0.94);
+      ctx.bezierCurveTo(hx + d/2, hy + d * 0.82, hx + d, hy + d * 0.58, hx + d, hy + d * 0.32);
+      ctx.bezierCurveTo(hx + d, hy, hx + d/2, hy + d * 0.08, hx + d/2, hy + d * 0.28);
+      ctx.closePath();
       ctx.fill();
       break;
     }
@@ -1372,7 +1570,6 @@ export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = 
       const t = s * 0.3;
       ctx.save();
       ctx.translate(x + size / 2, y + size / 2);
-      ctx.rotate(Math.PI / 4);
       ctx.rotate(Math.PI / 4);
       ctx.fillRect(-t / 2, -s / 2, t, s);
       ctx.fillRect(-s / 2, -t / 2, s, t);

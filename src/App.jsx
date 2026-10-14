@@ -75,6 +75,8 @@ import {
 import ColorPicker from './components/ColorPicker';
 import Slider from './components/Slider';
 import Toggle from './components/Toggle';
+import ShapedQrOptions from './components/ShapedQrOptions';
+import { isShapedQr } from './utils/shapedQr';
 import LogoPresets from './components/LogoPresets';
 import { LOGO_PRESETS } from './data/logoPresets';
 import QRTypeSelector from './components/QRTypeSelector';
@@ -303,7 +305,11 @@ const QR_BG_SHAPES = [
   { id: 'shield', label: 'Shield' },
   { id: 'hexagon', label: 'Hexagon' },
   { id: 'octagon', label: 'Octagon' },
-  { id: 'diamond', label: 'Diamond' }
+  { id: 'diamond', label: 'Diamond' },
+  { id: 'paper', label: 'Paper Frame' },
+  { id: 'torn', label: 'Torn Paper' },
+  { id: 'blob', label: 'Flower Blob' },
+  { id: 'round', label: 'Round Burst' }
 ];
 const QR_CARD_SHAPES = [
   { id: 'rounded', label: 'Rounded Box' },
@@ -1524,7 +1530,8 @@ export default function App() {
   const [aiArtQrEnabled, setAiArtQrEnabled] = useState(false);
   const [aiArtBlend, setAiArtBlend] = useState(0.72);
   const [aiArtStyle, setAiArtStyle] = useState('illustration');
-  const [qrBgShape, setQrBgShape] = useState('full'); // 'full' | 'rounded' | 'squircle' | 'cut' | 'leaf' | 'circle'
+  const [qrBgShape, setQrBgShape] = useState('full'); // 'full' | 'rounded' | 'squircle' | 'cut' | 'leaf' | 'circle' | 'paper' | 'torn' | 'blob' | 'round'
+  const [qrShapeOpts, setQrShapeOpts] = useState({ clean: false, decor: true, outline: false }); // options for shaped QR (paper/torn/blob/round)
   const [qrBgCardShape, setQrBgCardShape] = useState('rounded'); // 'rounded' | 'squircle' | 'cut' | 'leaf' | 'circle'
   const [qrSizeScale, setQrSizeScale] = useState(1.0);
   const [qrPosX, setQrPosX] = useState(0.5);
@@ -1669,7 +1676,7 @@ export default function App() {
     eyeColor, eyeOuterColor, syncEyes,
     gradientEnabled, gradientColor1, gradientColor2, gradientType,
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
-    qrBgShape, qrSizeScale, qrPosX, qrPosY,
+    qrBgShape, qrShapeOpts, qrSizeScale, qrPosX, qrPosY,
     logo: logo?.image, logoWidth, logoHeight, logoPadding,
     logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity
@@ -1678,7 +1685,7 @@ export default function App() {
     eyeColor, eyeOuterColor, syncEyes,
     gradientEnabled, gradientColor1, gradientColor2, gradientType,
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
-    qrBgShape, qrSizeScale, qrPosX, qrPosY,
+    qrBgShape, qrShapeOpts, qrSizeScale, qrPosX, qrPosY,
     logo?.image, logoWidth, logoHeight, logoPadding,
     logoBackground, logoBgColor, logoBgShape,
     logoOutline, logoOutlineColor, logoOutlineWidth, logoOutlineOpacity
@@ -1973,7 +1980,7 @@ export default function App() {
       qrTextureSyncEyes,
       qrBgImageEnabled, qrBgImage: qrBgImage ? { src: qrBgImage.src, name: qrBgImage.name } : null,
       qrBgImageOpacity, qrBgImageBlur, qrBgImageOverlayOpacity,
-      qrBgCardEnabled, qrBgCardOpacity, qrBgShape, qrBgCardShape,
+      qrBgCardEnabled, qrBgCardOpacity, qrBgShape, qrShapeOpts, qrBgCardShape,
       aiArtQrEnabled, aiArtBlend, aiArtStyle,
       qrSizeScale, qrPosX, qrPosY,
       dotStyle, eyeStyle, dotPadding, eyePadding,
@@ -2004,7 +2011,7 @@ export default function App() {
     gradientEnabled, gradientColor1, gradientColor2, gradientType,
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
     qrBgImageEnabled, qrBgImage, qrBgImageOpacity, qrBgImageBlur, qrBgImageOverlayOpacity,
-    qrBgCardEnabled, qrBgCardOpacity, qrBgShape, qrBgCardShape,
+    qrBgCardEnabled, qrBgCardOpacity, qrBgShape, qrShapeOpts, qrBgCardShape,
     aiArtQrEnabled, aiArtBlend, aiArtStyle,
     qrSizeScale, qrPosX, qrPosY,
     dotStyle, eyeStyle, dotPadding, eyePadding,
@@ -2122,6 +2129,7 @@ export default function App() {
     if (s.qrBgCardEnabled !== undefined) setQrBgCardEnabled(s.qrBgCardEnabled);
     if (s.qrBgCardOpacity !== undefined) setQrBgCardOpacity(s.qrBgCardOpacity);
     if (s.qrBgShape !== undefined) setQrBgShape(s.qrBgShape);
+    if (s.qrShapeOpts !== undefined) setQrShapeOpts(s.qrShapeOpts);
     if (s.qrBgCardShape !== undefined) setQrBgCardShape(s.qrBgCardShape);
     if (s.aiArtQrEnabled !== undefined) setAiArtQrEnabled(s.aiArtQrEnabled);
     if (s.aiArtBlend !== undefined) setAiArtBlend(s.aiArtBlend);
@@ -2283,6 +2291,7 @@ export default function App() {
     setQrBgCardEnabled(false);
     setQrBgCardOpacity(1);
     setQrBgShape('full');
+    setQrShapeOpts({ clean: false, decor: true, outline: false });
     setQrBgCardShape('rounded');
     setAiArtQrEnabled(false);
     setAiArtBlend(0.85);
@@ -2391,6 +2400,7 @@ export default function App() {
       qrBgCardEnabled: false,
       qrBgCardOpacity: 1,
       qrBgShape: 'full',
+      qrShapeOpts: { clean: false, decor: true, outline: false },
       qrBgCardShape: 'rounded',
       aiArtQrEnabled: false,
       aiArtBlend: 0.85,
@@ -2489,7 +2499,7 @@ export default function App() {
     gradientEnabled, gradientColor1, gradientColor2, gradientType,
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
     qrBgImageEnabled, qrBgImage, qrBgImageOpacity, qrBgImageBlur, qrBgImageOverlayOpacity,
-    qrBgCardEnabled, qrBgCardOpacity, qrBgShape, qrBgCardShape,
+    qrBgCardEnabled, qrBgCardOpacity, qrBgShape, qrShapeOpts, qrBgCardShape,
     aiArtQrEnabled, aiArtBlend, aiArtStyle,
     qrSizeScale, qrPosX, qrPosY,
     dotStyle, eyeStyle, dotPadding, eyePadding,
@@ -3010,6 +3020,7 @@ export default function App() {
       qrBackgroundCardEnabled: qrBgCardEnabled,
       qrBackgroundCardOpacity: qrBgCardOpacity,
       qrBgShape,
+      qrShapeOpts,
       qrBackgroundCardShape: qrBgCardShape,
       qrSizeScale,
       qrPosX,
@@ -3311,6 +3322,7 @@ export default function App() {
         qrBackgroundCardEnabled: qrBgCardEnabled,
         qrBackgroundCardOpacity: qrBgCardOpacity,
         qrBgShape,
+        qrShapeOpts,
         qrBackgroundCardShape: qrBgCardShape,
         qrSizeScale,
         qrPosX,
@@ -3379,7 +3391,7 @@ export default function App() {
     logoInnerShadowEnabled, logoEraseColorEnabled, logoEraseColor, logoEraseTolerance, logoEraseSmoothing, logoTexture, logoCrop, 
     qrTextureEnabled, qrTexture, qrTextureSyncEyes,
     qrBgImageEnabled, qrBgImage, qrBgImageOpacity, qrBgImageBlur, qrBgImageOverlayOpacity, qrBgCardEnabled, qrBgCardOpacity,
-    qrBgShape, qrBgCardShape, qrSizeScale, qrPosX, qrPosY,
+    qrBgShape, qrShapeOpts, qrBgCardShape, qrSizeScale, qrPosX, qrPosY,
     aiArtQrEnabled, aiArtBlend, aiArtStyle,
     activeTab, canvasSelection,
     selectedTemplate, templateHeadlineText, templateHandleText, templateFont,
@@ -5744,6 +5756,24 @@ export default function App() {
                             >
                               <QREyesIcon size={16} /> Eyes
                             </button>
+                            <button
+                              id="pattern-tab-shape"
+                              onClick={() => setPatternTab('shape')}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                border: 'none',
+                                background: patternTab === 'shape' ? 'var(--accent-primary)' : 'transparent',
+                                color: patternTab === 'shape' ? '#fff' : 'var(--text-secondary)',
+                                padding: '6px 16px',
+                                borderRadius: '8px',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease'
+                              }}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c2.2 0 3.1 1.6 4.7 2.2 1.7.6 3.6.2 4.5 1.9.9 1.7-.3 3.2-.2 4.9.1 1.7 1.3 3.1.4 4.7-.9 1.6-2.8 1.5-4.2 2.5-1.4 1-2 2.8-3.9 2.8s-2.5-1.8-3.9-2.8c-1.4-1-3.3-.9-4.2-2.5-.9-1.6.3-3 .4-4.7.1-1.7-1.1-3.2-.2-4.9.9-1.7 2.8-1.3 4.5-1.9C8.9 4.1 9.8 2.5 12 2.5z"/></svg> Shape
+                            </button>
                           </div>
                         )}
 
@@ -7729,7 +7759,69 @@ export default function App() {
                       )}
                        {shapePopup === 'pattern' && (
                            <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                             {patternTab === 'dots' ? (
+                             {patternTab === 'shape' ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>QR Shape</div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))', gap: '10px' }}>
+                                    {[{ id: 'full', label: 'None' }, ...QR_BG_SHAPES.filter(s => isShapedQr(s.id))]
+                                      .filter(shape => shape.id === 'full' || FeatureAccessManager.isFeatureEnabled(`qr_bg_${shape.id}`))
+                                      .map(shape => {
+                                        const isActive = shape.id === 'full' ? !isShapedQr(qrBgShape) : qrBgShape === shape.id;
+                                        const featId = `qr_bg_${shape.id}`;
+                                        return (
+                                          <button
+                                            key={shape.id}
+                                            id={`qr-shape-${shape.id}`}
+                                            onClick={() => {
+                                              if (shape.id === 'full') {
+                                                if (isShapedQr(qrBgShape)) setQrBgShape('full');
+                                                return;
+                                              }
+                                              const access = FeatureAccessManager.canUseFeature(featId);
+                                              if (!access.allowed) { showPaywall(featId); return; }
+                                              setQrBgShape(shape.id);
+                                            }}
+                                            style={{
+                                              padding: '4px',
+                                              borderRadius: '12px',
+                                              fontSize: '10px',
+                                              fontWeight: 600,
+                                              background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                                              color: isActive ? '#fff' : 'var(--text-primary)',
+                                              border: isActive ? '2px solid var(--accent-primary)' : '1px solid var(--border-light)',
+                                              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                              gap: '6px', height: '94px',
+                                              boxShadow: isActive ? '0 6px 14px rgba(239, 30, 52,0.2)' : 'none',
+                                              transition: 'all 0.2s ease', overflow: 'hidden', position: 'relative', cursor: 'pointer'
+                                            }}
+                                          >
+                                            {shape.id !== 'full' && <PaidCrownBadge featureId={featId} position="corner" size={9} />}
+                                            <MiniQRCanvasBg
+                                              qrParams={{
+                                                dotStyle, eyeStyle, syncEyes,
+                                                gradientEnabled, gradientColor1, gradientColor2, gradientType,
+                                                qrColor, bgColor, bgTransparent,
+                                                qrShapeOpts,
+                                                errorLevel: 'H'
+                                              }}
+                                              shapeId={shape.id}
+                                              isActive={isActive}
+                                            />
+                                            <span style={{ fontSize: '9px', whiteSpace: 'nowrap', opacity: isActive ? 1 : 0.8 }}>{shape.label}</span>
+                                          </button>
+                                        );
+                                      })}
+                                  </div>
+                                  {isShapedQr(qrBgShape) && (
+                                    <>
+                                      <ShapedQrOptions opts={qrShapeOpts} onChange={setQrShapeOpts} />
+                                      <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', lineHeight: 1.4 }}>
+                                        Dots, eyes and colors follow your current style. Fill or transparency is managed in the Background section.
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              ) : patternTab === 'dots' ? (
                                <div>
                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>
                                  <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
@@ -7745,10 +7837,10 @@ export default function App() {
                         {shapePopup === 'background' && (
                           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
-                            <div style={{ opacity: bgTransparent ? 0.4 : 1, pointerEvents: bgTransparent ? 'none' : 'auto', transition: 'all 0.2s ease' }}>
+                            <div style={{ opacity: (bgTransparent && !isShapedQr(qrBgShape)) ? 0.4 : 1, pointerEvents: (bgTransparent && !isShapedQr(qrBgShape)) ? 'none' : 'auto', transition: 'all 0.2s ease' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                                 <div style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Background Shape</div>
-                                {bgTransparent && (
+                                {bgTransparent && !isShapedQr(qrBgShape) && (
                                   <span style={{ fontSize: '10px', color: 'var(--accent-primary)', fontWeight: '600' }}>Disabled (Transparent BG)</span>
                                 )}
                               </div>
@@ -7805,6 +7897,7 @@ export default function App() {
                                           qrColor,
                                           bgColor,
                                           bgTransparent,
+                                          qrShapeOpts,
                                           errorLevel: 'H'
                                         }}
                                         shapeId={shape.id}
@@ -7818,6 +7911,9 @@ export default function App() {
                                 })}
                               </div>
                             </div>
+                            {isShapedQr(qrBgShape) && (
+                              <ShapedQrOptions opts={qrShapeOpts} onChange={setQrShapeOpts} />
+                            )}
                           </div>
                         )}
                        {shapePopup === 'size' && (
@@ -10081,6 +10177,7 @@ function TemplatePreviewCanvas({ template, theme, qrMatrixInfo, currentQrOptions
         bgColor: template.preset?.bgColor || currentQrOptions?.bgColor || '#FFFFFF',
         bgTransparent: template.preset?.bgTransparent ?? (currentQrOptions?.bgTransparent || false),
         qrBgShape: currentQrOptions?.qrBgShape || 'full',
+        qrShapeOpts: currentQrOptions?.qrShapeOpts,
         dotStyle: template.preset?.dotStyle || currentQrOptions?.dotStyle || DOT_STYLES.DENSO,
         eyeStyle: template.preset?.eyeStyle || currentQrOptions?.eyeStyle || EYE_STYLES.SQUARE,
         eyeColor: template.preset?.eyeColor || currentQrOptions?.eyeColor || '',

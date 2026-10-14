@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { DOT_STYLES, EYE_STYLES, renderQR, generateQRMatrix, drawDotModule, drawEye } from '../utils/qrEngine';
+import { isPathDot, thumbnailPath } from '../utils/dotPaths';
 import { FeatureAccessManager } from '../services/FeatureAccessManager';
 import PaidCrownBadge from './PaidCrownBadge';
 import { usePremium } from '../services/premiumContext';
@@ -73,57 +74,49 @@ function MiniQRCanvas({ qrParams, overrideParams }) {
 
 function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
   const canvasRef = useRef(null);
+  const usePath = isPathDot(dotStyle);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (usePath || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const size = 120;
     ctx.clearRect(0, 0, size, size);
 
-    // 1. Draw solid background
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, size, size);
-
-    // 2. Grid Dimensions (6x6 mini matrix for extra LARGE dots)
-    const gridCount = 6;
-    const padding = 2;
-    const availableSize = size - padding * 2;
-    const cellSize = availableSize / gridCount;
-
-    // 3. 6x6 Matrix with a small 3x3 Secret Eye made of dots (rows 2..4, cols 1..3)
-    // Placed slightly down from center with maximum dot module size (18px wide per dot!)
-    const matrix = [
-      [1, 0, 1, 1, 0, 1], // Row 0
-      [0, 1, 1, 0, 1, 0], // Row 1
-      [1, 1, 1, 1, 0, 1], // Row 2: Secret Eye Top (c=1..3)
-      [0, 1, 0, 1, 1, 0], // Row 3: Secret Eye Middle (c=1..3, center gap at c=2)
-      [1, 1, 1, 1, 0, 1], // Row 4: Secret Eye Bottom (c=1..3)
-      [0, 1, 0, 1, 1, 1]  // Row 5
-    ];
+    // Same 5x5 sample + framing (viewBox -.2 -.2 5.4 5.4) as the reference sheet
+    const pattern = ['11010', '01111', '10110', '11011', '01101'];
+    const matrix = pattern.map(row => row.split('').map(ch => ch === '1'));
+    const gridCount = 5;
+    const unit = size / 5.4;
+    const offset = 0.2 * unit;
 
     ctx.fillStyle = PREVIEW_THUMBNAIL_INK;
-
     const previewQrParams = { ...(qrParams || {}), fgColor: PREVIEW_THUMBNAIL_INK };
 
     for (let r = 0; r < gridCount; r++) {
       for (let c = 0; c < gridCount; c++) {
         if (!matrix[r][c]) continue;
-
-        const x = padding + c * cellSize;
-        const y = padding + r * cellSize;
-
         const neighbors = {
-          top: r > 0 && !!matrix[r - 1][c],
-          bottom: r < gridCount - 1 && !!matrix[r + 1][c],
-          left: c > 0 && !!matrix[r][c - 1],
-          right: c < gridCount - 1 && !!matrix[r][c + 1]
+          top: r > 0 && matrix[r - 1][c],
+          bottom: r < gridCount - 1 && matrix[r + 1][c],
+          left: c > 0 && matrix[r][c - 1],
+          right: c < gridCount - 1 && matrix[r][c + 1]
         };
-
-        drawDotModule(ctx, x, y, cellSize, dotStyle, neighbors, previewQrParams, r, c);
+        drawDotModule(ctx, offset + c * unit, offset + r * unit, unit, dotStyle, neighbors, previewQrParams, r, c);
       }
     }
-  }, [dotStyle, qrParams?.dotPadding]);
+  }, [dotStyle, usePath, qrParams?.dotPadding]);
+
+  if (usePath) {
+    return (
+      <svg
+        viewBox="-.2 -.2 5.4 5.4"
+        style={{ width: '100%', height: '100%', display: 'block' }}
+      >
+        <path d={thumbnailPath(dotStyle)} fill={PREVIEW_THUMBNAIL_INK} />
+      </svg>
+    );
+  }
 
   return (
     <canvas 
@@ -133,8 +126,6 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
       style={{ 
         width: '100%', 
         height: '100%', 
-        borderRadius: '10px',
-        objectFit: 'cover',
         display: 'block'
       }} 
     />
@@ -216,6 +207,25 @@ export const DOT_PREVIEWS = {
   [DOT_STYLES.ROUNDED]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
       <rect x="2" y="2" width="24" height="24" rx="6" fill="currentColor" />
+    </svg>
+  ),
+  [DOT_STYLES.SMALL]: (
+    <svg viewBox="0 0 28 28" width="28" height="28"><circle cx="14" cy="14" r="9" fill="currentColor" /></svg>
+  ),
+  [DOT_STYLES.CLASSY]: (
+    <svg viewBox="0 0 28 28" width="28" height="28"><path d="M13 2H26V15A11 11 0 0 1 15 26H2V13A11 11 0 0 1 13 2Z" fill="currentColor" /></svg>
+  ),
+  [DOT_STYLES.LIQUID]: (
+    <svg viewBox="0 0 28 28" width="28" height="28"><rect x="2" y="2" width="24" height="24" rx="12" fill="currentColor" /></svg>
+  ),
+  [DOT_STYLES.HBAR]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <rect x="1" y="6" width="26" height="16" rx="8" fill="currentColor" />
+    </svg>
+  ),
+  [DOT_STYLES.VBAR]: (
+    <svg viewBox="0 0 28 28" width="28" height="28">
+      <rect x="6" y="1" width="16" height="26" rx="8" fill="currentColor" />
     </svg>
   ),
   [DOT_STYLES.LEAF]: (
