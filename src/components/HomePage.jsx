@@ -626,7 +626,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 overflow: 'hidden',
                 padding: '12px',
                 boxSizing: 'border-box',
-                minHeight: '144px',
+                minHeight: '135px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -692,8 +692,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }} />
 
               {/* Top Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative', maxWidth: 'calc(100% - 58px)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -713,7 +713,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       fontWeight: 800,
                       color: isDark ? '#FFFFFF' : '#0F172A',
                       margin: 0,
-                      lineHeight: 1.1
+                      lineHeight: 1.1,
+                      whiteSpace: 'nowrap'
                     }}>
                       QR Codes
                     </h2>
@@ -723,6 +724,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       color: isDark ? '#FF6B7A' : '#C60E23',
                       marginTop: '2px',
                       lineHeight: 1,
+                      whiteSpace: 'nowrap',
                       textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
                     }}>
                       Creative &amp; Branded
@@ -733,25 +735,25 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '3px',
-                  margin: '2px 0 6px 0',
+                  gap: '2px',
+                  margin: '1px 0 4px 0',
                   alignItems: 'flex-start'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Custom Logos</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Custom Logos</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>QR Templates</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>QR Templates</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Art Frames</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Art Frames</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>HD Export</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>HD Export</span>
                   </div>
                 </div>
               </div>
@@ -806,7 +808,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 overflow: 'hidden',
                 padding: '12px',
                 boxSizing: 'border-box',
-                minHeight: '144px',
+                minHeight: '135px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -872,8 +874,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }} />
 
               {/* Top Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative', maxWidth: 'calc(100% - 58px)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -893,7 +895,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       fontWeight: 800,
                       color: isDark ? '#FFFFFF' : '#0F172A',
                       margin: 0,
-                      lineHeight: 1.1
+                      lineHeight: 1.1,
+                      whiteSpace: 'nowrap'
                     }}>
                       Barcodes
                     </h2>
@@ -903,6 +906,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       color: isDark ? '#FFB74D' : '#D96500',
                       marginTop: '2px',
                       lineHeight: 1,
+                      whiteSpace: 'nowrap',
                       textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
                     }}>
                       Universal Standards
@@ -913,25 +917,25 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '3px',
-                  margin: '2px 0 6px 0',
+                  gap: '2px',
+                  margin: '1px 0 4px 0',
                   alignItems: 'flex-start'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>1D &amp; 2D Codes</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>1D &amp; 2D Codes</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Retail &amp; Stock</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Retail &amp; Stock</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Scan Verified</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Scan Verified</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Print-Ready</span>
+                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Print-Ready</span>
                   </div>
                 </div>
               </div>
