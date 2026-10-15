@@ -514,7 +514,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
       flexDirection: 'column',
       position: 'relative'
     }}>
-      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '90px' }} className="fade-in-up" onScroll={handleScroll}>
+      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 24px)' }} className="fade-in-up" onScroll={handleScroll}>
         {/* Static Hero Section with Smooth Subtle Top-to-Bottom Ruby Gradient */}
         <div style={{
           width: '100%',
@@ -526,11 +526,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           `,
           borderRadius: '0 0 28px 28px',
           marginTop: '-64px',
-          padding: '74px var(--main-padding-x) 48px var(--main-padding-x)',
+          padding: '68px var(--main-padding-x) 34px var(--main-padding-x)',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          gap: '14px',
+          gap: '10px',
           color: '#FFFFFF',
           boxShadow: '0 18px 40px rgba(198, 14, 159, 0.35), inset 0 -1px 2px rgba(255, 255, 255, 0.22)',
           position: 'relative',
@@ -596,15 +596,26 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   </div>
                 </>
               ) : (
-                <div style={{
-                  fontSize: '22px',
-                  fontWeight: 800,
-                  color: '#FFFFFF',
-                  lineHeight: 1.2,
-                  padding: '2px 0'
-                }}>
-                  Welcome to Mushi QR Pro
-                </div>
+                <>
+                  <div style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    letterSpacing: '0.8px',
+                    textTransform: 'uppercase',
+                    color: '#FFE2E8',
+                    marginBottom: '0'
+                  }}>
+                    WELCOME TO 👋
+                  </div>
+                  <div style={{
+                    fontSize: '22px',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    lineHeight: 1.2
+                  }}>
+                    Mushi QR Pro
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -661,7 +672,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  bottom: '14.4px',
+                  bottom: '16.4px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -843,7 +854,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  bottom: '14.4px',
+                  bottom: '16.4px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -977,7 +988,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Bottom Full-Width Card: Batch Creator */}
-        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '-36px', position: 'relative', zIndex: 10, marginBottom: '10px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '-24px', position: 'relative', zIndex: 10, marginBottom: '6px' }}>
           <div
             onClick={() => onNavigate('batch', 'QR')}
             role="button"
@@ -991,7 +1002,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               justifyContent: 'space-between',
               position: 'relative',
               overflow: 'hidden',
-              padding: '12px',
+              padding: '10px 12px',
               boxSizing: 'border-box',
               backgroundColor: isDark ? '#141A28' : '#FFFFFF',
               boxShadow: isDark 
@@ -1041,10 +1052,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
 
             {/* Top Title & Description */}
             <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, flex: 1, minWidth: 0, position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3px' }}>
                 <div style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '30px',
+                  height: '30px',
                   borderRadius: '10px',
                   background: '#FF2A54',
                   display: 'flex',
@@ -1053,7 +1064,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   boxShadow: '0 4px 12px rgba(255, 42, 84, 0.35)',
                   flexShrink: 0
                 }}>
-                  <Layers size={16} color="#FFFFFF" />
+                  <Layers size={15} color="#FFFFFF" />
                 </div>
                 <div>
                   <h3 style={{
@@ -1076,7 +1087,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   </div>
                 </div>
               </div>
-              <p style={{ fontSize: '8.5px', margin: '6px 110px 0 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{ fontSize: '8.5px', margin: '4px 110px 0 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 Create 10K+ codes from your spreadsheets.
               </p>
             </div>
@@ -1084,9 +1095,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Create QR Grid */}
-        <div style={{ padding: '16px var(--main-padding-x) 12px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create QR Code</h3>
+        <div style={{ padding: '8px var(--main-padding-x) 6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create QR Code</h3>
             <button
               onClick={() => setShowAllQR(!showAllQR)}
               style={{ 
@@ -1138,9 +1149,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Create Barcode Grid */}
-        <div style={{ padding: '12px var(--main-padding-x) 24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create Barcode</h3>
+        <div style={{ padding: '6px var(--main-padding-x) 8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create Barcode</h3>
             <button
               onClick={() => setShowAllBarcodes(!showAllBarcodes)}
               style={{ 
@@ -1191,9 +1202,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           </div>
         </div>
 
-        <div style={{ padding: '0 var(--main-padding-x) 32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent Projects</h3>
+        <div style={{ padding: '0 var(--main-padding-x) 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent Projects</h3>
             {recentItems.length > 0 && (
               <button
                 onClick={() => {
@@ -1212,7 +1223,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {recentItems.length > 0 ? recentItems.map(item => (
               <div key={item.id} style={{
                 background: 'var(--bg-elevated)',
@@ -1366,14 +1377,14 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 background: 'var(--bg-elevated)',
                 border: 'none',
                 borderRadius: '16px',
-                padding: '20px 24px',
+                padding: '12px 16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '20px',
+                gap: '14px',
                 boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="68" height="52" viewBox="0 0 68 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="54" height="42" viewBox="0 0 68 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                     {/* Back document sheet */}
                     <rect x="22" y="4" width="28" height="34" rx="3" fill="#FFF2F5" stroke="#FFE0E6" strokeWidth="1.5" />
                     <line x1="28" y1="12" x2="44" y2="12" stroke="#FFCCD5" strokeWidth="1.5" strokeLinecap="round" />
@@ -1399,10 +1410,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   </svg>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     No recent projects found.
                   </h4>
-                  <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.3 }}>
+                  <p style={{ margin: 0, fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.3 }}>
                     Create your first QR code or barcode to get started.
                   </p>
                 </div>
