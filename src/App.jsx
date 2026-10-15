@@ -3540,6 +3540,16 @@ export default function App() {
     }
     return { contentX, contentY, contentSize };
   }, [frameStyle]);
+  // Area in which free text layers live: whole template image when a template is active,
+  // otherwise the QR content area.
+  const getTextArea = useCallback(() => {
+    if (selectedTemplate) {
+      const hr = selectedTemplate.heightRatio || 1;
+      return { contentX: 0, contentY: 0, contentSize: 512, areaW: 512, areaH: 512 * hr };
+    }
+    const c = getQRContentArea();
+    return { ...c, areaW: c.contentSize, areaH: c.contentSize };
+  }, [selectedTemplate, getQRContentArea]);
   // â”€â”€ Pipette Handling â”€â”€
   // â”€â”€ Pipette Handling â”€â”€
   const sampleCanvasColor = useCallback((clientX, clientY) => {
@@ -3984,6 +3994,7 @@ export default function App() {
     }
     // 3. Check Custom Text Layers
     if (customTexts && customTexts.length > 0) {
+      const { contentX, contentY, contentSize, areaW, areaH } = getTextArea();
       for (let i = customTexts.length - 1; i >= 0; i--) {
         const item = customTexts[i];
         if (!item || !item.text) continue;
@@ -3993,8 +4004,8 @@ export default function App() {
         const tw = item.width ? (item.width * contentSize) : (metrics.width + 20);
         const th = item.height ? (item.height * contentSize) : ((fontSize * 0.8) + 20);
 
-        const tx = contentX + (contentSize - tw) * (item.posX ?? 0.5);
-        const ty = contentY + (contentSize - th) * (item.posY ?? 0.5);
+        const tx = contentX + (areaW - tw) * (item.posX ?? 0.5);
+        const ty = contentY + (areaH - th) * (item.posY ?? 0.5);
         const centerX = tx + tw / 2;
         const centerY = ty + th / 2;
         const dx_raw = x - centerX;
@@ -4075,8 +4086,11 @@ export default function App() {
         if (inRect(localX, localY, tx, ty, tw, th)) {
           setCanvasSelection('custom-text-' + item.id);
           setTextEditMode('custom-' + item.id);
-          setActiveTab('text');
-          setTextPopup('input');
+          // On templates only show the transform/resize frame; do not pop the text panel.
+          if (!selectedTemplate) {
+            setActiveTab('text');
+            setTextPopup('input');
+          }
           setIsDraggingCanvas(true);
           dragType.current = 'custom-text-' + item.id;
           dragStartOffset.current = { x: x - tx, y: y - ty, customTextId: item.id };
@@ -4086,33 +4100,12 @@ export default function App() {
       }
     }
 
-    // 4. Check Template Text Direct Click
-    if (selectedTemplate) {
-      if (selectedTemplate.styleFamily === 'vcard') {
-        if (x <= 360) {
-          setIsTemplateTextModalOpen(true);
-          e.preventDefault();
-          return;
-        }
-      } else {
-        // Top Headline / Label
-        if (y <= 170) {
-          setCanvasSelection('template-headline');
-          setTextEditMode('template-top');
-          setActiveTab('text');
-          setTextPopup('input');
-          e.preventDefault();
-          return;
-        }
-        // Bottom Subtitle / Handle (non-frame templates)
-        if (y >= 350 && selectedTemplate.styleFamily !== 'frame') {
-          setCanvasSelection('template-handle');
-          setTextEditMode('template-bottom');
-          setActiveTab('text');
-          setTextPopup('input');
-          e.preventDefault();
-          return;
-        }
+    // 4. Template vCard details modal (other templates no longer open the text panel on click)
+    if (selectedTemplate && selectedTemplate.styleFamily === 'vcard') {
+      if (x <= 360) {
+        setIsTemplateTextModalOpen(true);
+        e.preventDefault();
+        return;
       }
     }
 
@@ -4120,7 +4113,7 @@ export default function App() {
     if (!isPipetteActive) {
       setCanvasSelection(null);
     }
-  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterWidth, textCenterHeight, textCenterPosX, textCenterPosY, textCenterRotation, customTexts, logoPadding, getQRContentArea, canvasSelection, getSnapshot, frameStyle, frameText, frameSize, frameFont, framePosition, frameRotation, selectedTemplate]);
+  }, [qrMatrixInfo, logo, logoWidth, logoHeight, logoPosX, logoPosY, logoRotation, textCenterEnabled, textCenterText, textCenterSize, textCenterWidth, textCenterHeight, textCenterPosX, textCenterPosY, textCenterRotation, customTexts, logoPadding, getQRContentArea, getTextArea, canvasSelection, getSnapshot, frameStyle, frameText, frameSize, frameFont, framePosition, frameRotation, selectedTemplate]);
   const handleCanvasDoubleClick = useCallback((e) => {
     if (!canvasRef.current || !qrMatrixInfo) return;
     if (selectedTemplate) {

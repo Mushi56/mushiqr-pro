@@ -756,6 +756,7 @@ export function renderQR(canvas, options) {
       });
       ctx.drawImage(shapedCanvas, qrX - qrSize / 2, qrY - qrSize / 2, qrSize, qrSize);
       ctx.restore();
+      drawTemplateOverlayTexts(ctx, w, h, options);
       return canvas;
     } else {
       // ── Standard fallback: ratio-based QR positioning ───────────────────────
@@ -1216,7 +1217,9 @@ export function renderQR(canvas, options) {
   }
 
   // ── Custom Multi-Text Layers ──
-  if (options.customTexts && Array.isArray(options.customTexts) && options.customTexts.length > 0) {
+  // Inside a template the QR lives in a scaled holder; custom text layers are drawn
+  // afterwards over the whole template image so they can be placed anywhere.
+  if (!options.template && options.customTexts && Array.isArray(options.customTexts) && options.customTexts.length > 0) {
     drawCustomTexts(ctx, options.customTexts, size, {
       ...options,
       contentX,
@@ -1231,6 +1234,7 @@ export function renderQR(canvas, options) {
 
   if (options.template) {
     ctx.restore();
+    drawTemplateOverlayTexts(ctx, w, h, options);
   }
 
   return canvas;
@@ -3477,6 +3481,20 @@ function drawCenterText(ctx, text, canvasSize, options) {
 /**
  * Draw custom free-floating text layers with individual styling, transformation frame, and handles
  */
+function drawTemplateOverlayTexts(ctx, w, h, options) {
+  if (!Array.isArray(options.customTexts) || options.customTexts.length === 0) return;
+  drawCustomTexts(ctx, options.customTexts, w, {
+    ...options,
+    contentX: 0,
+    contentY: 0,
+    contentSize: w,
+    areaW: w,
+    areaH: h,
+    showHandle: options.showHandle,
+    selectedType: options.selectedType
+  });
+}
+
 function drawCustomTexts(ctx, customTexts, canvasSize, options) {
   const {
     contentX = 0,
@@ -3485,6 +3503,8 @@ function drawCustomTexts(ctx, customTexts, canvasSize, options) {
     showHandle = false,
     selectedType = null
   } = options;
+  const areaW = options.areaW ?? contentSize;
+  const areaH = options.areaH ?? contentSize;
 
   customTexts.forEach((item) => {
     if (!item || !item.text) return;
@@ -3518,8 +3538,8 @@ function drawCustomTexts(ctx, customTexts, canvasSize, options) {
     const paddedW = width ? (width * contentSize) : (textWidth + padding * 2);
     const paddedH = height ? (height * contentSize) : (textHeight + padding * 2);
 
-    const rawX = contentX + (contentSize - paddedW) * posX;
-    const rawY = contentY + (contentSize - paddedH) * posY;
+    const rawX = contentX + (areaW - paddedW) * posX;
+    const rawY = contentY + (areaH - paddedH) * posY;
 
     const textX = rawX;
     const textY = rawY;
@@ -3566,14 +3586,14 @@ function drawCustomTexts(ctx, customTexts, canvasSize, options) {
       ctx.setLineDash([6, 4]);
       if (Math.abs(posX - 0.5) < 0.01) {
         ctx.beginPath();
-        ctx.moveTo(contentX + contentSize / 2, contentY);
-        ctx.lineTo(contentX + contentSize / 2, contentY + contentSize);
+        ctx.moveTo(contentX + areaW / 2, contentY);
+        ctx.lineTo(contentX + areaW / 2, contentY + areaH);
         ctx.stroke();
       }
       if (Math.abs(posY - 0.5) < 0.01) {
         ctx.beginPath();
-        ctx.moveTo(contentX, contentY + contentSize / 2);
-        ctx.lineTo(contentX + contentSize, contentY + contentSize / 2);
+        ctx.moveTo(contentX, contentY + areaH / 2);
+        ctx.lineTo(contentX + areaW, contentY + areaH / 2);
         ctx.stroke();
       }
       ctx.restore();
