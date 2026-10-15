@@ -115,7 +115,9 @@ export const DOT_STYLES = {
   DENSO: 'denso',
   DOTS: 'dots',
   SPARKLE: 'sparkle',
-  FLUID: 'fluid',
+  LIQUID: 'liquid',
+  HBAR: 'hbar',
+  VBAR: 'vbar',
   CAPSULE: 'capsule',
   HEXAGON: 'hexagon',
   SQUARE: 'square',
@@ -998,27 +1000,41 @@ export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = 
     case DOT_STYLES.EXTRA_ROUNDED:
       drawRoundedRect(ctx, x + padding, y + padding, s, s, s * 0.45);
       break;
-    case DOT_STYLES.FLUID: {
-      const r = size * 0.45;
-      const xL = left ? x - 0.6 : x;
-      const xR = right ? x + size + 0.6 : x + size;
-      const yT = top ? y - 0.6 : y;
-      const yB = bottom ? y + size + 0.6 : y + size;
-
+    case DOT_STYLES.HBAR: {
+      const t = size * 0.62;
+      const by = y + (size - t) / 2;
+      const x0 = left ? x - 0.5 : x + size * 0.06;
+      const x1 = right ? x + size + 0.5 : x + size * 0.94;
+      const rr = t / 2;
       ctx.beginPath();
-      // TL corner
-      if (top || left) ctx.moveTo(xL, yT);
-      else { ctx.moveTo(x + r, y); ctx.arcTo(x, y, x, y + r, r); }
-      // BL corner
-      if (bottom || left) ctx.lineTo(xL, yB);
-      else { ctx.lineTo(x, y + size - r); ctx.arcTo(x, y + size, x + r, y + size, r); }
-      // BR corner
-      if (bottom || right) ctx.lineTo(xR, yB);
-      else { ctx.lineTo(x + size - r, y + size); ctx.arcTo(x + size, y + size, x + size, y + size - r, r); }
-      // TR corner
-      if (top || right) ctx.lineTo(xR, yT);
-      else { ctx.lineTo(x + size, y + r); ctx.arcTo(x + size, y, x + size - r, y, r); }
-      ctx.closePath(); ctx.fill();
+      ctx.moveTo(x0 + (left ? 0 : rr), by);
+      ctx.lineTo(x1 - (right ? 0 : rr), by);
+      if (!right) ctx.arc(x1 - rr, by + rr, rr, -Math.PI / 2, Math.PI / 2); else ctx.lineTo(x1, by + t);
+      ctx.lineTo(x1 - (right ? 0 : rr), by + t);
+      ctx.lineTo(x0 + (left ? 0 : rr), by + t);
+      if (!left) ctx.arc(x0 + rr, by + rr, rr, Math.PI / 2, Math.PI * 1.5); else ctx.lineTo(x0, by);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case DOT_STYLES.VBAR: {
+      const t = size * 0.62;
+      const bx = x + (size - t) / 2;
+      const y0 = top ? y - 0.5 : y + size * 0.06;
+      const y1 = bottom ? y + size + 0.5 : y + size * 0.94;
+      const rr = t / 2;
+      ctx.beginPath();
+      ctx.moveTo(bx, y0 + (top ? 0 : rr));
+      ctx.lineTo(bx, y1 - (bottom ? 0 : rr));
+      if (!bottom) ctx.arc(bx + rr, y1 - rr, rr, Math.PI, 0, true); else ctx.lineTo(bx + t, y1);
+      ctx.lineTo(bx + t, y0 + (top ? 0 : rr));
+      if (!top) ctx.arc(bx + rr, y0 + rr, rr, 0, Math.PI, true); else ctx.lineTo(bx, y0);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case DOT_STYLES.LIQUID: {
+      drawRoundedRect(ctx, x + padding, y + padding, s, s, s * 0.4);
       break;
     }
     case DOT_STYLES.LEAF: {

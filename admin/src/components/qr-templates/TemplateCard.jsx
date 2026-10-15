@@ -201,7 +201,7 @@ export const TemplateCard = React.memo(function TemplateCard({
           qrColor: stylePreset?.qrColor || '#1877F2',
           bgColor: 'transparent',
           bgTransparent: true,
-          dotStyle: stylePreset?.dotStyle || 'fluid',
+          dotStyle: stylePreset?.dotStyle || 'rounded',
           eyeStyle: stylePreset?.eyeStyle || 'rounded',
           eyeColor: stylePreset?.eyeColor || stylePreset?.qrColor || '#1877F2',
           eyeOuterColor: stylePreset?.eyeOuterColor || stylePreset?.qrColor || '#1877F2',

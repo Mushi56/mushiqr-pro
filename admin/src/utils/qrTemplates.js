@@ -133,7 +133,7 @@ export const QR_TEMPLATES = ALL_50_TEMPLATES.map(tpl => {
     preset: stylingPreset || tpl.preset || {
       qrColor:   '#1877F2',
       bgColor:   '#FFFFFF',
-      dotStyle:  'fluid',
+      dotStyle:  'rounded',
       eyeStyle:  'rounded'
     },
     drawBackground(ctx, w, h, options = {}) {

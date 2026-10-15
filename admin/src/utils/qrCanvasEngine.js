@@ -6,7 +6,9 @@ export const DOT_STYLES = {
   DENSO: 'denso',
   DOTS: 'dots',
   SPARKLE: 'sparkle',
-  FLUID: 'fluid',
+  LIQUID: 'liquid',
+  HBAR: 'hbar',
+  VBAR: 'vbar',
   CAPSULE: 'capsule',
   HEXAGON: 'hexagon',
   SQUARE: 'square',
@@ -131,6 +133,18 @@ export function drawDotModule(ctx, x, y, size, style, neighbors = {}, options = 
       ctx.fill();
       break;
     }
+
+    case 'hbar':
+      drawRoundedRect(ctx, x + padding, y + padding + s * 0.25, s, s * 0.5, s * 0.25);
+      break;
+
+    case 'vbar':
+      drawRoundedRect(ctx, x + padding + s * 0.25, y + padding, s * 0.5, s, s * 0.25);
+      break;
+
+    case 'liquid':
+      drawRoundedRect(ctx, x + padding, y + padding, s, s, s * 0.4);
+      break;
 
     case 'capsule':
       drawRoundedRect(ctx, x + padding + s * 0.1, y + padding, s * 0.8, s, s * 0.4);
