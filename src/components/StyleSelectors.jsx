@@ -184,11 +184,6 @@ export const DOT_PREVIEWS = {
       <path d="M14 2 Q14 14 26 14 Q14 14 14 26 Q14 14 2 14 Q14 14 14 2 Z" fill="currentColor" />
     </svg>
   ),
-  [DOT_STYLES.FLUID]: (
-    <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M4 14 a10 10 0 0 1 10 -10 v20 a10 10 0 0 1 -10 -10 M14 4 h4 a10 10 0 0 1 0 20 h-4 Z" fill="currentColor" />
-    </svg>
-  ),
   [DOT_STYLES.CAPSULE]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
       <rect x="5" y="2" width="18" height="24" rx="9" fill="currentColor" />
@@ -238,11 +233,6 @@ export const DOT_PREVIEWS = {
       <polygon points="14,2 26,14 14,26 2,14" fill="currentColor" />
     </svg>
   ),
-  [DOT_STYLES.PIXEL]: (
-    <svg viewBox="0 0 28 28" width="28" height="28">
-      <path d="M2 2 h24 v24 h-24 Z M10 10 h8 v8 h-8 Z" fillRule="evenodd" fill="currentColor" />
-    </svg>
-  ),
   [DOT_STYLES.SHIELD]: (
     <svg viewBox="0 0 28 28" width="28" height="28">
       <path d="M4 2 h20 v12 q0 12 -10 14 q-10 -2 -10 -14 Z" fill="currentColor" />
@@ -288,15 +278,6 @@ export const DOT_PREVIEWS = {
       <circle cx="8.5" cy="20" r="4.2" fill="currentColor" />
       <circle cx="19.5" cy="20" r="4.2" fill="currentColor" />
       <circle cx="14" cy="14" r="2.2" fill="currentColor" />
-    </svg>
-  ),
-  [DOT_STYLES.VIOLET_FLOWER]: (
-    <svg viewBox="0 0 28 28" width="28" height="28">
-      <circle cx="14" cy="5" r="5" fill="currentColor" />
-      <circle cx="5.5" cy="11.5" r="5" fill="currentColor" />
-      <circle cx="22.5" cy="11.5" r="5" fill="currentColor" />
-      <circle cx="8" cy="21" r="5" fill="currentColor" />
-      <circle cx="20" cy="21" r="5" fill="currentColor" />
     </svg>
   ),
   [DOT_STYLES.SUNFLOWER]: (

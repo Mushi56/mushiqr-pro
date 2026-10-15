@@ -1,5 +1,113 @@
 export const ANIMAL_TEMPLATES = [
   {
+    "id": "template-torn-paper",
+    "name": "Torn Paper Template",
+    "category": "AI Magic",
+    "styleFamily": "image",
+    "bgImage": "/templates/torn-paper-template.avif",
+    "thumbImage": "/templates/torn-paper-template-thumb.avif",
+    "dimensions": "5016 x 5016 px",
+    "heightRatio": 1.0,
+    "qrSize": 0.584,
+    "qrX": 0.525,
+    "qrY": 0.50,
+    "quietZone": 0,
+    "preset": {
+      "qrColor": "#993b45",
+      "bgColor": "transparent",
+      "bgTransparent": true,
+      "dotStyle": "hbar",
+      "eyeStyle": "rounded",
+      "qrBgShape": "torn",
+      "qrShapeOpts": {
+        "clean": true,
+        "decor": true,
+        "outline": false
+      }
+    }
+  },
+  {
+    "id": "template-paper-frame",
+    "name": "Paper Frame Template",
+    "category": "AI Magic",
+    "styleFamily": "image",
+    "bgImage": "/templates/paper-frame-template.avif",
+    "thumbImage": "/templates/paper-frame-template-thumb.avif",
+    "dimensions": "5016 x 5016 px",
+    "heightRatio": 1.0,
+    "qrSize": 0.531,
+    "qrX": 0.505,
+    "qrY": 0.540,
+    "quietZone": 0,
+    "preset": {
+      "qrColor": "#4d0524",
+      "bgColor": "transparent",
+      "bgTransparent": true,
+      "dotStyle": "vbar",
+      "eyeStyle": "rounded",
+      "qrBgShape": "paper",
+      "qrShapeOpts": {
+        "clean": true,
+        "decor": true,
+        "outline": false
+      }
+    }
+  },
+  {
+    "id": "template-circle",
+    "name": "Circle Template",
+    "category": "AI Magic",
+    "styleFamily": "image",
+    "bgImage": "/templates/circle-template.avif",
+    "thumbImage": "/templates/circle-template-thumb.avif",
+    "dimensions": "3584 x 2688 px",
+    "heightRatio": 0.75,
+    "qrSize": 0.335,
+    "qrX": 0.500,
+    "qrY": 0.4982,
+    "quietZone": 0,
+    "preset": {
+      "qrColor": "#9b262d",
+      "bgColor": "transparent",
+      "bgTransparent": true,
+      "dotStyle": "small",
+      "eyeStyle": "pillow",
+      "qrBgShape": "round",
+      "qrShapeOpts": {
+        "clean": true,
+        "decor": true,
+        "outline": false
+      }
+    }
+  },
+  {
+    "id": "template-blob-flower",
+    "name": "Blob Flower Template",
+    "category": "AI Magic",
+    "styleFamily": "image",
+    "bgImage": "/templates/blob-flower-template.avif",
+    "thumbImage": "/templates/blob-flower-template-thumb.avif",
+    "dimensions": "3584 x 2688 px",
+    "heightRatio": 0.75,
+    "qrSize": 0.375,
+    "qrX": 0.4985,
+    "qrY": 0.5122,
+    "quietZone": 0,
+    "preset": {
+      "qrColor": "#9f213a",
+      "bgColor": "transparent",
+      "bgTransparent": true,
+      "dotStyle": "small",
+      "eyeStyle": "pillow",
+      "qrBgShape": "blob",
+      "qrShapeOpts": {
+        "clean": true,
+        "decor": true,
+        "outline": false
+      }
+    }
+  },
+  {
     "id": "template-mask-exploding",
     "name": "Mask Exploding Template",
     "category": "AI Magic",
@@ -49,7 +157,7 @@ export const ANIMAL_TEMPLATES = [
       "qrColor": "#0289ab",
       "bgColor": "transparent",
       "bgTransparent": true,
-      "dotStyle": "fluid",
+      "dotStyle": "rounded",
       "eyeStyle": "pillow"
     }
   },
@@ -69,7 +177,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#275c86",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -89,7 +197,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#1a7b93",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -109,7 +217,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#0492aa",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -129,7 +237,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#1e9064",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -149,7 +257,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#0262ab",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -169,7 +277,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#a00e77",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -189,7 +297,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#035dab",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -209,7 +317,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#1f8e77",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -229,7 +337,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#035caa",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -249,7 +357,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#ad7800",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -269,7 +377,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#ac022e",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -289,7 +397,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#1c926f",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -309,7 +417,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#ac0203",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   },
@@ -329,7 +437,7 @@ export const ANIMAL_TEMPLATES = [
           "qrColor": "#3703aa",
           "bgColor": "transparent",
           "bgTransparent": true,
-          "dotStyle": "fluid",
+          "dotStyle": "rounded",
           "eyeStyle": "pillow"
       }
   }

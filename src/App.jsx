@@ -1313,6 +1313,7 @@ export default function App() {
   // Tracks whether the user has meaningfully changed the QR generator since it was last reset/loaded
   const generatorIsDirtyRef = useRef(false);
   const ignoreDirtyRef = useRef(false);
+  const suppressExitGuardRef = useRef(false);
   const historyRef = useRef([]);
   const historyIndexRef = useRef(-1);
   // â”€â”€ Batch QR â”€â”€
@@ -1389,6 +1390,8 @@ export default function App() {
       setLogoTexture('none');
       setLogoPosX(0.5);
       setLogoPosY(0.5);
+      setQrBgShape('full');
+      setQrShapeOpts({ clean: false, decor: true, outline: false });
 
       // Restore clean default background when removing template so QR is never left transparent
       setBgTransparent(false);
@@ -1435,8 +1438,15 @@ export default function App() {
       if (tpl.preset.bgTransparent !== undefined) {
         setBgTransparent(tpl.preset.bgTransparent);
       }
-      if (tpl.preset.dotStyle) setDotStyle(tpl.preset.dotStyle);
-      if (tpl.preset.eyeStyle) setEyeStyle(tpl.preset.eyeStyle);
+      setQrBgShape(tpl.preset.qrBgShape || 'full');
+      setQrShapeOpts(tpl.preset.qrShapeOpts || { clean: false, decor: true, outline: false });
+      
+      const nextDot = (tpl.preset.dotStyle && tpl.preset.dotStyle !== 'fluid') ? tpl.preset.dotStyle : 'rounded';
+      setDotStyle(nextDot);
+
+      const nextEye = tpl.preset.eyeStyle || 'rounded';
+      setEyeStyle(nextEye);
+
       if (tpl.preset.eyeColor) setEyeColor(tpl.preset.eyeColor);
       if (tpl.preset.eyeOuterColor) setEyeOuterColor(tpl.preset.eyeOuterColor);
       if (tpl.preset.logoBgColor !== undefined) {
@@ -1874,6 +1884,7 @@ export default function App() {
   const [batchPageDefaultType, setBatchPageDefaultType] = useState('QR');
   // Helper: check if the generator has unsaved modifications
   const hasUnsavedGeneratorChanges = () => {
+    if (suppressExitGuardRef.current) return false;
     if (generatorIsDirtyRef.current) return true;
     if (historyIndex > 0 || (historyIndexRef.current && historyIndexRef.current > 0)) return true;
     if (loadedItemId) return false;
@@ -2713,6 +2724,8 @@ export default function App() {
     if (page !== activePage) {
       // Intercept browser / system back navigation when leaving generator
       if (activePage === 'generator') {
+        // Programmatic navigation into the generator in progress: ignore stale location
+        if (suppressExitGuardRef.current) return;
         // 1. If unsaved changes modal is open, dismiss it and remain on generator
         if (unsavedChangesModal.isOpen) {
           handleCancelExit();
@@ -3202,19 +3215,28 @@ export default function App() {
     
     ignoreDirtyRef.current = true;
     generatorIsDirtyRef.current = false;
+    suppressExitGuardRef.current = true;
+    setUnsavedChangesModal({ isOpen: false, nextPage: null });
     setTimeout(() => {
       ignoreDirtyRef.current = false;
       generatorIsDirtyRef.current = false;
     }, 1000);
+    setTimeout(() => {
+      suppressExitGuardRef.current = false;
+      generatorIsDirtyRef.current = false;
+    }, 2000);
     
     // Core data
     if (item.source === 'scan' || (!item.qrType && item.qrData?.text)) {
-      const rawText = item.qrData?.text || item.displayText || '';
-      const parsed = parseRawQRText(rawText);
-      setQrType(parsed.type);
-      setQrData(parsed.data);
-      
-      // Reset layout options for scanned QRs to clear the designer
+      // Open designer with a clean default QR (do not load scanned content)
+      if (selectedTemplate) applyTemplate(null);
+      setQrType(QR_TYPES.URL);
+      setQrData({ url: 'https://example.com' });
+      setErrorLevel('M');
+      setQrBgShape('full');
+      setQrShapeOpts({ clean: false, decor: true, outline: false });
+      setEyeColor('');
+      setEyeOuterColor('');
       setLogo(null);
       setQrColor('#000000');
       setBgColor('#ffffff');
@@ -7760,9 +7782,35 @@ export default function App() {
                        {shapePopup === 'pattern' && (
                            <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                              {patternTab === 'shape' ? (
+                                (() => {
+                                  const isShapeLocked = ['template-circle', 'template-blob-flower', 'template-torn-paper', 'template-paper-frame'].includes(selectedTemplate?.id);
+                                  return (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                  {isShapeLocked && (
+                                    <div style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                      padding: '8px 12px',
+                                      borderRadius: '10px',
+                                      background: 'rgba(239, 68, 68, 0.1)',
+                                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                                      color: 'var(--text-primary)',
+                                      fontSize: '11.5px',
+                                      fontWeight: 600
+                                    }}>
+                                      <Lock size={15} color="#ef4444" style={{ flexShrink: 0 }} />
+                                      <span>QR Shape & its properties are locked specifically to this template design.</span>
+                                    </div>
+                                  )}
                                   <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>QR Shape</div>
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))', gap: '10px' }}>
+                                  <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
+                                    gap: '10px',
+                                    opacity: isShapeLocked ? 0.45 : 1,
+                                    pointerEvents: isShapeLocked ? 'none' : 'auto'
+                                  }}>
                                     {[{ id: 'full', label: 'None' }, ...QR_BG_SHAPES.filter(s => isShapedQr(s.id))]
                                       .filter(shape => shape.id === 'full' || FeatureAccessManager.isFeatureEnabled(`qr_bg_${shape.id}`))
                                       .map(shape => {
@@ -7813,14 +7861,25 @@ export default function App() {
                                       })}
                                   </div>
                                   {isShapedQr(qrBgShape) && (
-                                    <>
+                                    <div style={{
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '10px',
+                                      opacity: isShapeLocked ? 0.45 : 1,
+                                      pointerEvents: isShapeLocked ? 'none' : 'auto'
+                                    }}>
                                       <ShapedQrOptions opts={qrShapeOpts} onChange={setQrShapeOpts} />
                                       <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', lineHeight: 1.4 }}>
-                                        Dots, eyes and colors follow your current style. Fill or transparency is managed in the Background section.
+                                        {isShapeLocked
+                                          ? 'Properties are locked to preserve seamless alignment with the template artwork.'
+                                          : 'Dots, eyes and colors follow your current style. Fill or transparency is managed in the Background section.'
+                                        }
                                       </div>
-                                    </>
+                                    </div>
                                   )}
                                 </div>
+                                  );
+                                })()
                               ) : patternTab === 'dots' ? (
                                <div>
                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>

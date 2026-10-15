@@ -740,6 +740,23 @@ export function renderQR(canvas, options) {
       const inner   = boxSize - margin * 2;
       ctx.translate(boxX + margin, boxY + margin);
       ctx.scale(inner / w, inner / w);
+    } else if (isShapedQr(qrBgShape)) {
+      const qrSize = w * (options.template.qrSize || 0.35);
+      const qrX = w * (options.template.qrX || 0.5);
+      const qrY = h * (options.template.qrY || 0.555);
+      // Delegate rendering to renderShapedQr on an offscreen canvas of matching aspect
+      const shapedCanvas = document.createElement('canvas');
+      shapedCanvas.width = qrSize;
+      shapedCanvas.height = qrSize;
+      const shapedCtx = shapedCanvas.getContext('2d');
+      renderShapedQr(shapedCanvas, shapedCtx, {
+        ...options,
+        size: qrSize,
+        template: null
+      });
+      ctx.drawImage(shapedCanvas, qrX - qrSize / 2, qrY - qrSize / 2, qrSize, qrSize);
+      ctx.restore();
+      return canvas;
     } else {
       // ── Standard fallback: ratio-based QR positioning ───────────────────────
       const qrSize = w * (options.template.qrSize || 0.35);
@@ -1304,14 +1321,25 @@ function renderShapedQr(canvas, ctx, options) {
 
     if (decor) {
       const K = Math.ceil(R - h) + 1;
+      const isDecorDark = (c, r) => {
+        const x = c + 0.5 - h, y = r + 0.5 - h;
+        const outside = clean
+          ? ![[0.5, 0.5], [-0.5, 0.5], [0.5, -0.5], [-0.5, -0.5]].every(([a, b]) => inShape(x + a, y + b))
+          : Math.hypot(x - ox, y - oy) > rf(Math.atan2(y - oy, x - ox)) + 0.5;
+        if (outside || (Math.abs(x) < h && Math.abs(y) < h) || nearEye(x, y)) return false;
+        return decoHash(c, r) < 0.5;
+      };
+
       for (let r = -K; r < N + K; r++) {
         for (let c = -K; c < N + K; c++) {
-          const x = c + 0.5 - h, y = r + 0.5 - h;
-          const outside = clean
-            ? ![[0.5, 0.5], [-0.5, 0.5], [0.5, -0.5], [-0.5, -0.5]].every(([a, b]) => inShape(x + a, y + b))
-            : Math.hypot(x - ox, y - oy) > rf(Math.atan2(y - oy, x - ox)) + 0.5;
-          if (outside || (Math.abs(x) < h && Math.abs(y) < h) || nearEye(x, y)) continue;
-          if (decoHash(c, r) < 0.5) drawDotModule(ctx, c - h, r - h, 1, dotStyle, {}, dotOpts, r, c);
+          if (!isDecorDark(c, r)) continue;
+          const nb = {
+            top: isDecorDark(c, r - 1) || dark(r - 1, c),
+            bottom: isDecorDark(c, r + 1) || dark(r + 1, c),
+            left: isDecorDark(c - 1, r) || dark(r, c - 1),
+            right: isDecorDark(c + 1, r) || dark(r, c + 1)
+          };
+          drawDotModule(ctx, c - h, r - h, 1, dotStyle, nb, dotOpts, r, c);
         }
       }
     }

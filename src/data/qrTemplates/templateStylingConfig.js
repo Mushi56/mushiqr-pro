@@ -15,7 +15,7 @@ export const TEMPLATE_STYLING_MAP = {
   // ── Social Media Templates ──
   'facebook': {
     qrColor: '#1877F2',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#1877F2',
     eyeOuterColor: '#0d47a1',
@@ -39,7 +39,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'twitter': {
     qrColor: '#1DA1F2',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#1DA1F2',
     eyeOuterColor: '#0c85d0',
@@ -79,7 +79,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'discord': {
     qrColor: '#5865F2',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#5865F2',
     eyeOuterColor: '#404EED',
@@ -119,7 +119,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'telegram': {
     qrColor: '#229ED9',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#229ED9',
     eyeOuterColor: '#1c5f8a',
@@ -151,7 +151,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'wechat': {
     qrColor: '#07C160',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#07C160',
     eyeOuterColor: '#0a5c26',
@@ -191,7 +191,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'dribbble': {
     qrColor: '#EA4C89',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.CIRCLE,
     eyeColor: '#EA4C89',
     eyeOuterColor: '#b5235d',
@@ -247,7 +247,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'whatsapp-channel': {
     qrColor: '#25D366',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#25D366',
     eyeOuterColor: '#075E54',
@@ -255,7 +255,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'whatsapp': {
     qrColor: '#25D366',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#25D366',
     eyeOuterColor: '#075E54',
@@ -263,7 +263,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'messenger': {
     qrColor: '#0084FF',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#0084FF',
     eyeOuterColor: '#0055b3',
@@ -345,7 +345,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'paypal': {
     qrColor: '#0079C1',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#00457C',
     eyeOuterColor: '#0079C1',
@@ -361,7 +361,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'venmo': {
     qrColor: '#008CFF',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#008CFF',
     eyeOuterColor: '#005cb3',
@@ -401,7 +401,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'reservation': {
     qrColor: '#00B0FF',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#00B0FF',
     eyeOuterColor: '#007bb3',
@@ -433,7 +433,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'download-app': {
     qrColor: '#00BCD4',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#00BCD4',
     eyeOuterColor: '#006064',
@@ -481,7 +481,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'website': {
     qrColor: '#00BCD4',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#00BCD4',
     eyeOuterColor: '#006064',
@@ -489,7 +489,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'url': {
     qrColor: '#00BCD4',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#00BCD4',
     eyeOuterColor: '#006064',
@@ -529,7 +529,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'sms': {
     qrColor: '#4CAF50',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#4CAF50',
     eyeOuterColor: '#1b5e20',
@@ -537,7 +537,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'message': {
     qrColor: '#34C759',
-    dotStyle: DOT_STYLES.FLUID,
+    dotStyle: DOT_STYLES.ROUNDED,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#34C759',
     eyeOuterColor: '#1e7b34',
@@ -594,7 +594,7 @@ export function getTemplateStylingPreset(template) {
   }
 
   // Fallback palette derived from template background or accent
-  const fallbackDot = DOT_STYLES.FLUID;
+  const fallbackDot = DOT_STYLES.ROUNDED;
   const fallbackEye = EYE_STYLES.ROUNDED;
   const fallbackColor = template.accent || '#1e293b';
 
