@@ -83,6 +83,10 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
     const size = 120;
     ctx.clearRect(0, 0, size, size);
 
+    // Draw solid white background for high-contrast preview thumbnails in both light and dark modes
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, size, size);
+
     // Same 5x5 sample + framing (viewBox -.2 -.2 5.4 5.4) as the reference sheet
     const pattern = ['11010', '01111', '10110', '11011', '01101'];
     const matrix = pattern.map(row => row.split('').map(ch => ch === '1'));
@@ -111,8 +115,9 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
     return (
       <svg
         viewBox="-.2 -.2 5.4 5.4"
-        style={{ width: '100%', height: '100%', display: 'block' }}
+        style={{ width: '100%', height: '100%', display: 'block', backgroundColor: '#FFFFFF', borderRadius: '10px' }}
       >
+        <rect x="-.2" y="-.2" width="5.4" height="5.4" fill="#FFFFFF" />
         <path d={thumbnailPath(dotStyle)} fill={PREVIEW_THUMBNAIL_INK} />
       </svg>
     );
@@ -126,7 +131,10 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
       style={{ 
         width: '100%', 
         height: '100%', 
-        display: 'block'
+        borderRadius: '10px',
+        objectFit: 'cover',
+        display: 'block',
+        backgroundColor: '#FFFFFF'
       }} 
     />
   );

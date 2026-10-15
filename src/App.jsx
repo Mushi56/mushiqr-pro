@@ -1219,10 +1219,11 @@ export default function App() {
         navigateTo('home');
       }
     } else if (activePage === 'generator') {
-      navigateTo(previousPage || 'home');
+      const target = (previousPage && previousPage !== 'generator') ? previousPage : 'home';
+      navigateTo(target);
     } else if (activePage === 'history') {
-      // From History/Recent/Menu to previous tab
-      navigateTo(previousPage || 'home');
+      const target = (previousPage && previousPage !== 'history') ? previousPage : 'home';
+      navigateTo(target);
     } else if (activePage !== 'home') {
       navigateTo('home');
     }
@@ -1441,7 +1442,7 @@ export default function App() {
       setQrBgShape(tpl.preset.qrBgShape || 'full');
       setQrShapeOpts(tpl.preset.qrShapeOpts || { clean: false, decor: true, outline: false });
       
-      const nextDot = (tpl.preset.dotStyle && tpl.preset.dotStyle !== 'fluid') ? tpl.preset.dotStyle : 'rounded';
+      const nextDot = tpl.preset.dotStyle || 'rounded';
       setDotStyle(nextDot);
 
       const nextEye = tpl.preset.eyeStyle || 'rounded';
@@ -1885,15 +1886,31 @@ export default function App() {
   // Helper: check if the generator has unsaved modifications
   const hasUnsavedGeneratorChanges = () => {
     if (suppressExitGuardRef.current) return false;
+    // 1. Any user styling or parameter change marks generator as dirty
     if (generatorIsDirtyRef.current) return true;
-    if (historyIndex > 0 || (historyIndexRef.current && historyIndexRef.current > 0)) return true;
-    if (loadedItemId) return false;
-    if (selectedTemplate) return true;
+    // 2. Undo stack indicates changes have been made
+    if (historyIndex > 0 || (historyIndexRef.current && historyIndexRef.current > 0)) {
+      return true;
+    }
+    // 3. User uploaded a logo
     if (logo) return true;
+    // 4. User selected a template
+    if (selectedTemplate) return true;
+    // 5. User added custom texts
     if (customTexts && customTexts.length > 0) return true;
-    if (qrType !== QR_TYPES.URL) return true;
-    if (qrData && qrData.url && qrData.url !== 'https://example.com') return true;
-    if (qrData && !qrData.url && Object.keys(qrData).length > 0) return true;
+    // 6. User entered actual content into qrData
+    if (qrData) {
+      if (qrData.url && qrData.url.trim() !== '' && qrData.url !== 'https://example.com') {
+        return true;
+      }
+      const hasContent = Object.entries(qrData).some(([key, val]) => {
+        if (key === 'url') return false; // Handled above
+        if (key === 'encryption') return false; // Default Wi-Fi field
+        if (val === null || val === undefined || val === '' || typeof val === 'boolean') return false;
+        return true;
+      });
+      if (hasContent) return true;
+    }
     return false;
   };
   // Custom navigation wrapper to track history
@@ -1906,14 +1923,17 @@ export default function App() {
     }
     if (page !== activePage) {
       if (activePage === 'generator' && hasUnsavedGeneratorChanges()) {
-        setUnsavedChangesModal({ isOpen: true, nextPage: page });
+        const target = (page && page !== 'generator') ? page : (previousPage && previousPage !== 'generator') ? previousPage : 'home';
+        setUnsavedChangesModal({ isOpen: true, nextPage: target });
         return;
       }
       performNavigation(page);
     }
   };
   const performNavigation = (page) => {
-    if (page !== 'scanner') {
+    const targetPage = page || previousPage || 'home';
+    suppressExitGuardRef.current = true;
+    if (targetPage !== 'scanner') {
       setLaunchedDirectlyToScanner(false);
     }
     if (logoPopup || textPopup || colorPopup || shapePopup) {
@@ -1921,30 +1941,30 @@ export default function App() {
     }
     setCanvasSelection(null);
     setPreviousPage(activePage);
-    if (page !== 'generator') {
+    if (targetPage !== 'generator') {
       setIsDataModalOpen(false);
       setAdvPicker(prev => ({ ...prev, open: false }));
       setFormatDropdownOpen(false);
       setActiveBatchItemIndex(null);
     }
     let path = '/';
-    if (page === 'onboarding') path = '/onboarding';
-    else if (page === 'login') path = '/login';
-    else if (page === 'signup') path = '/signup';
-    else if (page === 'forgot-password') path = '/forgot-password';
-    else if (page === 'generator') path = '/generator';
-    else if (page === 'settings') path = '/settings';
-    else if (page === 'you') path = '/you';
-    else if (page === 'saved') path = '/saved';
-    else if (page === 'history') path = '/history';
-    else if (page === 'scanner') path = '/scanner';
-    else if (page === 'batch') path = '/batch';
-    else if (page === 'barcode') path = '/barcode';
-    else if (page === 'scanner-gun') path = '/scanner-gun';
+    if (targetPage === 'onboarding') path = '/onboarding';
+    else if (targetPage === 'login') path = '/login';
+    else if (targetPage === 'signup') path = '/signup';
+    else if (targetPage === 'forgot-password') path = '/forgot-password';
+    else if (targetPage === 'generator') path = '/generator';
+    else if (targetPage === 'settings') path = '/settings';
+    else if (targetPage === 'you') path = '/you';
+    else if (targetPage === 'saved') path = '/saved';
+    else if (targetPage === 'history') path = '/history';
+    else if (targetPage === 'scanner') path = '/scanner';
+    else if (targetPage === 'batch') path = '/batch';
+    else if (targetPage === 'barcode') path = '/barcode';
+    else if (targetPage === 'scanner-gun') path = '/scanner-gun';
     if (location.pathname !== path) {
-      navigate(path);
+      navigate(path, { state: { activePage: targetPage } });
     }
-    setActivePage(page);
+    setActivePage(targetPage);
     // Clear tab history when starting a new session or returning home
     if (page === 'generator' || page === 'home') {
       setTabHistory([]);
@@ -1954,6 +1974,9 @@ export default function App() {
         setCanvasSelection(null);
       }
     }
+    setTimeout(() => {
+      suppressExitGuardRef.current = false;
+    }, 500);
   };
   // â”€â”€ Native App Actions / Deep Links (from Widget or quick settings tile) â”€â”€
   useEffect(() => {
@@ -2044,10 +2067,7 @@ export default function App() {
   ]);
 
   const saveSnapshot = useCallback(() => {
-    if (isInternalUpdate.current) return;
-    if (!ignoreDirtyRef.current) {
-      generatorIsDirtyRef.current = true;
-    }
+    if (isInternalUpdate.current || ignoreDirtyRef.current) return;
     const current = getSnapshot();
     const currStr = JSON.stringify(current);
     
@@ -2056,6 +2076,8 @@ export default function App() {
     if (prevIdx >= 0 && historyRef.current[prevIdx]) {
       if (JSON.stringify(historyRef.current[prevIdx]) === currStr) return;
     }
+
+    generatorIsDirtyRef.current = true;
 
     const newHistory = historyRef.current.slice(0, prevIdx + 1);
     newHistory.push(current);
@@ -2498,9 +2520,6 @@ export default function App() {
 
   // Debounced auto-save for all parameter changes
   useEffect(() => {
-    if (!isInternalUpdate.current && !ignoreDirtyRef.current) {
-      generatorIsDirtyRef.current = true;
-    }
     const timer = setTimeout(() => {
       saveSnapshot();
     }, 600);
@@ -2662,43 +2681,64 @@ export default function App() {
   };
   // â”€â”€ Unsaved Changes Modal Actions â”€â”€
   const handleSaveAndExit = () => {
-    const dataString = formatQRData(qrType, qrData);
-    if (dataString) {
-      const displayText = getQRDisplayName(qrType, qrData);
-      
-      if (loadedItemId && loadedItemId.startsWith('saved_')) {
-        saveToSaved({
-          id: loadedItemId,
-          source: 'create',
-          qrType, qrData, displayText: displayText.substring(0, 80), errorLevel,
-          ...getSnapshot(),
-          thumbnail: latestThumbnailRef.current || canvasRef.current?.toDataURL('image/jpeg', 0.8) || null
-        });
-      } else {
-        const savedEntry = saveToHistory({
-          id: loadedItemId,
-          source: 'create',
-          qrType, qrData, displayText: displayText.substring(0, 80), errorLevel,
-          ...getSnapshot(),
-          thumbnail: latestThumbnailRef.current || canvasRef.current?.toDataURL('image/jpeg', 0.8) || null
-        });
-        if (savedEntry && savedEntry.id) {
-          setLoadedItemId(savedEntry.id);
+    try {
+      const displayText = getQRDisplayName(qrType, qrData) || 'QR Code';
+      let thumb = latestThumbnailRef.current;
+      if (!thumb && canvasRef.current) {
+        try {
+          thumb = canvasRef.current.toDataURL('image/jpeg', 0.8);
+        } catch (e) {
+          console.warn('Could not extract canvas thumbnail', e);
         }
       }
+      
+      const entryPayload = {
+        id: loadedItemId,
+        source: 'create',
+        qrType,
+        qrData,
+        displayText: displayText.substring(0, 80),
+        errorLevel,
+        ...getSnapshot(),
+        thumbnail: thumb || null
+      };
+
+      if (loadedItemId && loadedItemId.startsWith('saved_')) {
+        saveToSaved(entryPayload);
+      }
+      
+      // Always save to History so it shows in Recent Projects on Home
+      const savedEntry = saveToHistory(entryPayload);
+      if (savedEntry && savedEntry.id) {
+        setLoadedItemId(savedEntry.id);
+      }
+      window.dispatchEvent(new Event('storage-sync'));
+      showToast('Changes saved', 'success');
+    } catch (e) {
+      console.warn('Error saving in handleSaveAndExit:', e);
     }
-    const nextPage = unsavedChangesModal.nextPage;
+    const rawNextPage = unsavedChangesModal.nextPage;
+    const nextPage = (rawNextPage && rawNextPage !== 'generator') ? rawNextPage : (previousPage && previousPage !== 'generator') ? previousPage : 'home';
+    suppressExitGuardRef.current = true;
     setUnsavedChangesModal({ isOpen: false, nextPage: null });
     generatorIsDirtyRef.current = false;
     resetGenerator();
     performNavigation(nextPage);
+    setTimeout(() => {
+      suppressExitGuardRef.current = false;
+    }, 500);
   };
   const handleDiscardAndExit = () => {
-    const nextPage = unsavedChangesModal.nextPage;
+    const rawNextPage = unsavedChangesModal.nextPage;
+    const nextPage = (rawNextPage && rawNextPage !== 'generator') ? rawNextPage : (previousPage && previousPage !== 'generator') ? previousPage : 'home';
+    suppressExitGuardRef.current = true;
     setUnsavedChangesModal({ isOpen: false, nextPage: null });
     generatorIsDirtyRef.current = false;
     resetGenerator();
     performNavigation(nextPage);
+    setTimeout(() => {
+      suppressExitGuardRef.current = false;
+    }, 500);
   };
   const handleCancelExit = () => {
     setUnsavedChangesModal({ isOpen: false, nextPage: null });
@@ -2713,8 +2753,10 @@ export default function App() {
   }, [logo]);
   // ── Centralized Route & Browser Back Button Synchronization ──
   useEffect(() => {
+    if (suppressExitGuardRef.current) return;
+
     const onboardingCompleted = localStorage.getItem('mushi_onboarding_completed') === 'true';
-    let page = location.state?.activePage || getPageFromPath(location.pathname);
+    let page = getPageFromPath(location.pathname);
     
     // If not completed onboarding and on root or onboarding, force onboarding
     if (!onboardingCompleted && (location.pathname === '/' || location.pathname === '/onboarding')) {
@@ -2724,11 +2766,9 @@ export default function App() {
     if (page !== activePage) {
       // Intercept browser / system back navigation when leaving generator
       if (activePage === 'generator') {
-        // Programmatic navigation into the generator in progress: ignore stale location
-        if (suppressExitGuardRef.current) return;
         // 1. If unsaved changes modal is open, dismiss it and remain on generator
         if (unsavedChangesModal.isOpen) {
-          handleCancelExit();
+          setUnsavedChangesModal({ isOpen: false, nextPage: null });
           navigate('/generator', { replace: true });
           return;
         }
@@ -2772,7 +2812,8 @@ export default function App() {
 
         // 3. If generator has unsaved modifications, display the warning modal and prevent leaving
         if (hasUnsavedGeneratorChanges()) {
-          setUnsavedChangesModal({ isOpen: true, nextPage: page });
+          const target = (page && page !== 'generator') ? page : (previousPage && previousPage !== 'generator') ? previousPage : 'home';
+          setUnsavedChangesModal({ isOpen: true, nextPage: target });
           navigate('/generator', { replace: true });
           return;
         }
@@ -2793,7 +2834,7 @@ export default function App() {
       if (location.state.isDataModalOpen !== undefined) setIsDataModalOpen(location.state.isDataModalOpen);
       if (location.state.loadedBarcodeItem) setLoadedBarcodeItem(location.state.loadedBarcodeItem);
     }
-  }, [location.pathname, location.state, activePage, unsavedChangesModal.isOpen, isFullScreenPreviewOpen, isDataModalOpen, isTemplateTextModalOpen, advPicker, formatDropdownOpen, cropModalConfig, logoPopup, textPopup, colorPopup, shapePopup]);
+  }, [location.pathname, activePage]);
   // â”€â”€ Back Button Handling (Centralized) â”€â”€
   const lastBackPress = useRef(0);
   const backHandlerRef = useRef();
@@ -2871,8 +2912,9 @@ export default function App() {
 
     // 9.5. Generator unsaved changes check
     if (activePage === 'generator') {
+      const target = (previousPage && previousPage !== 'generator') ? previousPage : 'home';
       if (hasUnsavedGeneratorChanges()) {
-        setUnsavedChangesModal({ isOpen: true, nextPage: previousPage || 'home' });
+        setUnsavedChangesModal({ isOpen: true, nextPage: target });
         return;
       }
       goBack();
@@ -3102,6 +3144,18 @@ export default function App() {
         }
         generatorIsDirtyRef.current = false;
       }
+      try {
+        const displayText = getQRDisplayName(qrType, qrData) || 'QR Code';
+        saveToHistory({
+          id: loadedItemId,
+          source: 'create',
+          qrType, qrData, displayText: displayText.substring(0, 80), errorLevel,
+          ...getSnapshot(),
+          thumbnail: latestThumbnailRef.current || canvasRef.current?.toDataURL('image/jpeg', 0.8) || null
+        });
+      } catch (histErr) {
+        console.warn('Failed auto-saving to history during export:', histErr);
+      }
     } catch (err) {
       console.error('Download failed:', err);
       showToast('Save failed', 'error');
@@ -3116,18 +3170,31 @@ export default function App() {
     if (!dataString) { showToast('Please enter QR data first', 'error'); return; }
     
     const displayText = getQRDisplayName(qrType, qrData);
+    const thumb = latestThumbnailRef.current || canvasRef.current?.toDataURL('image/jpeg', 0.8) || null;
     
-    // We already save to history automatically, but user clicked "Add to Saved"
     const savedEntry = saveToSaved({
       id: loadedItemId,
       source: 'create',
       qrType, qrData, displayText: displayText.substring(0, 80), errorLevel,
       ...getSnapshot(),
-      thumbnail: latestThumbnailRef.current || canvasRef.current?.toDataURL('image/jpeg', 0.8) || null
+      thumbnail: thumb
     });
     if (savedEntry && savedEntry.id) {
       setLoadedItemId(savedEntry.id);
     }
+
+    try {
+      saveToHistory({
+        id: loadedItemId,
+        source: 'create',
+        qrType, qrData, displayText: displayText.substring(0, 80), errorLevel,
+        ...getSnapshot(),
+        thumbnail: thumb
+      });
+    } catch (e) {
+      console.warn('Failed saving to history in handleSave:', e);
+    }
+
     generatorIsDirtyRef.current = false;
     showToast('Added to Saved QRs', 'success');
   };
@@ -4824,7 +4891,7 @@ export default function App() {
         style={{ display: ['barcode', 'scanner', 'onboarding', 'login', 'signup', 'forgot-password'].includes(activePage) ? 'none' : 'flex' }}
       >
         <div className="app-logo">
-          {activePage === 'scanner' && (
+          {(activePage === 'scanner' || activePage === 'generator') && (
             <button 
               onClick={goBack}
               style={{
@@ -5777,24 +5844,18 @@ export default function App() {
                             >
                               <QREyesIcon size={16} /> Eyes
                             </button>
-                            <button
-                              id="pattern-tab-shape"
-                              onClick={() => setPatternTab('shape')}
-                              style={{
-                                display: 'flex', alignItems: 'center', gap: '6px',
-                                border: 'none',
-                                background: patternTab === 'shape' ? 'var(--accent-primary)' : 'transparent',
-                                color: patternTab === 'shape' ? '#fff' : 'var(--text-secondary)',
-                                padding: '6px 16px',
-                                borderRadius: '8px',
-                                fontSize: '13px',
-                                fontWeight: 600,
-                                cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                              }}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c2.2 0 3.1 1.6 4.7 2.2 1.7.6 3.6.2 4.5 1.9.9 1.7-.3 3.2-.2 4.9.1 1.7 1.3 3.1.4 4.7-.9 1.6-2.8 1.5-4.2 2.5-1.4 1-2 2.8-3.9 2.8s-2.5-1.8-3.9-2.8c-1.4-1-3.3-.9-4.2-2.5-.9-1.6.3-3 .4-4.7.1-1.7-1.1-3.2-.2-4.9.9-1.7 2.8-1.3 4.5-1.9C8.9 4.1 9.8 2.5 12 2.5z"/></svg> Shape
-                            </button>
+                          </div>
+                        )}
+                        {shapePopup === 'qr-shape' && (
+                          <div style={{
+                            position: 'absolute',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            fontWeight: 600,
+                            fontSize: '14px',
+                            color: 'var(--text-primary)'
+                          }}>
+                            QR Shape
                           </div>
                         )}
 
@@ -7779,119 +7840,122 @@ export default function App() {
                         </div>
                       )}
                        {shapePopup === 'pattern' && (
-                           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                             {patternTab === 'shape' ? (
-                                (() => {
-                                  const isShapeLocked = ['template-circle', 'template-blob-flower', 'template-torn-paper', 'template-paper-frame'].includes(selectedTemplate?.id);
-                                  return (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                                  {isShapeLocked && (
-                                    <div style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: '8px',
-                                      padding: '8px 12px',
-                                      borderRadius: '10px',
-                                      background: 'rgba(239, 68, 68, 0.1)',
-                                      border: '1px solid rgba(239, 68, 68, 0.25)',
-                                      color: 'var(--text-primary)',
-                                      fontSize: '11.5px',
-                                      fontWeight: 600
-                                    }}>
-                                      <Lock size={15} color="#ef4444" style={{ flexShrink: 0 }} />
-                                      <span>QR Shape & its properties are locked specifically to this template design.</span>
-                                    </div>
-                                  )}
-                                  <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>QR Shape</div>
-                                  <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
-                                    gap: '10px',
-                                    opacity: isShapeLocked ? 0.45 : 1,
-                                    pointerEvents: isShapeLocked ? 'none' : 'auto'
-                                  }}>
-                                    {[{ id: 'full', label: 'None' }, ...QR_BG_SHAPES.filter(s => isShapedQr(s.id))]
-                                      .filter(shape => shape.id === 'full' || FeatureAccessManager.isFeatureEnabled(`qr_bg_${shape.id}`))
-                                      .map(shape => {
-                                        const isActive = shape.id === 'full' ? !isShapedQr(qrBgShape) : qrBgShape === shape.id;
-                                        const featId = `qr_bg_${shape.id}`;
-                                        return (
-                                          <button
-                                            key={shape.id}
-                                            id={`qr-shape-${shape.id}`}
-                                            onClick={() => {
-                                              if (shape.id === 'full') {
-                                                if (isShapedQr(qrBgShape)) setQrBgShape('full');
-                                                return;
-                                              }
-                                              const access = FeatureAccessManager.canUseFeature(featId);
-                                              if (!access.allowed) { showPaywall(featId); return; }
-                                              setQrBgShape(shape.id);
-                                            }}
-                                            style={{
-                                              padding: '4px',
-                                              borderRadius: '12px',
-                                              fontSize: '10px',
-                                              fontWeight: 600,
-                                              background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)',
-                                              color: isActive ? '#fff' : 'var(--text-primary)',
-                                              border: isActive ? '2px solid var(--accent-primary)' : '1px solid var(--border-light)',
-                                              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                                              gap: '6px', height: '94px',
-                                              boxShadow: isActive ? '0 6px 14px rgba(239, 30, 52,0.2)' : 'none',
-                                              transition: 'all 0.2s ease', overflow: 'hidden', position: 'relative', cursor: 'pointer'
-                                            }}
-                                          >
-                                            {shape.id !== 'full' && <PaidCrownBadge featureId={featId} position="corner" size={9} />}
-                                            <MiniQRCanvasBg
-                                              qrParams={{
-                                                dotStyle, eyeStyle, syncEyes,
-                                                gradientEnabled, gradientColor1, gradientColor2, gradientType,
-                                                qrColor, bgColor, bgTransparent,
-                                                qrShapeOpts,
-                                                errorLevel: 'H'
-                                              }}
-                                              shapeId={shape.id}
-                                              isActive={isActive}
-                                            />
-                                            <span style={{ fontSize: '9px', whiteSpace: 'nowrap', opacity: isActive ? 1 : 0.8 }}>{shape.label}</span>
-                                          </button>
-                                        );
-                                      })}
-                                  </div>
-                                  {isShapedQr(qrBgShape) && (
-                                    <div style={{
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      gap: '10px',
-                                      opacity: isShapeLocked ? 0.45 : 1,
-                                      pointerEvents: isShapeLocked ? 'none' : 'auto'
-                                    }}>
-                                      <ShapedQrOptions opts={qrShapeOpts} onChange={setQrShapeOpts} />
-                                      <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', lineHeight: 1.4 }}>
-                                        {isShapeLocked
-                                          ? 'Properties are locked to preserve seamless alignment with the template artwork.'
-                                          : 'Dots, eyes and colors follow your current style. Fill or transparency is managed in the Background section.'
-                                        }
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                                  );
-                                })()
-                              ) : patternTab === 'dots' ? (
-                               <div>
-                                 <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>
-                                 <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
+                         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                           {patternTab === 'dots' ? (
+                             <div>
+                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Dot Shape</div>
+                               <DotStyleSelector value={dotStyle} onChange={setDotStyle} qrParams={qrParams} />
+                             </div>
+                           ) : (
+                             <div>
+                               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Eye Shape</div>
+                               <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} qrParams={qrParams} />
+                             </div>
+                           )}
+                         </div>
+                       )}
+                       {shapePopup === 'qr-shape' && (
+                         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                           {(() => {
+                             const isShapeLocked = ['template-circle', 'template-blob-flower', 'template-torn-paper', 'template-paper-frame'].includes(selectedTemplate?.id);
+                             return (
+                               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                 {isShapeLocked && (
+                                   <div style={{
+                                     display: 'flex',
+                                     alignItems: 'center',
+                                     gap: '8px',
+                                     padding: '8px 12px',
+                                     borderRadius: '10px',
+                                     background: 'rgba(239, 68, 68, 0.1)',
+                                     border: '1px solid rgba(239, 68, 68, 0.25)',
+                                     color: 'var(--text-primary)',
+                                     fontSize: '11.5px',
+                                     fontWeight: 600
+                                   }}>
+                                     <Lock size={15} color="#ef4444" style={{ flexShrink: 0 }} />
+                                     <span>QR Shape & its properties are locked specifically to this template design.</span>
+                                   </div>
+                                 )}
+                                 <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>QR Shape</div>
+                                 <div style={{
+                                   display: 'grid',
+                                   gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
+                                   gap: '10px',
+                                   opacity: isShapeLocked ? 0.45 : 1,
+                                   pointerEvents: isShapeLocked ? 'none' : 'auto'
+                                 }}>
+                                   {[{ id: 'full', label: 'None' }, ...QR_BG_SHAPES.filter(s => isShapedQr(s.id))]
+                                     .filter(shape => shape.id === 'full' || FeatureAccessManager.isFeatureEnabled(`qr_bg_${shape.id}`))
+                                     .map(shape => {
+                                       const isActive = shape.id === 'full' ? !isShapedQr(qrBgShape) : qrBgShape === shape.id;
+                                       const featId = `qr_bg_${shape.id}`;
+                                       return (
+                                         <button
+                                           key={shape.id}
+                                           id={`qr-shape-${shape.id}`}
+                                           onClick={() => {
+                                             if (shape.id === 'full') {
+                                               if (isShapedQr(qrBgShape)) setQrBgShape('full');
+                                               return;
+                                             }
+                                             const access = FeatureAccessManager.canUseFeature(featId);
+                                             if (!access.allowed) { showPaywall(featId); return; }
+                                             setQrBgShape(shape.id);
+                                           }}
+                                           style={{
+                                             padding: '4px',
+                                             borderRadius: '12px',
+                                             fontSize: '10px',
+                                             fontWeight: 600,
+                                             background: isActive ? 'var(--accent-primary)' : 'var(--bg-elevated)',
+                                             color: isActive ? '#fff' : 'var(--text-primary)',
+                                             border: isActive ? '2px solid var(--accent-primary)' : '1px solid var(--border-light)',
+                                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                             gap: '6px', height: '94px',
+                                             boxShadow: isActive ? '0 6px 14px rgba(239, 30, 52,0.2)' : 'none',
+                                             transition: 'all 0.2s ease', overflow: 'hidden', position: 'relative', cursor: 'pointer'
+                                           }}
+                                         >
+                                           {shape.id !== 'full' && <PaidCrownBadge featureId={featId} position="corner" size={9} />}
+                                           <MiniQRCanvasBg
+                                             qrParams={{
+                                               dotStyle, eyeStyle, syncEyes,
+                                               gradientEnabled, gradientColor1, gradientColor2, gradientType,
+                                               qrColor, bgColor, bgTransparent,
+                                               qrShapeOpts,
+                                               errorLevel: 'H'
+                                             }}
+                                             shapeId={shape.id}
+                                             isActive={isActive}
+                                           />
+                                           <span style={{ fontSize: '9px', whiteSpace: 'nowrap', opacity: isActive ? 1 : 0.8 }}>{shape.label}</span>
+                                         </button>
+                                       );
+                                     })}
+                                 </div>
+                                 {isShapedQr(qrBgShape) && (
+                                   <div style={{
+                                     display: 'flex',
+                                     flexDirection: 'column',
+                                     gap: '10px',
+                                     opacity: isShapeLocked ? 0.45 : 1,
+                                     pointerEvents: isShapeLocked ? 'none' : 'auto'
+                                   }}>
+                                     <ShapedQrOptions opts={qrShapeOpts} onChange={setQrShapeOpts} />
+                                     <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', lineHeight: 1.4 }}>
+                                       {isShapeLocked
+                                         ? 'Properties are locked to preserve seamless alignment with the template artwork.'
+                                         : 'Dots, eyes and colors follow your current style. Fill or transparency is managed in the Background section.'
+                                       }
+                                     </div>
+                                   </div>
+                                 )}
                                </div>
-                             ) : (
-                               <div>
-                                 <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '10px' }}>Eye Shape</div>
-                                 <EyeStyleSelector value={eyeStyle} onChange={setEyeStyle} qrParams={qrParams} />
-                               </div>
-                             )}
-                           </div>
-                         )}
+                             );
+                           })()}
+                         </div>
+                       )}
                         {shapePopup === 'background' && (
                           <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <Toggle label="Transparent Background" checked={bgTransparent} onChange={setBgTransparent} />
@@ -8138,6 +8202,12 @@ export default function App() {
                              </button>
                            )}
                            {FeatureAccessManager.isFeatureEnabled('custom_background_shapes') && (
+                             <button className={`text-toolbar-btn${shapePopup === 'qr-shape' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'qr-shape')} style={{ position: 'relative' }}>
+                               <PaidCrownBadge featureId="custom_background_shapes" fallbackFeatureId="qr_bg_shapes" position="floating" size={8} />
+                               <Shapes size={24} /><span>QR Shape</span>
+                             </button>
+                           )}
+                           {FeatureAccessManager.isFeatureEnabled('custom_background_shapes') && (
                              <button className={`text-toolbar-btn${shapePopup === 'background' ? ' active' : ''}`} onClick={() => startEditing('shapes', 'background')} style={{ position: 'relative' }}>
                                <PaidCrownBadge featureId="custom_background_shapes" position="floating" size={8} />
                                <QRBgIcon size={24} /><span>Background</span>
@@ -8330,19 +8400,13 @@ export default function App() {
                 showPaywall(`qr_${type.toLowerCase()}`);
                 return;
               }
+              generatorIsDirtyRef.current = false;
+              setPreviousPage('home');
               resetGenerator();
               setQrType(type);
               setQrData({});
               setIsDataModalOpen(true);
-              navigate('/generator', {
-                state: {
-                  qrType: type,
-                  qrData: {},
-                  isDataModalOpen: true,
-                  activePage: 'generator'
-                }
-              });
-              setActivePage('generator');
+              performNavigation('generator');
             }}
             onQuickCreateBarcode={(id) => {
               const baseAccess = FeatureAccessManager.canUseFeature('barcode_generator');
@@ -8359,6 +8423,7 @@ export default function App() {
                 showPaywall(`barcode_${id.toLowerCase()}`);
                 return;
               }
+              setPreviousPage('home');
               const defaults = {
                 ean13: '4006381333931',
                 upca: '012345678905',
@@ -8405,13 +8470,8 @@ export default function App() {
                   displayValue: true
                 }
               };
-              navigate('/barcode', {
-                state: {
-                  loadedBarcodeItem: item,
-                  activePage: 'barcode'
-                }
-              });
-              setActivePage('barcode');
+              setLoadedBarcodeItem(item);
+              performNavigation('barcode');
             }}
             onLoadQR={handleLoadQR}
             theme={theme}
@@ -9271,6 +9331,24 @@ export default function App() {
                 onMouseLeave={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
               >
                 Discard Changes
+              </button>
+
+              <button 
+                onClick={handleCancelExit}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  padding: '10px',
+                  borderRadius: '12px',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+              >
+                Keep Editing
               </button>
             </div>
           </div>

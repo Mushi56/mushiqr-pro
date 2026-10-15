@@ -402,7 +402,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
               qrColor: '#EF1E34',
               eyeColor: '#B50B20',
               eyeOuterColor: '#EF1E34',
-              dotStyle: 'fluid',
+              dotStyle: 'liquid',
               eyeStyle: 'rounded',
               quietZone: 0
             });
@@ -731,7 +731,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             qrColor: '#EF1E34',
             eyeColor: '#B50B20',
             eyeOuterColor: '#EF1E34',
-            dotStyle: 'fluid',
+            dotStyle: 'liquid',
             eyeStyle: 'rounded'
           });
           thumbnail = canvas.toDataURL('image/png');
@@ -1142,7 +1142,7 @@ export default function QRScanner({ onBack, navigateTo, onLoadQR, currentUser, o
             qrColor: '#EF1E34',
             eyeColor: '#B50B20',
             eyeOuterColor: '#EF1E34',
-            dotStyle: 'fluid',
+            dotStyle: 'liquid',
             eyeStyle: 'rounded'
           });
           thumbnail = canvas.toDataURL('image/png');

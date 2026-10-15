@@ -1259,6 +1259,7 @@ input[type="range"]::-moz-range-thumb {
   justify-content: center;
   border-radius: 10px;
   overflow: hidden;
+  background: #FFFFFF;
 }
 
 .style-option-preview svg {

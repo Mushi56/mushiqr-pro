@@ -31,6 +31,7 @@ export function saveToHistory(entry) {
   history.unshift(newEntry);
   if (history.length > MAX_HISTORY) history.pop();
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  window.dispatchEvent(new Event('storage-sync'));
 
   // Firestore mirror sync
   try {
@@ -57,6 +58,7 @@ export function getHistory() {
 export function deleteFromHistory(id) {
   const history = getHistory().filter(item => item.id !== id);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  window.dispatchEvent(new Event('storage-sync'));
 
   // Mirror deletion to Firestore
   try {
@@ -74,6 +76,7 @@ export function deleteFromHistory(id) {
 export function clearHistory() {
   const current = getHistory();
   localStorage.removeItem(HISTORY_KEY);
+  window.dispatchEvent(new Event('storage-sync'));
 
   // Mirror purge to Firestore
   try {

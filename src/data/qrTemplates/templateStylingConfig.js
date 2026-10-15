@@ -9,7 +9,7 @@ import { DOT_STYLES, EYE_STYLES } from '../../utils/qrEngine';
  * Allowed Eyes: ROUNDED, CIRCLE, FLOWER, TRIANGLE (Pillow)
  * Disallowed Eyes Removed: modern, hexagon, notch, teardrop, star, leaf, shield, diamond, geometric, octagon, spotlight
  * Disallowed Dots Removed: plus
- * Allowed Dots: dots, fluid, hexagon, rounded, octagon, star, denso, sparkle, capsule, etc.
+ * Allowed Dots: dots, liquid, hbar, vbar, hexagon, rounded, octagon, star, denso, sparkle, capsule, etc.
  */
 export const TEMPLATE_STYLING_MAP = {
   // ── Social Media Templates ──
@@ -95,7 +95,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'snapchat': {
     qrColor: '#111111',
-    dotStyle: DOT_STYLES.ROUNDED,
+    dotStyle: DOT_STYLES.LIQUID,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#111111',
     eyeOuterColor: '#333333',
@@ -111,7 +111,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'github': {
     qrColor: '#24292F',
-    dotStyle: DOT_STYLES.HEXAGON,
+    dotStyle: DOT_STYLES.VBAR,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#24292F',
     eyeOuterColor: '#1b1f23',
@@ -119,7 +119,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'telegram': {
     qrColor: '#229ED9',
-    dotStyle: DOT_STYLES.ROUNDED,
+    dotStyle: DOT_STYLES.LIQUID,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#229ED9',
     eyeOuterColor: '#1c5f8a',
@@ -127,7 +127,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'twitch': {
     qrColor: '#9146FF',
-    dotStyle: DOT_STYLES.HEXAGON,
+    dotStyle: DOT_STYLES.HBAR,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#9146FF',
     eyeOuterColor: '#6441A5',
@@ -255,7 +255,7 @@ export const TEMPLATE_STYLING_MAP = {
   },
   'whatsapp': {
     qrColor: '#25D366',
-    dotStyle: DOT_STYLES.ROUNDED,
+    dotStyle: DOT_STYLES.LIQUID,
     eyeStyle: EYE_STYLES.ROUNDED,
     eyeColor: '#25D366',
     eyeOuterColor: '#075E54',
