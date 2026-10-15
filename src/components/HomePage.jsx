@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, ChevronLeft, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2, Star, FileSpreadsheet, Barcode, Link, Contact, File, Music, Coins, MessageCircle, Play, Calendar, Layers, Zap, Target, Palette, ShieldCheck, Gauge, LayoutTemplate, Sliders } from 'lucide-react';
+import { Menu, Crown, Plus, Link2, Type, Wifi, User, Mail, MapPin, History, Moon, Sun, Info, Shield, FileText, Home, Bookmark, Settings, QrCode, ChevronLeft, ChevronRight, ScanLine, Phone, MessageSquare, FileCode, Image, Trash2, Star, FileSpreadsheet, Barcode, Link, Contact, File, Music, Coins, MessageCircle, Play, Calendar, Layers, Zap, Target, Palette, ShieldCheck, Gauge, LayoutTemplate, Sliders, Check } from 'lucide-react';
 import { FaInstagram, FaFacebookF, FaXTwitter, FaLinkedinIn } from 'react-icons/fa6';
 import { QR_TYPES, renderQR, generateQRMatrix, getQRItemTitle, getQRItemSubtitle } from '../utils/qrEngine';
 import { renderBarcode } from '../utils/barcodeEngine';
@@ -709,13 +709,31 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       marginTop: '2px',
                       lineHeight: 1
                     }}>
-                      Design Without Limits
+                      Creative &amp; Branded
                     </div>
                   </div>
                 </div>
-                <p style={{ fontSize: '8.5px', margin: '0 0 8px 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.3, maxWidth: '85px' }}>
-                  Create beautiful, custom QR codes with logos, colors, and unique frames.
-                </p>
+                {/* Feature Bullets */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3.5px',
+                  margin: '2px 0 8px 0',
+                  maxWidth: '92px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Custom Logos</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Artistic Frames</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>HD Vector Export</span>
+                  </div>
+                </div>
               </div>
 
               {/* Bottom Action Pill */}
@@ -734,8 +752,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 position: 'relative'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Image size={12} color={isDark ? '#94A3B8' : '#64748B'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>Make it Yours</span>
+                  <Palette size={12} color={isDark ? '#FF6B7A' : '#EF1E34'} />
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>Custom QR Studio</span>
                 </div>
                 <div style={{
                   width: '20px',
@@ -847,17 +865,35 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     <div style={{
                       fontSize: '8.5px',
                       fontWeight: 700,
-                      color: isDark ? '#FF9D33' : '#D96500',
+                      color: isDark ? '#FFB74D' : '#D96500',
                       marginTop: '2px',
                       lineHeight: 1
                     }}>
-                      Professional &amp; Reliable
+                      Universal Standards
                     </div>
                   </div>
                 </div>
-                <p style={{ fontSize: '8.5px', margin: '0 0 8px 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.3, maxWidth: '85px' }}>
-                  Generate reliable 1D &amp; 2D barcodes for over 30 industrial standards.
-                </p>
+                {/* Feature Bullets */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3.5px',
+                  margin: '2px 0 8px 0',
+                  maxWidth: '92px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>1D &amp; 2D Barcodes</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Retail &amp; Shipping</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Print-Ready Export</span>
+                  </div>
+                </div>
               </div>
 
               {/* Bottom Action Pill */}
@@ -876,8 +912,8 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 position: 'relative'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Barcode size={12} color={isDark ? '#94A3B8' : '#64748B'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30+ Formats</span>
+                  <Barcode size={12} color={isDark ? '#FFB74D' : '#FF7C00'} />
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30+ Industry Standards</span>
                 </div>
                 <div style={{
                   width: '20px',
