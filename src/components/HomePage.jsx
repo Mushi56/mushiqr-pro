@@ -626,7 +626,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 overflow: 'hidden',
                 padding: '12px',
                 boxSizing: 'border-box',
-                minHeight: '135px',
+                minHeight: '144px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -654,7 +654,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FF4D80', fontSize: '9px', zIndex: 2 }}>✦</span>
               <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FF2A6D', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
 
-              {/* Card Image with 3D Drop-Shadow and Ruby Neon Glow (Exact Old Position & Size) */}
+              {/* Card Image with 3D Drop-Shadow and Ruby Neon Glow (Exact Position & Size) */}
               <img 
                 src="/Glossy Pink QR Code Badge.webp" 
                 alt="QR Code" 
@@ -667,7 +667,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   transform: 'rotate(-9.5deg)',
                   transformOrigin: 'center center',
                   objectFit: 'contain',
-                  zIndex: 3,
+                  zIndex: 2,
                   pointerEvents: 'none',
                   opacity: 0.98,
                   filter: isDark 
@@ -676,8 +676,23 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 }} 
               />
 
+              {/* Left Contrast Scrim to keep text 100% crisp and readable across all screen sizes */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: '65%',
+                background: isDark 
+                  ? 'linear-gradient(90deg, rgba(26, 36, 56, 0.96) 0%, rgba(26, 36, 56, 0.88) 55%, transparent 100%)'
+                  : 'linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.90) 55%, transparent 100%)',
+                zIndex: 3,
+                pointerEvents: 'none',
+                borderRadius: '18px 0 0 18px'
+              }} />
+
               {/* Top Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative', maxWidth: 'calc(100% - 58px)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <div style={{
                     width: '32px',
@@ -707,31 +722,36 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       fontWeight: 700,
                       color: isDark ? '#FF6B7A' : '#C60E23',
                       marginTop: '2px',
-                      lineHeight: 1
+                      lineHeight: 1,
+                      textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
                     }}>
                       Creative &amp; Branded
                     </div>
                   </div>
                 </div>
-                {/* Feature Bullets */}
+                {/* Feature List (4 Features) */}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '3.5px',
-                  margin: '2px 0 8px 0',
-                  maxWidth: '92px'
+                  gap: '3px',
+                  margin: '2px 0 6px 0',
+                  alignItems: 'flex-start'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
                     <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Custom Logos</span>
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Custom Logos</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
                     <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Artistic Frames</span>
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>QR Templates</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
                     <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>HD Vector Export</span>
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Art Frames</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>HD Export</span>
                   </div>
                 </div>
               </div>
@@ -786,7 +806,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 overflow: 'hidden',
                 padding: '12px',
                 boxSizing: 'border-box',
-                minHeight: '135px',
+                minHeight: '144px',
                 backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
@@ -814,7 +834,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FFB74D', fontSize: '9px', zIndex: 2 }}>✦</span>
               <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FFA000', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
 
-              {/* Card Image with 3D Drop-Shadow and Golden Neon Glow (Exact Old Position & Size) */}
+              {/* Card Image with 3D Drop-Shadow and Golden Neon Glow (Exact Position & Size) */}
               <img 
                 src="/Glossy Orange Barcode Badge.webp" 
                 alt="Barcode" 
@@ -827,7 +847,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   transform: 'rotate(-9.5deg)',
                   transformOrigin: 'center center',
                   objectFit: 'contain',
-                  zIndex: 3,
+                  zIndex: 2,
                   pointerEvents: 'none',
                   opacity: 0.98,
                   filter: isDark 
@@ -836,8 +856,23 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 }} 
               />
 
+              {/* Left Contrast Scrim to keep text 100% crisp and readable across all screen sizes */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: '65%',
+                background: isDark 
+                  ? 'linear-gradient(90deg, rgba(26, 36, 56, 0.96) 0%, rgba(26, 36, 56, 0.88) 55%, transparent 100%)'
+                  : 'linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.90) 55%, transparent 100%)',
+                zIndex: 3,
+                pointerEvents: 'none',
+                borderRadius: '18px 0 0 18px'
+              }} />
+
               {/* Top Title & Description */}
-              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative', maxWidth: 'calc(100% - 58px)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <div style={{
                     width: '32px',
@@ -867,31 +902,36 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                       fontWeight: 700,
                       color: isDark ? '#FFB74D' : '#D96500',
                       marginTop: '2px',
-                      lineHeight: 1
+                      lineHeight: 1,
+                      textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
                     }}>
                       Universal Standards
                     </div>
                   </div>
                 </div>
-                {/* Feature Bullets */}
+                {/* Feature List (4 Features) */}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '3.5px',
-                  margin: '2px 0 8px 0',
-                  maxWidth: '92px'
+                  gap: '3px',
+                  margin: '2px 0 6px 0',
+                  alignItems: 'flex-start'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
                     <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>1D &amp; 2D Barcodes</span>
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>1D &amp; 2D Codes</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
                     <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Retail &amp; Shipping</span>
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Retail &amp; Stock</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
                     <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                    <span style={{ fontSize: '8.5px', fontWeight: 600, color: isDark ? 'rgba(255, 255, 255, 0.92)' : '#334155', whiteSpace: 'nowrap' }}>Print-Ready Export</span>
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Scan Verified</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check size={10} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap', textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : '0 1px 1px rgba(255,255,255,0.8)' }}>Print-Ready</span>
                   </div>
                 </div>
               </div>
@@ -913,7 +953,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Barcode size={12} color={isDark ? '#FFB74D' : '#FF7C00'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30+ Industry Standards</span>
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30 Industrial Standards</span>
                 </div>
                 <div style={{
                   width: '20px',
