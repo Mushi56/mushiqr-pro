@@ -7972,8 +7972,15 @@ video {
 }
 
 /* --- Redesigned 1-Font-Per-Line Typography Browser --- */
+/* Keep max-height compact on mobile/small screens so QR canvas is never covered */
 .toolbar-properties-panel-full:has(.font-picker-modal-content) {
-  max-height: min(480px, 62vh);
+  max-height: min(290px, 34vh) !important;
+}
+
+@media (min-width: 768px) {
+  .toolbar-properties-panel-full:has(.font-picker-modal-content) {
+    max-height: calc(100dvh - var(--header-height) - var(--bottom-nav-height, 64px) - 70px) !important;
+  }
 }
 
 .font-picker-modal-content {
@@ -7986,13 +7993,19 @@ video {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: min(360px, 46vh);
+  max-height: min(180px, 22vh);
   overflow-y: auto;
   padding-right: 4px;
   padding-bottom: 8px;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
   -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+  .font-rows-container {
+    max-height: min(440px, 50vh);
+  }
 }
 
 .font-rows-container::-webkit-scrollbar {

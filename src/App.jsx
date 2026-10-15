@@ -3228,10 +3228,16 @@ export default function App() {
     
     // Core data
     if (item.source === 'scan' || (!item.qrType && item.qrData?.text)) {
-      // Open designer with a clean default QR (do not load scanned content)
+      // Clear any active template
       if (selectedTemplate) applyTemplate(null);
-      setQrType(QR_TYPES.URL);
-      setQrData({ url: 'https://example.com' });
+
+      // Parse and load the scanned QR code's actual encoded data
+      const rawText = item.qrData?.text || item.displayText || '';
+      const parsed = parseRawQRText(rawText);
+      setQrType(parsed.type || QR_TYPES.URL);
+      setQrData(parsed.data || { url: rawText });
+
+      // Reset styling to clean default standard QR
       setErrorLevel('M');
       setQrBgShape('full');
       setQrShapeOpts({ clean: false, decor: true, outline: false });
