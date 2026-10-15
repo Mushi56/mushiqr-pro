@@ -1087,7 +1087,16 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   </div>
                 </div>
               </div>
-              <p style={{ fontSize: '8.5px', margin: '4px 110px 0 0', color: isDark ? 'rgba(255, 255, 255, 0.95)' : '#334155', fontWeight: 500, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p style={{
+                fontSize: '8px',
+                fontWeight: 700,
+                margin: '4px 110px 0 0',
+                color: isDark ? '#FFFFFF' : '#0F172A',
+                lineHeight: 1.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
                 Create 10K+ codes from your spreadsheets.
               </p>
             </div>
@@ -1097,23 +1106,81 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         {/* Create QR Grid */}
         <div style={{ padding: '8px var(--main-padding-x) 6px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create QR Code</h3>
+            <div 
+              onClick={() => setShowAllQR(!showAllQR)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setShowAllQR(!showAllQR)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}
+              onMouseEnter={(e) => {
+                const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
+                if (iconBox) {
+                  iconBox.style.transform = 'scale(1.08)';
+                  iconBox.style.boxShadow = '0 4px 14px rgba(239, 30, 52, 0.5)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
+                if (iconBox) {
+                  iconBox.style.transform = 'scale(1)';
+                  iconBox.style.boxShadow = '0 2px 8px rgba(239, 30, 52, 0.35)';
+                }
+              }}
+            >
+              <div 
+                className="section-header-icon-box"
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '8px',
+                  background: '#EF1E34',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(239, 30, 52, 0.35)',
+                  flexShrink: 0,
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                }}
+              >
+                <QrCode size={14} color="#FFFFFF" strokeWidth={2.2} />
+              </div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create QR Code</h3>
+            </div>
             <button
               onClick={() => setShowAllQR(!showAllQR)}
+              aria-label={showAllQR ? 'See Less' : 'Expand'}
               style={{ 
-                background: 'none', 
+                background: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)', 
                 border: 'none', 
                 color: isDark ? '#E53E3E' : '#B91C1C', 
-                fontSize: '13px', 
-                fontWeight: 600, 
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
                 cursor: 'pointer', 
                 padding: 0,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '2px'
+                justifyContent: 'center',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = isDark ? 'rgba(239, 30, 52, 0.25)' : 'rgba(239, 30, 52, 0.12)';
+                e.currentTarget.style.color = '#EF1E34';
+                e.currentTarget.style.transform = 'scale(1.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
+                e.currentTarget.style.color = isDark ? '#E53E3E' : '#B91C1C';
+                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {showAllQR ? 'See Less' : 'Explore'} <ChevronRight size={14} />
+              <ChevronRight 
+                size={14} 
+                style={{ 
+                  transform: showAllQR ? 'rotate(90deg)' : 'rotate(0deg)', 
+                  transition: 'transform 0.2s ease' 
+                }} 
+              />
             </button>
           </div>
           <div className="quick-options-grid">
@@ -1151,23 +1218,81 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         {/* Create Barcode Grid */}
         <div style={{ padding: '6px var(--main-padding-x) 8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create Barcode</h3>
+            <div 
+              onClick={() => setShowAllBarcodes(!showAllBarcodes)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && setShowAllBarcodes(!showAllBarcodes)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}
+              onMouseEnter={(e) => {
+                const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
+                if (iconBox) {
+                  iconBox.style.transform = 'scale(1.08)';
+                  iconBox.style.boxShadow = '0 4px 14px rgba(239, 30, 52, 0.5)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
+                if (iconBox) {
+                  iconBox.style.transform = 'scale(1)';
+                  iconBox.style.boxShadow = '0 2px 8px rgba(239, 30, 52, 0.35)';
+                }
+              }}
+            >
+              <div 
+                className="section-header-icon-box"
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '8px',
+                  background: '#EF1E34',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(239, 30, 52, 0.35)',
+                  flexShrink: 0,
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                }}
+              >
+                <Barcode size={14} color="#FFFFFF" strokeWidth={2.2} />
+              </div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>Create Barcode</h3>
+            </div>
             <button
               onClick={() => setShowAllBarcodes(!showAllBarcodes)}
+              aria-label={showAllBarcodes ? 'See Less' : 'Expand'}
               style={{ 
-                background: 'none', 
+                background: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)', 
                 border: 'none', 
                 color: isDark ? '#E53E3E' : '#B91C1C', 
-                fontSize: '13px', 
-                fontWeight: 600, 
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
                 cursor: 'pointer', 
                 padding: 0,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '2px'
+                justifyContent: 'center',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = isDark ? 'rgba(239, 30, 52, 0.25)' : 'rgba(239, 30, 52, 0.12)';
+                e.currentTarget.style.color = '#EF1E34';
+                e.currentTarget.style.transform = 'scale(1.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
+                e.currentTarget.style.color = isDark ? '#E53E3E' : '#B91C1C';
+                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {showAllBarcodes ? 'See Less' : 'Explore'} <ChevronRight size={14} />
+              <ChevronRight 
+                size={14} 
+                style={{ 
+                  transform: showAllBarcodes ? 'rotate(90deg)' : 'rotate(0deg)', 
+                  transition: 'transform 0.2s ease' 
+                }} 
+              />
             </button>
           </div>
           <div className="quick-options-grid">
@@ -1204,7 +1329,42 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
 
         <div style={{ padding: '0 var(--main-padding-x) 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent Projects</h3>
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}
+              onMouseEnter={(e) => {
+                const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
+                if (iconBox) {
+                  iconBox.style.transform = 'scale(1.08)';
+                  iconBox.style.boxShadow = '0 4px 14px rgba(239, 30, 52, 0.5)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
+                if (iconBox) {
+                  iconBox.style.transform = 'scale(1)';
+                  iconBox.style.boxShadow = '0 2px 8px rgba(239, 30, 52, 0.35)';
+                }
+              }}
+            >
+              <div 
+                className="section-header-icon-box"
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '8px',
+                  background: '#EF1E34',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(239, 30, 52, 0.35)',
+                  flexShrink: 0,
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                }}
+              >
+                <History size={14} color="#FFFFFF" strokeWidth={2.2} />
+              </div>
+              <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Recent Projects</h3>
+            </div>
             {recentItems.length > 0 && (
               <button
                 onClick={() => {
