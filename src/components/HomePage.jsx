@@ -1063,7 +1063,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               overflow: 'hidden',
               padding: '12px',
               boxSizing: 'border-box',
-              backgroundColor: isDark ? '#1A2438' : '#FFFFFF',
+              backgroundColor: isDark ? '#251A29' : '#FFE8ED',
               border: 'none',
               outline: 'none',
               WebkitTapHighlightColor: 'transparent',
