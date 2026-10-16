@@ -99,7 +99,7 @@ export default function BarcodeQualityModal({
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #FF7C00)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               DIAGNOSTIC AUDIT
             </span>
             <h3 style={{ fontSize: 18, fontWeight: 900, margin: '2px 0 0 0', color: 'var(--text-primary, #1C1C1E)' }}>
@@ -184,7 +184,7 @@ export default function BarcodeQualityModal({
         <button
           onClick={onClose}
           style={{
-            background: 'var(--accent-primary, #EF1E34)',
+            background: 'var(--accent-primary, #FF7C00)',
             color: '#FFFFFF',
             border: 'none',
             borderRadius: 14,
@@ -192,7 +192,7 @@ export default function BarcodeQualityModal({
             fontSize: 14,
             fontWeight: 700,
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(239, 30, 52, 0.3)',
+            boxShadow: '0 4px 14px rgba(255, 124, 0, 0.3)',
             marginTop: 4
           }}
         >

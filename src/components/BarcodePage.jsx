@@ -517,7 +517,12 @@ export default function BarcodePage({
       flexDirection: 'column',
       overflow: 'hidden',
       backgroundColor: 'var(--bg-primary, #FAFAFC)',
-      position: 'relative'
+      position: 'relative',
+      '--accent-primary': '#FF7C00',
+      '--accent-gradient': 'linear-gradient(135deg, #FF7C00 0%, #E06000 100%)',
+      '--accent-soft': 'rgba(255, 124, 0, 0.16)',
+      '--accent-glow': 'rgba(255, 124, 0, 0.35)',
+      '--accent-border': 'rgba(255, 124, 0, 0.3)'
     }}>
       {/* ── TOP APP BAR ── */}
       <header className="app-header" style={{
@@ -563,7 +568,7 @@ export default function BarcodePage({
                   if (onNavigate) onNavigate('batch', 'BARCODE');
                 }}
                 style={{
-                  background: '#EF1E34',
+                  background: '#FF7C00',
                   border: 'none',
                   color: 'white',
                   padding: '8px 12px',
@@ -632,10 +637,10 @@ export default function BarcodePage({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                background: '#EF1E34',
+                background: '#FF7C00',
                 borderRadius: 12,
                 padding: '2px',
-                boxShadow: '0 4px 14px rgba(239, 30, 52, 0.25)',
+                boxShadow: '0 4px 14px rgba(255, 124, 0, 0.25)',
                 height: 36,
                 opacity: !isDataValid ? 0.5 : 1,
                 pointerEvents: !isDataValid ? 'none' : 'auto'
@@ -731,16 +736,16 @@ export default function BarcodePage({
                         gap: 6,
                         aspectRatio: '1 / 1',
                         padding: 0,
-                        background: selectedFormat === label ? 'rgba(239, 30, 52, 0.12)' : 'var(--bg-hover, rgba(255, 255, 255, 0.06))',
-                        border: selectedFormat === label ? '1.5px solid var(--accent-primary, #EF1E34)' : '1px solid transparent',
+                        background: selectedFormat === label ? 'rgba(255, 124, 0, 0.12)' : 'var(--bg-hover, rgba(255, 255, 255, 0.06))',
+                        border: selectedFormat === label ? '1.5px solid var(--accent-primary, #FF7C00)' : '1px solid transparent',
                         borderRadius: 12,
-                        color: selectedFormat === label ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #FFFFFF)',
+                        color: selectedFormat === label ? 'var(--accent-primary, #FF7C00)' : 'var(--text-primary, #FFFFFF)',
                         cursor: 'pointer',
                         position: 'relative'
                       }}
                     >
                       <PaidCrownBadge featureId={featId} position="floating" size={8} />
-                      <Icon size={18} color={selectedFormat === label ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #FFFFFF)'} />
+                      <Icon size={18} color={selectedFormat === label ? 'var(--accent-primary, #FF7C00)' : 'var(--text-primary, #FFFFFF)'} />
                       <span style={{ fontSize: 10, fontWeight: 700 }}>{label}</span>
                     </button>
                   ))}
@@ -776,7 +781,7 @@ export default function BarcodePage({
                       width: 44,
                       height: 26,
                       borderRadius: 16,
-                      background: isTransparentBg ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, #E5E5EA)',
+                      background: isTransparentBg ? 'var(--accent-primary, #FF7C00)' : 'var(--bg-hover, #E5E5EA)',
                       border: 'none',
                       cursor: 'pointer',
                       position: 'relative',
@@ -966,7 +971,7 @@ export default function BarcodePage({
             boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
           }}
         >
-          <Scan size={14} color="var(--accent-primary, #EF1E34)" />
+          <Scan size={14} color="var(--accent-primary, #FF7C00)" />
           <span>Test Scan</span>
         </button>
 
@@ -1012,7 +1017,7 @@ export default function BarcodePage({
             boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
           }}
         >
-          <Printer size={14} color="var(--accent-primary, #EF1E34)" />
+          <Printer size={14} color="var(--accent-primary, #FF7C00)" />
           <span>Label Sheet</span>
         </button>
 
@@ -1244,7 +1249,7 @@ function undoRedoStyle(disabled) {
     borderRadius: 8,
     background: 'var(--bg-hover, rgba(0,0,0,0.04))',
     border: '1px solid var(--border-color, rgba(0,0,0,0.08))',
-    color: disabled ? 'var(--text-muted, #C7C7CC)' : 'var(--accent-primary, #EF1E34)',
+    color: disabled ? 'var(--text-muted, #C7C7CC)' : 'var(--accent-primary, #FF7C00)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

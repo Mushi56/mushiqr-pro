@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, Check, Info, Pencil, LayoutGrid, ShoppingCart, Factory, Globe, QrCode } from 'lucide-react';
+import { Search, Info, Pencil, LayoutGrid, ShoppingCart, Factory, Globe, QrCode } from 'lucide-react';
 import { BARCODE_STANDARDS, renderBarcode } from '../../utils/barcodeEngine';
 import { BARCODE_CATEGORIES, FORMAT_CATEGORY_MAP, BARCODE_SPECS } from '../../utils/barcodeStandardsExtended';
 import { FeatureAccessManager } from '../../services/FeatureAccessManager';
@@ -132,7 +132,7 @@ export default function BarcodeFormatSelector({
                 padding: '7px 14px',
                 borderRadius: '12px',
                 border: 'none',
-                background: isActive ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-card, #151C2E)',
+                background: isActive ? '#FF7C00' : 'var(--bg-card, #151C2E)',
                 color: isActive ? '#FFFFFF' : 'var(--text-secondary, #94A3B8)',
                 fontWeight: isActive ? 800 : 600,
                 fontSize: '12.5px',
@@ -142,7 +142,7 @@ export default function BarcodeFormatSelector({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                boxShadow: isActive ? '0 4px 12px rgba(239, 30, 52, 0.35)' : 'none'
+                boxShadow: isActive ? '0 4px 12px rgba(255, 124, 0, 0.35)' : 'none'
               }}
             >
               {getCategoryIcon()}
@@ -179,6 +179,7 @@ export default function BarcodeFormatSelector({
           return (
             <div
               key={item.id}
+              className={`barcode-format-card ${isSelected ? 'selected' : ''}`}
               onClick={() => {
                 const feat = `barcode_${item.id}`;
                 const access = FeatureAccessManager.canUseFeature(feat);
@@ -188,73 +189,18 @@ export default function BarcodeFormatSelector({
                 }
                 onSelectFormat(item.id);
               }}
-              style={{
-                background: isSelected ? 'var(--accent-soft, rgba(239, 30, 52, 0.18))' : 'var(--bg-card, #151C2E)',
-                border: 'none',
-                borderRadius: 16,
-                padding: '10px 10px 8px 10px',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                position: 'relative',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: isSelected
-                  ? '0 6px 20px rgba(239, 30, 52, 0.25)'
-                  : '0 2px 6px rgba(0,0,0,0.04)',
-                minHeight: 112,
-                boxSizing: 'border-box'
-              }}
             >
               {/* Pro Crown Badge */}
               <PaidCrownBadge featureId={`barcode_${item.id}`} position="floating" size={9} />
 
-              {/* Selected Check Badge */}
-              {isSelected && (
-                <div style={{
-                  position: 'absolute',
-                  top: 6,
-                  right: 6,
-                  width: 18,
-                  height: 18,
-                  borderRadius: '50%',
-                  background: 'var(--accent-primary, #EF1E34)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                  boxShadow: '0 2px 6px rgba(239, 30, 52,0.3)',
-                  zIndex: 4
-                }}>
-                  <Check size={11} strokeWidth={3} />
-                </div>
-              )}
-
               {/* Mini Preview Thumbnail */}
-              <div style={{
-                width: '100%',
-                height: 44,
-                background: '#FFFFFF',
-                borderRadius: 10,
-                border: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px',
-                boxSizing: 'border-box',
-                overflow: 'hidden',
-                marginBottom: 8
-              }}>
+              <div className="barcode-thumbnail-wrapper">
                 <MiniThumbnail type={item.id} defaultValue={item.defaultValue} />
               </div>
 
               {/* Format Title and Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, width: '100%' }}>
-                <span style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: isSelected ? 'var(--accent-primary, #EF1E34)' : 'var(--text-primary, #FFFFFF)',
-                  letterSpacing: '-0.2px'
-                }}>
+              <div className="barcode-title-row">
+                <span className="barcode-format-name">
                   {item.name}
                 </span>
                 <button
@@ -264,15 +210,7 @@ export default function BarcodeFormatSelector({
                     if (onOpenInfo) onOpenInfo(item.id);
                   }}
                   title="Symbology info"
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    color: isSelected ? 'var(--accent-primary, #EF1E34)' : 'var(--text-muted, #8E8E93)',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
+                  className="barcode-format-info-btn"
                 >
                   <Info size={14} />
                 </button>
@@ -286,23 +224,10 @@ export default function BarcodeFormatSelector({
                   if (onOpenDataModal) onOpenDataModal(item.id);
                 }}
                 title="Edit fields"
-                style={{
-                  width: '100%',
-                  background: 'var(--accent-primary, #EF1E34)',
-                  border: 'none',
-                  borderRadius: 8,
-                  padding: '6px 0',
-                  cursor: 'pointer',
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  boxShadow: '0 2px 6px rgba(239, 30, 52, 0.25)'
-                }}
+                className="barcode-format-edit-btn"
               >
                 <Pencil size={11} strokeWidth={2.5} />
-                <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Edit Fields</span>
+                <span>Edit Fields</span>
               </button>
             </div>
           );

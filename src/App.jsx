@@ -5805,44 +5805,52 @@ export default function App() {
                             left: '50%', 
                             transform: 'translateX(-50%)',
                             display: 'flex',
-                            background: 'var(--bg-elevated)',
-                            borderRadius: '12px',
-                            padding: '4px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                            alignItems: 'center',
+                            gap: '10px'
                           }}>
                             <button
                               onClick={() => setPatternTab('dots')}
                               style={{
-                                display: 'flex', alignItems: 'center', gap: '6px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
                                 border: 'none',
-                                background: patternTab === 'dots' ? 'var(--accent-primary)' : 'transparent',
-                                color: patternTab === 'dots' ? '#fff' : 'var(--text-secondary)',
-                                padding: '6px 16px',
-                                borderRadius: '8px',
+                                height: '38px',
+                                padding: '0 18px',
+                                borderRadius: '10px',
+                                background: patternTab === 'dots' ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, rgba(0,0,0,0.05))',
+                                color: patternTab === 'dots' ? '#ffffff' : 'var(--text-secondary, #636366)',
                                 fontSize: '13px',
-                                fontWeight: 600,
+                                fontWeight: 700,
                                 cursor: 'pointer',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.2s ease',
+                                boxShadow: patternTab === 'dots' ? '0 4px 12px rgba(239, 30, 52, 0.25)' : 'none'
                               }}
                             >
-                              <QRDotsIcon size={16} /> Dots
+                              <QRDotsIcon size={16} /> <span>Dots</span>
                             </button>
                             <button
                               onClick={() => setPatternTab('eyes')}
                               style={{
-                                display: 'flex', alignItems: 'center', gap: '6px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '6px',
                                 border: 'none',
-                                background: patternTab === 'eyes' ? 'var(--accent-primary)' : 'transparent',
-                                color: patternTab === 'eyes' ? '#fff' : 'var(--text-secondary)',
-                                padding: '6px 16px',
-                                borderRadius: '8px',
+                                height: '38px',
+                                padding: '0 18px',
+                                borderRadius: '10px',
+                                background: patternTab === 'eyes' ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, rgba(0,0,0,0.05))',
+                                color: patternTab === 'eyes' ? '#ffffff' : 'var(--text-secondary, #636366)',
                                 fontSize: '13px',
-                                fontWeight: 600,
+                                fontWeight: 700,
                                 cursor: 'pointer',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.2s ease',
+                                boxShadow: patternTab === 'eyes' ? '0 4px 12px rgba(239, 30, 52, 0.25)' : 'none'
                               }}
                             >
-                              <QREyesIcon size={16} /> Eyes
+                              <QREyesIcon size={16} /> <span>Eyes</span>
                             </button>
                           </div>
                         )}

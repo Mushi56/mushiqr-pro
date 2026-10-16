@@ -75,7 +75,7 @@ export default function BarcodeHistoryModal({
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--accent-primary, #FF7C00)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
               SAVED ARCHIVE
             </span>
             <h3 style={{ fontSize: 18, fontWeight: 900, margin: '2px 0 0 0', color: 'var(--text-primary, #1C1C1E)' }}>
@@ -142,7 +142,7 @@ export default function BarcodeHistoryModal({
                 padding: '6px 14px',
                 borderRadius: 10,
                 border: 'none',
-                background: filter === f.id ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, #F2F2F7)',
+                background: filter === f.id ? 'var(--accent-primary, #FF7C00)' : 'var(--bg-hover, #F2F2F7)',
                 color: filter === f.id ? '#FFFFFF' : 'var(--text-secondary, #636366)',
                 fontWeight: 700,
                 fontSize: 11,
@@ -215,7 +215,7 @@ export default function BarcodeHistoryModal({
 
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)' }}>
+                        <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--accent-primary, #FF7C00)' }}>
                           {bcid}
                         </span>
                         <span style={{ fontSize: 10, color: 'var(--text-muted, #8E8E93)' }}>

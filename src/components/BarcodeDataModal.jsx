@@ -1431,7 +1431,7 @@ export default function BarcodeDataModal({ isOpen, bcid, initialFields, onApply,
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary, #1C1C1E)' }}>Auto Check Digit</span>
-                      <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--accent-primary, #EF1E34)', background: 'rgba(239, 30, 52, 0.08)', padding: '2px 6px', borderRadius: 6 }}>GS1</span>
+                      <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--accent-primary, #FF7C00)', background: 'rgba(255, 124, 0, 0.08)', padding: '2px 6px', borderRadius: 6 }}>GS1</span>
                     </div>
                     <span style={{ fontSize: 11, color: 'var(--text-secondary, #636366)', marginTop: 2, display: 'block' }}>
                       {autoCheckDigit ? 'Automatically computes modulo-10 check digit' : 'Allow manual complete input'}
@@ -1440,7 +1440,7 @@ export default function BarcodeDataModal({ isOpen, bcid, initialFields, onApply,
 
                   <button
                     onClick={() => setAutoCheckDigit(!autoCheckDigit)}
-                    style={{ width: 52, height: 30, borderRadius: 20, background: autoCheckDigit ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, #E5E5EA)', border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 0.25s ease', padding: 2 }}
+                    style={{ width: 52, height: 30, borderRadius: 20, background: autoCheckDigit ? 'var(--accent-primary, #FF7C00)' : 'var(--bg-hover, #E5E5EA)', border: 'none', cursor: 'pointer', position: 'relative', transition: 'background 0.25s ease', padding: 2 }}
                   >
                     <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#FFFFFF', transform: autoCheckDigit ? 'translateX(22px)' : 'translateX(0px)', transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }} />
                   </button>

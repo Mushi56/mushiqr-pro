@@ -512,7 +512,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
       color: 'var(--text-primary)',
       display: 'flex',
       flexDirection: 'column',
-      position: 'relative'
+      position: 'relative',
+      userSelect: 'none',
+      WebkitUserSelect: 'none',
+      WebkitTouchCallout: 'none',
+      WebkitTapHighlightColor: 'transparent'
     }}>
       <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 'calc(var(--bottom-nav-height, 64px) + env(safe-area-inset-bottom, 0px) + 24px)' }} className="fade-in-up" onScroll={handleScroll}>
         {/* Static Hero Section with Smooth Subtle Top-to-Bottom Ruby Gradient */}
@@ -642,6 +646,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 backdropFilter: 'blur(30px)',
                 WebkitBackdropFilter: 'blur(30px)',
                 border: 'none',
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                WebkitTouchCallout: 'none',
                 boxShadow: isDark 
                   ? '0 16px 38px rgba(0, 0, 0, 0.55)' 
                   : '0 12px 30px rgba(0, 0, 0, 0.06)',
@@ -831,6 +840,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 backdropFilter: 'blur(30px)',
                 WebkitBackdropFilter: 'blur(30px)',
                 border: 'none',
+                outline: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                WebkitTouchCallout: 'none',
                 boxShadow: isDark 
                   ? '0 16px 38px rgba(0, 0, 0, 0.55)' 
                   : '0 12px 30px rgba(0, 0, 0, 0.06)',
@@ -1020,6 +1034,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               boxSizing: 'border-box',
               backgroundColor: isDark ? '#1A2438' : '#FFFFFF',
               border: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
               boxShadow: isDark 
                 ? '0 16px 38px rgba(0, 0, 0, 0.55)' 
                 : '0 12px 30px rgba(0, 0, 0, 0.06)',
@@ -1219,7 +1238,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <button
                 key={option.id}
                 onClick={() => onQuickCreate(option.id)}
-                className="quick-option-card"
+                className="quick-option-card quick-option-qr"
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`qr_${option.id}`} position="floating" size={10} />
@@ -1330,7 +1349,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <button
                 key={option.id}
                 onClick={() => onQuickCreateBarcode(option.id)}
-                className="quick-option-card"
+                className="quick-option-card quick-option-barcode"
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`barcode_${option.id}`} position="floating" size={10} />

@@ -77,7 +77,7 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
   const usePath = isPathDot(dotStyle);
 
   useEffect(() => {
-    if (usePath || !canvasRef.current) return;
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const size = 120;
@@ -86,6 +86,21 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
     // Draw solid white background for high-contrast preview thumbnails in both light and dark modes
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, size, size);
+
+    if (usePath && typeof Path2D !== 'undefined') {
+      const d = thumbnailPath(dotStyle);
+      if (d) {
+        ctx.save();
+        const scale = size / 5.4;
+        ctx.translate(0.2 * scale, 0.2 * scale);
+        ctx.scale(scale, scale);
+        ctx.fillStyle = PREVIEW_THUMBNAIL_INK;
+        const p2d = new Path2D(d);
+        ctx.fill(p2d);
+        ctx.restore();
+        return;
+      }
+    }
 
     // Same 5x5 sample + framing (viewBox -.2 -.2 5.4 5.4) as the reference sheet
     const pattern = ['11010', '01111', '10110', '11011', '01101'];
@@ -110,18 +125,6 @@ function MiniDotPreviewCanvas({ dotStyle, qrParams }) {
       }
     }
   }, [dotStyle, usePath, qrParams?.dotPadding]);
-
-  if (usePath) {
-    return (
-      <svg
-        viewBox="-.2 -.2 5.4 5.4"
-        style={{ width: '100%', height: '100%', display: 'block', backgroundColor: '#FFFFFF', borderRadius: '10px' }}
-      >
-        <rect x="-.2" y="-.2" width="5.4" height="5.4" fill="#FFFFFF" />
-        <path d={thumbnailPath(dotStyle)} fill={PREVIEW_THUMBNAIL_INK} />
-      </svg>
-    );
-  }
 
   return (
     <canvas 

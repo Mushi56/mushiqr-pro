@@ -135,6 +135,50 @@
   --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.06);
 }
 
+/* ========================================================
+   Mobile Touch & Tap-Highlight Fixes (Android / iOS)
+   - Eliminates Android Chrome default blue hard-corner tap highlight
+   - Prevents long-press text selection / "Copy" popup on cards & buttons
+   ======================================================== */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+*:focus, *:focus-visible, *:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Prevent text selection and long-press copy context menu on interactive UI and cards */
+html, body, #root, .app, button, a, [role="button"], [tabindex], .quick-option-card, .settings-card, .card {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Allow text selection ONLY in form inputs and editable text areas */
+input, textarea, [contenteditable="true"], .selectable-text {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+}
+
+/* Prevent image ghost dragging and native save dialogs on long-press */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
 /* Glass Utility Classes */
 .glass-panel {
   background: var(--glass-bg) !important;
@@ -1158,38 +1202,197 @@ input[type="range"]::-moz-range-thumb {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: var(--transition-base);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-secondary);
   font-size: 9px;
   font-weight: 700;
   text-align: center;
   width: 100%;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .type-tab:hover {
-  background: var(--bg-hover);
-  border-color: var(--border-light);
-  transform: translateY(-2px);
-  color: var(--text-primary);
+  transform: none !important;
+  background-color: #EF1E34 !important;
+  border-color: #EF1E34 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(239, 30, 52, 0.45) !important;
+}
+
+.type-tab:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transform: scale(0.95) !important;
+  transition-duration: 0.1s !important;
 }
 
 .type-tab.active {
-  background: var(--accent-soft);
+  background-color: #EF1E34 !important;
   border-radius: var(--radius-md);
-  /* Restored rounded edges */
-  border-color: transparent;
-  color: var(--accent-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.type-tab.active .type-tab-icon svg {
-  fill: var(--accent-primary);
-  fill-opacity: 0.15;
-  /* Subtle fill instead of solid */
+  border-color: #EF1E34 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 6px 20px rgba(239, 30, 52, 0.45) !important;
+  transform: none !important;
 }
 
 .type-tab-icon {
   display: flex;
+  color: inherit;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.type-tab:hover .type-tab-icon,
+.type-tab.active .type-tab-icon {
+  color: #FFFFFF !important;
+  transform: scale(1.08);
+}
+
+.type-tab:hover .type-tab-icon svg,
+.type-tab.active .type-tab-icon svg {
+  color: #FFFFFF !important;
+}
+
+/* Lucide stroke-based icons */
+.type-tab:hover .type-tab-icon svg.lucide,
+.type-tab.active .type-tab-icon svg.lucide {
+  stroke: #FFFFFF !important;
+  fill: none !important;
+}
+
+/* Fill-based social icons (Facebook, Instagram, X, LinkedIn, etc.) */
+.type-tab:hover .type-tab-icon svg:not(.lucide),
+.type-tab.active .type-tab-icon svg:not(.lucide) {
+  fill: #FFFFFF !important;
+  stroke: none !important;
+}
+
+/* ========================================
+   BARCODE FORMAT CARD (Hover & Active)
+   ======================================== */
+.barcode-format-card {
+  background: var(--bg-card, #151C2E);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.06));
+  border-radius: 16px;
+  padding: 10px 10px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  min-height: 112px;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.barcode-format-card:hover,
+.barcode-format-card.selected {
+  background-color: #FF7C00 !important;
+  border-color: #FF7C00 !important;
+  box-shadow: 0 6px 20px rgba(255, 124, 0, 0.45) !important;
+  transform: none !important;
+}
+
+.barcode-format-card:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transform: scale(0.95) !important;
+  transition-duration: 0.1s !important;
+}
+
+.barcode-thumbnail-wrapper {
+  width: 100%;
+  height: 44px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  transition: transform 0.22s ease;
+}
+
+.barcode-format-card:hover .barcode-thumbnail-wrapper,
+.barcode-format-card.selected .barcode-thumbnail-wrapper {
+  transform: scale(1.02);
+}
+
+.barcode-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.barcode-format-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary, #FFFFFF);
+  letter-spacing: -0.2px;
+  transition: color 0.22s ease;
+}
+
+.barcode-format-card:hover .barcode-format-name,
+.barcode-format-card.selected .barcode-format-name {
+  color: #FFFFFF !important;
+}
+
+.barcode-format-info-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-muted, #8E8E93);
+  display: flex;
+  align-items: center;
+  transition: color 0.22s ease;
+}
+
+.barcode-format-card:hover .barcode-format-info-btn,
+.barcode-format-card.selected .barcode-format-info-btn {
+  color: #FFFFFF !important;
+}
+
+.barcode-format-edit-btn {
+  width: 100%;
+  background: #FF7C00;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 6px rgba(255, 124, 0, 0.25);
+  transition: all 0.22s ease;
+}
+
+.barcode-format-edit-btn span {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.barcode-format-card:hover .barcode-format-edit-btn,
+.barcode-format-card.selected .barcode-format-edit-btn {
+  background: #FFFFFF !important;
+  color: #FF7C00 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* ========================================
@@ -1239,14 +1442,7 @@ input[type="range"]::-moz-range-thumb {
   background: var(--accent-soft);
   border: 2px solid var(--accent-primary) !important;
   border-radius: 10px;
-  /* Restored rounded edges */
   color: var(--accent-primary);
-}
-
-.style-option.active svg {
-  fill: var(--accent-primary);
-  fill-opacity: 0.15;
-  /* Subtle fill instead of solid */
 }
 
 .style-option-preview {
@@ -1262,10 +1458,11 @@ input[type="range"]::-moz-range-thumb {
   background: #FFFFFF;
 }
 
+.style-option-preview canvas,
 .style-option-preview svg {
-  width: 50%;
-  height: 50%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* ========================================
@@ -8244,7 +8441,12 @@ button:active,
 .quick-option-card {
   aspect-ratio: 1 / 1;
   background: var(--bg-elevated) !important;
-  border: none !important;
+  border: 1px solid transparent !important;
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
   border-radius: 20px !important;
   padding: 12px !important;
   display: flex;
@@ -8255,14 +8457,67 @@ button:active,
   cursor: pointer;
   box-shadow: var(--shadow-sm) !important;
   color: var(--text-secondary);
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.16s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+.quick-option-card:focus,
+.quick-option-card:focus-visible {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Eliminate upward jump and red shadow */
 .quick-option-card:hover {
-  transform: translateY(-4px) !important;
-  border-color: transparent !important;
+  transform: none !important;
   color: var(--text-primary) !important;
-  box-shadow: 0 10px 24px rgba(239, 30, 52, 0.15), var(--shadow-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Subtle click compression */
+.quick-option-card:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transform: scale(0.95) !important;
+  transition-duration: 0.1s !important;
+}
+
+/* QR Code Section: Hard Solid Ruby Red Fill */
+.quick-option-card.quick-option-qr:hover,
+.quick-option-card.quick-option-qr:active {
+  background-color: #EF1E34 !important;
+  border-color: #EF1E34 !important;
+  box-shadow: 0 6px 20px rgba(239, 30, 52, 0.45) !important;
+}
+
+.quick-option-card.quick-option-qr:hover .quick-option-icon-wrapper,
+.quick-option-card.quick-option-qr:active .quick-option-icon-wrapper {
+  color: #FFFFFF !important;
+}
+
+.quick-option-card.quick-option-qr:hover span,
+.quick-option-card.quick-option-qr:active span {
+  color: #FFFFFF !important;
+}
+
+/* Barcode Section: Hard Solid Vibrant Orange Fill */
+.quick-option-card.quick-option-barcode:hover,
+.quick-option-card.quick-option-barcode:active {
+  background-color: #FF7C00 !important;
+  border-color: #FF7C00 !important;
+  box-shadow: 0 6px 20px rgba(255, 124, 0, 0.45) !important;
+}
+
+.quick-option-card.quick-option-barcode:hover .quick-option-icon-wrapper,
+.quick-option-card.quick-option-barcode:active .quick-option-icon-wrapper {
+  color: #FFFFFF !important;
+}
+
+.quick-option-card.quick-option-barcode:hover span,
+.quick-option-card.quick-option-barcode:active span {
+  color: #FFFFFF !important;
 }
 
 .quick-option-icon-wrapper {
@@ -8273,13 +8528,17 @@ button:active,
   align-items: center;
   justify-content: center;
   color: inherit;
-  transition: all 0.2s ease;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.quick-option-card span {
+  transition: color 0.22s ease;
 }
 
 .quick-option-card:hover .quick-option-icon-wrapper {
   background: transparent !important;
   color: inherit;
-  transform: scale(1.12);
+  transform: scale(1.08);
 }
 
 @media (max-width: 600px) {

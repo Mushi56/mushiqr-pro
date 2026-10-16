@@ -17,7 +17,7 @@ const BG_SWATCHES = [
 // ─── Authentic Color Presets (Old Style) ──────────────────────────────────────
 const COLOR_PRESETS = [
   { name: 'Classic', qr: '#000000', bg: '#FFFFFF' },
-  { name: 'Red & White', qr: '#EF1E34', bg: '#FFFFFF' },
+  { name: 'Orange & White', qr: '#FF7C00', bg: '#FFFFFF' },
   { name: 'Ocean', qr: '#0055FF', bg: '#EEF4FF' },
   { name: 'Forest', qr: '#008844', bg: '#F0FFF4' },
   { name: 'Sunset', qr: '#FF4400', bg: '#FFF5F0' },
@@ -122,7 +122,7 @@ export default function BarcodeColorsTab({
               className={`swatch-item${barColor.toLowerCase() === color.toLowerCase() ? ' active' : ''}`}
               style={{
                 backgroundColor: color,
-                border: barColor.toLowerCase() === color.toLowerCase() ? '2px solid var(--accent-primary, #EF1E34)' : '1px solid rgba(0,0,0,0.1)'
+                border: barColor.toLowerCase() === color.toLowerCase() ? '2px solid var(--accent-primary, #FF7C00)' : '1px solid rgba(0,0,0,0.1)'
               }}
               onClick={() => onChangeColors({ barColor: color })}
             />
@@ -157,7 +157,7 @@ export default function BarcodeColorsTab({
               className={`swatch-item${!isTransparentBg && bgColor.toLowerCase() === color.toLowerCase() ? ' active' : ''}`}
               style={{
                 backgroundColor: color,
-                border: !isTransparentBg && bgColor.toLowerCase() === color.toLowerCase() ? '2px solid var(--accent-primary, #EF1E34)' : '1px solid rgba(0,0,0,0.1)'
+                border: !isTransparentBg && bgColor.toLowerCase() === color.toLowerCase() ? '2px solid var(--accent-primary, #FF7C00)' : '1px solid rgba(0,0,0,0.1)'
               }}
               onClick={() => onChangeColors({ bgColor: color, isTransparentBg: false })}
             />
@@ -205,12 +205,12 @@ export default function BarcodeColorsTab({
                   height: 46,
                   borderRadius: 14,
                   background: p.bg,
-                  border: isSel ? '2px solid var(--accent-primary, #EF1E34)' : '1px solid var(--border-color, rgba(0,0,0,0.1))',
+                  border: isSel ? '2px solid var(--accent-primary, #FF7C00)' : '1px solid var(--border-color, rgba(0,0,0,0.1))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   overflow: 'hidden',
-                  boxShadow: isSel ? '0 8px 18px rgba(239, 30, 52, 0.25)' : '0 2px 6px rgba(0,0,0,0.06)',
+                  boxShadow: isSel ? '0 8px 18px rgba(255, 124, 0, 0.25)' : '0 2px 6px rgba(0,0,0,0.06)',
                   transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                   transform: isSel ? 'scale(1.08)' : 'scale(1)'
                 }}>
@@ -219,7 +219,7 @@ export default function BarcodeColorsTab({
                 <span style={{
                   fontSize: 10,
                   fontWeight: isSel ? 700 : 500,
-                  color: isSel ? 'var(--accent-primary, #EF1E34)' : 'var(--text-secondary, #636366)',
+                  color: isSel ? 'var(--accent-primary, #FF7C00)' : 'var(--text-secondary, #636366)',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
@@ -260,7 +260,7 @@ export default function BarcodeColorsTab({
             width: 52,
             height: 30,
             borderRadius: 20,
-            background: isTransparentBg ? 'var(--accent-primary, #EF1E34)' : 'var(--bg-hover, #E5E5EA)',
+            background: isTransparentBg ? 'var(--accent-primary, #FF7C00)' : 'var(--bg-hover, #E5E5EA)',
             border: 'none',
             cursor: 'pointer',
             position: 'relative',
