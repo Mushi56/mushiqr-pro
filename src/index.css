@@ -8741,7 +8741,9 @@ button:active,
 
 .quick-option-card.quick-option-qr:hover .quick-option-icon-wrapper,
 .quick-option-card.quick-option-qr:active .quick-option-icon-wrapper {
+  background: rgba(255, 255, 255, 0.22) !important;
   color: #FFFFFF !important;
+  transform: scale(1.06);
 }
 
 .quick-option-card.quick-option-qr:hover span,
@@ -8759,7 +8761,9 @@ button:active,
 
 .quick-option-card.quick-option-barcode:hover .quick-option-icon-wrapper,
 .quick-option-card.quick-option-barcode:active .quick-option-icon-wrapper {
+  background: rgba(255, 255, 255, 0.22) !important;
   color: #FFFFFF !important;
+  transform: scale(1.06);
 }
 
 .quick-option-card.quick-option-barcode:hover span,
@@ -8768,24 +8772,36 @@ button:active,
 }
 
 .quick-option-icon-wrapper {
-  width: auto;
-  height: auto;
-  background: transparent !important;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: inherit;
-  transition: color 0.22s ease, transform 0.22s ease;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pale tile background for QR Code icons */
+.quick-option-card.quick-option-qr .quick-option-icon-wrapper {
+  background: rgba(239, 30, 52, 0.08) !important;
+}
+
+[data-theme="dark"] .quick-option-card.quick-option-qr .quick-option-icon-wrapper {
+  background: rgba(239, 30, 52, 0.16) !important;
+}
+
+/* Pale tile background for Barcode icons */
+.quick-option-card.quick-option-barcode .quick-option-icon-wrapper {
+  background: rgba(255, 124, 0, 0.09) !important;
+}
+
+[data-theme="dark"] .quick-option-card.quick-option-barcode .quick-option-icon-wrapper {
+  background: rgba(255, 124, 0, 0.16) !important;
 }
 
 .quick-option-card span {
   transition: color 0.22s ease;
-}
-
-.quick-option-card:hover .quick-option-icon-wrapper {
-  background: transparent !important;
-  color: inherit;
-  transform: scale(1.08);
 }
 
 @media (max-width: 600px) {
@@ -8799,9 +8815,9 @@ button:active,
     gap: 4px !important;
   }
   .quick-option-icon-wrapper {
-    width: auto !important;
-    height: auto !important;
-    background: transparent !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
   }
   .quick-option-icon-wrapper svg {
     width: 18px !important;

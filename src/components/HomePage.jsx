@@ -659,27 +659,27 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               
               {/* Large Radiant Color Dabs for Glassy Look */}
               <div style={{
-                position: 'absolute', top: '-35%', right: '-22%',
-                width: '210px', height: '210px',
+                position: 'absolute', top: '5%', right: '-15%',
+                width: '180px', height: '180px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.18) 0%, rgba(239, 30, 52, 0.08) 40%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.11) 0%, rgba(255, 77, 109, 0.05) 45%, transparent 70%)',
-                filter: 'blur(28px)', pointerEvents: 'none', zIndex: 1
+                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.22) 0%, rgba(239, 30, 52, 0.10) 45%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.14) 0%, rgba(255, 77, 109, 0.06) 50%, transparent 70%)',
+                filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
               }} />
               <div style={{
                 position: 'absolute', bottom: '-20%', left: '-20%',
                 width: '160px', height: '160px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 77, 109, 0.13) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 59, 92, 0.08) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 77, 109, 0.06) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 59, 92, 0.035) 0%, transparent 70%)',
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
               }} />
               <div style={{
                 position: 'absolute', top: '0%', left: '10%',
                 width: '120px', height: '120px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.10) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.06) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.04) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.025) 0%, transparent 70%)',
                 filter: 'blur(18px)', pointerEvents: 'none', zIndex: 1
               }} />
 
@@ -870,27 +870,27 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               
               {/* Large Radiant Color Dabs for Glassy Look */}
               <div style={{
-                position: 'absolute', top: '-35%', right: '-22%',
-                width: '210px', height: '210px',
+                position: 'absolute', top: '5%', right: '-15%',
+                width: '180px', height: '180px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.18) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.11) 0%, rgba(251, 191, 36, 0.05) 45%, transparent 70%)',
-                filter: 'blur(28px)', pointerEvents: 'none', zIndex: 1
+                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.22) 0%, rgba(245, 158, 11, 0.10) 45%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.14) 0%, rgba(251, 191, 36, 0.06) 50%, transparent 70%)',
+                filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
               }} />
               <div style={{
                 position: 'absolute', bottom: '-20%', left: '-20%',
                 width: '160px', height: '160px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 160, 0, 0.13) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 152, 0, 0.08) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 160, 0, 0.06) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 152, 0, 0.035) 0%, transparent 70%)',
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
               }} />
               <div style={{
                 position: 'absolute', top: '0%', left: '10%',
                 width: '120px', height: '120px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.10) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.06) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.04) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.025) 0%, transparent 70%)',
                 filter: 'blur(18px)', pointerEvents: 'none', zIndex: 1
               }} />
 
@@ -1083,27 +1083,27 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             
             {/* Large Radiant Color Dabs for Glassy Look */}
             <div style={{
-              position: 'absolute', top: '-35%', right: '-5%',
-              width: '240px', height: '240px',
+              position: 'absolute', top: '50%', right: '-20px', transform: 'translateY(-50%)',
+              width: '200px', height: '200px',
               background: isDark 
-                ? 'radial-gradient(circle, rgba(239, 30, 52, 0.18) 0%, rgba(255, 77, 109, 0.08) 40%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(239, 30, 52, 0.11) 0%, rgba(255, 77, 109, 0.05) 45%, transparent 70%)',
-              filter: 'blur(30px)', pointerEvents: 'none', zIndex: 1
+                ? 'radial-gradient(circle, rgba(239, 30, 52, 0.22) 0%, rgba(255, 77, 109, 0.10) 45%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(239, 30, 52, 0.14) 0%, rgba(255, 77, 109, 0.06) 50%, transparent 70%)',
+              filter: 'blur(28px)', pointerEvents: 'none', zIndex: 1
             }} />
             <div style={{
               position: 'absolute', top: '-25%', left: '-12%',
               width: '180px', height: '180px',
               background: isDark 
-                ? 'radial-gradient(circle, rgba(255, 42, 84, 0.13) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(239, 30, 52, 0.08) 0%, transparent 70%)',
+                ? 'radial-gradient(circle, rgba(255, 42, 84, 0.06) 0%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(239, 30, 52, 0.035) 0%, transparent 70%)',
               filter: 'blur(24px)', pointerEvents: 'none', zIndex: 1
             }} />
             <div style={{
               position: 'absolute', bottom: '-40%', left: '30%',
               width: '200px', height: '200px',
               background: isDark 
-                ? 'radial-gradient(circle, rgba(255, 77, 109, 0.11) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(255, 42, 84, 0.06) 0%, transparent 70%)',
+                ? 'radial-gradient(circle, rgba(255, 77, 109, 0.05) 0%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(255, 42, 84, 0.025) 0%, transparent 70%)',
               filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
             }} />
 
