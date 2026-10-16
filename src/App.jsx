@@ -8639,7 +8639,7 @@ export default function App() {
               flexDirection: 'column', 
               alignItems: 'center', 
               justifyContent: 'center',
-              marginTop: '-30px',
+              marginTop: '-20px',
               cursor: 'pointer',
               flex: 1
             }}
@@ -8647,15 +8647,15 @@ export default function App() {
             <button 
               className="floating-scan-btn glow-scan-btn"
               style={{ 
-                width: '64px',
-                height: '64px',
-                borderRadius: '32px',
+                width: '56px',
+                height: '56px',
+                borderRadius: '28px',
                 background: 'var(--accent-primary)',
                 border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 24px rgba(239, 30, 52, 0.4)',
+                boxShadow: '0 6px 20px rgba(239, 30, 52, 0.38)',
                 color: 'white',
                 zIndex: 101,
                 transition: 'transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67)'
@@ -8663,7 +8663,7 @@ export default function App() {
               onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              <ScanLine size={28} />
+              <ScanLine size={24} />
             </button>
           </div>
           
