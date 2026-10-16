@@ -8429,6 +8429,253 @@ button:active,
   align-items: center;
   gap: 4px;
 }
+/* ========================================
+   HOME SCREEN HERO CARDS (Hover & Active)
+   Hard Solid Fills, No Jumps,
+   Click Compression, and Inverted Icon Badges
+   ======================================== */
+
+.home-hero-card {
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.16s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  cursor: pointer !important;
+}
+
+.home-hero-card:focus,
+.home-hero-card:focus-visible {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.home-hero-card:hover {
+  transform: none !important;
+}
+
+.home-hero-card:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  transform: scale(0.97) !important;
+  transition-duration: 0.1s !important;
+}
+
+/* Inner elements smooth transitions */
+.home-hero-card .hero-card-icon-box,
+.home-hero-card .hero-card-title,
+.home-hero-card .hero-card-subtitle,
+.home-hero-card .hero-card-feature-item span,
+.home-hero-card .hero-card-check-icon,
+.home-hero-card .hero-card-action-pill,
+.home-hero-card .hero-card-pill-icon,
+.home-hero-card .hero-card-pill-text,
+.home-hero-card .hero-card-pill-arrow,
+.home-hero-card .hero-card-pill-arrow-icon,
+.home-hero-card .hero-card-badge-img,
+.home-hero-card .hero-card-batch-desc,
+.home-hero-card .sparkle-star {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 1. QR Code Hero Card (Midnight Obsidian Hover without Stroke) */
+.home-hero-card.home-hero-qr:hover,
+.home-hero-card.home-hero-qr:active {
+  background-color: #0F172A !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), 0 0 24px rgba(239, 30, 52, 0.35) !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-icon-box,
+.home-hero-card.home-hero-qr:active .hero-card-icon-box {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-icon-box svg,
+.home-hero-card.home-hero-qr:active .hero-card-icon-box svg {
+  color: #EF1E34 !important;
+  stroke: #EF1E34 !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-title,
+.home-hero-card.home-hero-qr:active .hero-card-title {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-subtitle,
+.home-hero-card.home-hero-qr:active .hero-card-subtitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-feature-item span,
+.home-hero-card.home-hero-qr:active .hero-card-feature-item span {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-check-icon,
+.home-hero-card.home-hero-qr:active .hero-card-check-icon {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-action-pill,
+.home-hero-card.home-hero-qr:active .hero-card-action-pill {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-pill-icon,
+.home-hero-card.home-hero-qr:active .hero-card-pill-icon {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-pill-text,
+.home-hero-card.home-hero-qr:active .hero-card-pill-text {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-pill-arrow,
+.home-hero-card.home-hero-qr:active .hero-card-pill-arrow {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.home-hero-card.home-hero-qr:hover .hero-card-pill-arrow-icon,
+.home-hero-card.home-hero-qr:active .hero-card-pill-arrow-icon {
+  color: #EF1E34 !important;
+  stroke: #EF1E34 !important;
+}
+
+/* 2. Barcode Hero Card (Midnight Obsidian Hover without Stroke) */
+.home-hero-card.home-hero-barcode:hover,
+.home-hero-card.home-hero-barcode:active {
+  background-color: #0F172A !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), 0 0 24px rgba(255, 124, 0, 0.35) !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-icon-box,
+.home-hero-card.home-hero-barcode:active .hero-card-icon-box {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-icon-box svg,
+.home-hero-card.home-hero-barcode:active .hero-card-icon-box svg {
+  color: #FF7C00 !important;
+  stroke: #FF7C00 !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-title,
+.home-hero-card.home-hero-barcode:active .hero-card-title {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-subtitle,
+.home-hero-card.home-hero-barcode:active .hero-card-subtitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-feature-item span,
+.home-hero-card.home-hero-barcode:active .hero-card-feature-item span {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-check-icon,
+.home-hero-card.home-hero-barcode:active .hero-card-check-icon {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-action-pill,
+.home-hero-card.home-hero-barcode:active .hero-card-action-pill {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border: none !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-pill-icon,
+.home-hero-card.home-hero-barcode:active .hero-card-pill-icon {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-pill-text,
+.home-hero-card.home-hero-barcode:active .hero-card-pill-text {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-pill-arrow,
+.home-hero-card.home-hero-barcode:active .hero-card-pill-arrow {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+.home-hero-card.home-hero-barcode:hover .hero-card-pill-arrow-icon,
+.home-hero-card.home-hero-barcode:active .hero-card-pill-arrow-icon {
+  color: #FF7C00 !important;
+  stroke: #FF7C00 !important;
+}
+
+/* 3. Bulk Generation Hero Card (Midnight Obsidian Hover without Stroke) */
+.home-hero-card.home-hero-batch:hover,
+.home-hero-card.home-hero-batch:active {
+  background-color: #0F172A !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), 0 0 24px rgba(239, 30, 52, 0.3) !important;
+}
+
+.home-hero-card.home-hero-batch:hover .hero-card-icon-box,
+.home-hero-card.home-hero-batch:active .hero-card-icon-box {
+  background-color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+}
+
+.home-hero-card.home-hero-batch:hover .hero-card-icon-box svg,
+.home-hero-card.home-hero-batch:active .hero-card-icon-box svg {
+  color: #EF1E34 !important;
+  stroke: #EF1E34 !important;
+}
+
+.home-hero-card.home-hero-batch:hover .hero-card-title,
+.home-hero-card.home-hero-batch:active .hero-card-title {
+  color: #FFFFFF !important;
+}
+
+.home-hero-card.home-hero-batch:hover .hero-card-subtitle,
+.home-hero-card.home-hero-batch:active .hero-card-subtitle {
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.home-hero-card.home-hero-batch:hover .hero-card-batch-desc,
+.home-hero-card.home-hero-batch:active .hero-card-batch-desc {
+  color: #FFFFFF !important;
+}
+
+/* 3D Badge Image micro-animation */
+.home-hero-card:hover .hero-card-badge-img {
+  transform: rotate(-6deg) scale(1.05) !important;
+}
+
+.home-hero-card.home-hero-batch:hover .hero-card-badge-img {
+  transform: translateY(-50%) scale(1.05) !important;
+}
+
+.home-hero-card:hover .sparkle-star,
+.home-hero-card:active .sparkle-star {
+  color: #FFFFFF !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.9) !important;
+}
 
 /* Quick Options Grid */
 .quick-options-grid {

@@ -556,9 +556,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
 
           {/* Welcome Message / Admin Dashboard Header Block */}
           <div 
-            onClick={() => onOpenProfile && onOpenProfile()}
-            role="button"
-            tabIndex={0}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -567,7 +564,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               zIndex: 2,
               paddingTop: '2px',
               paddingBottom: '2px',
-              cursor: 'pointer',
               userSelect: 'none'
             }}
           >
@@ -631,6 +627,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && onNavigate('generator')}
+              className="home-hero-card home-hero-qr"
               style={{
                 borderRadius: '18px',
                 color: isDark ? '#FFFFFF' : '#0F172A',
@@ -694,6 +691,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <img 
                 src="/Glossy Pink QR Code Badge.webp" 
                 alt="QR Code" 
+                className="hero-card-badge-img"
                 style={{
                   position: 'absolute',
                   right: '-10px',
@@ -715,39 +713,48 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               {/* Top Title & Description */}
               <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    background: '#EF1E34',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(239, 30, 52, 0.25)',
-                    flexShrink: 0
-                  }}>
+                  <div 
+                    className="hero-card-icon-box"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '10px',
+                      background: '#EF1E34',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 10px rgba(239, 30, 52, 0.25)',
+                      flexShrink: 0
+                    }}
+                  >
                     <QrCode size={16} color="#FFFFFF" />
                   </div>
                   <div>
-                    <h2 style={{
-                      fontSize: '13px',
-                      fontWeight: 800,
-                      color: isDark ? '#FFFFFF' : '#0F172A',
-                      margin: 0,
-                      lineHeight: 1.1,
-                      whiteSpace: 'nowrap'
-                    }}>
+                    <h2 
+                      className="hero-card-title"
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        color: isDark ? '#FFFFFF' : '#0F172A',
+                        margin: 0,
+                        lineHeight: 1.1,
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
                       QR Codes
                     </h2>
-                    <div style={{
-                      fontSize: '8.5px',
-                      fontWeight: 700,
-                      color: isDark ? '#FF6B7A' : '#C60E23',
-                      marginTop: '2px',
-                      lineHeight: 1,
-                      whiteSpace: 'nowrap',
-                      textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
-                    }}>
+                    <div 
+                      className="hero-card-subtitle"
+                      style={{
+                        fontSize: '8.5px',
+                        fontWeight: 700,
+                        color: isDark ? '#FF6B7A' : '#C60E23',
+                        marginTop: '2px',
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                        textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
+                      }}
+                    >
                       Creative &amp; Branded
                     </div>
                   </div>
@@ -760,61 +767,67 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   margin: '0 0 6px 0',
                   alignItems: 'flex-start'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Custom Logos</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>QR Templates</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Art Frames</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FF6B7A' : '#EF1E34'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>HD Export</span>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Action Pill - Glassmorphic with Fully Rounded Corners */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '4px 6px 4px 10px',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.28)' : 'rgba(255, 255, 255, 0.55)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                borderRadius: '9999px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.75)',
-                boxShadow: isDark 
-                  ? '0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
-                  : '0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
-                width: '100%',
-                boxSizing: 'border-box',
-                margin: 'auto 0 0 0',
-                zIndex: 4,
-                position: 'relative'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Palette size={12} color={isDark ? '#FF6B7A' : '#EF1E34'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Custom QR Studio</span>
-                </div>
-                <div style={{
-                  width: '18px',
-                  height: '18px',
-                  borderRadius: '50%',
-                  background: '#EF1E34',
+              <div 
+                className="hero-card-action-pill"
+                style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(239, 30, 52, 0.3)',
-                  flexShrink: 0
-                }}>
-                  <ChevronRight size={11} color="#FFFFFF" />
+                  justifyContent: 'space-between',
+                  padding: '4px 6px 4px 10px',
+                  backgroundColor: isDark ? 'rgba(0, 0, 0, 0.28)' : 'rgba(255, 255, 255, 0.55)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  borderRadius: '9999px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.75)',
+                  boxShadow: isDark 
+                    ? '0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
+                    : '0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  margin: 'auto 0 0 0',
+                  zIndex: 4,
+                  position: 'relative'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Palette className="hero-card-pill-icon" size={12} color={isDark ? '#FF6B7A' : '#EF1E34'} />
+                  <span className="hero-card-pill-text" style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Custom QR Studio</span>
+                </div>
+                <div 
+                  className="hero-card-pill-arrow"
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    background: '#EF1E34',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 6px rgba(239, 30, 52, 0.3)',
+                    flexShrink: 0
+                  }}
+                >
+                  <ChevronRight className="hero-card-pill-arrow-icon" size={11} color="#FFFFFF" />
                 </div>
               </div>
             </div>
@@ -825,6 +838,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               role="button"
               tabIndex={0}
               onKeyDown={(e) => e.key === 'Enter' && onNavigate('barcode')}
+              className="home-hero-card home-hero-barcode"
               style={{
                 borderRadius: '18px',
                 color: isDark ? '#FFFFFF' : '#0F172A',
@@ -888,9 +902,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               <img 
                 src="/Glossy Orange Barcode Badge.webp" 
                 alt="Barcode" 
+                className="hero-card-badge-img"
                 style={{
                   position: 'absolute',
-                  right: '-10px',
+                  right: '-7px',
                   top: '29px',
                   width: '96.3px',
                   height: '96.3px',
@@ -909,39 +924,48 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               {/* Top Title & Description */}
               <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <div style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    background: '#FF7C00',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(255, 124, 0, 0.25)',
-                    flexShrink: 0
-                  }}>
+                  <div 
+                    className="hero-card-icon-box"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '10px',
+                      background: '#FF7C00',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 10px rgba(255, 124, 0, 0.25)',
+                      flexShrink: 0
+                    }}
+                  >
                     <Barcode size={16} color="#FFFFFF" />
                   </div>
                   <div>
-                    <h2 style={{
-                      fontSize: '13px',
-                      fontWeight: 800,
-                      color: isDark ? '#FFFFFF' : '#0F172A',
-                      margin: 0,
-                      lineHeight: 1.1,
-                      whiteSpace: 'nowrap'
-                    }}>
+                    <h2 
+                      className="hero-card-title"
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 800,
+                        color: isDark ? '#FFFFFF' : '#0F172A',
+                        margin: 0,
+                        lineHeight: 1.1,
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
                       Barcodes
                     </h2>
-                    <div style={{
-                      fontSize: '8.5px',
-                      fontWeight: 700,
-                      color: isDark ? '#FFB74D' : '#D96500',
-                      marginTop: '2px',
-                      lineHeight: 1,
-                      whiteSpace: 'nowrap',
-                      textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
-                    }}>
+                    <div 
+                      className="hero-card-subtitle"
+                      style={{
+                        fontSize: '8.5px',
+                        fontWeight: 700,
+                        color: isDark ? '#FFB74D' : '#D96500',
+                        marginTop: '2px',
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                        textShadow: isDark ? '0 1px 2px rgba(0,0,0,0.8)' : 'none'
+                      }}
+                    >
                       Universal Standards
                     </div>
                   </div>
@@ -954,61 +978,67 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   margin: '0 0 6px 0',
                   alignItems: 'flex-start'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>1D &amp; 2D Codes</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Retail &amp; Stock</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Scan Verified</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
-                    <Check size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                  <div className="hero-card-feature-item" style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
+                    <Check className="hero-card-check-icon" size={9} strokeWidth={2.8} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
                     <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Print-Ready</span>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Action Pill - Glassmorphic with Fully Rounded Corners */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '4px 6px 4px 10px',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.28)' : 'rgba(255, 255, 255, 0.55)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                borderRadius: '9999px',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.75)',
-                boxShadow: isDark 
-                  ? '0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
-                  : '0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
-                width: '100%',
-                boxSizing: 'border-box',
-                margin: 'auto 0 0 0',
-                zIndex: 4,
-                position: 'relative'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                  <Barcode size={12} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Barcode Studio</span>
-                </div>
-                <div style={{
-                  width: '18px',
-                  height: '18px',
-                  borderRadius: '50%',
-                  background: '#FF7C00',
+              <div 
+                className="hero-card-action-pill"
+                style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(255, 124, 0, 0.3)',
-                  flexShrink: 0
-                }}>
-                  <ChevronRight size={11} color="#FFFFFF" />
+                  justifyContent: 'space-between',
+                  padding: '4px 6px 4px 10px',
+                  backgroundColor: isDark ? 'rgba(0, 0, 0, 0.28)' : 'rgba(255, 255, 255, 0.55)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  borderRadius: '9999px',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.75)',
+                  boxShadow: isDark 
+                    ? '0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
+                    : '0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  margin: 'auto 0 0 0',
+                  zIndex: 4,
+                  position: 'relative'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                  <Barcode className="hero-card-pill-icon" size={12} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                  <span className="hero-card-pill-text" style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Barcode Studio</span>
+                </div>
+                <div 
+                  className="hero-card-pill-arrow"
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    background: '#FF7C00',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 6px rgba(255, 124, 0, 0.3)',
+                    flexShrink: 0
+                  }}
+                >
+                  <ChevronRight className="hero-card-pill-arrow-icon" size={11} color="#FFFFFF" />
                 </div>
               </div>
             </div>
@@ -1022,6 +1052,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && onNavigate('batch', 'QR')}
+            className="home-hero-card home-hero-batch"
             style={{
               borderRadius: '18px',
               color: isDark ? '#FFFFFF' : '#0F172A',
@@ -1084,6 +1115,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             <img 
               src="/Bulk Ganaration.webp" 
               alt="Bulk Generation" 
+              className="hero-card-badge-img"
               style={{
                 position: 'absolute',
                 right: '12px',
@@ -1104,50 +1136,62 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             {/* Top Title & Description */}
             <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, flex: 1, minWidth: 0, position: 'relative' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3px' }}>
-                <div style={{
-                  width: '30px',
-                  height: '30px',
-                  borderRadius: '10px',
-                  background: '#EF1E34',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(239, 30, 52, 0.35)',
-                  flexShrink: 0
-                }}>
+                <div 
+                  className="hero-card-icon-box"
+                  style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '10px',
+                    background: '#EF1E34',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(239, 30, 52, 0.35)',
+                    flexShrink: 0
+                  }}
+                >
                   <Layers size={15} color="#FFFFFF" />
                 </div>
                 <div>
-                  <h3 style={{
-                    fontSize: '13px',
-                    fontWeight: 800,
-                    color: isDark ? '#FFFFFF' : '#0F172A',
-                    margin: 0,
-                    lineHeight: 1.1
-                  }}>
+                  <h3 
+                    className="hero-card-title"
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      color: isDark ? '#FFFFFF' : '#0F172A',
+                      margin: 0,
+                      lineHeight: 1.1
+                    }}
+                  >
                     Bulk Generation
                   </h3>
-                  <div style={{
-                    fontSize: '8.5px',
-                    fontWeight: 700,
-                    color: isDark ? '#FF6B8B' : '#C60E23',
-                    marginTop: '2px',
-                    lineHeight: 1
-                  }}>
+                  <div 
+                    className="hero-card-subtitle"
+                    style={{
+                      fontSize: '8.5px',
+                      fontWeight: 700,
+                      color: isDark ? '#FF6B8B' : '#C60E23',
+                      marginTop: '2px',
+                      lineHeight: 1
+                    }}
+                  >
                     Powerful • Fast • Efficient
                   </div>
                 </div>
               </div>
-              <p style={{
-                fontSize: '8px',
-                fontWeight: 700,
-                margin: '4px 110px 0 0',
-                color: isDark ? '#FFFFFF' : '#0F172A',
-                lineHeight: 1.2,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
+              <p 
+                className="hero-card-batch-desc"
+                style={{
+                  fontSize: '8px',
+                  fontWeight: 700,
+                  margin: '4px 110px 0 0',
+                  color: isDark ? '#FFFFFF' : '#0F172A',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
                 Create 10K+ codes from your spreadsheets.
               </p>
             </div>
