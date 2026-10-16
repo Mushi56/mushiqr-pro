@@ -8639,7 +8639,7 @@ export default function App() {
               flexDirection: 'column', 
               alignItems: 'center', 
               justifyContent: 'center',
-              marginTop: '-20px',
+              marginTop: '-30px',
               cursor: 'pointer',
               flex: 1
             }}
@@ -8651,12 +8651,11 @@ export default function App() {
                 height: '56px',
                 borderRadius: '28px',
                 background: 'var(--accent-primary)',
-                border: '2.5px solid #FF7C00',
-                boxSizing: 'border-box',
+                border: '3.5px solid var(--bg-elevated)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 6px 20px rgba(239, 30, 52, 0.38)',
+                boxShadow: '0 6px 20px rgba(239, 30, 52, 0.4)',
                 color: 'white',
                 zIndex: 101,
                 transition: 'transform 0.2s cubic-bezier(0.17, 0.67, 0.83, 0.67)'
