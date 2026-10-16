@@ -530,7 +530,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
-          gap: '10px',
+          gap: '12px',
           color: '#FFFFFF',
           boxShadow: '0 18px 40px rgba(198, 14, 159, 0.35), inset 0 -1px 2px rgba(255, 255, 255, 0.22)',
           position: 'relative',
@@ -637,42 +637,58 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 overflow: 'hidden',
                 padding: '12px',
                 boxSizing: 'border-box',
-                minHeight: '135px',
-                backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
+                minHeight: '148px',
+                backgroundColor: isDark ? 'rgba(26, 36, 56, 0.65)' : 'rgba(255, 255, 255, 0.76)',
+                backdropFilter: 'blur(30px)',
+                WebkitBackdropFilter: 'blur(30px)',
                 border: 'none',
                 boxShadow: isDark 
-                  ? '0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
-                  : '0 12px 30px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                  ? '0 16px 38px rgba(0, 0, 0, 0.55)' 
+                  : '0 12px 30px rgba(0, 0, 0, 0.06)',
                 cursor: 'pointer',
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               <PaidCrownBadge featureId="qr_generator" position="floating" size={10} />
               
-              {/* Onboarding Style Ambient Ruby Nebula Background */}
+              {/* Large Radiant Color Dabs for Glassy Look */}
               <div style={{
-                position: 'absolute', top: '-30%', right: '-15%',
-                width: '150px', height: '150px',
+                position: 'absolute', top: '-35%', right: '-22%',
+                width: '210px', height: '210px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.35) 0%, rgba(184, 0, 38, 0.15) 50%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.2) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.48) 0%, rgba(239, 30, 52, 0.22) 40%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.35) 0%, rgba(255, 77, 109, 0.18) 45%, transparent 70%)',
+                filter: 'blur(28px)', pointerEvents: 'none', zIndex: 1
+              }} />
+              <div style={{
+                position: 'absolute', bottom: '-20%', left: '-20%',
+                width: '160px', height: '160px',
+                background: isDark 
+                  ? 'radial-gradient(circle, rgba(255, 77, 109, 0.35) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 59, 92, 0.25) 0%, transparent 70%)',
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
+              }} />
+              <div style={{
+                position: 'absolute', top: '0%', left: '10%',
+                width: '120px', height: '120px',
+                background: isDark 
+                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.28) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.18) 0%, transparent 70%)',
+                filter: 'blur(18px)', pointerEvents: 'none', zIndex: 1
               }} />
 
               {/* Onboarding Style Sparkle Stars */}
               <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FF4D80', fontSize: '9px', zIndex: 2 }}>✦</span>
               <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FF2A6D', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
 
-              {/* Card Image with 3D Drop-Shadow and Ruby Neon Glow (Exact Position & Size) */}
+              {/* Card Image with 3D Drop-Shadow and Ruby Neon Glow (Maintained Old Top Position) */}
               <img 
                 src="/Glossy Pink QR Code Badge.webp" 
                 alt="QR Code" 
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  bottom: '16.4px',
+                  top: '18px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -687,24 +703,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 }} 
               />
 
-              {/* Left Contrast Scrim to keep text 100% crisp and readable across all screen sizes */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                bottom: 0,
-                width: '65%',
-                background: isDark 
-                  ? 'linear-gradient(90deg, rgba(26, 36, 56, 0.96) 0%, rgba(26, 36, 56, 0.88) 55%, transparent 100%)'
-                  : 'linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.90) 55%, transparent 100%)',
-                zIndex: 3,
-                pointerEvents: 'none',
-                borderRadius: '18px 0 0 18px'
-              }} />
-
               {/* Top Title & Description */}
               <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -747,7 +748,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '2px',
-                  margin: '1px 0 4px 0',
+                  margin: '0 0 6px 0',
                   alignItems: 'flex-start'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
@@ -769,36 +770,42 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 </div>
               </div>
 
-              {/* Bottom Action Pill */}
+              {/* Bottom Action Pill - Glassmorphic with Fully Rounded Corners */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '5px 8px',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.35)' : '#F8FAFC',
-                borderRadius: '12px',
-                border: 'none',
-                width: 'calc(100% + 24px)',
+                padding: '4px 6px 4px 10px',
+                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.28)' : 'rgba(255, 255, 255, 0.55)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                borderRadius: '9999px',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.75)',
+                boxShadow: isDark 
+                  ? '0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
+                  : '0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+                width: '100%',
                 boxSizing: 'border-box',
-                margin: 'auto -12px -12px -12px',
+                margin: 'auto 0 0 0',
                 zIndex: 4,
                 position: 'relative'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Palette size={12} color={isDark ? '#FF6B7A' : '#EF1E34'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>Custom QR Studio</span>
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Custom QR Studio</span>
                 </div>
                 <div style={{
-                  width: '20px',
-                  height: '20px',
+                  width: '18px',
+                  height: '18px',
                   borderRadius: '50%',
                   background: '#EF1E34',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(239, 30, 52, 0.3)'
+                  boxShadow: '0 2px 6px rgba(239, 30, 52, 0.3)',
+                  flexShrink: 0
                 }}>
-                  <ChevronRight size={12} color="#FFFFFF" />
+                  <ChevronRight size={11} color="#FFFFFF" />
                 </div>
               </div>
             </div>
@@ -819,42 +826,58 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 overflow: 'hidden',
                 padding: '12px',
                 boxSizing: 'border-box',
-                minHeight: '135px',
-                backgroundColor: isDark ? 'rgba(26, 36, 56, 0.78)' : 'rgba(255, 255, 255, 0.88)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
+                minHeight: '148px',
+                backgroundColor: isDark ? 'rgba(26, 36, 56, 0.65)' : 'rgba(255, 255, 255, 0.76)',
+                backdropFilter: 'blur(30px)',
+                WebkitBackdropFilter: 'blur(30px)',
                 border: 'none',
                 boxShadow: isDark 
-                  ? '0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
-                  : '0 12px 30px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+                  ? '0 16px 38px rgba(0, 0, 0, 0.55)' 
+                  : '0 12px 30px rgba(0, 0, 0, 0.06)',
                 cursor: 'pointer',
                 transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               <PaidCrownBadge featureId="barcode_generator" position="floating" size={10} />
               
-              {/* Onboarding Style Ambient Golden Amber Nebula Background */}
+              {/* Large Radiant Color Dabs for Glassy Look */}
               <div style={{
-                position: 'absolute', top: '-30%', right: '-15%',
-                width: '150px', height: '150px',
+                position: 'absolute', top: '-35%', right: '-22%',
+                width: '210px', height: '210px',
                 background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.35) 0%, rgba(217, 101, 0, 0.15) 50%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.2) 0%, transparent 70%)',
+                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.48) 0%, rgba(245, 158, 11, 0.22) 40%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.35) 0%, rgba(251, 191, 36, 0.18) 45%, transparent 70%)',
+                filter: 'blur(28px)', pointerEvents: 'none', zIndex: 1
+              }} />
+              <div style={{
+                position: 'absolute', bottom: '-20%', left: '-20%',
+                width: '160px', height: '160px',
+                background: isDark 
+                  ? 'radial-gradient(circle, rgba(255, 160, 0, 0.35) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 152, 0, 0.25) 0%, transparent 70%)',
                 filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
+              }} />
+              <div style={{
+                position: 'absolute', top: '0%', left: '10%',
+                width: '120px', height: '120px',
+                background: isDark 
+                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.28) 0%, transparent 70%)'
+                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.18) 0%, transparent 70%)',
+                filter: 'blur(18px)', pointerEvents: 'none', zIndex: 1
               }} />
 
               {/* Onboarding Style Sparkle Stars */}
               <span className="sparkle-star" style={{ top: '15%', right: '48%', color: '#FFB74D', fontSize: '9px', zIndex: 2 }}>✦</span>
               <span className="sparkle-star" style={{ bottom: '26%', right: '12%', color: '#FFA000', fontSize: '11px', animationDelay: '1.2s', zIndex: 2 }}>✦</span>
 
-              {/* Card Image with 3D Drop-Shadow and Golden Neon Glow (Exact Position & Size) */}
+              {/* Card Image with 3D Drop-Shadow and Golden Neon Glow (Maintained Old Top Position) */}
               <img 
                 src="/Glossy Orange Barcode Badge.webp" 
                 alt="Barcode" 
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  bottom: '16.4px',
+                  top: '18px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -869,24 +892,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 }} 
               />
 
-              {/* Left Contrast Scrim to keep text 100% crisp and readable across all screen sizes */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                bottom: 0,
-                width: '65%',
-                background: isDark 
-                  ? 'linear-gradient(90deg, rgba(26, 36, 56, 0.96) 0%, rgba(26, 36, 56, 0.88) 55%, transparent 100%)'
-                  : 'linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.90) 55%, transparent 100%)',
-                zIndex: 3,
-                pointerEvents: 'none',
-                borderRadius: '18px 0 0 18px'
-              }} />
-
               {/* Top Title & Description */}
               <div style={{ display: 'flex', flexDirection: 'column', zIndex: 4, position: 'relative' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                   <div style={{
                     width: '32px',
                     height: '32px',
@@ -929,7 +937,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '2px',
-                  margin: '1px 0 4px 0',
+                  margin: '0 0 6px 0',
                   alignItems: 'flex-start'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4.5px' }}>
@@ -951,36 +959,42 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 </div>
               </div>
 
-              {/* Bottom Action Pill */}
+              {/* Bottom Action Pill - Glassmorphic with Fully Rounded Corners */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '5px 8px',
-                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.35)' : '#F8FAFC',
-                borderRadius: '12px',
-                border: 'none',
-                width: 'calc(100% + 24px)',
+                padding: '4px 6px 4px 10px',
+                backgroundColor: isDark ? 'rgba(0, 0, 0, 0.28)' : 'rgba(255, 255, 255, 0.55)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                borderRadius: '9999px',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.75)',
+                boxShadow: isDark 
+                  ? '0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.15)' 
+                  : '0 4px 14px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.85)',
+                width: '100%',
                 boxSizing: 'border-box',
-                margin: 'auto -12px -12px -12px',
+                margin: 'auto 0 0 0',
                 zIndex: 4,
                 position: 'relative'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Barcode size={12} color={isDark ? '#FFB74D' : '#FF7C00'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A' }}>30 Industrial Standards</span>
+                  <Barcode size={13} color={isDark ? '#FFB74D' : '#FF7C00'} />
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>30 Industrial Standards</span>
                 </div>
                 <div style={{
-                  width: '20px',
-                  height: '20px',
+                  width: '18px',
+                  height: '18px',
                   borderRadius: '50%',
                   background: '#FF7C00',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 6px rgba(255, 124, 0, 0.3)'
+                  boxShadow: '0 2px 6px rgba(255, 124, 0, 0.3)',
+                  flexShrink: 0
                 }}>
-                  <ChevronRight size={12} color="#FFFFFF" />
+                  <ChevronRight size={11} color="#FFFFFF" />
                 </div>
               </div>
             </div>
@@ -988,7 +1002,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Bottom Full-Width Card: Batch Creator */}
-        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '-24px', position: 'relative', zIndex: 10, marginBottom: '6px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '-20px', position: 'relative', zIndex: 10, marginBottom: '14px' }}>
           <div
             onClick={() => onNavigate('batch', 'QR')}
             role="button"
@@ -1002,27 +1016,45 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               justifyContent: 'space-between',
               position: 'relative',
               overflow: 'hidden',
-              padding: '10px 12px',
+              padding: '12px',
               boxSizing: 'border-box',
-              backgroundColor: isDark ? '#141A28' : '#FFFFFF',
+              backgroundColor: isDark ? '#1A2438' : '#FFFFFF',
+              border: 'none',
               boxShadow: isDark 
-                ? '0 16px 38px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.08)' 
-                : '0 12px 30px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
+                ? '0 16px 38px rgba(0, 0, 0, 0.55)' 
+                : '0 12px 30px rgba(0, 0, 0, 0.06)',
               width: '100%',
               cursor: 'pointer',
-              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+              opacity: 1
             }}
           >
             <PaidCrownBadge featureId="batch_view" position="floating" size={10} />
             
-            {/* Ambient Vibrant Warm Coral-Crimson Accent Nebula Background */}
+            {/* Large Radiant Color Dabs for Glassy Look */}
             <div style={{
-              position: 'absolute', top: '-40%', right: '8%',
-              width: '200px', height: '180px',
+              position: 'absolute', top: '-35%', right: '-5%',
+              width: '240px', height: '240px',
               background: isDark 
-                ? 'radial-gradient(circle, rgba(255, 42, 84, 0.32) 0%, rgba(255, 124, 0, 0.12) 50%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(255, 42, 84, 0.14) 0%, transparent 70%)',
+                ? 'radial-gradient(circle, rgba(239, 30, 52, 0.48) 0%, rgba(255, 77, 109, 0.22) 40%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(239, 30, 52, 0.35) 0%, rgba(255, 77, 109, 0.18) 45%, transparent 70%)',
+              filter: 'blur(30px)', pointerEvents: 'none', zIndex: 1
+            }} />
+            <div style={{
+              position: 'absolute', top: '-25%', left: '-12%',
+              width: '180px', height: '180px',
+              background: isDark 
+                ? 'radial-gradient(circle, rgba(255, 42, 84, 0.35) 0%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(239, 30, 52, 0.25) 0%, transparent 70%)',
               filter: 'blur(24px)', pointerEvents: 'none', zIndex: 1
+            }} />
+            <div style={{
+              position: 'absolute', bottom: '-40%', left: '30%',
+              width: '200px', height: '200px',
+              background: isDark 
+                ? 'radial-gradient(circle, rgba(255, 77, 109, 0.32) 0%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(255, 42, 84, 0.20) 0%, transparent 70%)',
+              filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
             }} />
 
             {/* Sparkle Stars */}
@@ -1043,9 +1075,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 objectFit: 'contain',
                 zIndex: 3,
                 pointerEvents: 'none',
-                opacity: 0.98,
+                opacity: 1,
                 filter: isDark 
-                  ? 'drop-shadow(0 14px 24px rgba(0,0,0,0.7)) drop-shadow(0 4px 10px rgba(255, 42, 84, 0.35))'
+                  ? 'drop-shadow(0 14px 24px rgba(0,0,0,0.7)) drop-shadow(0 4px 10px rgba(239, 30, 52, 0.35))'
                   : 'drop-shadow(0 10px 18px rgba(0,0,0,0.18))'
               }} 
             />
@@ -1057,11 +1089,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   width: '30px',
                   height: '30px',
                   borderRadius: '10px',
-                  background: '#FF2A54',
+                  background: '#EF1E34',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(255, 42, 84, 0.35)',
+                  boxShadow: '0 4px 12px rgba(239, 30, 52, 0.35)',
                   flexShrink: 0
                 }}>
                   <Layers size={15} color="#FFFFFF" />
@@ -1079,7 +1111,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   <div style={{
                     fontSize: '8.5px',
                     fontWeight: 700,
-                    color: isDark ? '#FF6B8B' : '#D90F38',
+                    color: isDark ? '#FF6B8B' : '#C60E23',
                     marginTop: '2px',
                     lineHeight: 1
                   }}>
@@ -1104,7 +1136,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Create QR Grid */}
-        <div style={{ padding: '8px var(--main-padding-x) 6px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginBottom: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <div 
               onClick={() => setShowAllQR(!showAllQR)}
@@ -1148,34 +1180,33 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             </div>
             <button
               onClick={() => setShowAllQR(!showAllQR)}
-              aria-label={showAllQR ? 'See Less' : 'Expand'}
+              aria-label={showAllQR ? 'View Less' : 'View All'}
               style={{ 
-                background: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)', 
+                background: 'transparent', 
                 border: 'none', 
-                color: isDark ? '#E53E3E' : '#B91C1C', 
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
+                color: '#EF1E34', 
+                padding: '2px 0',
                 cursor: 'pointer', 
-                padding: 0,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                gap: '3px',
+                fontSize: '12px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-display)',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = isDark ? 'rgba(239, 30, 52, 0.25)' : 'rgba(239, 30, 52, 0.12)';
-                e.currentTarget.style.color = '#EF1E34';
-                e.currentTarget.style.transform = 'scale(1.15)';
+                e.currentTarget.style.opacity = '0.75';
+                e.currentTarget.style.transform = 'translateX(2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
-                e.currentTarget.style.color = isDark ? '#E53E3E' : '#B91C1C';
-                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'translateX(0)';
               }}
             >
+              <span style={{ lineHeight: 1 }}>{showAllQR ? 'View Less' : 'View All'}</span>
               <ChevronRight 
-                size={14} 
+                size={13} 
                 style={{ 
                   transform: showAllQR ? 'rotate(90deg)' : 'rotate(0deg)', 
                   transition: 'transform 0.2s ease' 
@@ -1192,7 +1223,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`qr_${option.id}`} position="floating" size={10} />
-                <div className="quick-option-icon-wrapper" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
+                <div className="quick-option-icon-wrapper" style={{ color: '#EF1E34' }}>
                   {React.cloneElement(option.icon, { size: 22 })}
                 </div>
                 <span style={{
@@ -1216,7 +1247,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Create Barcode Grid */}
-        <div style={{ padding: '6px var(--main-padding-x) 8px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginBottom: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <div 
               onClick={() => setShowAllBarcodes(!showAllBarcodes)}
@@ -1228,14 +1259,14 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
                 if (iconBox) {
                   iconBox.style.transform = 'scale(1.08)';
-                  iconBox.style.boxShadow = '0 4px 14px rgba(239, 30, 52, 0.5)';
+                  iconBox.style.boxShadow = '0 4px 14px rgba(255, 124, 0, 0.5)';
                 }
               }}
               onMouseLeave={(e) => {
                 const iconBox = e.currentTarget.querySelector('.section-header-icon-box');
                 if (iconBox) {
                   iconBox.style.transform = 'scale(1)';
-                  iconBox.style.boxShadow = '0 2px 8px rgba(239, 30, 52, 0.35)';
+                  iconBox.style.boxShadow = '0 2px 8px rgba(255, 124, 0, 0.35)';
                 }
               }}
             >
@@ -1245,11 +1276,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   width: '26px',
                   height: '26px',
                   borderRadius: '8px',
-                  background: '#EF1E34',
+                  background: '#FF7C00',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 8px rgba(239, 30, 52, 0.35)',
+                  boxShadow: '0 2px 8px rgba(255, 124, 0, 0.35)',
                   flexShrink: 0,
                   transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                 }}
@@ -1260,34 +1291,33 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             </div>
             <button
               onClick={() => setShowAllBarcodes(!showAllBarcodes)}
-              aria-label={showAllBarcodes ? 'See Less' : 'Expand'}
+              aria-label={showAllBarcodes ? 'View Less' : 'View All'}
               style={{ 
-                background: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)', 
+                background: 'transparent', 
                 border: 'none', 
-                color: isDark ? '#E53E3E' : '#B91C1C', 
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
+                color: '#FF7C00', 
+                padding: '2px 0',
                 cursor: 'pointer', 
-                padding: 0,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                gap: '3px',
+                fontSize: '12px',
+                fontWeight: 600,
+                fontFamily: 'var(--font-display)',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = isDark ? 'rgba(239, 30, 52, 0.25)' : 'rgba(239, 30, 52, 0.12)';
-                e.currentTarget.style.color = '#EF1E34';
-                e.currentTarget.style.transform = 'scale(1.15)';
+                e.currentTarget.style.opacity = '0.75';
+                e.currentTarget.style.transform = 'translateX(2px)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)';
-                e.currentTarget.style.color = isDark ? '#E53E3E' : '#B91C1C';
-                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.opacity = '1';
+                e.currentTarget.style.transform = 'translateX(0)';
               }}
             >
+              <span style={{ lineHeight: 1 }}>{showAllBarcodes ? 'View Less' : 'View All'}</span>
               <ChevronRight 
-                size={14} 
+                size={13} 
                 style={{ 
                   transform: showAllBarcodes ? 'rotate(90deg)' : 'rotate(0deg)', 
                   transition: 'transform 0.2s ease' 
@@ -1304,7 +1334,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{ width: '100%', position: 'relative' }}
               >
                 <PaidCrownBadge featureId={`barcode_${option.id}`} position="floating" size={10} />
-                <div className="quick-option-icon-wrapper" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
+                <div className="quick-option-icon-wrapper" style={{ color: '#FF7C00' }}>
                   {getBarcodeIcon(option.id)}
                 </div>
                 <span style={{
@@ -1327,7 +1357,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           </div>
         </div>
 
-        <div style={{ padding: '0 var(--main-padding-x) 16px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginBottom: '14px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <div 
               style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', userSelect: 'none' }}

@@ -8272,13 +8272,13 @@ button:active,
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  color: inherit;
   transition: all 0.2s ease;
 }
 
 .quick-option-card:hover .quick-option-icon-wrapper {
   background: transparent !important;
-  color: #EF1E34;
+  color: inherit;
   transform: scale(1.12);
 }
 
