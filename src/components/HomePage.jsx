@@ -905,7 +905,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 className="hero-card-badge-img"
                 style={{
                   position: 'absolute',
-                  right: '-7px',
+                  right: 'calc(-10px + 1.4%)',
                   top: '29px',
                   width: '96.3px',
                   height: '96.3px',
