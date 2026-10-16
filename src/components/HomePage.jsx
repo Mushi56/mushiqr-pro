@@ -657,7 +657,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="qr_generator" position="floating" size={10} />
               
-              {/* Large Radiant Color Dabs for Glassy Look */}
+              {/* Large Radiant Color Dab Behind Badge Image */}
               <div style={{
                 position: 'absolute', top: '5%', right: '-15%',
                 width: '180px', height: '180px',
@@ -665,22 +665,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   ? 'radial-gradient(circle, rgba(255, 30, 86, 0.22) 0%, rgba(239, 30, 52, 0.10) 45%, transparent 70%)'
                   : 'radial-gradient(circle, rgba(239, 30, 52, 0.14) 0%, rgba(255, 77, 109, 0.06) 50%, transparent 70%)',
                 filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
-              }} />
-              <div style={{
-                position: 'absolute', bottom: '-20%', left: '-20%',
-                width: '160px', height: '160px',
-                background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 77, 109, 0.06) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 59, 92, 0.035) 0%, transparent 70%)',
-                filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
-              }} />
-              <div style={{
-                position: 'absolute', top: '0%', left: '10%',
-                width: '120px', height: '120px',
-                background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 30, 86, 0.04) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(239, 30, 52, 0.025) 0%, transparent 70%)',
-                filter: 'blur(18px)', pointerEvents: 'none', zIndex: 1
               }} />
 
               {/* Onboarding Style Sparkle Stars */}
@@ -868,7 +852,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
             >
               <PaidCrownBadge featureId="barcode_generator" position="floating" size={10} />
               
-              {/* Large Radiant Color Dabs for Glassy Look */}
+              {/* Large Radiant Color Dab Behind Badge Image */}
               <div style={{
                 position: 'absolute', top: '5%', right: '-15%',
                 width: '180px', height: '180px',
@@ -876,22 +860,6 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   ? 'radial-gradient(circle, rgba(255, 124, 0, 0.22) 0%, rgba(245, 158, 11, 0.10) 45%, transparent 70%)'
                   : 'radial-gradient(circle, rgba(255, 124, 0, 0.14) 0%, rgba(251, 191, 36, 0.06) 50%, transparent 70%)',
                 filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
-              }} />
-              <div style={{
-                position: 'absolute', bottom: '-20%', left: '-20%',
-                width: '160px', height: '160px',
-                background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 160, 0, 0.06) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 152, 0, 0.035) 0%, transparent 70%)',
-                filter: 'blur(22px)', pointerEvents: 'none', zIndex: 1
-              }} />
-              <div style={{
-                position: 'absolute', top: '0%', left: '10%',
-                width: '120px', height: '120px',
-                background: isDark 
-                  ? 'radial-gradient(circle, rgba(255, 124, 0, 0.04) 0%, transparent 70%)'
-                  : 'radial-gradient(circle, rgba(255, 124, 0, 0.025) 0%, transparent 70%)',
-                filter: 'blur(18px)', pointerEvents: 'none', zIndex: 1
               }} />
 
               {/* Onboarding Style Sparkle Stars */}
@@ -1063,7 +1031,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               overflow: 'hidden',
               padding: '12px',
               boxSizing: 'border-box',
-              backgroundColor: isDark ? '#251A29' : '#FFE8ED',
+              backgroundColor: isDark ? '#14291F' : '#E8F8EE',
               border: 'none',
               outline: 'none',
               WebkitTapHighlightColor: 'transparent',
@@ -1081,35 +1049,19 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           >
             <PaidCrownBadge featureId="batch_view" position="floating" size={10} />
             
-            {/* Large Radiant Color Dabs for Glassy Look */}
+            {/* Large Radiant Color Dab Behind Badge Image */}
             <div style={{
               position: 'absolute', top: '50%', right: '-20px', transform: 'translateY(-50%)',
               width: '200px', height: '200px',
               background: isDark 
-                ? 'radial-gradient(circle, rgba(239, 30, 52, 0.22) 0%, rgba(255, 77, 109, 0.10) 45%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(239, 30, 52, 0.14) 0%, rgba(255, 77, 109, 0.06) 50%, transparent 70%)',
+                ? 'radial-gradient(circle, rgba(16, 185, 129, 0.24) 0%, rgba(5, 150, 105, 0.10) 45%, transparent 70%)'
+                : 'radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(52, 211, 153, 0.07) 50%, transparent 70%)',
               filter: 'blur(28px)', pointerEvents: 'none', zIndex: 1
-            }} />
-            <div style={{
-              position: 'absolute', top: '-25%', left: '-12%',
-              width: '180px', height: '180px',
-              background: isDark 
-                ? 'radial-gradient(circle, rgba(255, 42, 84, 0.06) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(239, 30, 52, 0.035) 0%, transparent 70%)',
-              filter: 'blur(24px)', pointerEvents: 'none', zIndex: 1
-            }} />
-            <div style={{
-              position: 'absolute', bottom: '-40%', left: '30%',
-              width: '200px', height: '200px',
-              background: isDark 
-                ? 'radial-gradient(circle, rgba(255, 77, 109, 0.05) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(255, 42, 84, 0.025) 0%, transparent 70%)',
-              filter: 'blur(26px)', pointerEvents: 'none', zIndex: 1
             }} />
 
             {/* Sparkle Stars */}
-            <span className="sparkle-star" style={{ top: '16%', right: '124px', color: '#FF4D6D', fontSize: '10px', zIndex: 2 }}>✦</span>
-            <span className="sparkle-star" style={{ bottom: '18%', right: '16px', color: '#FF758F', fontSize: '11px', animationDelay: '1.4s', zIndex: 2 }}>✦</span>
+            <span className="sparkle-star" style={{ top: '16%', right: '124px', color: '#10B981', fontSize: '10px', zIndex: 2 }}>✦</span>
+            <span className="sparkle-star" style={{ bottom: '18%', right: '16px', color: '#34D399', fontSize: '11px', animationDelay: '1.4s', zIndex: 2 }}>✦</span>
 
             {/* Card Image with 3D Drop-Shadow */}
             <img 
@@ -1128,7 +1080,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 pointerEvents: 'none',
                 opacity: 1,
                 filter: isDark 
-                  ? 'drop-shadow(0 14px 24px rgba(0,0,0,0.7)) drop-shadow(0 4px 10px rgba(239, 30, 52, 0.35))'
+                  ? 'drop-shadow(0 14px 24px rgba(0,0,0,0.7)) drop-shadow(0 4px 10px rgba(16, 185, 129, 0.35))'
                   : 'drop-shadow(0 10px 18px rgba(0,0,0,0.18))'
               }} 
             />
@@ -1142,11 +1094,11 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     width: '30px',
                     height: '30px',
                     borderRadius: '10px',
-                    background: '#EF1E34',
+                    background: '#10B981',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 4px 12px rgba(239, 30, 52, 0.35)',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
                     flexShrink: 0
                   }}
                 >
@@ -1170,7 +1122,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                     style={{
                       fontSize: '8.5px',
                       fontWeight: 700,
-                      color: isDark ? '#FF6B8B' : '#C60E23',
+                      color: isDark ? '#34D399' : '#059669',
                       marginTop: '2px',
                       lineHeight: 1
                     }}

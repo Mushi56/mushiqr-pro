@@ -8631,7 +8631,7 @@ button:active,
   background-color: #0F172A !important;
   border: none !important;
   outline: none !important;
-  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), 0 0 24px rgba(239, 30, 52, 0.3) !important;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.55), 0 0 24px rgba(16, 185, 129, 0.35) !important;
 }
 
 .home-hero-card.home-hero-batch:hover .hero-card-icon-box,
@@ -8642,8 +8642,8 @@ button:active,
 
 .home-hero-card.home-hero-batch:hover .hero-card-icon-box svg,
 .home-hero-card.home-hero-batch:active .hero-card-icon-box svg {
-  color: #EF1E34 !important;
-  stroke: #EF1E34 !important;
+  color: #10B981 !important;
+  stroke: #10B981 !important;
 }
 
 .home-hero-card.home-hero-batch:hover .hero-card-title,
