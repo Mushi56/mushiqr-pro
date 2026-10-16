@@ -979,9 +979,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 zIndex: 4,
                 position: 'relative'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Barcode size={13} color={isDark ? '#FFB74D' : '#FF7C00'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>30 Industry Standards</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                  <Barcode size={12} color={isDark ? '#FFB74D' : '#FF7C00'} style={{ flexShrink: 0 }} />
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>Barcode Studio</span>
                 </div>
                 <div style={{
                   width: '18px',
