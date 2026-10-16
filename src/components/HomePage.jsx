@@ -688,7 +688,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  top: '32px',
+                  top: '29px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -877,7 +877,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  top: '32px',
+                  top: '29px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -1600,12 +1600,9 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   </svg>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ margin: '0 0 4px 0', fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     No recent projects found.
                   </h4>
-                  <p style={{ margin: 0, fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.3 }}>
-                    Create your first QR code or barcode to get started.
-                  </p>
                 </div>
               </div>
             )}
