@@ -526,7 +526,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
           `,
           borderRadius: '0 0 28px 28px',
           marginTop: '-64px',
-          padding: '68px var(--main-padding-x) 34px var(--main-padding-x)',
+          padding: '68px var(--main-padding-x) 50px var(--main-padding-x)',
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -688,7 +688,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  top: '18px',
+                  top: '32px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -877,7 +877,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 style={{
                   position: 'absolute',
                   right: '-10px',
-                  top: '18px',
+                  top: '32px',
                   width: '96.3px',
                   height: '96.3px',
                   transform: 'rotate(-9.5deg)',
@@ -981,7 +981,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Barcode size={13} color={isDark ? '#FFB74D' : '#FF7C00'} />
-                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>30 Industrial Standards</span>
+                  <span style={{ fontSize: '8px', fontWeight: 700, color: isDark ? '#FFFFFF' : '#0F172A', whiteSpace: 'nowrap' }}>30 Industry Standards</span>
                 </div>
                 <div style={{
                   width: '18px',
@@ -1002,7 +1002,7 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
         </div>
 
         {/* Bottom Full-Width Card: Batch Creator */}
-        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '-20px', position: 'relative', zIndex: 10, marginBottom: '14px' }}>
+        <div style={{ padding: '0 var(--main-padding-x)', marginTop: '-38px', position: 'relative', zIndex: 10, marginBottom: '14px' }}>
           <div
             onClick={() => onNavigate('batch', 'QR')}
             role="button"
