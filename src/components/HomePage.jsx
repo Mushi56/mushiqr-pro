@@ -1582,10 +1582,10 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                 background: 'var(--bg-elevated)',
                 border: 'none',
                 borderRadius: '16px',
-                padding: '12px 16px',
+                padding: '16px 18px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '14px',
+                gap: '15px',
                 boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1615,9 +1615,12 @@ export default function HomePage({ currentUser, onScrollChange, onNavigate, onQu
                   </svg>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     No recent projects found.
                   </h4>
+                  <p style={{ margin: 0, fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.35 }}>
+                    Your created codes will appear here.
+                  </p>
                 </div>
               </div>
             )}
